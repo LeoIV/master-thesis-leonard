@@ -1,0 +1,7 @@
+keras
+plaidml-keras
+matplotlib
+pydot
+Pillow
+tensorflow==1.14
+pandas
