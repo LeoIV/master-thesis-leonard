@@ -6,12 +6,49 @@ from PIL import Image
 from keras.callbacks import Callback, LearningRateScheduler
 
 
+class KernelVisualizationCallback(Callback):
+    def __init__(self, log_dir: str, vae: 'VariationalAutoencoder', print_every_n_batches: int, initial_epoch: int, filewriter):
+        super().__init__()
+        self.vae = vae
+        self.log_dir = log_dir
+        self.seen = 0
+        self.print_every_n_batches = print_every_n_batches
+        self.writer = filewriter
+
+    def on_batch_end(self, batch, logs=None):
+        if logs is None:
+            logs = {}
+        if batch % self.print_every_n_batches == 0:
+            self.seen += 1
+            # summarize filter shapes
+            # get filter weights
+            # retrieve weights from the second hidden layer
+            filters, biases = self.vae.encoder.layers[1].get_weights()
+            # normalize filter values to 0-1 so we can visualize them
+            f_min, f_max = filters.min(), filters.max()
+            filters = (filters - f_min) / (f_max - f_min)
+            filters = (filters.T.squeeze() * 255.0).astype(np.uint8)
+            for map_nr, map in enumerate(filters):
+                pil_im = Image.fromarray(map)
+                b = BytesIO()
+                pil_im.save(b, 'jpeg')
+                im_bytes = b.getvalue()
+
+                # create protobuf summary
+                im_summary = tf.Summary.Image(encoded_image_string=im_bytes)
+                im_summary_value = tf.Summary.Value(tag="layer1 maps/map {}".format(map_nr), image=im_summary)
+                summary = tf.Summary(value=[im_summary_value])
+
+                self.writer.add_summary(summary, global_step=self.seen)
+                self.writer.flush()
+
+
 class ReconstructionImagesCallback(Callback):
     """
     Randomly draw 9 Gaussians and reconstruct their images with fixed seeds (consistency over batches)
     """
 
-    def __init__(self, log_dir: str, print_every_n_batches: int, initial_epoch: int, vae: 'VariationalAutoencoder'):
+    def __init__(self, log_dir: str, print_every_n_batches: int, initial_epoch: int, vae: 'VariationalAutoencoder', filewriter):
         """
         
         :param log_dir: the tensorboard log directory
@@ -25,7 +62,7 @@ class ReconstructionImagesCallback(Callback):
         self.vae = vae
         self.seeds = list(range(9))
         self.seen = 0
-        self.writer = tf.summary.FileWriter(log_dir)
+        self.writer = filewriter
 
     def on_batch_end(self, batch, logs=None):
         if logs is None:

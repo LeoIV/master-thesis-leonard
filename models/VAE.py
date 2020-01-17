@@ -10,8 +10,9 @@ from keras.layers import Input, Conv2D, Flatten, Dense, Conv2DTranspose, Reshape
 from keras.models import Model
 from keras.optimizers import Adam
 from keras.utils import plot_model
+import tensorflow as tf
 
-from utils.callbacks import ReconstructionImagesCallback, step_decay_schedule
+from utils.callbacks import ReconstructionImagesCallback, step_decay_schedule, KernelVisualizationCallback
 
 
 class VariationalAutoencoder:
@@ -175,17 +176,23 @@ class VariationalAutoencoder:
             for index, label in enumerate(y_train[:5000]):
                 f.write("%d\t%d\n" % (index, int(label)))
 
-        custom_callback = ReconstructionImagesCallback('./logs', print_every_n_batches, initial_epoch, self)
+        tf_filewriter = tf.summary.FileWriter(self.log_dir)
+
+        custom_callback = ReconstructionImagesCallback('./logs', print_every_n_batches, initial_epoch, self,
+                                                       tf_filewriter)
         lr_sched = step_decay_schedule(initial_lr=self.learning_rate, decay_factor=lr_decay, step_size=1)
 
         checkpoint_filepath = os.path.join(run_folder, "weights/weights-{epoch:03d}-{loss:.2f}.h5")
         checkpoint1 = ModelCheckpoint(checkpoint_filepath, save_weights_only=True, verbose=1)
         checkpoint2 = ModelCheckpoint(os.path.join(run_folder, 'weights/weights.h5'), save_weights_only=True, verbose=1)
-        tb_callback = TensorBoard(log_dir='./logs', batch_size=batch_size, embeddings_freq=1,
+        tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, embeddings_freq=1,
                                   embeddings_layer_names=["mu"],
                                   embeddings_metadata='metadata.tsv', embeddings_data=x_train[:5000])
+        kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, vae=self,
+                                                  print_every_n_batches=print_every_n_batches,
+                                                  initial_epoch=initial_epoch, filewriter=tf_filewriter)
 
-        callbacks_list = [tb_callback, checkpoint1, checkpoint2, custom_callback, lr_sched]
+        callbacks_list = [kv_callback, tb_callback, checkpoint1, checkpoint2, custom_callback, lr_sched]
 
         print("Training for {} epochs".format(epochs))
 
