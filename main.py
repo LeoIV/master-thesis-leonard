@@ -1,8 +1,5 @@
 import os
-from glob import glob
 from shutil import rmtree
-
-import numpy as np
 
 from models.VAE import VariationalAutoencoder
 # run config

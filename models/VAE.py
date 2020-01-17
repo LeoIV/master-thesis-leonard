@@ -12,7 +12,8 @@ from keras.optimizers import Adam
 from keras.utils import plot_model
 import tensorflow as tf
 
-from utils.callbacks import ReconstructionImagesCallback, step_decay_schedule, KernelVisualizationCallback
+from utils.callbacks import ReconstructionImagesCallback, step_decay_schedule, KernelVisualizationCallback, \
+    FeatureMapVisualizationCallback
 
 
 class VariationalAutoencoder:
@@ -176,23 +177,25 @@ class VariationalAutoencoder:
             for index, label in enumerate(y_train[:5000]):
                 f.write("%d\t%d\n" % (index, int(label)))
 
-        tf_filewriter = tf.summary.FileWriter(self.log_dir)
-
-        custom_callback = ReconstructionImagesCallback('./logs', print_every_n_batches, initial_epoch, self,
-                                                       tf_filewriter)
         lr_sched = step_decay_schedule(initial_lr=self.learning_rate, decay_factor=lr_decay, step_size=1)
 
         checkpoint_filepath = os.path.join(run_folder, "weights/weights-{epoch:03d}-{loss:.2f}.h5")
         checkpoint1 = ModelCheckpoint(checkpoint_filepath, save_weights_only=True, verbose=1)
         checkpoint2 = ModelCheckpoint(os.path.join(run_folder, 'weights/weights.h5'), save_weights_only=True, verbose=1)
-        tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, embeddings_freq=1,
-                                  embeddings_layer_names=["mu"],
-                                  embeddings_metadata='metadata.tsv', embeddings_data=x_train[:5000])
+        tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, embeddings_freq=1, update_freq="batch",
+                                  embeddings_layer_names=["mu"], embeddings_metadata='metadata.tsv',
+                                  embeddings_data=x_train[:5000])
+        custom_callback = ReconstructionImagesCallback(log_dir='./logs', print_every_n_batches=print_every_n_batches,
+                                                       initial_epoch=initial_epoch, vae=self, tb_callback=tb_callback)
         kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, vae=self,
                                                   print_every_n_batches=print_every_n_batches,
-                                                  initial_epoch=initial_epoch, filewriter=tf_filewriter)
-
-        callbacks_list = [kv_callback, tb_callback, checkpoint1, checkpoint2, custom_callback, lr_sched]
+                                                  layer_idx=1, tb_callback=tb_callback)
+        fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, vae=self,
+                                                      print_every_n_batches=print_every_n_batches,
+                                                      layer_idxs=[2, 4, 6, 8],
+                                                      tb_callback=tb_callback, x_train=x_train)
+        # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
+        callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, kv_callback, custom_callback, lr_sched]
 
         print("Training for {} epochs".format(epochs))
 
