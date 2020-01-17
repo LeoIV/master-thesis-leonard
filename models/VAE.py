@@ -3,7 +3,6 @@ import pickle
 from typing import Sequence, Union, Tuple
 
 import numpy as np
-import pdb
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.layers import Input, Conv2D, Flatten, Dense, Conv2DTranspose, Reshape, Lambda, Activation, \
@@ -12,14 +11,15 @@ from keras.models import Model
 from keras.optimizers import Adam
 from keras.utils import plot_model
 
-from utils.callbacks import CustomCallback, step_decay_schedule
+from utils.callbacks import ReconstructionImagesCallback, step_decay_schedule
 
 
-class VariationalAutoencoder():
+class VariationalAutoencoder:
     def __init__(self, input_dim, encoder_conv_filters, encoder_conv_kernel_size: Sequence[Union[int, Tuple[int, int]]],
                  encoder_conv_strides: Sequence[Union[int, Tuple[int, int]]], decoder_conv_t_filters,
                  decoder_conv_t_kernel_size: Sequence[Union[int, Tuple[int, int]]],
-                 decoder_conv_t_strides: Sequence[Union[int, Tuple[int, int]]], z_dim, use_batch_norm: bool = False,
+                 decoder_conv_t_strides: Sequence[Union[int, Tuple[int, int]]], z_dim: int, log_dir: str,
+                 use_batch_norm: bool = False,
                  use_dropout: bool = False):
 
         self.name = 'variational_autoencoder'
@@ -38,6 +38,8 @@ class VariationalAutoencoder():
 
         self.n_layers_encoder = len(encoder_conv_filters)
         self.n_layers_decoder = len(decoder_conv_t_filters)
+
+        self.log_dir = log_dir
 
         self._build()
 
@@ -146,8 +148,11 @@ class VariationalAutoencoder():
 
         if not os.path.exists(folder):
             os.makedirs(folder)
-            os.makedirs(os.path.join(folder, 'viz'))
+        if not os.path.exists(os.path.join(folder, 'visualizations')):
+            os.makedirs(os.path.join(folder, 'visualizations'))
+        if not os.path.exists(os.path.join(folder, 'weights')):
             os.makedirs(os.path.join(folder, 'weights'))
+        if not os.path.exists(os.path.join(folder, 'images')):
             os.makedirs(os.path.join(folder, 'images'))
 
         with open(os.path.join(folder, 'params.pkl'), 'wb') as f:
@@ -162,9 +167,15 @@ class VariationalAutoencoder():
     def load_weights(self, filepath):
         self.model.load_weights(filepath)
 
-    def train(self, x_train, batch_size, epochs, run_folder, print_every_n_batches=100, initial_epoch=0, lr_decay=1):
+    def train(self, x_train, y_train, batch_size, epochs, run_folder, print_every_n_batches=100, initial_epoch=0,
+              lr_decay=1):
 
-        custom_callback = CustomCallback(run_folder, print_every_n_batches, initial_epoch, self)
+        with open(os.path.join(self.log_dir, 'metadata.tsv'), 'w') as f:
+            f.write("Index\tLabel\n")
+            for index, label in enumerate(y_train[:5000]):
+                f.write("%d\t%d\n" % (index, int(label)))
+
+        custom_callback = ReconstructionImagesCallback('./logs', print_every_n_batches, initial_epoch, self)
         lr_sched = step_decay_schedule(initial_lr=self.learning_rate, decay_factor=lr_decay, step_size=1)
 
         checkpoint_filepath = os.path.join(run_folder, "weights/weights-{epoch:03d}-{loss:.2f}.h5")
@@ -183,33 +194,10 @@ class VariationalAutoencoder():
             callbacks=callbacks_list
         )
 
-    def train_with_generator(self, data_flow, epochs, steps_per_epoch, run_folder, print_every_n_batches=100,
-                             initial_epoch=0, lr_decay=1, ):
-
-        custom_callback = CustomCallback(run_folder, print_every_n_batches, initial_epoch, self)
-        lr_sched = step_decay_schedule(initial_lr=self.learning_rate, decay_factor=lr_decay, step_size=1)
-
-        checkpoint_filepath = os.path.join(run_folder, "weights/weights-{epoch:03d}-{loss:.2f}.h5")
-        checkpoint1 = ModelCheckpoint(checkpoint_filepath, save_weights_only=True, verbose=1)
-        checkpoint2 = ModelCheckpoint(os.path.join(run_folder, 'weights/weights.h5'), save_weights_only=True, verbose=1)
-        tb_callback = TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=32, write_graph=False,
-                                  write_grads=False, write_images=False, embeddings_freq=1,
-                                  embeddings_layer_names=["mu"], embeddings_metadata=None,
-                                  embeddings_data=data_flow.next(),
-                                  update_freq=100)
-        callbacks_list = [checkpoint1, checkpoint2, custom_callback, lr_sched, tb_callback]
-
-        self.model.save_weights(os.path.join(run_folder, 'weights/weights.h5'))
-
-        self.model.fit_generator(
-            data_flow, shuffle=True, epochs=epochs, initial_epoch=initial_epoch, callbacks=callbacks_list,
-            steps_per_epoch=steps_per_epoch
-        )
-
     def plot_model(self, run_folder):
-        plot_model(self.model, to_file=os.path.join(run_folder, 'viz/model.png'), show_shapes=True,
+        plot_model(self.model, to_file=os.path.join(run_folder, 'visualizations/model.png'), show_shapes=True,
                    show_layer_names=True)
-        plot_model(self.encoder, to_file=os.path.join(run_folder, 'viz/encoder.png'), show_shapes=True,
+        plot_model(self.encoder, to_file=os.path.join(run_folder, 'visualizations/encoder.png'), show_shapes=True,
                    show_layer_names=True)
-        plot_model(self.decoder, to_file=os.path.join(run_folder, 'viz/decoder.png'), show_shapes=True,
+        plot_model(self.decoder, to_file=os.path.join(run_folder, 'visualizations/decoder.png'), show_shapes=True,
                    show_layer_names=True)
