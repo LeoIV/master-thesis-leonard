@@ -13,7 +13,7 @@ from keras.utils import plot_model
 import tensorflow as tf
 
 from utils.callbacks import ReconstructionImagesCallback, step_decay_schedule, KernelVisualizationCallback, \
-    FeatureMapVisualizationCallback
+    FeatureMapVisualizationCallback, FeatureMapActivationCorrelationCallback
 
 
 class VariationalAutoencoder:
@@ -194,8 +194,19 @@ class VariationalAutoencoder:
                                                       print_every_n_batches=print_every_n_batches,
                                                       layer_idxs=[2, 4, 6, 8],
                                                       tb_callback=tb_callback, x_train=x_train)
+        fma_callback = FeatureMapActivationCorrelationCallback(log_dir=self.log_dir, vae=self,
+                                                               print_every_n_batches=print_every_n_batches,
+                                                               layer_mappings=[("encoder_input", "activation_1"),
+                                                                               ("encoder_conv_0", "decoder_conv_t_2"),
+                                                                               ("leaky_re_lu_1", "leaky_re_lu_7"),
+                                                                               ("encoder_conv_1", "decoder_conv_t_1"),
+                                                                               ("leaky_re_lu_2", "leaky_re_lu_6"),
+                                                                               ("encoder_conv_2", "decoder_conv_t_0"),
+                                                                               ("leaky_re_lu_3", "leaky_re_lu_5"),
+                                                                               ("encoder_conv_3", "reshape_1")],
+                                                               x_train=x_train, tb_callback=tb_callback)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, kv_callback, custom_callback, lr_sched]
+        callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, fma_callback, kv_callback, custom_callback, lr_sched]
 
         print("Training for {} epochs".format(epochs))
 
@@ -203,6 +214,7 @@ class VariationalAutoencoder:
             x_train, x_train, batch_size=batch_size, shuffle=False, epochs=epochs,
             callbacks=callbacks_list
         )
+        print("Training finished")
 
     def plot_model(self, run_folder):
         plot_model(self.model, to_file=os.path.join(run_folder, 'visualizations/model.png'), show_shapes=True,

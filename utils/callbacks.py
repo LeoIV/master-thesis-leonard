@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import Sequence
+from typing import Sequence, Tuple
 
 import numpy as np
 import tensorflow as tf
@@ -65,6 +65,81 @@ class FeatureMapVisualizationCallback(Callback):
                 for i, map in enumerate(feature_maps):
                     image_summary(image=map, tag="feature_maps_{}/map_{}".format(output_layer.name, i),
                                   global_step=self.seen, writer=self.writer)
+
+
+class FeatureMapActivationCorrelationCallback(Callback):
+    """
+    Compute the correlation between
+    """
+
+    def __init__(self, log_dir: str, vae: 'VariationalAutoencoder', print_every_n_batches: int,
+                 layer_mappings: Sequence[Tuple[str, str]], x_train: np.ndarray, writer: FileWriter = None,
+                 tb_callback: TensorBoard = None):
+        super().__init__()
+        if tb_callback is None and writer is None:
+            raise AttributeError("Either writer or tb_callback has to be set.")
+        self.log_dir = log_dir
+        self.vae = vae
+        self.encoder_layers = dict(map(lambda x: (x.name, x), self.vae.encoder.layers))
+        self.decoder_layers = dict(map(lambda x: (x.name, x), self.vae.decoder.layers))
+        self.print_every_n_batches = print_every_n_batches
+        self.layer_mappings = layer_mappings
+        self.no_resample_encoder = Model(self.vae.encoder.inputs,
+                                         (self.encoder_layers['mu'].output))
+        self.writer = writer
+        self.seen = 0
+        self.x_train = x_train
+        self.tb_callback = tb_callback
+        idx = np.random.randint(0, len(self.x_train))
+        # draw sample from data
+        self.sample = self.x_train[idx]
+        # try to convert to 0-255 uint8 array
+
+    def set_model(self, model):
+        """
+        If we have set a tb_callback, we use it's writer for our own summaries.
+        :param model:
+        :return:
+        """
+        if self.tb_callback is not None:
+            if not self.tb_callback.writer:
+                raise AttributeError(
+                    "If you  set tb_callback, it has to be set as a Keras callback before this callback!")
+            self.writer = self.tb_callback.writer
+
+    def on_batch_end(self, batch, logs=None):
+        if logs is None:
+            logs = {}
+        if batch % self.print_every_n_batches == 0:
+            self.seen += 1
+            sample_as_uint8 = self.sample
+            if not self.sample.dtype == np.uint8:
+                sample_as_uint8 = (self.sample - self.sample.min()) / (self.sample - self.sample.max())
+                sample_as_uint8 *= 255.0
+                sample_as_uint8 = sample_as_uint8.astype(np.uint8)
+            sample_as_uint8 = sample_as_uint8.squeeze()
+            image_summary(image=sample_as_uint8, tag="feature_maps_original", global_step=self.seen, writer=self.writer)
+            correlations = []
+            for encoder_layer_name, decoder_layer_name in self.layer_mappings:
+                encoder_layer = self.encoder_layers[encoder_layer_name]
+                truncated_encoder = Model(self.vae.encoder.inputs, encoder_layer.output)
+                if encoder_layer_name == self.vae.encoder.layers[0].name:
+                    flattened_encoder_output = self.sample[np.newaxis, :].flatten() + 0.001
+                else:
+                    flattened_encoder_output = truncated_encoder.predict(self.sample[np.newaxis, :]).flatten() + 0.001
+
+                mu = self.no_resample_encoder.predict(self.sample[np.newaxis, :])
+                decoder_layer = self.decoder_layers[decoder_layer_name]
+                truncated_decoder = Model(self.vae.decoder.inputs, decoder_layer.output)
+                flattened_decoder_output = truncated_decoder.predict(mu).flatten() + 0.001
+
+                correlations.append(_correlation_coefficient(flattened_decoder_output, flattened_encoder_output))
+            print(correlations)
+
+            summary = tf.Summary(value=[tf.Summary.Value(tag="correlation", simple_value=np.mean(correlations))])
+
+            self.writer.add_summary(summary, global_step=self.seen)
+            self.writer.flush()
 
 
 class KernelVisualizationCallback(Callback):
@@ -209,3 +284,11 @@ def image_summary(image: np.ndarray, tag: str, global_step: int, writer: FileWri
 
     writer.add_summary(summary, global_step=global_step)
     writer.flush()
+
+
+def _correlation_coefficient(a, b):
+    mean_a = np.mean(a)
+    mean_b = np.mean(b)
+    a_centered = a - mean_a
+    b_centered = b - mean_b
+    return np.dot(a_centered, b_centered) / np.sqrt(np.dot(a_centered, a_centered) * np.dot(b_centered, b_centered))

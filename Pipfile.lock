@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8c89fd014a00ba861d9b929bd174def6f021ce16ae2739905464589e25f5a9f4"
+            "sha256": "a8ea2b5ce9663deae886d30b045dcba6073f0769e65348267558a007cf3f2479"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -85,9 +85,10 @@
         },
         "gast": {
             "hashes": [
-                "sha256:5c7617f1f6c8b8b426819642b16b9016727ddaecd16af9a07753e537eba8a3a5"
+                "sha256:8f46f5be57ae6889a4e16e2ca113b1703ef17f2b0abceb83793eaba9e1351a45",
+                "sha256:b881ef288a49aa81440d2c5eb8aeefd4c2bb8993d5f50edae7413a85bfdb3b57"
             ],
-            "version": "==0.3.2"
+            "version": "==0.3.3"
         },
         "google-pasta": {
             "hashes": [
@@ -358,10 +359,10 @@
         },
         "plaidml-keras": {
             "hashes": [
-                "sha256:81cd63754916903d392ac73eebfe02775f2dddea44331158bf33142be090682d"
+                "sha256:e49cc34d47a6eec6acca8a6bf5ac7af6a8172e333d422ffac8c85846d8521bbc"
             ],
             "index": "pypi",
-            "version": "==0.6.4"
+            "version": "==0.7.0"
         },
         "protobuf": {
             "hashes": [
@@ -461,6 +462,7 @@
                 "sha256:dc60bb302f48acf6da8ca4444cfa17d52c63c5415302a9ee77b3b21618090521",
                 "sha256:dee1bbf3a6c8f73b6b218cb28eed8dd13347ea2f87d572ce19b289d6fd3fbc59"
             ],
+            "index": "pypi",
             "version": "==1.4.1"
         },
         "six": {
