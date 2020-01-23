@@ -1,3 +1,4 @@
+import math
 import os
 import pickle
 from typing import Sequence, Union, Tuple
@@ -10,10 +11,11 @@ from keras.layers import Input, Conv2D, Flatten, Dense, Conv2DTranspose, Reshape
 from keras.models import Model
 from keras.optimizers import Adam
 from keras.utils import plot_model
-import tensorflow as tf
+from keras_preprocessing.image import DirectoryIterator, Iterator
+from receptivefield.keras import KerasReceptiveField
 
 from utils.callbacks import ReconstructionImagesCallback, step_decay_schedule, KernelVisualizationCallback, \
-    FeatureMapVisualizationCallback, FeatureMapActivationCorrelationCallback
+    FeatureMapVisualizationCallback, FeatureMapActivationCorrelationCallback, ActivationVisualizationCallback
 
 
 class VariationalAutoencoder:
@@ -43,11 +45,15 @@ class VariationalAutoencoder:
 
         self.log_dir = log_dir
 
-        self._build()
+        layer_names = ["encoder_conv_{}".format(i) for i in range(self.n_layers_encoder)]
+        self.rfs = KerasReceptiveField(self._build).compute(input_shape=self.input_dim[0:2],
+                                                            input_layer="encoder_input",
+                                                            output_layers=layer_names)
+        self.rfs = dict(map(lambda x: (x[0], x[1]), zip(layer_names, self.rfs)))
 
-    def _build(self):
+    def _build(self, input_dim):
 
-        ### THE ENCODER
+        # THE ENCODER
         encoder_input = Input(shape=self.input_dim, name='encoder_input')
 
         x = encoder_input
@@ -92,7 +98,7 @@ class VariationalAutoencoder:
 
         self.encoder = Model(encoder_input, encoder_output)
 
-        ### THE DECODER
+        # THE DECODER
 
         decoder_input = Input(shape=(self.z_dim,), name='decoder_input')
 
@@ -120,16 +126,17 @@ class VariationalAutoencoder:
 
         self.decoder = Model(decoder_input, decoder_output)
 
-        ### THE FULL VAE
+        # THE FULL VAE
         model_input = encoder_input
         model_output = self.decoder(encoder_output)
 
         self.model = Model(model_input, model_output)
+        return self.encoder
 
     def compile(self, learning_rate, r_loss_factor):
         self.learning_rate = learning_rate
 
-        ### COMPILATION
+        # COMPILATION
         def vae_r_loss(y_true, y_pred):
             r_loss = K.mean(K.square(y_true - y_pred), axis=[1, 2, 3])
             return r_loss_factor * r_loss
@@ -169,13 +176,22 @@ class VariationalAutoencoder:
     def load_weights(self, filepath):
         self.model.load_weights(filepath)
 
-    def train(self, x_train, y_train, batch_size, epochs, run_folder, print_every_n_batches=100, initial_epoch=0,
-              lr_decay=1):
+    def train(self, training_data, batch_size, epochs, run_folder, print_every_n_batches=100, initial_epoch=0,
+              lr_decay=1, embedding_samples: int = 5000):
 
-        with open(os.path.join(self.log_dir, 'metadata.tsv'), 'w') as f:
-            f.write("Index\tLabel\n")
-            for index, label in enumerate(y_train[:5000]):
-                f.write("%d\t%d\n" % (index, int(label)))
+        if isinstance(training_data, Iterator):
+            training_data: DirectoryIterator
+            n_batches = embedding_samples // batch_size
+            if n_batches > training_data.n:
+                n_batches = training_data.n
+            samples = []
+            for i in range(n_batches):
+                samples.append(training_data.next()[0])
+            embeddings_data = np.concatenate(samples, axis=0)
+            training_data.reset()
+
+        else:
+            embeddings_data = training_data[:5000]
 
         lr_sched = step_decay_schedule(initial_lr=self.learning_rate, decay_factor=lr_decay, step_size=1)
 
@@ -183,8 +199,7 @@ class VariationalAutoencoder:
         checkpoint1 = ModelCheckpoint(checkpoint_filepath, save_weights_only=True, verbose=1)
         checkpoint2 = ModelCheckpoint(os.path.join(run_folder, 'weights/weights.h5'), save_weights_only=True, verbose=1)
         tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, embeddings_freq=1, update_freq="batch",
-                                  embeddings_layer_names=["mu"], embeddings_metadata='metadata.tsv',
-                                  embeddings_data=x_train[:5000])
+                                  embeddings_layer_names=["mu"], embeddings_data=embeddings_data)
         custom_callback = ReconstructionImagesCallback(log_dir='./logs', print_every_n_batches=print_every_n_batches,
                                                        initial_epoch=initial_epoch, vae=self, tb_callback=tb_callback)
         kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, vae=self,
@@ -193,7 +208,11 @@ class VariationalAutoencoder:
         fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, vae=self,
                                                       print_every_n_batches=print_every_n_batches,
                                                       layer_idxs=[2, 4, 6, 8],
-                                                      tb_callback=tb_callback, x_train=x_train)
+                                                      tb_callback=tb_callback, x_train=embeddings_data)
+        av_callback = ActivationVisualizationCallback(log_dir=self.log_dir, vae=self,
+                                                      print_every_n_batches=print_every_n_batches,
+                                                      layer_idxs=[1, 3, 5, 7],
+                                                      tb_callback=tb_callback)
         fma_callback = FeatureMapActivationCorrelationCallback(log_dir=self.log_dir, vae=self,
                                                                print_every_n_batches=print_every_n_batches,
                                                                layer_mappings=[("encoder_input", "activation_1"),
@@ -204,16 +223,24 @@ class VariationalAutoencoder:
                                                                                ("encoder_conv_2", "decoder_conv_t_0"),
                                                                                ("leaky_re_lu_3", "leaky_re_lu_5"),
                                                                                ("encoder_conv_3", "reshape_1")],
-                                                               x_train=x_train, tb_callback=tb_callback)
+                                                               x_train=embeddings_data, tb_callback=tb_callback)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, fma_callback, kv_callback, custom_callback, lr_sched]
+        callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, fma_callback, kv_callback, av_callback,
+                          custom_callback, lr_sched]
 
         print("Training for {} epochs".format(epochs))
 
-        self.model.fit(
-            x_train, x_train, batch_size=batch_size, shuffle=False, epochs=epochs,
-            callbacks=callbacks_list
-        )
+        if isinstance(training_data, Iterator):
+            steps_per_epoch = math.ceil(training_data.n / batch_size)
+            self.model.fit_generator(
+                training_data, shuffle=True, epochs=epochs, initial_epoch=initial_epoch, callbacks=callbacks_list,
+                steps_per_epoch=steps_per_epoch
+            )
+        else:
+            self.model.fit(
+                training_data, training_data, batch_size=batch_size, shuffle=False, epochs=epochs,
+                callbacks=callbacks_list
+            )
         print("Training finished")
 
     def plot_model(self, run_folder):

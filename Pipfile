@@ -14,4 +14,5 @@ pydot = "*"
 Pillow = "*"
 tensorflow= "==1.14"
 pandas = "*"
-scipy="*"
+keras-vis = {editable = true,ref = "master",git = "https://github.com/LeoIV/keras-vis.git"}
+receptivefield="==0.4.0"
