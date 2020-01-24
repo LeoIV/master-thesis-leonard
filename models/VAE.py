@@ -201,18 +201,17 @@ class VariationalAutoencoder:
         tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, embeddings_freq=1, update_freq="batch",
                                   embeddings_layer_names=["mu"], embeddings_data=embeddings_data)
         custom_callback = ReconstructionImagesCallback(log_dir='./logs', print_every_n_batches=print_every_n_batches,
-                                                       initial_epoch=initial_epoch, vae=self, tb_callback=tb_callback)
+                                                       initial_epoch=initial_epoch, vae=self)
         kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, vae=self,
                                                   print_every_n_batches=print_every_n_batches,
-                                                  layer_idx=1, tb_callback=tb_callback)
+                                                  layer_idx=1)
         fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, vae=self,
                                                       print_every_n_batches=print_every_n_batches,
                                                       layer_idxs=[2, 4, 6, 8],
-                                                      tb_callback=tb_callback, x_train=embeddings_data)
+                                                      x_train=embeddings_data)
         av_callback = ActivationVisualizationCallback(log_dir=self.log_dir, vae=self,
                                                       print_every_n_batches=print_every_n_batches,
-                                                      layer_idxs=[1, 3, 5, 7],
-                                                      tb_callback=tb_callback)
+                                                      layer_idxs=[1, 3, 5, 7])
         fma_callback = FeatureMapActivationCorrelationCallback(log_dir=self.log_dir, vae=self,
                                                                print_every_n_batches=print_every_n_batches,
                                                                layer_mappings=[("encoder_input", "activation_1"),
@@ -223,7 +222,8 @@ class VariationalAutoencoder:
                                                                                ("encoder_conv_2", "decoder_conv_t_0"),
                                                                                ("leaky_re_lu_3", "leaky_re_lu_5"),
                                                                                ("encoder_conv_3", "reshape_1")],
-                                                               x_train=embeddings_data, tb_callback=tb_callback)
+                                                               x_train=embeddings_data,
+                                                               tb_callback=tb_callback)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
         callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, fma_callback, kv_callback, av_callback,
                           custom_callback, lr_sched]

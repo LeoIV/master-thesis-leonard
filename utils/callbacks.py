@@ -1,10 +1,12 @@
+import logging
+import os
 from io import BytesIO
 from typing import Sequence, Tuple
 
 import PIL
 import numpy as np
 import tensorflow as tf
-from PIL import Image
+from PIL import Image, ImageDraw
 from keras import Model, losses
 from keras.callbacks import Callback, LearningRateScheduler, TensorBoard
 from keras.layers import Conv2D, LeakyReLU, Input
@@ -18,34 +20,17 @@ from matplotlib import pyplot as plt
 
 class FeatureMapVisualizationCallback(Callback):
     def __init__(self, log_dir: str, vae: 'VariationalAutoencoder', print_every_n_batches: int,
-                 layer_idxs: Sequence[int], x_train: np.ndarray, writer: FileWriter = None,
-                 tb_callback: TensorBoard = None):
+                 layer_idxs: Sequence[int], x_train: np.ndarray):
         super().__init__()
-        if tb_callback is None and writer is None:
-            raise AttributeError("Either writer or tb_callback has to be set.")
         self.log_dir = log_dir
         self.vae = vae
         self.print_every_n_batches = print_every_n_batches
         self.layer_idxs = layer_idxs
-        self.writer = writer
         self.seen = 0
         self.x_train = x_train
-        self.tb_callback = tb_callback
         idx = np.random.randint(0, len(self.x_train))
         # draw sample from data
         self.sample = self.x_train[idx]
-
-    def set_model(self, model):
-        """
-        If we have set a tb_callback, we use it's writer for our own summaries.
-        :param model:
-        :return:
-        """
-        if self.tb_callback is not None:
-            if not self.tb_callback.writer:
-                raise AttributeError(
-                    "If you  set tb_callback, it has to be set as a Keras callback before this callback!")
-            self.writer = self.tb_callback.writer
 
     def on_batch_end(self, batch, logs=None):
         if logs is None:
@@ -57,9 +42,15 @@ class FeatureMapVisualizationCallback(Callback):
                 sample_as_uint8 *= 255.0
                 sample_as_uint8 = sample_as_uint8.astype(np.uint8)
             sample_as_uint8 = sample_as_uint8.squeeze()
-            image_summary(image=sample_as_uint8, tag="feature_maps_original", global_step=self.seen, writer=self.writer)
+            img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "feature_map")
+            os.makedirs(img_path, exist_ok=True)
+            Image.fromarray(sample_as_uint8).save(
+                os.path.join(img_path, "original.jpg"))
             for layer_idx in self.layer_idxs:
+                logging.info("Visualizing feature maps for layer {}".format(layer_idx))
                 output_layer = self.vae.encoder.layers[layer_idx]
+                img_path_layer = os.path.join(img_path, "{}".format(output_layer.name))
+                os.makedirs(img_path_layer, exist_ok=True)
                 model = Model(inputs=self.vae.encoder.inputs, outputs=output_layer.output)
                 feature_maps = model.predict(self.sample[np.newaxis, :])
                 feature_maps = feature_maps.squeeze()
@@ -67,43 +58,26 @@ class FeatureMapVisualizationCallback(Callback):
                 feature_maps = (feature_maps - feature_maps.min()) / (feature_maps - feature_maps.max())
                 feature_maps *= 255.0
                 feature_maps = feature_maps.astype(np.uint8)
-                for i, map in enumerate(feature_maps):
-                    image_summary(image=map, tag="feature_maps_{}/map_{}".format(output_layer.name, i),
-                                  global_step=self.seen, writer=self.writer)
+                for i, f_map in enumerate(feature_maps):
+                    Image.fromarray(f_map.squeeze()).save(os.path.join(img_path_layer, "map_{}.jpg".format(i)))
 
 
 class ActivationVisualizationCallback(Callback):
     def __init__(self, log_dir: str, vae: 'VariationalAutoencoder', print_every_n_batches: int,
-                 layer_idxs: Sequence[int], writer: FileWriter = None,
-                 tb_callback: TensorBoard = None):
+                 layer_idxs: Sequence[int]):
         super().__init__()
-        if tb_callback is None and writer is None:
-            raise AttributeError("Either writer or tb_callback has to be set.")
+
         self.log_dir = log_dir
         self.vae = vae
         self.print_every_n_batches = print_every_n_batches
         self.layer_idxs = layer_idxs
-        self.writer = writer
         self.seen = 0
-        self.tb_callback = tb_callback
-
-    def set_model(self, model):
-        """
-        If we have set a tb_callback, we use it's writer for our own summaries.
-        :param model:
-        :return:
-        """
-        if self.tb_callback is not None:
-            if not self.tb_callback.writer:
-                raise AttributeError(
-                    "If you  set tb_callback, it has to be set as a Keras callback before this callback!")
-            self.writer = self.tb_callback.writer
 
     def on_batch_end(self, batch, logs=None):
         if logs is None:
             logs = {}
-        if batch % self.print_every_n_batches == 0:
-            vis_images = []
+        if batch % self.print_every_n_batches == 0 and batch > 0:
+            self.seen += 1
             for i, layer_idx in enumerate(self.layer_idxs):
                 # get current target layer
                 layer = self.vae.encoder.layers[layer_idx]
@@ -112,6 +86,7 @@ class ActivationVisualizationCallback(Callback):
                         "layers of which you want to visualize the optimal stimuli have to have a defined receptive field in self.rfs")
                 # use layer receptive field size as input size
                 # we assume quadratic receptive fields
+                logging.info("Visualizing max activations for layer {}".format(layer.name))
                 input_size = max(self.vae.rfs[layer.name].rf.size[0:2])
                 input_size = [input_size, input_size, self.vae.encoder.input.shape[-1].value]
                 inp = x = Input(shape=input_size)
@@ -133,23 +108,20 @@ class ActivationVisualizationCallback(Callback):
 
                 truncated_encoder.compile(optimizer=Adam(lr=self.vae.learning_rate), loss=losses.mean_squared_error)
 
-                filters = np.random.permutation(get_num_filters(truncated_encoder.layers[layer_idx]))[:5]
+                filters = list(range(get_num_filters(truncated_encoder.layers[layer_idx])))
+                img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "max_activations",
+                                        "layer_{}".format(layer_idx))
+                os.makedirs(img_path, exist_ok=True)
                 for f_idx in filters:
-                    img = visualize_activation(truncated_encoder, layer_idx, filter_indices=f_idx, lp_norm_weight=0,
-                                               tv_weight=0)
+                    img = visualize_activation(truncated_encoder, layer_idx, filter_indices=f_idx, lp_norm_weight=0.01,
+                                               tv_weight=0.01)
                     '''img = visualize_activation(self.vae.encoder, layer_idx, filter_indices=idx,
                                                seed_input=img,
                                                input_modifiers=[Jitter(0.5)])'''
-                    img = np.array(Image.fromarray(img.squeeze()).resize((50, 50), resample=Image.NEAREST))
-                    img = utils.draw_text(img, "L{}F{}".format(layer_idx, f_idx))
-                    vis_images.append(img)
-
-            # Generate stitched image palette with 5 cols so we get 2 rows.
-            stitched = utils.stitch_images(vis_images, cols=5)
-            plt.figure()
-            plt.axis('off')
-            plt.imshow(stitched)
-            plt.show()
+                    img = Image.fromarray(img.squeeze()).resize((100, 100), resample=Image.NEAREST)
+                    draw = ImageDraw.Draw(img)
+                    draw.text((1, 1), "L{}F{}".format(layer_idx, f_idx), color=0)
+                    img.save(os.path.join(img_path, "filter_{}.jpg".format(f_idx)))
 
 
 class FeatureMapActivationCorrelationCallback(Callback):
@@ -171,14 +143,14 @@ class FeatureMapActivationCorrelationCallback(Callback):
         self.layer_mappings = layer_mappings
         self.no_resample_encoder = Model(self.vae.encoder.inputs,
                                          (self.encoder_layers['mu'].output))
-        self.writer = writer
         self.seen = 0
         self.x_train = x_train
-        self.tb_callback = tb_callback
         idx = np.random.randint(0, len(self.x_train))
         # draw sample from data
         self.sample = self.x_train[idx]
         # try to convert to 0-255 uint8 array
+        self.tb_callback = tb_callback
+        self.writer = writer
 
     def set_model(self, model):
         """
@@ -197,6 +169,7 @@ class FeatureMapActivationCorrelationCallback(Callback):
             logs = {}
         if batch % self.print_every_n_batches == 0:
             self.seen += 1
+            logging.info("Computing activation correlations")
             correlations = []
             for encoder_layer_name, decoder_layer_name in self.layer_mappings:
                 encoder_layer = self.encoder_layers[encoder_layer_name]
@@ -221,36 +194,20 @@ class FeatureMapActivationCorrelationCallback(Callback):
 
 
 class KernelVisualizationCallback(Callback):
-    def __init__(self, log_dir: str, vae: 'VariationalAutoencoder', print_every_n_batches: int, layer_idx: int,
-                 writer: FileWriter = None, tb_callback: TensorBoard = None):
+    def __init__(self, log_dir: str, vae: 'VariationalAutoencoder', print_every_n_batches: int, layer_idx: int):
         super().__init__()
-        if tb_callback is None and writer is None:
-            raise AttributeError("Either writer or tb_callback has to be set.")
         self.vae = vae
         self.log_dir = log_dir
         self.seen = 0
         self.print_every_n_batches = print_every_n_batches
-        self.writer = writer
-        self.tb_callback = tb_callback
         self.layer_idx = layer_idx
-
-    def set_model(self, model):
-        """
-        If we have set a tb_callback, we use it's writer for our own summaries.
-        :param model:
-        :return:
-        """
-        if self.tb_callback is not None:
-            if not self.tb_callback.writer:
-                raise AttributeError(
-                    "If you  set tb_callback, it has to be set as a Keras callback before this callback!")
-            self.writer = self.tb_callback.writer
 
     def on_batch_end(self, batch, logs=None):
         if logs is None:
             logs = {}
         if batch % self.print_every_n_batches == 0:
             self.seen += 1
+            logging.info("Visualizing kernels")
             # summarize filter shapes
             # get filter weights
             # retrieve weights from the second hidden layer
@@ -258,10 +215,12 @@ class KernelVisualizationCallback(Callback):
             # normalize filter values to 0-1 so we can visualize them
             f_min, f_max = filters.min(), filters.max()
             filters = (filters - f_min) / (f_max - f_min)
-            filters = (filters.T.squeeze() * 255.0).astype(np.uint8)
+            filters = np.moveaxis(filters, (0, 1), (-2, -1))
+            filters = (filters.reshape(((-1,) + filters.shape[-2:])) * 255.0).astype(np.uint8)
+            img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "layer1_kernels")
+            os.makedirs(img_path, exist_ok=True)
             for map_nr, map in enumerate(filters):
-                image_summary(image=map, tag="layer1 maps/map {}".format(map_nr), global_step=self.seen,
-                              writer=self.writer)
+                Image.fromarray(map.squeeze()).save(os.path.join(img_path, "map_{}.jpg".format(map_nr)))
 
 
 class ReconstructionImagesCallback(Callback):
@@ -270,7 +229,7 @@ class ReconstructionImagesCallback(Callback):
     """
 
     def __init__(self, log_dir: str, print_every_n_batches: int, initial_epoch: int, vae: 'VariationalAutoencoder',
-                 tb_callback: TensorBoard = None, writer: FileWriter = None):
+                 num_reconstructions: int = 10):
         """
 
         :param log_dir:
@@ -281,33 +240,21 @@ class ReconstructionImagesCallback(Callback):
         :param writer:
         """
         super().__init__()
-        if tb_callback is None and writer is None:
-            raise AttributeError("Either writer or tb_callback has to be set.")
         self.epoch = initial_epoch
         self.print_every_n_batches = print_every_n_batches
         self.vae = vae
-        self.seeds = list(range(9))
+        self.seeds = list(range(num_reconstructions))
         self.seen = 0
-        self.writer = writer
-        self.tb_callback = tb_callback
-
-    def set_model(self, model):
-        """
-        If we have set a tb_callback, we use it's writer for our own summaries.
-        :param model:
-        :return:
-        """
-        if self.tb_callback is not None:
-            if not self.tb_callback.writer:
-                raise AttributeError(
-                    "If you  set tb_callback, it has to be set as a Keras callback before this callback!")
-            self.writer = self.tb_callback.writer
+        self.log_dir = log_dir
 
     def on_batch_end(self, batch, logs=None):
         if logs is None:
             logs = {}
         if batch % self.print_every_n_batches == 0:
             self.seen += 1
+            logging.info("Visualizing reconstructions")
+            img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "reconstructions")
+            os.makedirs(img_path, exist_ok=True)
             for seed in self.seeds:
                 # make sure we always reconstruct the same image
                 np.random.seed(seed)
@@ -318,8 +265,7 @@ class ReconstructionImagesCallback(Callback):
                 # make byte array
                 k = (reconst.squeeze() * 255.0).astype(np.uint8)
 
-                image_summary(image=k, tag="reconstructions/sample {}".format(seed), global_step=self.seen,
-                              writer=self.writer)
+                Image.fromarray(k.squeeze()).save(os.path.join(img_path, "sample_{}.jpg".format(seed)))
 
     def on_epoch_begin(self, epoch, logs=None):
         if logs is None:
