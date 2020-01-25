@@ -14,8 +14,8 @@ BATCH_SIZE = 32
 # train config
 LEARNING_RATE = 0.0005
 R_LOSS_FACTOR = 10000
-EPOCHS = 10
-PRINT_EVERY_N_BATCHES = 500
+EPOCHS = 100
+PRINT_EVERY_N_BATCHES = 100
 INITIAL_EPOCH = 0
 LOGDIR = 'logs/'
 WEIGHTS = 'weights'
@@ -54,10 +54,10 @@ if __name__ == '__main__':
                                                      shuffle=True, class_mode='input')
     elif DATASET == 'cifar-10':
         INPUT_DIM = (224, 224, 1)
-        vae = VariationalAutoencoder(input_dim=INPUT_DIM, encoder_conv_filters=[32, 64, 64, 64],
-                                     encoder_conv_kernel_size=[11, 7, 5, 3], encoder_conv_strides=[4, 2, 2, 2],
-                                     decoder_conv_t_filters=[64, 64, 32, 1], decoder_conv_t_kernel_size=[3, 5, 7, 11],
-                                     decoder_conv_t_strides=[2, 2, 2, 2], log_dir='./logs/', z_dim=200)
+        vae = VariationalAutoencoder(input_dim=INPUT_DIM, encoder_conv_filters=[32, 64, 64],
+                                     encoder_conv_kernel_size=[11, 7, 5], encoder_conv_strides=[4, 2, 2],
+                                     decoder_conv_t_filters=[64, 64, 32, 1], decoder_conv_t_kernel_size=[3, 5, 5, 5],
+                                     decoder_conv_t_strides=[2, 2, 4, 2], log_dir='./logs/', z_dim=200)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory('./data/celeb/', target_size=INPUT_DIM[:2], batch_size=BATCH_SIZE,
                                                      shuffle=True, class_mode='input', interpolation='lanczos',

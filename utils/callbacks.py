@@ -9,7 +9,7 @@ import tensorflow as tf
 from PIL import Image, ImageDraw
 from keras import Model, losses
 from keras.callbacks import Callback, LearningRateScheduler, TensorBoard
-from keras.layers import Conv2D, LeakyReLU, Input
+from keras.layers import Conv2D, LeakyReLU, Input, MaxPool2D
 from keras.optimizers import Adam
 from tensorflow.python.summary.writer.writer import FileWriter
 from vis.input_modifiers import Jitter
@@ -76,7 +76,7 @@ class ActivationVisualizationCallback(Callback):
     def on_batch_end(self, batch, logs=None):
         if logs is None:
             logs = {}
-        if batch % self.print_every_n_batches == 0 and batch > 0:
+        if batch % self.print_every_n_batches == 0:
             self.seen += 1
             for i, layer_idx in enumerate(self.layer_idxs):
                 # get current target layer
@@ -92,9 +92,12 @@ class ActivationVisualizationCallback(Callback):
                 inp = x = Input(shape=input_size)
                 for l in self.vae.encoder.layers[1:]:
                     if isinstance(l, Conv2D):
-                        x = Conv2D(filters=l.filters, kernel_size=l.kernel_size, strides=l.strides, trainable=False)(x)
+                        x = Conv2D(filters=l.filters, kernel_size=l.kernel_size, strides=l.strides, padding=l.padding,
+                                   trainable=False)(x)
                     elif isinstance(l, LeakyReLU):
                         x = LeakyReLU(alpha=l.alpha, trainable=False)(x)
+                    elif isinstance(l, MaxPool2D):
+                        x = MaxPool2D(pool_size=l.pool_size, strides=l.strides, padding=l.padding)(x)
                     else:
                         raise ValueError("only Conv2D or LeakyReLU layers supported.")
                     if l.name == layer.name:
@@ -108,7 +111,7 @@ class ActivationVisualizationCallback(Callback):
 
                 truncated_encoder.compile(optimizer=Adam(lr=self.vae.learning_rate), loss=losses.mean_squared_error)
 
-                filters = list(range(get_num_filters(truncated_encoder.layers[layer_idx])))
+                filters = list(range(get_num_filters(truncated_encoder.layers[layer_idx])))[:15]
                 img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "max_activations",
                                         "layer_{}".format(layer_idx))
                 os.makedirs(img_path, exist_ok=True)

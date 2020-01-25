@@ -7,7 +7,7 @@ import numpy as np
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.layers import Input, Conv2D, Flatten, Dense, Conv2DTranspose, Reshape, Lambda, Activation, \
-    BatchNormalization, LeakyReLU, Dropout
+    BatchNormalization, LeakyReLU, Dropout, MaxPool2D
 from keras.models import Model
 from keras.optimizers import Adam
 from keras.utils import plot_model
@@ -58,28 +58,11 @@ class VariationalAutoencoder:
 
         x = encoder_input
 
-        for i in range(self.n_layers_encoder):
-
-            if i == 0:
-                conv_layer = Conv2D(input_shape=self.input_dim,
-                                    filters=self.encoder_conv_filters[i], kernel_size=self.encoder_conv_kernel_size[i],
-                                    strides=self.encoder_conv_strides[i], padding='same', name='encoder_conv_' + str(i)
-                                    )
-            else:
-                conv_layer = Conv2D(
-                    filters=self.encoder_conv_filters[i], kernel_size=self.encoder_conv_kernel_size[i],
-                    strides=self.encoder_conv_strides[i], padding='same', name='encoder_conv_' + str(i)
-                )
-
-            x = conv_layer(x)
-
-            if self.use_batch_norm:
-                x = BatchNormalization()(x)
-
-            x = LeakyReLU()(x)
-
-            if self.use_dropout:
-                x = Dropout(rate=0.25)(x)
+        x = Conv2D(96, 11, strides=4, name="encoder_conv_0")(x)
+        x = MaxPool2D(pool_size=(3, 3), strides=2)(x)
+        x = Conv2D(256, kernel_size=5, name="encoder_conv_1")(x)
+        x = MaxPool2D(pool_size=(3, 3), strides=3)(x)
+        x = Conv2D(384, kernel_size=3, name="encoder_conv_2", padding="same")(x)
 
         shape_before_flattening = K.int_shape(x)[1:]
 
@@ -207,11 +190,11 @@ class VariationalAutoencoder:
                                                   layer_idx=1)
         fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, vae=self,
                                                       print_every_n_batches=print_every_n_batches,
-                                                      layer_idxs=[2, 4, 6, 8],
+                                                      layer_idxs=[1, 3, 5],
                                                       x_train=embeddings_data)
         av_callback = ActivationVisualizationCallback(log_dir=self.log_dir, vae=self,
                                                       print_every_n_batches=print_every_n_batches,
-                                                      layer_idxs=[1, 3, 5, 7])
+                                                      layer_idxs=[1])
         fma_callback = FeatureMapActivationCorrelationCallback(log_dir=self.log_dir, vae=self,
                                                                print_every_n_batches=print_every_n_batches,
                                                                layer_mappings=[("encoder_input", "activation_1"),
@@ -225,7 +208,7 @@ class VariationalAutoencoder:
                                                                x_train=embeddings_data,
                                                                tb_callback=tb_callback)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, fma_callback, kv_callback, av_callback,
+        callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, kv_callback, av_callback,
                           custom_callback, lr_sched]
 
         print("Training for {} epochs".format(epochs))
