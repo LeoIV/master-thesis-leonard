@@ -225,7 +225,7 @@ class VariationalAutoencoder:
                                                                x_train=embeddings_data,
                                                                tb_callback=tb_callback)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, fma_callback, kv_callback, av_callback,
+        callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, kv_callback, fma_callback,
                           custom_callback, lr_sched]
 
         print("Training for {} epochs".format(epochs))

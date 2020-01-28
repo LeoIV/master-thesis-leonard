@@ -3,7 +3,6 @@ import os
 from io import BytesIO
 from typing import Sequence, Tuple
 
-import PIL
 import numpy as np
 import tensorflow as tf
 from PIL import Image, ImageDraw
@@ -11,55 +10,82 @@ from keras import Model, losses
 from keras.callbacks import Callback, LearningRateScheduler, TensorBoard
 from keras.layers import Conv2D, LeakyReLU, Input
 from keras.optimizers import Adam
-from tensorflow.python.summary.writer.writer import FileWriter
-from vis.input_modifiers import Jitter
-from vis.utils import utils
-from vis.visualization import get_num_filters, visualize_activation
 from matplotlib import pyplot as plt
+
+from tensorflow.python.summary.writer.writer import FileWriter
+from vis.visualization import get_num_filters, visualize_activation
 
 
 class FeatureMapVisualizationCallback(Callback):
     def __init__(self, log_dir: str, vae: 'VariationalAutoencoder', print_every_n_batches: int,
-                 layer_idxs: Sequence[int], x_train: np.ndarray):
+                 layer_idxs: Sequence[int], x_train: np.ndarray, num_samples: int = 5):
         super().__init__()
+        plt.rcParams["figure.figsize"] = (8 * num_samples, 100)
         self.log_dir = log_dir
         self.vae = vae
         self.print_every_n_batches = print_every_n_batches
         self.layer_idxs = layer_idxs
         self.seen = 0
         self.x_train = x_train
-        idx = np.random.randint(0, len(self.x_train))
-        # draw sample from data
-        self.sample = self.x_train[idx]
+        self.fmas = {}
+        self.batch_nrs = []
+        idxs = np.random.randint(0, len(self.x_train), num_samples)
+        self.samples = [np.copy(self.x_train[idx]) for idx in idxs]
+
+    @staticmethod
+    def _save_feature_maps(img_path_layer, fms):
+        feature_maps = np.copy(fms).squeeze()
+        feature_maps = np.moveaxis(feature_maps, [0, 1, 2], [1, 2, 0])
+        feature_maps = (feature_maps - feature_maps.min()) / (feature_maps - feature_maps.max())
+        feature_maps *= 255.0
+        feature_maps = feature_maps.astype(np.uint8)
+        for i, f_map in enumerate(feature_maps):
+            Image.fromarray(f_map.squeeze()).save(os.path.join(img_path_layer, "map_{}.jpg".format(i)))
 
     def on_batch_end(self, batch, logs=None):
         if logs is None:
             logs = {}
         if batch % self.print_every_n_batches == 0:
             self.seen += 1
-            sample_as_uint8 = np.copy(self.sample)
-            if not self.sample.dtype == np.uint8:
-                sample_as_uint8 *= 255.0
-                sample_as_uint8 = sample_as_uint8.astype(np.uint8)
-            sample_as_uint8 = sample_as_uint8.squeeze()
-            img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "feature_map")
-            os.makedirs(img_path, exist_ok=True)
-            Image.fromarray(sample_as_uint8).save(
-                os.path.join(img_path, "original.jpg"))
-            for layer_idx in self.layer_idxs:
-                logging.info("Visualizing feature maps for layer {}".format(layer_idx))
-                output_layer = self.vae.encoder.layers[layer_idx]
-                img_path_layer = os.path.join(img_path, "{}".format(output_layer.name))
-                os.makedirs(img_path_layer, exist_ok=True)
-                model = Model(inputs=self.vae.encoder.inputs, outputs=output_layer.output)
-                feature_maps = model.predict(self.sample[np.newaxis, :])
-                feature_maps = feature_maps.squeeze()
-                feature_maps = np.moveaxis(feature_maps, [0, 1, 2], [1, 2, 0])
-                feature_maps = (feature_maps - feature_maps.min()) / (feature_maps - feature_maps.max())
-                feature_maps *= 255.0
-                feature_maps = feature_maps.astype(np.uint8)
-                for i, f_map in enumerate(feature_maps):
-                    Image.fromarray(f_map.squeeze()).save(os.path.join(img_path_layer, "map_{}.jpg".format(i)))
+            self.batch_nrs.append(batch)
+            fig, ax = plt.subplots(1 + len(self.layer_idxs), len(self.samples))
+            for sample_nr, sample in enumerate(self.samples):
+
+                # draw sample from data
+                sample_as_uint8 = np.copy(sample)
+
+                if not sample_as_uint8.dtype == np.uint8:
+                    sample_as_uint8 *= 255.0
+                    sample_as_uint8 = sample_as_uint8.astype(np.uint8)
+                sample_as_uint8 = sample_as_uint8.squeeze()
+                img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "feature_map",
+                                        "sample_{}".format(sample_nr))
+                os.makedirs(img_path, exist_ok=True)
+                ax[0, sample_nr].imshow(sample.squeeze(), cmap='gray')
+                Image.fromarray(sample_as_uint8).save(
+                    os.path.join(img_path, "original.jpg"))
+                for i, layer_idx in enumerate(self.layer_idxs):
+                    logging.info("Visualizing feature maps for layer {}".format(layer_idx))
+                    output_layer = self.vae.encoder.layers[layer_idx]
+                    img_path_layer = os.path.join(img_path, "{}".format(output_layer.name))
+                    os.makedirs(img_path_layer, exist_ok=True)
+                    model = Model(inputs=self.vae.encoder.inputs, outputs=output_layer.output)
+                    feature_maps = model.predict(sample[np.newaxis, :])
+                    self._save_feature_maps(img_path_layer, feature_maps)
+                    fmas = np.sum(np.abs(feature_maps), axis=tuple(range(len(feature_maps.shape)))[:-1])
+                    fmas = fmas
+                    self.fmas.setdefault(sample_nr, {})
+                    self.fmas[sample_nr].setdefault(layer_idx, [])
+                    self.fmas[sample_nr][layer_idx].append(fmas)
+                    fmas_stacked = np.copy(np.stack(self.fmas[sample_nr][layer_idx]))
+                    fmas_stacked /= np.max(fmas_stacked)
+                    ax[i + 1, sample_nr].set_title('Normalized activations - Layer {}'.format(output_layer.name))
+                    ax[i + 1, sample_nr].imshow(fmas_stacked, origin='lower', interpolation="none")
+                    ax[i + 1, sample_nr].set(xlabel="#feature map", ylabel="# batch")
+                    ax[i + 1, sample_nr].set_yticks(np.arange(len(self.batch_nrs), step=2), self.batch_nrs[0::2])
+            plt.colorbar(ax[1, 0].get_images()[0])
+            plt.savefig(os.path.join(self.log_dir, "step_{}".format(self.seen), "feature_map", 'activations.png'))
+            plt.close()
 
 
 class ActivationVisualizationCallback(Callback):
@@ -175,21 +201,33 @@ class FeatureMapActivationCorrelationCallback(Callback):
                 encoder_layer = self.encoder_layers[encoder_layer_name]
                 truncated_encoder = Model(self.vae.encoder.inputs, encoder_layer.output)
                 if encoder_layer_name == self.vae.encoder.layers[0].name:
-                    flattened_encoder_output = self.sample[np.newaxis, :].flatten() + 0.001
+                    encoder_output = self.sample[np.newaxis, :].squeeze() + 0.001
                 else:
-                    flattened_encoder_output = truncated_encoder.predict(self.sample[np.newaxis, :]).flatten() + 0.001
+                    encoder_output = truncated_encoder.predict(self.sample[np.newaxis, :]).squeeze() + 0.001
 
                 mu = self.no_resample_encoder.predict(self.sample[np.newaxis, :])
                 decoder_layer = self.decoder_layers[decoder_layer_name]
                 truncated_decoder = Model(self.vae.decoder.inputs, decoder_layer.output)
-                flattened_decoder_output = truncated_decoder.predict(mu).flatten() + 0.001
+                decoder_output = truncated_decoder.predict(mu).squeeze() + 0.001
 
-                correlations.append(_correlation_coefficient(flattened_decoder_output, flattened_encoder_output))
+                encoder_output = np.moveaxis(encoder_output, -1, 0)
+                decoder_output = np.moveaxis(decoder_output, -1, 0)
+
+                def _key(x):
+                    return np.sum(np.abs(x))
+
+                sorted_encoder_maps = sorted(encoder_output, key=_key)
+                sorted_decoder_maps = sorted(decoder_output, key=_key)
+
+                flattened_encoder_maps = (np.stack(sorted_encoder_maps)).flatten()
+                flattened_decoder_maps = (np.stack(sorted_decoder_maps)).flatten()
+
+                corr = _correlation_coefficient(flattened_encoder_maps, flattened_decoder_maps)
+                summary = tf.Summary(
+                    value=[tf.Summary.Value(tag="correlation/{}".format(encoder_layer_name), simple_value=corr)])
+                self.writer.add_summary(summary, global_step=self.seen)
+
             print(correlations)
-
-            summary = tf.Summary(value=[tf.Summary.Value(tag="correlation", simple_value=np.mean(correlations))])
-
-            self.writer.add_summary(summary, global_step=self.seen)
             self.writer.flush()
 
 
