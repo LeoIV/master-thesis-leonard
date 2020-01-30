@@ -40,12 +40,12 @@ if __name__ == '__main__':
 
     weights = os.path.join(args.logdir, 'weights')
 
-    if not os.path.exists(weights):
-        logging.info("Creating weights dir: {}".format(weights))
-        os.mkdir(weights)
     if not os.path.exists(args.logdir):
         logging.info("Creating logdir: {}".format(args.logdir))
         os.mkdir(args.logdir)
+    if not os.path.exists(weights):
+        logging.info("Creating weights dir: {}".format(weights))
+        os.mkdir(weights)
 
     if not len(os.listdir(args.logdir)) == 0:
         logging.warning("Logdir not empty. Deleting content...")
