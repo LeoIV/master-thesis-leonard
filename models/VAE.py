@@ -10,7 +10,6 @@ from keras.layers import Input, Conv2D, Flatten, Dense, Conv2DTranspose, Reshape
     BatchNormalization, LeakyReLU, Dropout
 from keras.models import Model
 from keras.optimizers import Adam
-from keras.utils import plot_model
 from keras_preprocessing.image import DirectoryIterator, Iterator
 from receptivefield.keras import KerasReceptiveField
 
@@ -247,9 +246,9 @@ class VariationalAutoencoder(ModelWrapper):
         print("Training finished")
 
     def plot_model(self, run_folder):
-        plot_model(self.model, to_file=os.path.join(run_folder, 'visualizations/model.png'), show_shapes=True,
-                   show_layer_names=True)
-        plot_model(self.encoder, to_file=os.path.join(run_folder, 'visualizations/encoder.png'), show_shapes=True,
-                   show_layer_names=True)
-        plot_model(self.decoder, to_file=os.path.join(run_folder, 'visualizations/decoder.png'), show_shapes=True,
-                   show_layer_names=True)
+        with open(os.path.join(self.log_dir, "model_config.json", "w+")) as f:
+            f.write(self.model.to_json())
+        with open(os.path.join(self.log_dir, "encoder_model_config.json", "w+")) as f:
+            f.write(self.encoder.to_json())
+        with open(os.path.join(self.log_dir, "decoder_model_config.json", "w+")) as f:
+            f.write(self.decoder.to_json())

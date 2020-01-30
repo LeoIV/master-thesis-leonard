@@ -1,16 +1,13 @@
 import logging
 import math
 import os
-from typing import Tuple, Union
 
 import numpy as np
 from keras.callbacks import ModelCheckpoint, TensorBoard
-from keras.layers import Input, Conv2D, Flatten, Dense, Dropout, ReLU, MaxPool2D, Softmax, BatchNormalization, \
-    ZeroPadding1D
+from keras.layers import Input, Conv2D, Flatten, Dense, Dropout, ReLU, MaxPool2D, Softmax, BatchNormalization
 from keras.losses import categorical_crossentropy
 from keras.models import Model
 from keras.optimizers import Adam
-from keras.utils import plot_model
 from keras_preprocessing.image import DirectoryIterator, Iterator
 
 from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
