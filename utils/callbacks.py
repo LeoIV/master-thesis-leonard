@@ -1,7 +1,7 @@
 import logging
 import os
 from io import BytesIO
-from typing import Sequence, Tuple
+from typing import Sequence, Tuple, Union
 
 import numpy as np
 import tensorflow as tf
@@ -16,85 +16,16 @@ from tensorflow.python.summary.writer.writer import FileWriter
 from vis.visualization import get_num_filters, visualize_activation
 
 
-class FeatureMapVisualizationCallback(Callback):
-    def __init__(self, log_dir: str, vae: 'VariationalAutoencoder', print_every_n_batches: int,
-                 layer_idxs: Sequence[int], x_train: np.ndarray, num_samples: int = 5):
-        super().__init__()
-        plt.rcParams["figure.figsize"] = (8 * num_samples, 100)
-        self.log_dir = log_dir
-        self.vae = vae
-        self.print_every_n_batches = print_every_n_batches
-        self.layer_idxs = layer_idxs
-        self.seen = 0
-        self.x_train = x_train
-        self.fmas = {}
-        self.batch_nrs = []
-        idxs = np.random.randint(0, len(self.x_train), num_samples)
-        self.samples = [np.copy(self.x_train[idx]) for idx in idxs]
 
-    @staticmethod
-    def _save_feature_maps(img_path_layer, fms):
-        feature_maps = np.copy(fms).squeeze()
-        feature_maps = np.moveaxis(feature_maps, [0, 1, 2], [1, 2, 0])
-        feature_maps = (feature_maps - feature_maps.min()) / (feature_maps - feature_maps.max())
-        feature_maps *= 255.0
-        feature_maps = feature_maps.astype(np.uint8)
-        for i, f_map in enumerate(feature_maps):
-            Image.fromarray(f_map.squeeze()).save(os.path.join(img_path_layer, "map_{}.jpg".format(i)))
-
-    def on_batch_end(self, batch, logs=None):
-        if logs is None:
-            logs = {}
-        if batch % self.print_every_n_batches == 0:
-            self.seen += 1
-            self.batch_nrs.append(batch)
-            fig, ax = plt.subplots(1 + len(self.layer_idxs), len(self.samples))
-            for sample_nr, sample in enumerate(self.samples):
-
-                # draw sample from data
-                sample_as_uint8 = np.copy(sample)
-
-                if not sample_as_uint8.dtype == np.uint8:
-                    sample_as_uint8 *= 255.0
-                    sample_as_uint8 = sample_as_uint8.astype(np.uint8)
-                sample_as_uint8 = sample_as_uint8.squeeze()
-                img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "feature_map",
-                                        "sample_{}".format(sample_nr))
-                os.makedirs(img_path, exist_ok=True)
-                ax[0, sample_nr].imshow(sample.squeeze(), cmap='gray')
-                Image.fromarray(sample_as_uint8).save(
-                    os.path.join(img_path, "original.jpg"))
-                for i, layer_idx in enumerate(self.layer_idxs):
-                    logging.info("Visualizing feature maps for layer {}".format(layer_idx))
-                    output_layer = self.vae.encoder.layers[layer_idx]
-                    img_path_layer = os.path.join(img_path, "{}".format(output_layer.name))
-                    os.makedirs(img_path_layer, exist_ok=True)
-                    model = Model(inputs=self.vae.encoder.inputs, outputs=output_layer.output)
-                    feature_maps = model.predict(sample[np.newaxis, :])
-                    self._save_feature_maps(img_path_layer, feature_maps)
-                    fmas = np.sum(np.abs(feature_maps), axis=tuple(range(len(feature_maps.shape)))[:-1])
-                    fmas = fmas
-                    self.fmas.setdefault(sample_nr, {})
-                    self.fmas[sample_nr].setdefault(layer_idx, [])
-                    self.fmas[sample_nr][layer_idx].append(fmas)
-                    fmas_stacked = np.copy(np.stack(self.fmas[sample_nr][layer_idx]))
-                    fmas_stacked /= np.max(fmas_stacked)
-                    ax[i + 1, sample_nr].set_title('Normalized activations - Layer {}'.format(output_layer.name))
-                    ax[i + 1, sample_nr].imshow(fmas_stacked, origin='lower', interpolation="none")
-                    ax[i + 1, sample_nr].set(xlabel="#feature map", ylabel="# batch")
-                    ax[i + 1, sample_nr].set_yticks(np.arange(len(self.batch_nrs), step=2), self.batch_nrs[0::2])
-            plt.colorbar(ax[1, 0].get_images()[0])
-            plt.savefig(os.path.join(self.log_dir, "step_{}".format(self.seen), "feature_map", 'activations.png'))
-            plt.close()
 
 
 class ActivationVisualizationCallback(Callback):
-    def __init__(self, log_dir: str, vae: 'VariationalAutoencoder', print_every_n_batches: int,
+    def __init__(self, log_dir: str, model_wrapper: 'VariationalAutoencoder', print_every_n_batches: int,
                  layer_idxs: Sequence[int]):
         super().__init__()
 
         self.log_dir = log_dir
-        self.vae = vae
+        self.model_wrapper = model_wrapper
         self.print_every_n_batches = print_every_n_batches
         self.layer_idxs = layer_idxs
         self.seen = 0
@@ -106,17 +37,17 @@ class ActivationVisualizationCallback(Callback):
             self.seen += 1
             for i, layer_idx in enumerate(self.layer_idxs):
                 # get current target layer
-                layer = self.vae.encoder.layers[layer_idx]
-                if layer.name not in self.vae.rfs:
+                layer = self.model_wrapper.encoder.layers[layer_idx]
+                if layer.name not in self.model_wrapper.rfs:
                     raise AttributeError(
                         "layers of which you want to visualize the optimal stimuli have to have a defined receptive field in self.rfs")
                 # use layer receptive field size as input size
                 # we assume quadratic receptive fields
                 logging.info("Visualizing max activations for layer {}".format(layer.name))
-                input_size = max(self.vae.rfs[layer.name].rf.size[0:2])
-                input_size = [input_size, input_size, self.vae.encoder.input.shape[-1].value]
+                input_size = max(self.model_wrapper.rfs[layer.name].rf.size[0:2])
+                input_size = [input_size, input_size, self.model_wrapper.encoder.input.shape[-1].value]
                 inp = x = Input(shape=input_size)
-                for l in self.vae.encoder.layers[1:]:
+                for l in self.model_wrapper.encoder.layers[1:]:
                     if isinstance(l, Conv2D):
                         x = Conv2D(filters=l.filters, kernel_size=l.kernel_size, strides=l.strides, trainable=False)(x)
                     elif isinstance(l, LeakyReLU):
@@ -125,21 +56,22 @@ class ActivationVisualizationCallback(Callback):
                         raise ValueError("only Conv2D or LeakyReLU layers supported.")
                     if l.name == layer.name:
                         break
-                truncated_encoder = Model(inp, x)
-                for j, _ in enumerate(truncated_encoder.layers):
+                truncated_model = Model(inp, x)
+                for j, _ in enumerate(truncated_model.layers):
                     if j == 0:
                         continue
                     # copy weights for new model
-                    truncated_encoder.layers[j].set_weights(self.vae.encoder.layers[j].get_weights())
+                    truncated_model.layers[j].set_weights(self.model_wrapper.model.layers[j].get_weights())
 
-                truncated_encoder.compile(optimizer=Adam(lr=self.vae.learning_rate), loss=losses.mean_squared_error)
+                truncated_model.compile(optimizer=Adam(lr=self.model_wrapper.learning_rate),
+                                        loss=losses.mean_squared_error)
 
-                filters = list(range(get_num_filters(truncated_encoder.layers[layer_idx])))
+                filters = list(range(get_num_filters(truncated_model.layers[layer_idx])))
                 img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "max_activations",
                                         "layer_{}".format(layer_idx))
                 os.makedirs(img_path, exist_ok=True)
                 for f_idx in filters:
-                    img = visualize_activation(truncated_encoder, layer_idx, filter_indices=f_idx, lp_norm_weight=0.01,
+                    img = visualize_activation(truncated_model, layer_idx, filter_indices=f_idx, lp_norm_weight=0.01,
                                                tv_weight=0.01)
                     '''img = visualize_activation(self.vae.encoder, layer_idx, filter_indices=idx,
                                                seed_input=img,
@@ -214,7 +146,7 @@ class FeatureMapActivationCorrelationCallback(Callback):
                 decoder_output = np.moveaxis(decoder_output, -1, 0)
 
                 def _key(x):
-                    return np.sum(np.abs(x))
+                    return np.mean(np.sum(x))
 
                 sorted_encoder_maps = sorted(encoder_output, key=_key)
                 sorted_decoder_maps = sorted(decoder_output, key=_key)
@@ -231,34 +163,7 @@ class FeatureMapActivationCorrelationCallback(Callback):
             self.writer.flush()
 
 
-class KernelVisualizationCallback(Callback):
-    def __init__(self, log_dir: str, vae: 'VariationalAutoencoder', print_every_n_batches: int, layer_idx: int):
-        super().__init__()
-        self.vae = vae
-        self.log_dir = log_dir
-        self.seen = 0
-        self.print_every_n_batches = print_every_n_batches
-        self.layer_idx = layer_idx
 
-    def on_batch_end(self, batch, logs=None):
-        if logs is None:
-            logs = {}
-        if batch % self.print_every_n_batches == 0:
-            self.seen += 1
-            logging.info("Visualizing kernels")
-            # summarize filter shapes
-            # get filter weights
-            # retrieve weights from the second hidden layer
-            filters, biases = self.vae.encoder.layers[self.layer_idx].get_weights()
-            # normalize filter values to 0-1 so we can visualize them
-            f_min, f_max = filters.min(), filters.max()
-            filters = (filters - f_min) / (f_max - f_min)
-            filters = np.moveaxis(filters, (0, 1), (-2, -1))
-            filters = (filters.reshape(((-1,) + filters.shape[-2:])) * 255.0).astype(np.uint8)
-            img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "layer1_kernels")
-            os.makedirs(img_path, exist_ok=True)
-            for map_nr, map in enumerate(filters):
-                Image.fromarray(map.squeeze()).save(os.path.join(img_path, "map_{}.jpg".format(map_nr)))
 
 
 class ReconstructionImagesCallback(Callback):

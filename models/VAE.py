@@ -14,11 +14,14 @@ from keras.utils import plot_model
 from keras_preprocessing.image import DirectoryIterator, Iterator
 from receptivefield.keras import KerasReceptiveField
 
-from utils.callbacks import ReconstructionImagesCallback, step_decay_schedule, KernelVisualizationCallback, \
-    FeatureMapVisualizationCallback, FeatureMapActivationCorrelationCallback, ActivationVisualizationCallback
+from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
+from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
+from models.ModelWrapper import ModelWrapper
+from utils.callbacks import ReconstructionImagesCallback, step_decay_schedule, \
+    FeatureMapActivationCorrelationCallback, ActivationVisualizationCallback
 
 
-class VariationalAutoencoder:
+class VariationalAutoencoder(ModelWrapper):
     def __init__(self, input_dim, encoder_conv_filters, encoder_conv_kernel_size: Sequence[Union[int, Tuple[int, int]]],
                  encoder_conv_strides: Sequence[Union[int, Tuple[int, int]]], decoder_conv_t_filters,
                  decoder_conv_t_kernel_size: Sequence[Union[int, Tuple[int, int]]],
@@ -205,13 +208,13 @@ class VariationalAutoencoder:
         kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, vae=self,
                                                   print_every_n_batches=print_every_n_batches,
                                                   layer_idx=1)
-        fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, vae=self,
+        fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model_wrapper=self,
                                                       print_every_n_batches=print_every_n_batches,
-                                                      layer_idxs=[2, 4, 6, 8],
+                                                      layer_idxs=[2, 22, 4, 20, 6, 18, 8, 16],
                                                       x_train=embeddings_data)
-        av_callback = ActivationVisualizationCallback(log_dir=self.log_dir, vae=self,
+        av_callback = ActivationVisualizationCallback(log_dir=self.log_dir, model_wrapper=self,
                                                       print_every_n_batches=print_every_n_batches,
-                                                      layer_idxs=[1, 3, 5, 7])
+                                                      layer_idxs=[2, 4, 6, 8])
         fma_callback = FeatureMapActivationCorrelationCallback(log_dir=self.log_dir, vae=self,
                                                                print_every_n_batches=print_every_n_batches,
                                                                layer_mappings=[("encoder_input", "activation_1"),
