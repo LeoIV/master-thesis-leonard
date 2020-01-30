@@ -115,8 +115,6 @@ class AlexNet(ModelWrapper):
         if not os.path.exists(os.path.join(folder, 'images')):
             os.makedirs(os.path.join(folder, 'images'))
 
-        self.plot_model(folder)
-
     def load_weights(self, filepath):
         self.model.load_weights(filepath)
 
@@ -169,5 +167,5 @@ class AlexNet(ModelWrapper):
         print("Training finished")
 
     def plot_model(self, run_folder):
-        plot_model(self.model, to_file=os.path.join(run_folder, 'visualizations/model.png'), show_shapes=True,
-                   show_layer_names=True)
+        with open(os.path.join(self.log_dir, "model_config.json", "w+")) as f:
+            f.write(self.model.to_json())
