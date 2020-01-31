@@ -184,9 +184,6 @@ class VariationalAutoencoder(ModelWrapper):
     def train(self, training_data, batch_size, epochs, run_folder, print_every_n_batches=100, initial_epoch=0,
               lr_decay=1, embedding_samples: int = 5000):
 
-        logger.info("Gonna raise RuntimeError")
-        raise RuntimeError
-
         if isinstance(training_data, Iterator):
             training_data: DirectoryIterator
             n_batches = embedding_samples // batch_size
