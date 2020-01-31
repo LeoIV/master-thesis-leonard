@@ -7,34 +7,35 @@ from shutil import rmtree
 import traceback
 from keras_preprocessing.image import ImageDataGenerator
 
+from models.AlexNetVAE import AlexNetVAE
 from models.VAE import VariationalAutoencoder
 from models.AlexNet import AlexNet
 # run config
 from utils.loaders import load_mnist
 from argparse import ArgumentParser
 
+# create logger with 'spam_application'
+logger = logging.getLogger('root')
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+fh = logging.FileHandler('root.log', mode='w')
+fh.setLevel(logging.DEBUG)
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+# create formatter and add it to the handlers
+formatter = logging.Formatter('%(asctime)s [%(module)s][%(levelname)s]: %(message)s')
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+logger.addHandler(fh)
+logger.addHandler(ch)
+
 if __name__ == '__main__':
-
-    # create logger with 'spam_application'
-    logger = logging.getLogger('root')
-    logger.setLevel(logging.DEBUG)
-    # create file handler which logs even debug messages
-    fh = logging.FileHandler('root.log', mode='w')
-    fh.setLevel(logging.DEBUG)
-    # create console handler with a higher log level
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.WARN)
-    # create formatter and add it to the handlers
-    formatter = logging.Formatter('%(asctime)s [%(module)s][%(levelname)s]: %(message)s')
-    fh.setFormatter(formatter)
-    ch.setFormatter(formatter)
-
-    logger.addHandler(fh)
-    logger.addHandler(ch)
 
     parser = ArgumentParser(description='Functionality for Leonards master thesis')
     parser.add_argument('configuration', type=str,
-                        choices=['mnist', 'celeba', 'celeba_large_model', 'imagenet_classification_alexnet'],
+                        choices=['mnist', 'celeba', 'celeba_large_model', 'imagenet_classification_alexnet',
+                                 'imagenet_classification_alexnet_vae'],
                         help="The configuration to execute.\n\n"
                              "mnist: VAE trained on mnist\n"
                              "celeba: VAE trained on (128,128) sized celeba dataset\n"
@@ -56,6 +57,8 @@ if __name__ == '__main__':
                         help="The factor by which to weigh the reconstruction loss in case of variational autoencoder")
     parser.add_argument('--mode', type=str, choices=['build', 'load'], default='build',
                         help="Whether to build a new model or load an existing one.")
+    parser.add_argument('--z_dim', type=int, default=200,
+                        help="The embedding space dimensionality. Only considered for VAEs.")
     args = parser.parse_args()
 
     weights = os.path.join(args.logdir, 'weights')
@@ -75,9 +78,9 @@ if __name__ == '__main__':
     if args.configuration == 'mnist':
         INPUT_DIM = (28, 28, 1)
         model = VariationalAutoencoder(input_dim=INPUT_DIM, encoder_conv_filters=[32, 64, 64, 64],
-                                       encoder_conv_kernel_size=[11, 3, 3, 3], encoder_conv_strides=[1, 2, 2, 1],
+                                       encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[1, 2, 2, 1],
                                        decoder_conv_t_filters=[64, 64, 32, 1], decoder_conv_t_kernel_size=[3, 3, 3, 3],
-                                       decoder_conv_t_strides=[1, 2, 2, 1], log_dir=args.logdir, z_dim=4)
+                                       decoder_conv_t_strides=[1, 2, 2, 1], log_dir=args.logdir, z_dim=args.z_dim)
         (training_data, _), (_, _) = load_mnist()
 
     elif args.configuration == 'celeba':
@@ -85,7 +88,7 @@ if __name__ == '__main__':
         model = VariationalAutoencoder(input_dim=INPUT_DIM, encoder_conv_filters=[32, 64, 64, 64],
                                        encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[2, 2, 2, 2],
                                        decoder_conv_t_filters=[64, 64, 32, 3], decoder_conv_t_kernel_size=[3, 3, 3, 3],
-                                       decoder_conv_t_strides=[2, 2, 2, 2], log_dir=args.logdir, z_dim=200)
+                                       decoder_conv_t_strides=[2, 2, 2, 2], log_dir=args.logdir, z_dim=args.z_dim)
         data_gen = ImageDataGenerator(rescale=1. / 255)
 
         training_data = data_gen.flow_from_directory(os.path.join(args.data_path, 'celeb/'), target_size=INPUT_DIM[:2],
@@ -96,7 +99,7 @@ if __name__ == '__main__':
         model = VariationalAutoencoder(input_dim=INPUT_DIM, encoder_conv_filters=[32, 64, 64, 64],
                                        encoder_conv_kernel_size=[11, 7, 5, 3], encoder_conv_strides=[4, 2, 2, 2],
                                        decoder_conv_t_filters=[64, 64, 32, 1], decoder_conv_t_kernel_size=[3, 5, 7, 11],
-                                       decoder_conv_t_strides=[2, 2, 2, 4], log_dir=args.logdir, z_dim=200)
+                                       decoder_conv_t_strides=[2, 2, 2, 4], log_dir=args.logdir, z_dim=args.z_dim)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(os.path.join(args.data_path, 'celeb/'), target_size=INPUT_DIM[:2],
                                                      batch_size=args.batch_size,
@@ -105,13 +108,21 @@ if __name__ == '__main__':
     elif args.configuration == 'imagenet_classification_alexnet':
         INPUT_DIM = (224, 224, 3)
         model = AlexNet(input_dim=INPUT_DIM, log_dir=args.logdir)
-        data_gen = ImageDataGenerator()
+        data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(
             directory=os.path.join(args.data_path, 'imagenet/ILSVRC/Data/CLS-LOC/train/'),
             target_size=INPUT_DIM[:2], batch_size=args.batch_size,
             shuffle=True, class_mode='binary',
             follow_links=True)
-
+    elif args.configuration == 'imagenet_classification_alexnet_vae':
+        INPUT_DIM = (224, 224, 3)
+        model = AlexNetVAE(input_dim=INPUT_DIM, log_dir=args.logdir, z_dim=args.z_dim)
+        data_gen = ImageDataGenerator(rescale=1. / 255)
+        training_data = data_gen.flow_from_directory(
+            directory=os.path.join(args.data_path, 'celeb/'),
+            target_size=INPUT_DIM[:2], batch_size=args.batch_size,
+            class_mode='input', interpolation='lanczos',
+            follow_links=True)
     if args.mode == 'build':
         model.save(weights)
     else:
@@ -128,3 +139,4 @@ if __name__ == '__main__':
         exc_type, exc_value, exc_traceback = sys.exc_info()
         for line in traceback.format_exception(exc_type, exc_value, exc_traceback):
             logger.error(line)
+        raise e
