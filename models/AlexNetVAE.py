@@ -213,8 +213,7 @@ class AlexNetVAE(ModelWrapper):
         checkpoint_filepath = os.path.join(run_folder, "weights/weights-{epoch:03d}-{loss:.2f}.h5")
         checkpoint1 = ModelCheckpoint(checkpoint_filepath, save_weights_only=True, verbose=1)
         checkpoint2 = ModelCheckpoint(os.path.join(run_folder, 'weights/weights.h5'), save_weights_only=True, verbose=1)
-        tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, embeddings_data=embeddings_data,
-                                  embeddings_layer_names=["mu"], embeddings_freq=1, update_freq="batch")
+        tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, update_freq="batch")
         kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, vae=self,
                                                   print_every_n_batches=print_every_n_batches,
                                                   layer_idx=1)
