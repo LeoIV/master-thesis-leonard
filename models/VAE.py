@@ -1,3 +1,4 @@
+import logging
 import math
 import os
 import pickle
@@ -18,6 +19,8 @@ from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
 from models.ModelWrapper import ModelWrapper
 from utils.callbacks import ReconstructionImagesCallback, step_decay_schedule, \
     FeatureMapActivationCorrelationCallback, ActivationVisualizationCallback
+
+logger = logging.getLogger("root")
 
 
 class VariationalAutoencoder(ModelWrapper):
@@ -181,6 +184,9 @@ class VariationalAutoencoder(ModelWrapper):
     def train(self, training_data, batch_size, epochs, run_folder, print_every_n_batches=100, initial_epoch=0,
               lr_decay=1, embedding_samples: int = 5000):
 
+        logger.info("Gonna raise RuntimeError")
+        raise RuntimeError
+
         if isinstance(training_data, Iterator):
             training_data: DirectoryIterator
             n_batches = embedding_samples // batch_size
@@ -246,9 +252,9 @@ class VariationalAutoencoder(ModelWrapper):
         print("Training finished")
 
     def plot_model(self, run_folder):
-        with open(os.path.join(self.log_dir, "model_config.json", "w+")) as f:
+        with open(os.path.join(self.log_dir, "model_config.json"), "w+") as f:
             f.write(self.model.to_json())
-        with open(os.path.join(self.log_dir, "encoder_model_config.json", "w+")) as f:
+        with open(os.path.join(self.log_dir, "encoder_model_config.json"), "w+") as f:
             f.write(self.encoder.to_json())
-        with open(os.path.join(self.log_dir, "decoder_model_config.json", "w+")) as f:
+        with open(os.path.join(self.log_dir, "decoder_model_config.json"), "w+") as f:
             f.write(self.decoder.to_json())

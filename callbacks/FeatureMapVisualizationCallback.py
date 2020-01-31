@@ -2,11 +2,13 @@ import logging
 import os
 from typing import Union, Sequence
 
+import numpy as np
 from PIL import Image
 from keras import Model
 from keras.callbacks import Callback
-import numpy as np
 from matplotlib import pyplot as plt
+
+logger = logging.getLogger("root")
 
 
 class FeatureMapVisualizationCallback(Callback):
@@ -60,7 +62,7 @@ class FeatureMapVisualizationCallback(Callback):
                 Image.fromarray(sample_as_uint8).save(
                     os.path.join(img_path, "original.jpg"))
                 for i, layer_idx in enumerate(self.layer_idxs):
-                    logging.info("Visualizing feature maps for layer {}".format(layer_idx))
+                    logger.info("Visualizing feature maps for layer {}".format(layer_idx))
 
                     # we cannot use instanceof as we aren't allowed to import the model_wrapper class directly since
                     # this would lead to cyclic references

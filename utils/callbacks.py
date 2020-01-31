@@ -1,7 +1,7 @@
 import logging
 import os
 from io import BytesIO
-from typing import Sequence, Tuple, Union
+from typing import Sequence, Tuple
 
 import numpy as np
 import tensorflow as tf
@@ -10,13 +10,10 @@ from keras import Model, losses
 from keras.callbacks import Callback, LearningRateScheduler, TensorBoard
 from keras.layers import Conv2D, LeakyReLU, Input
 from keras.optimizers import Adam
-from matplotlib import pyplot as plt
-
 from tensorflow.python.summary.writer.writer import FileWriter
 from vis.visualization import get_num_filters, visualize_activation
 
-
-
+logger = logging.getLogger("root")
 
 
 class ActivationVisualizationCallback(Callback):
@@ -43,7 +40,7 @@ class ActivationVisualizationCallback(Callback):
                         "layers of which you want to visualize the optimal stimuli have to have a defined receptive field in self.rfs")
                 # use layer receptive field size as input size
                 # we assume quadratic receptive fields
-                logging.info("Visualizing max activations for layer {}".format(layer.name))
+                logger.info("Visualizing max activations for layer {}".format(layer.name))
                 input_size = max(self.model_wrapper.rfs[layer.name].rf.size[0:2])
                 input_size = [input_size, input_size, self.model_wrapper.encoder.input.shape[-1].value]
                 inp = x = Input(shape=input_size)
@@ -127,7 +124,7 @@ class FeatureMapActivationCorrelationCallback(Callback):
             logs = {}
         if batch % self.print_every_n_batches == 0:
             self.seen += 1
-            logging.info("Computing activation correlations")
+            logger.info("Computing activation correlations")
             correlations = []
             for encoder_layer_name, decoder_layer_name in self.layer_mappings:
                 encoder_layer = self.encoder_layers[encoder_layer_name]
@@ -163,9 +160,6 @@ class FeatureMapActivationCorrelationCallback(Callback):
             self.writer.flush()
 
 
-
-
-
 class ReconstructionImagesCallback(Callback):
     """
     Randomly draw 9 Gaussians and reconstruct their images with fixed seeds (consistency over batches)
@@ -195,7 +189,7 @@ class ReconstructionImagesCallback(Callback):
             logs = {}
         if batch % self.print_every_n_batches == 0:
             self.seen += 1
-            logging.info("Visualizing reconstructions")
+            logger.info("Visualizing reconstructions")
             img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "reconstructions")
             os.makedirs(img_path, exist_ok=True)
             for seed in self.seeds:

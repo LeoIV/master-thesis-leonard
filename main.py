@@ -1,7 +1,10 @@
 import logging
+
 import os
+import sys
 from shutil import rmtree
 
+import traceback
 from keras_preprocessing.image import ImageDataGenerator
 
 from models.VAE import VariationalAutoencoder
@@ -11,6 +14,23 @@ from utils.loaders import load_mnist
 from argparse import ArgumentParser
 
 if __name__ == '__main__':
+
+    # create logger with 'spam_application'
+    logger = logging.getLogger('root')
+    logger.setLevel(logging.DEBUG)
+    # create file handler which logs even debug messages
+    fh = logging.FileHandler('root.log', mode='w')
+    fh.setLevel(logging.DEBUG)
+    # create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.WARN)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s [%(module)s][%(levelname)s]: %(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+
+    logger.addHandler(fh)
+    logger.addHandler(ch)
 
     parser = ArgumentParser(description='Functionality for Leonards master thesis')
     parser.add_argument('configuration', type=str,
@@ -28,7 +48,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=32, help="The batch size.")
     parser.add_argument('--num_epochs', type=int, default=100, help="The number of epochs.")
     parser.add_argument('--initial_epoch', type=int, default=0, help="The initial epochs (0 for a new run).")
-    parser.add_argument('--print_every_n_batches', action="count", default=250,
+    parser.add_argument('--print_every_n_batches', type=int, default=250,
                         help="After how many batches the callbacks will be executed.")
     parser.add_argument('--learning_rate', type=float, default=0.0005,
                         help="The initial learning rate passed to the optimizer.")
@@ -41,14 +61,14 @@ if __name__ == '__main__':
     weights = os.path.join(args.logdir, 'weights')
 
     if not os.path.exists(args.logdir):
-        logging.info("Creating logdir: {}".format(args.logdir))
+        logger.info("Creating logdir: {}".format(args.logdir))
         os.mkdir(args.logdir)
     if not os.path.exists(weights):
-        logging.info("Creating weights dir: {}".format(weights))
+        logger.info("Creating weights dir: {}".format(weights))
         os.mkdir(weights)
 
     if not len(os.listdir(args.logdir)) == 0:
-        logging.warning("Logdir not empty. Deleting content...")
+        logger.warning("Logdir not empty. Deleting content...")
         rmtree(args.logdir)
         os.mkdir(args.logdir)
 
@@ -89,7 +109,7 @@ if __name__ == '__main__':
         training_data = data_gen.flow_from_directory(
             directory=os.path.join(args.data_path, 'imagenet/ILSVRC/Data/CLS-LOC/train/'),
             target_size=INPUT_DIM[:2], batch_size=args.batch_size,
-            shuffle=True,
+            shuffle=True, class_mode='binary',
             follow_links=True)
 
     if args.mode == 'build':
@@ -100,6 +120,11 @@ if __name__ == '__main__':
     model.compile(args.learning_rate, args.r_loss_factor)
 
     model.model.summary()
-
-    model.train(training_data, epochs=args.num_epochs, run_folder=weights, batch_size=args.batch_size,
-                print_every_n_batches=args.print_every_n_batches, initial_epoch=args.initial_epoch)
+    try:
+        model.train(training_data, epochs=args.num_epochs, run_folder=weights, batch_size=args.batch_size,
+                    print_every_n_batches=args.print_every_n_batches, initial_epoch=args.initial_epoch)
+    except Exception as e:
+        logger.error("An error occurred during training:")
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        for line in traceback.format_exception(exc_type, exc_value, exc_traceback):
+            logger.error(line)

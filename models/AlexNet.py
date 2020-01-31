@@ -15,6 +15,8 @@ from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
 from models.ModelWrapper import ModelWrapper
 from utils.callbacks import step_decay_schedule
 
+logger = logging.getLogger("root")
+
 
 class AlexNet(ModelWrapper):
 
@@ -92,7 +94,7 @@ class AlexNet(ModelWrapper):
         model_output = x
 
         self.model = Model(model_input, model_output)
-        logging.info("Built AlexNet model")
+        logger.info("Built AlexNet model")
         return self.model
 
     def compile(self, learning_rate, r_loss_factor):
@@ -111,6 +113,8 @@ class AlexNet(ModelWrapper):
             os.makedirs(os.path.join(folder, 'weights'))
         if not os.path.exists(os.path.join(folder, 'images')):
             os.makedirs(os.path.join(folder, 'images'))
+
+        self.plot_model(run_folder=folder)
 
     def load_weights(self, filepath):
         self.model.load_weights(filepath)

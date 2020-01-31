@@ -1,0 +1,7 @@
+keras
+plaidml-keras
+matplotlib
+Pillow
+pandas
+receptivefield==0.4.0
+seaborn
