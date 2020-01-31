@@ -5,7 +5,7 @@ import numpy as np
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.layers import Input, Conv2D, Flatten, Dense, Dropout, ReLU, MaxPool2D, BatchNormalization, Lambda, \
-    Reshape, Conv2DTranspose, UpSampling2D
+    Reshape, Conv2DTranspose, UpSampling2D, Activation
 from keras.models import Model
 from keras.optimizers import Adam
 from keras_preprocessing.image import DirectoryIterator, Iterator
@@ -107,9 +107,11 @@ class AlexNetVAE(ModelWrapper):
         # FC2 - reverse
         x = Dense(4096)(x)
         x = ReLU()(x)
+        x = Dropout(rate=0.5)(x)
         # FC1 - reverse
         x = Dense(np.prod(shape_before_flattening))(x)
         x = ReLU()(x)
+        x = Dropout(rate=0.5)(x)
 
         # Unflatten
         x = Reshape(shape_before_flattening)(x)
@@ -142,7 +144,7 @@ class AlexNetVAE(ModelWrapper):
         x = UpSampling2D(size=(2, 2))(x)
         x = Conv2DTranspose(filters=self.input_dim[-1], kernel_size=(11, 11), strides=(4, 4), padding='same')(x)
         x = BatchNormalization()(x)
-        decoder_output = x = ReLU()(x)
+        decoder_output = x = Activation('sigmoid')(x)
 
         self.decoder = Model(decoder_input, decoder_output)
 
@@ -211,7 +213,8 @@ class AlexNetVAE(ModelWrapper):
         checkpoint_filepath = os.path.join(run_folder, "weights/weights-{epoch:03d}-{loss:.2f}.h5")
         checkpoint1 = ModelCheckpoint(checkpoint_filepath, save_weights_only=True, verbose=1)
         checkpoint2 = ModelCheckpoint(os.path.join(run_folder, 'weights/weights.h5'), save_weights_only=True, verbose=1)
-        tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, embeddings_data=embeddings_data, embeddings_layer_names=["mu"], embeddings_freq=1, update_freq="batch")
+        tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, embeddings_data=embeddings_data,
+                                  embeddings_layer_names=["mu"], embeddings_freq=1, update_freq="batch")
         kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, vae=self,
                                                   print_every_n_batches=print_every_n_batches,
                                                   layer_idx=1)
