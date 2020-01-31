@@ -14,23 +14,14 @@ from models.AlexNet import AlexNet
 from utils.loaders import load_mnist
 from argparse import ArgumentParser
 
-# create logger with 'spam_application'
-logger = logging.getLogger('root')
-logger.setLevel(logging.DEBUG)
-# create file handler which logs even debug messages
-fh = logging.FileHandler('root.log', mode='w')
-fh.setLevel(logging.DEBUG)
-# create console handler with a higher log level
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-# create formatter and add it to the handlers
-formatter = logging.Formatter('%(asctime)s [%(module)s][%(levelname)s]: %(message)s')
-fh.setFormatter(formatter)
-ch.setFormatter(formatter)
-logger.addHandler(fh)
-logger.addHandler(ch)
 
-if __name__ == '__main__':
+# create logger with 'spam_application'
+
+
+def main():
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
+    logging.basicConfig(filename='root.log', level=logging.DEBUG, filemode="w")
 
     parser = ArgumentParser(description='Functionality for Leonards master thesis')
     parser.add_argument('configuration', type=str,
@@ -64,14 +55,14 @@ if __name__ == '__main__':
     weights = os.path.join(args.logdir, 'weights')
 
     if not os.path.exists(args.logdir):
-        logger.info("Creating logdir: {}".format(args.logdir))
+        logging.info("Creating logdir: {}".format(args.logdir))
         os.mkdir(args.logdir)
     if not os.path.exists(weights):
-        logger.info("Creating weights dir: {}".format(weights))
+        logging.info("Creating weights dir: {}".format(weights))
         os.mkdir(weights)
 
     if not len(os.listdir(args.logdir)) == 0:
-        logger.warning("Logdir not empty. Deleting content...")
+        logging.warning("Logdir not empty. Deleting content...")
         rmtree(args.logdir)
         os.mkdir(args.logdir)
 
@@ -112,7 +103,7 @@ if __name__ == '__main__':
         training_data = data_gen.flow_from_directory(
             directory=os.path.join(args.data_path, 'imagenet/ILSVRC/Data/CLS-LOC/train/'),
             target_size=INPUT_DIM[:2], batch_size=args.batch_size,
-            shuffle=True, class_mode='binary',
+            shuffle=True, class_mode='categorical',
             follow_links=True)
     elif args.configuration == 'imagenet_classification_alexnet_vae':
         INPUT_DIM = (224, 224, 3)
@@ -135,8 +126,12 @@ if __name__ == '__main__':
         model.train(training_data, epochs=args.num_epochs, run_folder=weights, batch_size=args.batch_size,
                     print_every_n_batches=args.print_every_n_batches, initial_epoch=args.initial_epoch)
     except Exception as e:
-        logger.error("An error occurred during training:")
+        logging.error("An error occurred during training:")
         exc_type, exc_value, exc_traceback = sys.exc_info()
         for line in traceback.format_exception(exc_type, exc_value, exc_traceback):
-            logger.error(line)
+            logging.error(line)
         raise e
+
+
+if __name__ == '__main__':
+    main()

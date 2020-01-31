@@ -1,13 +1,11 @@
-import logging
 import math
 import os
 
 import numpy as np
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, TensorBoard
-from keras.layers import Input, Conv2D, Flatten, Dense, Dropout, ReLU, MaxPool2D, Softmax, BatchNormalization, Lambda, \
+from keras.layers import Input, Conv2D, Flatten, Dense, Dropout, ReLU, MaxPool2D, BatchNormalization, Lambda, \
     Reshape, Conv2DTranspose, UpSampling2D
-from keras.losses import categorical_crossentropy
 from keras.models import Model
 from keras.optimizers import Adam
 from keras_preprocessing.image import DirectoryIterator, Iterator
@@ -16,8 +14,6 @@ from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCal
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
 from models.ModelWrapper import ModelWrapper
 from utils.callbacks import step_decay_schedule, ReconstructionImagesCallback
-
-logger = logging.getLogger("root")
 
 
 class AlexNetVAE(ModelWrapper):

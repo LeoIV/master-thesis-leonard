@@ -8,8 +8,6 @@ from keras import Model
 from keras.callbacks import Callback
 from matplotlib import pyplot as plt
 
-logger = logging.getLogger("root")
-
 
 class FeatureMapVisualizationCallback(Callback):
     def __init__(self, log_dir: str, model_wrapper: Union['VariationalAutoencoder', 'AlexNet'],
@@ -62,7 +60,7 @@ class FeatureMapVisualizationCallback(Callback):
                 Image.fromarray(sample_as_uint8).save(
                     os.path.join(img_path, "original.jpg"))
                 for i, layer_idx in enumerate(self.layer_idxs):
-                    logger.info("Visualizing feature maps for layer {}".format(layer_idx))
+                    logging.info("Visualizing feature maps for layer {}".format(layer_idx))
 
                     # we cannot use instanceof as we aren't allowed to import the model_wrapper class directly since
                     # this would lead to cyclic references
@@ -80,7 +78,8 @@ class FeatureMapVisualizationCallback(Callback):
                         output_layer = self.model_wrapper.model.layers[layer_idx]
                         model = Model(inputs=self.model_wrapper.model.inputs, outputs=output_layer.output)
                     else:
-                        raise RuntimeError("model_wrapper has to be either of type VariationalAutoencoder, AlexNetVAE or AlexNet")
+                        raise RuntimeError(
+                            "model_wrapper has to be either of type VariationalAutoencoder, AlexNetVAE or AlexNet")
 
                     img_path_layer = os.path.join(img_path, "{}".format(output_layer.name))
                     os.makedirs(img_path_layer, exist_ok=True)

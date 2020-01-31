@@ -6,8 +6,6 @@ import numpy as np
 from PIL import Image
 from keras.callbacks import Callback
 
-logger = logging.getLogger("root")
-
 class KernelVisualizationCallback(Callback):
     def __init__(self, log_dir: str, vae: Union['VariationalAutoencoder', 'AlexNet'], print_every_n_batches: int,
                  layer_idx: int):
@@ -23,7 +21,7 @@ class KernelVisualizationCallback(Callback):
             logs = {}
         if batch % self.print_every_n_batches == 0:
             self.seen += 1
-            logger.info("Visualizing kernels")
+            logging.info("Visualizing kernels")
             # summarize filter shapes
             # get filter weights
             # retrieve weights from the second hidden layer

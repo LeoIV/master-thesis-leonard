@@ -15,9 +15,6 @@ from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
 from models.ModelWrapper import ModelWrapper
 from utils.callbacks import step_decay_schedule
 
-logger = logging.getLogger("root")
-
-
 class AlexNet(ModelWrapper):
 
     def __init__(self, input_dim, log_dir: str,
@@ -94,7 +91,7 @@ class AlexNet(ModelWrapper):
         model_output = x
 
         self.model = Model(model_input, model_output)
-        logger.info("Built AlexNet model")
+        logging.info("Built AlexNet model")
         return self.model
 
     def compile(self, learning_rate, r_loss_factor):

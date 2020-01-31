@@ -13,8 +13,6 @@ from keras.optimizers import Adam
 from tensorflow.python.summary.writer.writer import FileWriter
 from vis.visualization import get_num_filters, visualize_activation
 
-logger = logging.getLogger("root")
-
 
 class ActivationVisualizationCallback(Callback):
     def __init__(self, log_dir: str, model_wrapper: 'VariationalAutoencoder', print_every_n_batches: int,
@@ -40,7 +38,7 @@ class ActivationVisualizationCallback(Callback):
                         "layers of which you want to visualize the optimal stimuli have to have a defined receptive field in self.rfs")
                 # use layer receptive field size as input size
                 # we assume quadratic receptive fields
-                logger.info("Visualizing max activations for layer {}".format(layer.name))
+                logging.info("Visualizing max activations for layer {}".format(layer.name))
                 input_size = max(self.model_wrapper.rfs[layer.name].rf.size[0:2])
                 input_size = [input_size, input_size, self.model_wrapper.encoder.input.shape[-1].value]
                 inp = x = Input(shape=input_size)
@@ -124,7 +122,7 @@ class FeatureMapActivationCorrelationCallback(Callback):
             logs = {}
         if batch % self.print_every_n_batches == 0:
             self.seen += 1
-            logger.info("Computing activation correlations")
+            logging.info("Computing activation correlations")
             correlations = []
             for encoder_layer_name, decoder_layer_name in self.layer_mappings:
                 encoder_layer = self.encoder_layers[encoder_layer_name]
@@ -173,8 +171,6 @@ class ReconstructionImagesCallback(Callback):
         :param print_every_n_batches:
         :param initial_epoch:
         :param vae:
-        :param tb_callback:
-        :param writer:
         """
         super().__init__()
         self.epoch = initial_epoch
@@ -189,7 +185,7 @@ class ReconstructionImagesCallback(Callback):
             logs = {}
         if batch % self.print_every_n_batches == 0:
             self.seen += 1
-            logger.info("Visualizing reconstructions")
+            logging.info("Visualizing reconstructions")
             img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "reconstructions")
             os.makedirs(img_path, exist_ok=True)
             for seed in self.seeds:
