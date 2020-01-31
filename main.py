@@ -110,7 +110,7 @@ def main():
         model = AlexNetVAE(input_dim=INPUT_DIM, log_dir=args.logdir, z_dim=args.z_dim)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(
-            directory=os.path.join(args.data_path, 'celeb/'),
+            directory=os.path.join(args.data_path, 'imagenet/ILSVRC/Data/CLS-LOC/train/'),
             target_size=INPUT_DIM[:2], batch_size=args.batch_size,
             class_mode='input', interpolation='lanczos',
             follow_links=True)
