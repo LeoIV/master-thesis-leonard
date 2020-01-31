@@ -168,5 +168,5 @@ class AlexNet(ModelWrapper):
         print("Training finished")
 
     def plot_model(self, run_folder):
-        with open(os.path.join(self.log_dir, "model_config.json", "w+")) as f:
+        with open(os.path.join(self.log_dir, "model_config.json"), "w+") as f:
             f.write(self.model.to_json())
