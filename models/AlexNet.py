@@ -23,7 +23,7 @@ class AlexNet(ModelWrapper):
                  use_batch_norm: bool = False,
                  use_dropout: bool = False,
                  dropout_rate: float = 0.5, feature_map_layers=None,
-                 kernel_visualization_layer: int = -1):
+                 kernel_visualization_layer: int = -1, num_samples: int = 5):
 
         if feature_map_layers is None:
             feature_map_layers = []
@@ -32,6 +32,8 @@ class AlexNet(ModelWrapper):
         self.name = 'variational_autoencoder'
 
         self.input_dim = input_dim
+
+        self.num_samples = num_samples
 
         self.use_batch_norm = use_batch_norm
         self.use_dropout = use_dropout
@@ -162,7 +164,7 @@ class AlexNet(ModelWrapper):
         fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model_wrapper=self,
                                                       print_every_n_batches=print_every_n_batches,
                                                       layer_idxs=self.feature_map_layers,
-                                                      x_train=embeddings_data)
+                                                      x_train=embeddings_data, num_samples=self.num_samples)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
         callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, lr_sched]
         if self.kernel_visualization_layer >= 0:

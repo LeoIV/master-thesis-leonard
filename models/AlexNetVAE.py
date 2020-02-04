@@ -21,12 +21,15 @@ class AlexNetVAE(ModelWrapper):
 
     def __init__(self, input_dim, log_dir: str, z_dim: int, kernel_visualization_layer: int = -1,
                  use_batch_norm: bool = False,
-                 use_dropout: bool = False, dropout_rate: float = 0.5, feature_map_layers=None):
+                 use_dropout: bool = False, dropout_rate: float = 0.5, feature_map_layers=None, num_samples: int = 5):
 
         if feature_map_layers is None:
             feature_map_layers = []
         self.kernel_visualization_layer = kernel_visualization_layer
         self.feature_map_layers = feature_map_layers
+
+        self.num_samples = num_samples
+
         self.name = 'variational_autoencoder'
 
         self.input_dim = input_dim
@@ -242,7 +245,7 @@ class AlexNetVAE(ModelWrapper):
         fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model_wrapper=self,
                                                       print_every_n_batches=print_every_n_batches,
                                                       layer_idxs=self.feature_map_layers,
-                                                      x_train=embeddings_data)
+                                                      x_train=embeddings_data, num_samples=self.num_samples)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
         callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, rc_callback, lr_sched]
         if self.kernel_visualization_layer >= 0:

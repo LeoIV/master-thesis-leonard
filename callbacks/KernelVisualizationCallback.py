@@ -28,11 +28,11 @@ class KernelVisualizationCallback(Callback):
             # retrieve weights from the second hidden layer
             filters, biases = self.model.layers[self.layer_idx].get_weights()
             # normalize filter values to 0-1 so we can visualize them
-            f_min, f_max = filters.min(), filters.max()
-            filters = (filters - f_min) / (f_max - f_min)
             filters = np.moveaxis(filters, (0, 1), (-2, -1))
             filters = (filters.reshape(((-1,) + filters.shape[-2:])) * 255.0).astype(np.uint8)
             img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "layer1_kernels")
             os.makedirs(img_path, exist_ok=True)
-            for map_nr, map in enumerate(filters):
-                Image.fromarray(map.squeeze()).save(os.path.join(img_path, "map_{}.jpg".format(map_nr)))
+            for map_nr, f_map in enumerate(filters):
+                f_min, f_max = f_map.min(), f_map.max()
+                f_map = (f_map - f_min) / (f_max - f_min)
+                Image.fromarray(f_map.squeeze()).save(os.path.join(img_path, "map_{}.jpg".format(map_nr)))

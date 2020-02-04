@@ -62,6 +62,7 @@ def main():
     parser.add_argument('--use_batch_norm', type=str2bool, default=False)
     parser.add_argument('--use_dropout', type=str2bool, default=False)
     parser.add_argument('--dropout_rate', type=float, default=0.5)
+    parser.add_argument('--num_samples', type=int, default=5)
     args = parser.parse_args()
 
     weights = os.path.join(args.logdir, 'weights')
@@ -114,7 +115,7 @@ def main():
     elif args.configuration == 'imagenet_classification_alexnet':
         INPUT_DIM = (224, 224, 3)
         model = AlexNet(input_dim=INPUT_DIM, log_dir=args.logdir, feature_map_layers=args.feature_map_layers,
-                        kernel_visualization_layer=args.kernel_visualization_layer)
+                        kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(
             directory=os.path.join(args.data_path,
@@ -126,7 +127,7 @@ def main():
         INPUT_DIM = (224, 224, 3)
         model = AlexNetVAE(input_dim=INPUT_DIM, log_dir=args.logdir, z_dim=args.z_dim,
                            feature_map_layers=args.feature_map_layers,
-                           kernel_visualization_layer=args.kernel_visualization_layer)
+                           kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(
             directory=os.path.join(args.data_path,
