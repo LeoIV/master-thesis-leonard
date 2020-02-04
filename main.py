@@ -1,6 +1,9 @@
 import logging
 
 import os
+
+import argparse
+
 import sys
 from shutil import rmtree
 
@@ -8,7 +11,6 @@ import traceback
 from keras_preprocessing.image import ImageDataGenerator
 
 from models.AlexNetVAE import AlexNetVAE
-from models.VAE import VariationalAutoencoder
 from models.AlexNet import AlexNet
 # run config
 from utils.loaders import load_mnist
@@ -24,23 +26,30 @@ def main():
     logging.basicConfig(filename='root.log', level=logging.DEBUG, filemode="w")
 
     parser = ArgumentParser(description='Functionality for Leonards master thesis')
-    parser.add_argument('configuration', type=str,
+    parser.add_argument('--configuration', type=str,
                         choices=['mnist', 'celeba', 'celeba_large_model', 'imagenet_classification_alexnet',
                                  'imagenet_classification_alexnet_vae'],
                         help="The configuration to execute.\n\n"
                              "mnist: VAE trained on mnist\n"
                              "celeba: VAE trained on (128,128) sized celeba dataset\n"
                              "celeba_large_model: celeba trained on upscaled (224,224) sized images\n"
-                             "imagenet_classification_alexnet: train AlexNet on imagenet classification task")
-    parser.add_argument('data_path',
+                             "imagenet_classification_alexnet: train AlexNet on imagenet classification task",
+                        required=True)
+    parser.add_argument('--data_path',
                         help="The path containing the individual datafolders. If the path to the imagenet folder is "
-                             "/foo/bar/imagenet, the value should be /foo/bar/. Can be absolute or relative.")
+                             "/foo/bar/imagenet, the value should be /foo/bar/. Can be absolute or relative.",
+                        required=True)
+    parser.add_argument('--feature_map_layers', nargs='+', type=int,
+                        help="The indices of layers after which to compute the "
+                             "feature maps. Exemplary input: 1 2 4 8 13", required=True)
+    parser.add_argument('--kernel_visualization_layer', type=int,
+                        help="The index of layer after which to compute the max stimuli.", default=-1)
     parser.add_argument('--logdir', type=str, default="logs/",
                         help="The directory to which the logs will be written. Absolute or relative.")
     parser.add_argument('--batch_size', type=int, default=32, help="The batch size.")
     parser.add_argument('--num_epochs', type=int, default=100, help="The number of epochs.")
     parser.add_argument('--initial_epoch', type=int, default=0, help="The initial epochs (0 for a new run).")
-    parser.add_argument('--print_every_n_batches', type=int, default=250,
+    parser.add_argument('--print_every_n_batches', type=int, default=100,
                         help="After how many batches the callbacks will be executed.")
     parser.add_argument('--learning_rate', type=float, default=0.0005,
                         help="The initial learning rate passed to the optimizer.")
@@ -50,6 +59,9 @@ def main():
                         help="Whether to build a new model or load an existing one.")
     parser.add_argument('--z_dim', type=int, default=200,
                         help="The embedding space dimensionality. Only considered for VAEs.")
+    parser.add_argument('--use_batch_norm', type=str2bool, default=False)
+    parser.add_argument('--use_dropout', type=str2bool, default=False)
+    parser.add_argument('--dropout_rate', type=float, default=0.5)
     args = parser.parse_args()
 
     weights = os.path.join(args.logdir, 'weights')
@@ -67,6 +79,7 @@ def main():
         os.mkdir(args.logdir)
 
     if args.configuration == 'mnist':
+        from models.VAE import VariationalAutoencoder
         INPUT_DIM = (28, 28, 1)
         model = VariationalAutoencoder(input_dim=INPUT_DIM, encoder_conv_filters=[32, 64, 64, 64],
                                        encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[1, 2, 2, 1],
@@ -75,6 +88,7 @@ def main():
         (training_data, _), (_, _) = load_mnist()
 
     elif args.configuration == 'celeba':
+        from models.VAE import VariationalAutoencoder
         INPUT_DIM = (128, 128, 3)
         model = VariationalAutoencoder(input_dim=INPUT_DIM, encoder_conv_filters=[32, 64, 64, 64],
                                        encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[2, 2, 2, 2],
@@ -86,6 +100,7 @@ def main():
                                                      batch_size=args.batch_size,
                                                      shuffle=True, class_mode='input')
     elif args.configuration == 'celeba_large_model':
+        from models.VAE import VariationalAutoencoder
         INPUT_DIM = (224, 224, 1)
         model = VariationalAutoencoder(input_dim=INPUT_DIM, encoder_conv_filters=[32, 64, 64, 64],
                                        encoder_conv_kernel_size=[11, 7, 5, 3], encoder_conv_strides=[4, 2, 2, 2],
@@ -98,19 +113,24 @@ def main():
                                                      color_mode='grayscale')
     elif args.configuration == 'imagenet_classification_alexnet':
         INPUT_DIM = (224, 224, 3)
-        model = AlexNet(input_dim=INPUT_DIM, log_dir=args.logdir)
+        model = AlexNet(input_dim=INPUT_DIM, log_dir=args.logdir, feature_map_layers=args.feature_map_layers,
+                        kernel_visualization_layer=args.kernel_visualization_layer)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(
-            directory=os.path.join(args.data_path, 'imagenet/ILSVRC/Data/CLS-LOC/train/'),
+            directory=os.path.join(args.data_path,
+                                   '/Users/leo/IdeaProjects/Masterarbeit/Master Thesis/data/ServerData/data/imagenet/ILSVRC/Data/CLS-LOC/train'),
             target_size=INPUT_DIM[:2], batch_size=args.batch_size,
             shuffle=True, class_mode='categorical',
             follow_links=True)
     elif args.configuration == 'imagenet_classification_alexnet_vae':
         INPUT_DIM = (224, 224, 3)
-        model = AlexNetVAE(input_dim=INPUT_DIM, log_dir=args.logdir, z_dim=args.z_dim)
+        model = AlexNetVAE(input_dim=INPUT_DIM, log_dir=args.logdir, z_dim=args.z_dim,
+                           feature_map_layers=args.feature_map_layers,
+                           kernel_visualization_layer=args.kernel_visualization_layer)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(
-            directory=os.path.join(args.data_path, 'imagenet/ILSVRC/Data/CLS-LOC/train/'),
+            directory=os.path.join(args.data_path,
+                                   '/Users/leo/IdeaProjects/Masterarbeit/Master Thesis/data/ServerData/data/imagenet/ILSVRC/Data/CLS-LOC/train'),
             target_size=INPUT_DIM[:2], batch_size=args.batch_size,
             class_mode='input', interpolation='lanczos',
             follow_links=True)
@@ -131,6 +151,17 @@ def main():
         for line in traceback.format_exception(exc_type, exc_value, exc_traceback):
             logging.error(line)
         raise e
+
+
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
 if __name__ == '__main__':

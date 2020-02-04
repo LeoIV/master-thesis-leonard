@@ -13,11 +13,12 @@ from keras.optimizers import Adam
 from keras_preprocessing.image import DirectoryIterator, Iterator
 from receptivefield.keras import KerasReceptiveField
 
+from callbacks.ActivationVisualizationCallback import ActivationVisualizationCallback
 from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
 from models.ModelWrapper import ModelWrapper
 from utils.callbacks import ReconstructionImagesCallback, step_decay_schedule, \
-    FeatureMapActivationCorrelationCallback, ActivationVisualizationCallback
+    FeatureMapActivationCorrelationCallback
 import math
 import os
 import pickle
@@ -37,7 +38,7 @@ from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCal
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
 from models.ModelWrapper import ModelWrapper
 from utils.callbacks import ReconstructionImagesCallback, step_decay_schedule, \
-    FeatureMapActivationCorrelationCallback, ActivationVisualizationCallback
+    FeatureMapActivationCorrelationCallback
 
 
 class VariationalAutoencoder(ModelWrapper):
