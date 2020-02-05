@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 import os
@@ -23,7 +24,9 @@ from argparse import ArgumentParser
 def main():
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
-    logging.basicConfig(filename='root.log', level=logging.DEBUG, filemode="w")
+    logging.basicConfig(format="'[%(asctime)s][%(filename)s][%(levelname)s]: %(message)s'",
+                        filename='{}.log'.format(datetime.date.today()),
+                        level=logging.INFO, filemode="a+")
 
     parser = ArgumentParser(description='Functionality for Leonards master thesis')
     parser.add_argument('--configuration', type=str,

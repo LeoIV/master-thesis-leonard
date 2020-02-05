@@ -13,6 +13,7 @@ from keras_preprocessing.image import DirectoryIterator, Iterator
 
 from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
+from callbacks.LossLoggingCallback import LossLoggingCallback
 from models.ModelWrapper import ModelWrapper
 from utils.callbacks import step_decay_schedule
 
@@ -165,8 +166,9 @@ class AlexNet(ModelWrapper):
                                                       print_every_n_batches=print_every_n_batches,
                                                       layer_idxs=self.feature_map_layers,
                                                       x_train=embeddings_data, num_samples=self.num_samples)
+        ll_callback = LossLoggingCallback()
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, lr_sched]
+        callbacks_list = [ll_callback, checkpoint1, checkpoint2, tb_callback, fm_callback, lr_sched]
         if self.kernel_visualization_layer >= 0:
             callbacks_list.append(kv_callback)
 
