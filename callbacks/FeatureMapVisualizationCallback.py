@@ -22,6 +22,7 @@ class FeatureMapVisualizationCallback(Callback):
         self.x_train = x_train
         self.fmas = {}
         self.batch_nrs = []
+        self.epoch = 1
         self.num_samples = num_samples
         idxs = np.random.randint(0, len(self.x_train), num_samples)
         self.samples = [np.copy(self.x_train[idx]) for idx in idxs]
@@ -35,6 +36,9 @@ class FeatureMapVisualizationCallback(Callback):
         feature_maps = feature_maps.astype(np.uint8)
         for i, f_map in enumerate(feature_maps):
             Image.fromarray(f_map.squeeze()).save(os.path.join(img_path_layer, "map_{}.jpg".format(i)))
+
+    def on_epoch_end(self, epoch, logs=None):
+        self.epoch += 1
 
     def on_batch_end(self, batch, logs=None):
         if logs is None:
@@ -53,7 +57,8 @@ class FeatureMapVisualizationCallback(Callback):
                     sample_as_uint8 *= 255.0
                     sample_as_uint8 = sample_as_uint8.astype(np.uint8)
                 sample_as_uint8 = sample_as_uint8.squeeze()
-                img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "feature_map",
+                img_path = os.path.join(self.log_dir, "epoch_{}", "step_{}".format(self.epoch, self.seen),
+                                        "feature_map",
                                         "sample_{}".format(sample_nr))
                 os.makedirs(img_path, exist_ok=True)
                 ax[0, sample_nr].imshow(sample.squeeze(), cmap='gray')

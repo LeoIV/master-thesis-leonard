@@ -65,6 +65,8 @@ def main():
     parser.add_argument('--num_samples', type=int, default=5)
     args = parser.parse_args()
 
+    logging.info("Program called with arguments: {}".format(sys.argv))
+
     weights = os.path.join(args.logdir, 'weights')
 
     if not os.path.exists(args.logdir):
@@ -143,6 +145,7 @@ def main():
     model.compile(args.learning_rate, args.r_loss_factor)
 
     model.model.summary()
+    model.model.summary(print_fn=lambda x: logging.info(x))
     try:
         model.train(training_data, epochs=args.num_epochs, run_folder=weights, batch_size=args.batch_size,
                     print_every_n_batches=args.print_every_n_batches, initial_epoch=args.initial_epoch)

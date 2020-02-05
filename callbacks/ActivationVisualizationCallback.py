@@ -20,7 +20,10 @@ class ActivationVisualizationCallback(Callback):
         self.print_every_n_batches = print_every_n_batches
         self.layer_idxs = layer_idxs
         self.seen = 0
+        self.epoch = 1
 
+    def on_epoch_end(self, epoch, logs=None):
+        self.epoch += 1
 
     def on_batch_end(self, batch, logs=None):
         if logs is None:
@@ -59,7 +62,8 @@ class ActivationVisualizationCallback(Callback):
                                         loss=losses.mean_squared_error)
 
                 filters = list(range(get_num_filters(truncated_model.layers[layer_idx])))
-                img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "max_activations",
+                img_path = os.path.join(self.log_dir, "epoch_{}", "step_{}".format(self.epoch, self.seen),
+                                        "max_activations",
                                         "layer_{}".format(layer_idx))
                 os.makedirs(img_path, exist_ok=True)
                 for f_idx in filters:

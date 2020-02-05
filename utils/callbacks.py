@@ -112,7 +112,11 @@ class ReconstructionImagesCallback(Callback):
         self.vae = vae
         self.seeds = list(range(num_reconstructions))
         self.seen = 0
+        self.epoch = 1
         self.log_dir = log_dir
+
+    def on_epoch_end(self, epoch, logs=None):
+        self.epoch += 1
 
     def on_batch_end(self, batch, logs=None):
         if logs is None:
@@ -120,7 +124,7 @@ class ReconstructionImagesCallback(Callback):
         if batch % self.print_every_n_batches == 0:
             self.seen += 1
             logging.info("Visualizing reconstructions")
-            img_path = os.path.join(self.log_dir, "step_{}".format(self.seen), "reconstructions")
+            img_path = os.path.join(self.log_dir, "epoch{}", "step_{}".format(self.epoch, self.seen), "reconstructions")
             os.makedirs(img_path, exist_ok=True)
             for seed in self.seeds:
                 # make sure we always reconstruct the same image
