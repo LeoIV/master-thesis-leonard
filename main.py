@@ -115,6 +115,7 @@ def main():
     elif args.configuration == 'imagenet_classification_alexnet':
         INPUT_DIM = (224, 224, 3)
         model = AlexNet(input_dim=INPUT_DIM, log_dir=args.logdir, feature_map_layers=args.feature_map_layers,
+                        use_batch_norm=args.use_batch_norm,
                         kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(
@@ -126,7 +127,7 @@ def main():
     elif args.configuration == 'imagenet_classification_alexnet_vae':
         INPUT_DIM = (224, 224, 3)
         model = AlexNetVAE(input_dim=INPUT_DIM, log_dir=args.logdir, z_dim=args.z_dim,
-                           feature_map_layers=args.feature_map_layers,
+                           feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,
                            kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(

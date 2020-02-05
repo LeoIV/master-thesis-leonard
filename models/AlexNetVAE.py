@@ -14,7 +14,6 @@ from keras_preprocessing.image import DirectoryIterator, Iterator
 
 from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
-from callbacks.LossAdaptationCallback import LossAdaptationCallback
 from models.ModelWrapper import ModelWrapper
 from utils.callbacks import step_decay_schedule, ReconstructionImagesCallback
 
@@ -40,8 +39,6 @@ class AlexNetVAE(ModelWrapper):
         self.use_batch_norm = use_batch_norm
         self.use_dropout = use_dropout
         self.dropout_rate = dropout_rate
-
-        self.kl_loss_factor = K.variable(0.0)
 
         self.log_dir = log_dir
 
@@ -196,7 +193,7 @@ class AlexNetVAE(ModelWrapper):
         def vae_loss(y_true, y_pred):
             r_loss = vae_r_loss(y_true, y_pred)
             kl_loss = vae_kl_loss(y_true, y_pred)
-            return r_loss + self.kl_loss_factor * kl_loss
+            return r_loss + kl_loss
 
         optimizer = Adam(lr=learning_rate)
         self.model.compile(optimizer=optimizer, loss=vae_loss, metrics=[vae_r_loss, vae_kl_loss])
@@ -250,9 +247,8 @@ class AlexNetVAE(ModelWrapper):
                                                       print_every_n_batches=print_every_n_batches,
                                                       layer_idxs=self.feature_map_layers,
                                                       x_train=embeddings_data, num_samples=self.num_samples)
-        la_callback = LossAdaptationCallback(vae=self, print_every_n_batches=print_every_n_batches)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, rc_callback, lr_sched, la_callback]
+        callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, rc_callback, lr_sched]
         if self.kernel_visualization_layer >= 0:
             callbacks_list.append(kv_callback)
 
