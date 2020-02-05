@@ -30,7 +30,7 @@ class FeatureMapVisualizationCallback(Callback):
     def _save_feature_maps(img_path_layer, fms):
         feature_maps = np.copy(fms).squeeze()
         feature_maps = np.moveaxis(feature_maps, [0, 1, 2], [1, 2, 0])
-        feature_maps = (feature_maps - feature_maps.min()) / (feature_maps - feature_maps.max())
+        feature_maps = (feature_maps - feature_maps.min()) / (feature_maps.max() - feature_maps.min())
         feature_maps *= 255.0
         feature_maps = feature_maps.astype(np.uint8)
         for i, f_map in enumerate(feature_maps):
