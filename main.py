@@ -130,8 +130,7 @@ def main():
                            kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(
-            directory=os.path.join(args.data_path,
-                                   'imagenet/ILSVRC/Data/CLS-LOC/train'),
+            directory=os.path.join(args.data_path, 'imagenet/ILSVRC/Data/CLS-LOC/train'),
             target_size=INPUT_DIM[:2], batch_size=args.batch_size,
             class_mode='input', interpolation='lanczos',
             follow_links=True)
