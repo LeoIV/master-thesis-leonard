@@ -53,7 +53,7 @@ def main():
                         help="After how many batches the callbacks will be executed.")
     parser.add_argument('--learning_rate', type=float, default=0.0005,
                         help="The initial learning rate passed to the optimizer.")
-    parser.add_argument('--r_loss_factor', type=int, default=10E4,
+    parser.add_argument('--r_loss_factor', type=float, default=10E4,
                         help="The factor by which to weigh the reconstruction loss in case of variational autoencoder")
     parser.add_argument('--mode', type=str, choices=['build', 'load'], default='build',
                         help="Whether to build a new model or load an existing one.")
