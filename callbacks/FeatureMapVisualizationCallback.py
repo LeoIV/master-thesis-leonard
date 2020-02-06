@@ -57,7 +57,7 @@ class FeatureMapVisualizationCallback(Callback):
                     sample_as_uint8 *= 255.0
                     sample_as_uint8 = sample_as_uint8.astype(np.uint8)
                 sample_as_uint8 = sample_as_uint8.squeeze()
-                img_path = os.path.join(self.log_dir, "epoch_{}", "step_{}".format(self.epoch, self.seen),
+                img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
                                         "feature_map",
                                         "sample_{}".format(sample_nr))
                 os.makedirs(img_path, exist_ok=True)
@@ -103,8 +103,9 @@ class FeatureMapVisualizationCallback(Callback):
                     ax[i + 1, sample_nr].set(xlabel="#feature map", ylabel="# batch")
                     ax[i + 1, sample_nr].set_yticks(np.arange(len(self.batch_nrs), step=2), self.batch_nrs[0::2])
             plt.colorbar(ax[1, 0].get_images()[0])
-            plt.savefig(os.path.join(self.log_dir, "epoch_{}", "step_{}".format(self.epoch, self.seen), "feature_map",
-                                     'activations.png'))
+            plt.savefig(
+                os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen), "feature_map",
+                             'activations.png'))
             plt.close()
             # set back to default
             plt.rcParams["figure.figsize"] = (8.0, 6.0)

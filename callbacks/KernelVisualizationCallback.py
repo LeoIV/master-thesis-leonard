@@ -34,7 +34,8 @@ class KernelVisualizationCallback(Callback):
             # normalize filter values to 0-1 so we can visualize them
             filters = np.moveaxis(filters, (0, 1), (-2, -1))
             filters = (filters.reshape(((-1,) + filters.shape[-2:])))
-            img_path = os.path.join(self.log_dir, "epoch{}", "step_{}".format(self.epoch, self.seen), "layer1_kernels")
+            img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
+                                    "layer1_kernels")
             os.makedirs(img_path, exist_ok=True)
             for map_nr, f_map in enumerate(filters):
                 f_min, f_max = f_map.min(), f_map.max()

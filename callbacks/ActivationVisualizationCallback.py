@@ -62,7 +62,7 @@ class ActivationVisualizationCallback(Callback):
                                         loss=losses.mean_squared_error)
 
                 filters = list(range(get_num_filters(truncated_model.layers[layer_idx])))
-                img_path = os.path.join(self.log_dir, "epoch_{}", "step_{}".format(self.epoch, self.seen),
+                img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
                                         "max_activations",
                                         "layer_{}".format(layer_idx))
                 os.makedirs(img_path, exist_ok=True)

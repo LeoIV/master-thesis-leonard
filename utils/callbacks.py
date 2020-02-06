@@ -124,7 +124,8 @@ class ReconstructionImagesCallback(Callback):
         if batch % self.print_every_n_batches == 0:
             self.seen += 1
             logging.info("Visualizing reconstructions")
-            img_path = os.path.join(self.log_dir, "epoch{}", "step_{}".format(self.epoch, self.seen), "reconstructions")
+            img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
+                                    "reconstructions")
             os.makedirs(img_path, exist_ok=True)
             for seed in self.seeds:
                 # make sure we always reconstruct the same image
