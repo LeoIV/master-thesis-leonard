@@ -139,11 +139,6 @@ class ReconstructionImagesCallback(Callback):
 
                 Image.fromarray(k.squeeze()).save(os.path.join(img_path, "sample_{}.jpg".format(seed)))
 
-    def on_epoch_begin(self, epoch, logs=None):
-        if logs is None:
-            logs = {}
-        self.epoch += 1
-
 
 def step_decay_schedule(initial_lr, decay_factor=0.5, step_size=1):
     '''
