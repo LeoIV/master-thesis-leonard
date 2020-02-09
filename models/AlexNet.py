@@ -1,6 +1,8 @@
 import logging
 import math
 import os
+import sys
+import traceback
 from typing import List
 
 import numpy as np
@@ -10,6 +12,7 @@ from keras.losses import categorical_crossentropy
 from keras.models import Model
 from keras.optimizers import Adam
 from keras_preprocessing.image import DirectoryIterator, Iterator
+from tensorflow_core.python.keras.utils import plot_model
 
 from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
@@ -188,5 +191,12 @@ class AlexNet(ModelWrapper):
         print("Training finished")
 
     def plot_model(self, run_folder):
+        try:
+            plot_model(self.model, os.path.join(self.log_dir, 'model.png'))
+        except Exception as e:
+            logging.error("unable to save model as png")
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            for line in traceback.format_exception(exc_type, exc_value, exc_traceback):
+                logging.error(line)
         with open(os.path.join(self.log_dir, "model_config.json"), "w+") as f:
             f.write(self.model.to_json())

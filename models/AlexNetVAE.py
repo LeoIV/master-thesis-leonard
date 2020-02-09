@@ -1,20 +1,22 @@
+import logging
 import math
 import os
-from typing import List
+import sys
+import traceback
 
 import numpy as np
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, TensorBoard
-from keras.layers import Input, Conv2D, Flatten, Dense, Dropout, ReLU, MaxPool2D, BatchNormalization, Lambda, \
-    Reshape, Conv2DTranspose, UpSampling2D, Activation, LeakyReLU
-from keras.losses import binary_crossentropy
+from keras.layers import Input, Conv2D, Flatten, Dense, Dropout, MaxPool2D, BatchNormalization, Lambda, \
+    Reshape, Conv2DTranspose, Activation, LeakyReLU
 from keras.models import Model
 from keras.optimizers import Adam
 from keras_preprocessing.image import DirectoryIterator, Iterator
+from tensorflow_core.python.keras.utils import plot_model
 
-from callbacks.LossLoggingCallback import LossLoggingCallback
 from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
+from callbacks.LossLoggingCallback import LossLoggingCallback
 from models.ModelWrapper import ModelWrapper
 from utils.callbacks import step_decay_schedule, ReconstructionImagesCallback
 
@@ -270,6 +272,15 @@ class AlexNetVAE(ModelWrapper):
         print("Training finished")
 
     def plot_model(self, run_folder):
+        try:
+            plot_model(self.encoder, os.path.join(self.log_dir, 'encoder.png'))
+            plot_model(self.decoder, os.path.join(self.log_dir, 'decoder.png'))
+            plot_model(self.model, os.path.join(self.log_dir, 'whole_model.png'))
+        except Exception as e:
+            logging.error("unable to save model as png")
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            for line in traceback.format_exception(exc_type, exc_value, exc_traceback):
+                logging.error(line)
         with open(os.path.join(self.log_dir, "model_config.json"), "w+") as f:
             f.write(self.model.to_json())
         with open(os.path.join(self.log_dir, "encoder_model_config.json"), "w+") as f:

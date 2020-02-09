@@ -1,0 +1,112 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{parskip}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\usepackage{acronym}
+\usepackage[natbib=true]{biblatex}
+\addbibresource{literature.bib}
+\renewcommand{\baselinestretch}{1.5}
+\newcounter{savepage}
+
+\begin{document}
+
+    \begin{titlepage}
+        \centering
+        \includegraphics[width=0.25\textwidth]{rublogo.png}\par
+        {\scshape\huge\bfseries Semantic Representations in Variational Autoencoders as a Model of the Visual System \par}
+        {\scshape\large Schriftliche Prüfungsarbeit für die Master-Prüfung des Studiengangs Angewandte Informatik an der Ruhr-Universität Bochum\par}
+        \vspace{1em}
+        vorgelegt von\par
+        \vspace{2em}
+        Leonard Papenmeier\par 108017257755\par
+        \vspace{2em}
+        01.01.1980\par
+
+        \vfill
+        Prof. Dr. Laurenz Wiskott\par
+        M.Sc. Zahra Fayyaz
+
+
+    \end{titlepage}
+    \pagenumbering{Roman}
+    \tableofcontents
+    \newpage
+    \setcounter{savepage}{\arabic{page}}
+    \pagenumbering{arabic}
+
+    \section{Introduction}\label{sec:introduction}
+    \section{Theoretical Background}\label{sec:theoretical-background}
+    \subsection{Primary Visual Cortex}\label{subsec:primary-visual-cortex}
+    \subsection{Variational Autoencoders}\label{subsec:variational-autoencoders}
+    \subsection{Visual Features in Neural Networks}\label{subsec:visual_features_in_neural_networks}
+    \begin{itemize}
+        \item~\cite{krizhevsky2012imagenet} report Gabor wavelets in \acp{CNN} trained on image classification
+    \end{itemize}
+    \subsection{Semantic Representations}\label{subsec:semantic-representations}
+    \subsubsection{Supervised Models}
+    \begin{itemize}
+        \item \citet{khaligh2014deep} found evidence for that supervised models may explain \ac{IT} cortical representation.
+    \end{itemize}
+
+    \subsubsection{Unsupervised Models}
+    \begin{itemize}
+        \item \citet{han2019variational} found no evidence for or against Gabor wavelets in \acp{VAE} due to too small kernel size
+        \item \citet{khaligh2014deep} found evidence against the assumption that unsupervised models might explain \ac{IT} cortical representation, however not explicitly for \acp{VAE}
+    \end{itemize}
+
+    \section{Methods}\label{sec:methods}
+    \input{methods}
+
+    \section{Results}\label{sec:results}
+
+    \subsection{Visual Features in Variational Autoencoders}\label{subsec:results_visual_features_in_variational_autoencoders}
+    \begin{itemize}
+        \item Results non-AlexNet-like-VAE on CelebA: especially layer 1 kernels
+        \item Results AlexNet-like-VAE on ImageNet: especially layer 1 kernels
+        \item Results AlexNet-like image classification CNN on ImageNet: especially layer 1 kernels
+        \item Results AlexNet-like-VAE with frozen decoder from classification network
+    \end{itemize}
+
+    \section{Discussion}\label{sec:discussion}
+
+    \subsection{Visual Features in Variational Autoencoders}\label{subsec:discussion_visual_features_in_variational_autoencoders}
+    \begin{itemize}
+        \item Reconstructions of AlexNet-VAE don't look natural at all, this might be because ImageNet, unlike CelebA, is not properly aligned and contains images from a large variety of classes.
+        This might be another hint towards the assumption that \acp{VAE} are no suitable model for semantic representations
+        \item How does it come that supervised models seem to be a good representation of \ac{IT} cortical representation~\citep{khaligh2014deep}? Maybe the brain learns in a ``supervised" manner in the sense that if you have never seen a horse, you need someone to tell you that that is a horse in order to make sense out of it.
+        However, you might, at least, be able to recognize that it is an animal.
+        Also, if someone tells you ``This is a horse.", you'll be able to recognize horses from different orientations and in different body positions without further training.
+        This is quite different from how \acp{CNN} capture animals and is a strong hint to that supervised \acp{CNN} alone a no sufficient model for cortical IT representations.
+    \end{itemize}
+
+
+    \section{Conclusion}\label{sec:conclusion}
+
+    \newpage
+    \printbibliography
+
+    \newpage
+    \pagenumbering{Roman}
+    \setcounter{page}{\thesavepage}
+    \section*{Acronyms}
+    \begin{acronym}[TDMA]
+        \acro{VAE}{Variational Autoencoder}
+        \acrodefplural{VAE}{Variational Autoencoders}
+        \acro{CNN}{Convolutional Neural Network}
+        \acrodefplural{CNN}{Convolutional Neural Networks}
+        \acro{IT}{Inferior Temporal Cortex}
+        \acro{ReLU}{Rectified Linear Unit}
+        \acro{LeakyReLU}{Leaky Rectified Linear Unit}
+    \end{acronym}
+    \newpage
+    \listoffigures
+    \newpage
+    \listoftables
+    \newpage
+    \include{erklaerung}
+
+
+\end{document}

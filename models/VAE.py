@@ -12,6 +12,7 @@ from keras.models import Model
 from keras.optimizers import Adam
 from keras_preprocessing.image import DirectoryIterator, Iterator
 from receptivefield.keras import KerasReceptiveField
+from tensorflow_core.python.keras.utils import plot_model
 
 from callbacks.ActivationVisualizationCallback import ActivationVisualizationCallback
 from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
