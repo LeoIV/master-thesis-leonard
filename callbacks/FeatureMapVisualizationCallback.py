@@ -66,6 +66,7 @@ class FeatureMapVisualizationCallback(Callback):
                     os.path.join(img_path, "original.jpg"))
                 for i, layer_idx in enumerate(self.layer_idxs):
                     logging.info("Visualizing feature maps for layer {}".format(layer_idx))
+                    print("Visualizing feature maps for layer {}".format(layer_idx))
 
                     # we cannot use instanceof as we aren't allowed to import the model_wrapper class directly since
                     # this would lead to cyclic references
