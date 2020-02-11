@@ -1,24 +1,16 @@
 import datetime
 import logging
-
 import os
-
 import argparse
-
 import sys
 from shutil import rmtree
-
 import traceback
 from keras_preprocessing.image import ImageDataGenerator
-
 from models.AlexNetVAE import AlexNetVAE
 from models.AlexNet import AlexNet
-# run config
+from models.FrozenAlexNetVAE import FrozenAlexNetVAE
 from utils.loaders import load_mnist
 from argparse import ArgumentParser
-
-
-# create logger with 'spam_application'
 
 
 def main():
@@ -31,7 +23,7 @@ def main():
     parser = ArgumentParser(description='Functionality for Leonards master thesis')
     parser.add_argument('--configuration', type=str,
                         choices=['mnist', 'celeba', 'celeba_large_model', 'imagenet_classification_alexnet',
-                                 'imagenet_classification_alexnet_vae'],
+                                 'imagenet_classification_alexnet_vae', 'frozen_alexnet_vae'],
                         help="The configuration to execute.\n\n"
                              "mnist: VAE trained on mnist\n"
                              "celeba: VAE trained on (128,128) sized celeba dataset\n"
@@ -66,7 +58,13 @@ def main():
     parser.add_argument('--use_dropout', type=str2bool, default=False)
     parser.add_argument('--dropout_rate', type=float, default=0.5)
     parser.add_argument('--num_samples', type=int, default=5)
+    parser.add_argument('--alexnet_weights_path', type=str,
+                        help="Only for configuration 'frozen_alexnet_vae'. The path to (and including) the .h5 file to restore the AlexNet classifier from.")
+    parser.add_argument('--dataset', type=str, choices=['celeba', 'imagenet'],
+                        help="Which dataset to use for training. WARNING: Use ImageNet for classification.")
     args = parser.parse_args()
+
+    dataset_subfolder = 'celeb' if args.dataset == 'celeba' else 'imagenet/ILSVRC/Data/CLS-LOC/train'
 
     logging.info("Program called with arguments: {}".format(sys.argv))
 
@@ -102,7 +100,8 @@ def main():
                                        decoder_conv_t_strides=[2, 2, 2, 2], log_dir=args.logdir, z_dim=args.z_dim)
         data_gen = ImageDataGenerator(rescale=1. / 255)
 
-        training_data = data_gen.flow_from_directory(os.path.join(args.data_path, 'celeb/'), target_size=INPUT_DIM[:2],
+        training_data = data_gen.flow_from_directory(os.path.join(args.data_path, dataset_subfolder),
+                                                     target_size=INPUT_DIM[:2],
                                                      batch_size=args.batch_size,
                                                      shuffle=True, class_mode='input')
     elif args.configuration == 'celeba_large_model':
@@ -113,7 +112,8 @@ def main():
                                        decoder_conv_t_filters=[64, 64, 32, 1], decoder_conv_t_kernel_size=[3, 5, 7, 11],
                                        decoder_conv_t_strides=[2, 2, 2, 4], log_dir=args.logdir, z_dim=args.z_dim)
         data_gen = ImageDataGenerator(rescale=1. / 255)
-        training_data = data_gen.flow_from_directory(os.path.join(args.data_path, 'celeb/'), target_size=INPUT_DIM[:2],
+        training_data = data_gen.flow_from_directory(os.path.join(args.data_path, dataset_subfolder),
+                                                     target_size=INPUT_DIM[:2],
                                                      batch_size=args.batch_size,
                                                      shuffle=True, class_mode='input', interpolation='lanczos',
                                                      color_mode='grayscale')
@@ -124,8 +124,7 @@ def main():
                         kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(
-            directory=os.path.join(args.data_path,
-                                   'imagenet/ILSVRC/Data/CLS-LOC/train'),
+            directory=os.path.join(args.data_path, dataset_subfolder),
             target_size=INPUT_DIM[:2], batch_size=args.batch_size,
             shuffle=True, class_mode='categorical',
             follow_links=True)
@@ -136,7 +135,22 @@ def main():
                            kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(
-            directory=os.path.join(args.data_path, 'imagenet/ILSVRC/Data/CLS-LOC/train'),
+            directory=os.path.join(args.data_path, dataset_subfolder),
+            target_size=INPUT_DIM[:2], batch_size=args.batch_size,
+            class_mode='input', interpolation='lanczos',
+            follow_links=True)
+    elif args.configuration == 'frozen_alexnet_vae':
+        INPUT_DIM = (224, 224, 3)
+        # TODO remove static requirements
+        shape_before_flattening = (7, 7, 256)
+        model = FrozenAlexNetVAE(z_dim=args.z_dim, use_dropout=args.use_dropout, dropout_rate=args.dropout_rate,
+                                 use_batch_norm=args.use_batch_norm, shape_before_flattening=shape_before_flattening,
+                                 input_dim=INPUT_DIM, log_dir=args.logdir, weights_path=args.alexnet_weights_path,
+                                 kernel_visualization_layer=args.kernel_visualization_layer,
+                                 feature_map_layers=args.feature_map_layers, num_samples=args.num_samples)
+        data_gen = ImageDataGenerator(rescale=1. / 255)
+        training_data = data_gen.flow_from_directory(
+            directory=os.path.join(args.data_path, dataset_subfolder),
             target_size=INPUT_DIM[:2], batch_size=args.batch_size,
             class_mode='input', interpolation='lanczos',
             follow_links=True)

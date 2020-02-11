@@ -69,7 +69,8 @@ class FeatureMapVisualizationCallback(Callback):
 
                     # we cannot use instanceof as we aren't allowed to import the model_wrapper class directly since
                     # this would lead to cyclic references
-                    if type(self.model_wrapper).__name__ in ['VariationalAutoencoder', 'AlexNetVAE']:
+                    if type(self.model_wrapper).__name__ in ['VariationalAutoencoder', 'AlexNetVAE',
+                                                             'FrozenAlexNetVAE']:
                         if layer_idx < len(self.model_wrapper.encoder.layers) - 1:
                             output_layer = self.model_wrapper.encoder.layers[layer_idx]
                             model = Model(inputs=self.model_wrapper.encoder.inputs, outputs=output_layer.output)
@@ -84,7 +85,8 @@ class FeatureMapVisualizationCallback(Callback):
                         model = Model(inputs=self.model_wrapper.model.inputs, outputs=output_layer.output)
                     else:
                         raise RuntimeError(
-                            "model_wrapper has to be either of type VariationalAutoencoder, AlexNetVAE or AlexNet")
+                            "model_wrapper has to be either of type VariationalAutoencoder, AlexNetVAE, "
+                            "FrozenAlexNetVAE or AlexNet")
 
                     img_path_layer = os.path.join(img_path, "{}".format(output_layer.name))
                     os.makedirs(img_path_layer, exist_ok=True)

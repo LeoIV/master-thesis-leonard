@@ -15,6 +15,7 @@
       <excludeFolder url="file://$MODULE_DIR$/logs_25_01_2020" />
       <excludeFolder url="file://$MODULE_DIR$/logs_28_01_2020" />
       <excludeFolder url="file://$MODULE_DIR$/logs_29_01_2020" />
+      <excludeFolder url="file://$MODULE_DIR$/results" />
       <excludeFolder url="file://$MODULE_DIR$/run" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
