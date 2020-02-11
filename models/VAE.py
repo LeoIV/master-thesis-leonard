@@ -47,9 +47,12 @@ class VariationalAutoencoder(ModelWrapper):
                  encoder_conv_strides: Sequence[Union[int, Tuple[int, int]]], decoder_conv_t_filters,
                  decoder_conv_t_kernel_size: Sequence[Union[int, Tuple[int, int]]],
                  decoder_conv_t_strides: Sequence[Union[int, Tuple[int, int]]], z_dim: int, log_dir: str,
+                 feature_map_visualization_layers: Sequence[int], kernel_visualization_layer: int,
                  use_batch_norm: bool = False,
                  use_dropout: bool = False):
 
+        self.kernel_visualization_layer = kernel_visualization_layer
+        self.feature_map_visualization_layers = feature_map_visualization_layers
         self.name = 'variational_autoencoder'
 
         self.input_dim = input_dim
@@ -227,10 +230,10 @@ class VariationalAutoencoder(ModelWrapper):
                                                        initial_epoch=initial_epoch, vae=self)
         kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, vae=self,
                                                   print_every_n_batches=print_every_n_batches,
-                                                  layer_idx=1)
+                                                  layer_idx=self.kernel_visualization_layer)
         fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model_wrapper=self,
                                                       print_every_n_batches=print_every_n_batches,
-                                                      layer_idxs=[2, 22, 4, 20, 6, 18, 8, 16],
+                                                      layer_idxs=self.feature_map_visualization_layers,
                                                       x_train=embeddings_data)
         av_callback = ActivationVisualizationCallback(log_dir=self.log_dir, model_wrapper=self,
                                                       print_every_n_batches=print_every_n_batches,

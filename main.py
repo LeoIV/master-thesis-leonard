@@ -97,7 +97,9 @@ def main():
         model = VariationalAutoencoder(input_dim=INPUT_DIM, encoder_conv_filters=[32, 64, 64, 64],
                                        encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[2, 2, 2, 2],
                                        decoder_conv_t_filters=[64, 64, 32, 3], decoder_conv_t_kernel_size=[3, 3, 3, 3],
-                                       decoder_conv_t_strides=[2, 2, 2, 2], log_dir=args.logdir, z_dim=args.z_dim)
+                                       decoder_conv_t_strides=[2, 2, 2, 2], log_dir=args.logdir, z_dim=args.z_dim,
+                                       kernel_visualization_layer=args.kernel_visualization_layer,
+                                       feature_map_visualization_layers=args.feature_map_layers)
         data_gen = ImageDataGenerator(rescale=1. / 255)
 
         training_data = data_gen.flow_from_directory(os.path.join(args.data_path, dataset_subfolder),
@@ -111,7 +113,9 @@ def main():
                                        encoder_conv_kernel_size=[11, 7, 5, 3], encoder_conv_strides=[4, 2, 2, 2],
                                        decoder_conv_t_filters=[64, 64, 32, 1], decoder_conv_t_kernel_size=[3, 5, 7, 11],
                                        decoder_conv_t_strides=[2, 2, 2, 4], log_dir=args.logdir, z_dim=args.z_dim,
-                                       use_batch_norm=args.use_batch_norm, use_dropout=args.use_dropout)
+                                       use_batch_norm=args.use_batch_norm, use_dropout=args.use_dropout,
+                                       kernel_visualization_layer=args.kernel_visualization_layer,
+                                       feature_map_visualization_layers=args.feature_map_layers)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(os.path.join(args.data_path, dataset_subfolder),
                                                      target_size=INPUT_DIM[:2],
