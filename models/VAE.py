@@ -222,8 +222,7 @@ class VariationalAutoencoder(ModelWrapper):
         checkpoint_filepath = os.path.join(run_folder, "weights/weights-{epoch:03d}-{loss:.2f}.h5")
         checkpoint1 = ModelCheckpoint(checkpoint_filepath, save_weights_only=True, verbose=1)
         checkpoint2 = ModelCheckpoint(os.path.join(run_folder, 'weights/weights.h5'), save_weights_only=True, verbose=1)
-        # tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, embeddings_freq=1, update_freq="batch",
-        #                         embeddings_layer_names=["mu"], embeddings_data=embeddings_data)
+        tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, update_freq="batch")
         custom_callback = ReconstructionImagesCallback(log_dir='./logs', print_every_n_batches=print_every_n_batches,
                                                        initial_epoch=initial_epoch, vae=self)
         kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, vae=self,
@@ -249,7 +248,7 @@ class VariationalAutoencoder(ModelWrapper):
                                                                x_train=embeddings_data,
                                                                tb_callback=tb_callback)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [checkpoint1, checkpoint2, fm_callback, kv_callback, fma_callback,
+        callbacks_list = [checkpoint1, checkpoint2, tb_callback, fm_callback, kv_callback, fma_callback,
                           custom_callback, lr_sched]
 
         print("Training for {} epochs".format(epochs))
