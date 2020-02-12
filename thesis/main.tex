@@ -7,6 +7,9 @@
 \usepackage{wrapfig}
 \usepackage{acronym}
 \usepackage[natbib=true]{biblatex}
+\usepackage{amsmath}
+\usepackage{csquotes}
+\usepackage{hyperref}
 \addbibresource{literature.bib}
 \renewcommand{\baselinestretch}{1.5}
 \newcounter{savepage}
@@ -57,18 +60,39 @@
         \item \citet{khaligh2014deep} found evidence against the assumption that unsupervised models might explain \ac{IT} cortical representation, however not explicitly for \acp{VAE}
     \end{itemize}
 
+
     \section{Methods}\label{sec:methods}
     \input{methods}
+
 
     \section{Results}\label{sec:results}
 
     \subsection{Visual Features in Variational Autoencoders}\label{subsec:results_visual_features_in_variational_autoencoders}
+    The following sections describe the results of the experiments on visual features in variational autoencoders.
+
     \begin{itemize}
         \item Results non-AlexNet-like-VAE on CelebA: especially layer 1 kernels
         \item Results AlexNet-like-VAE on ImageNet: especially layer 1 kernels
         \item Results AlexNet-like image classification CNN on ImageNet: especially layer 1 kernels
         \item Results AlexNet-like-VAE with frozen decoder from classification network
     \end{itemize}
+
+    \subsubsection{AlexNet Image Classification}
+    To make sure that the network structure of the \ac{VAE} is apt to generate Gabor wavelets, image classification was performed on ImageNet (see Figure~\ref{fig:alexnet} and Section~\ref{subsec:visual-features-variational-autoencoders} for the used network, see Section~\ref{ssec:imagenet} for ImageNet).
+    As the accuracy was not of primary concern, the training was stopped during the tenth epoch (\textbf{If time: train all 100 epochs}), the top-1 training accuracy at this time was at 0.85.
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\textwidth]{images/alexnet_classification_l1_kernels.png}
+        \caption[Image classification - Layer 1 Kernels]{Convolutional Kernels in the first layer of the image classification network.}
+        \label{fig:classification_layer1_kernels}
+    \end{figure}
+
+    Figure~\ref{fig:classification_layer1_kernels} shows all 256 convolutional kernels of the image classification network.
+    It is easy to see that in many kernels, Gabor wavelet-like filters emerge.
+
+    \subsection{Activity Correlation in \acp{VAE}}\label{subsec:results_activity-correlation-in-vaes}
+
 
     \section{Discussion}\label{sec:discussion}
 
@@ -100,6 +124,7 @@
         \acro{IT}{Inferior Temporal Cortex}
         \acro{ReLU}{Rectified Linear Unit}
         \acro{LeakyReLU}{Leaky Rectified Linear Unit}
+        \acro{ILSVRC2017}{Large Scale Visual Recognition Challenge 2017}
     \end{acronym}
     \newpage
     \listoffigures
