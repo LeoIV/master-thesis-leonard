@@ -1,9 +1,7 @@
 import logging
 import math
 import os
-import sys
-import traceback
-from typing import List
+from typing import Tuple
 
 import numpy as np
 from keras.callbacks import ModelCheckpoint, TensorBoard
@@ -12,38 +10,35 @@ from keras.losses import categorical_crossentropy
 from keras.models import Model
 from keras.optimizers import Adam
 from keras_preprocessing.image import DirectoryIterator, Iterator
-from tensorflow_core.python.keras.utils import plot_model
 
 from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
 from callbacks.LossLoggingCallback import LossLoggingCallback
-from models.ModelWrapper import ModelWrapper
 from utils.callbacks import step_decay_schedule
 
 
 class AlexNet(ModelWrapper):
+    """
+    An AlexNet-like image classification network.
+    """
 
-    def __init__(self, input_dim, log_dir: str,
-                 use_batch_norm: bool = False,
+    def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, use_batch_norm: bool = False,
                  use_dropout: bool = False,
-                 dropout_rate: float = 0.5, feature_map_layers=None,
-                 kernel_visualization_layer: int = -1, num_samples: int = 5):
+                 dropout_rate: float = 0.5, feature_map_layers=None, kernel_visualization_layer: int = -1,
+                 num_samples: int = 5):
 
+        super().__init__(input_dim, log_dir)
         if feature_map_layers is None:
             feature_map_layers = []
         self.kernel_visualization_layer = kernel_visualization_layer
         self.feature_map_layers = feature_map_layers
         self.name = 'variational_autoencoder'
 
-        self.input_dim = input_dim
-
         self.num_samples = num_samples
 
         self.use_batch_norm = use_batch_norm
         self.use_dropout = use_dropout
         self.dropout_rate = dropout_rate
-
-        self.log_dir = log_dir
 
         self._build(self.input_dim)
 
@@ -122,21 +117,6 @@ class AlexNet(ModelWrapper):
         optimizer = Adam(lr=learning_rate)
         self.model.compile(optimizer=optimizer, loss=categorical_crossentropy, metrics=['accuracy'])
 
-    def save(self, folder):
-
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-        if not os.path.exists(os.path.join(folder, 'visualizations')):
-            os.makedirs(os.path.join(folder, 'visualizations'))
-        if not os.path.exists(os.path.join(folder, 'weights')):
-            os.makedirs(os.path.join(folder, 'weights'))
-        if not os.path.exists(os.path.join(folder, 'images')):
-            os.makedirs(os.path.join(folder, 'images'))
-
-        self.plot_model(run_folder=folder)
-
-    def load_weights(self, filepath):
-        self.model.load_weights(filepath)
 
     def train(self, training_data, batch_size, epochs, run_folder, print_every_n_batches=100, initial_epoch=0,
               lr_decay=1, embedding_samples: int = 5000):
@@ -189,14 +169,3 @@ class AlexNet(ModelWrapper):
                 callbacks=callbacks_list
             )
         print("Training finished")
-
-    def plot_model(self, run_folder):
-        try:
-            plot_model(self.model, os.path.join(self.log_dir, 'model.png'))
-        except Exception as e:
-            logging.error("unable to save model as png")
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            for line in traceback.format_exception(exc_type, exc_value, exc_traceback):
-                logging.error(line)
-        with open(os.path.join(self.log_dir, "model_config.json"), "w+") as f:
-            f.write(self.model.to_json())

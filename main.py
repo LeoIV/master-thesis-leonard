@@ -58,6 +58,8 @@ def main():
     parser.add_argument('--use_dropout', type=str2bool, default=False)
     parser.add_argument('--dropout_rate', type=float, default=0.5)
     parser.add_argument('--num_samples', type=int, default=5)
+    parser.add_argument('--weights_path', type=str, required=False,
+                        help="The path to restore the model from. Is only considered if --mode=load You usually might want to also set initial_epoch.")
     parser.add_argument('--alexnet_weights_path', type=str,
                         help="Only for configuration 'frozen_alexnet_vae'. The path to (and including) the .h5 file to restore the AlexNet classifier from.")
     parser.add_argument('--dataset', type=str, choices=['celeba', 'imagenet'],
@@ -160,9 +162,9 @@ def main():
             class_mode='input', interpolation='lanczos',
             follow_links=True)
     if args.mode == 'build':
-        model.save(weights)
+        model.save()
     else:
-        model.load_weights(os.path.join(weights, 'weights/weights.h5'))
+        model.load_weights(args.weights_path)
 
     model.compile(args.learning_rate, args.r_loss_factor)
 
