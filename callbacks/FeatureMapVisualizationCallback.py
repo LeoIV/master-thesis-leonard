@@ -122,6 +122,6 @@ class FeatureMapVisualizationCallback(Callback):
             fig.savefig(
                 os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen), "feature_map",
                              'activations.png'))
-            fig.close()
+            plt.close(fig)
             # set back to default
             plt.rcParams["figure.figsize"] = (8.0, 6.0)
