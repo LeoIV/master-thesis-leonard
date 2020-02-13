@@ -108,30 +108,30 @@ class AlexNetVAE(VAEWrapper):
         x = LeakyReLU()(x)
 
         # Layer 4 - reverse
-        x = Conv2DTranspose(filters=384, kernel_size=(3, 3))(x)
+        x = Conv2DTranspose(filters=384, kernel_size=(2, 2), strides=(3, 3))(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x)
 
         # Layer 3 - reverse
-        x = Conv2DTranspose(filters=256, kernel_size=(4, 4))(x)
+        x = Conv2DTranspose(filters=256, kernel_size=(2, 2), strides=(3, 3))(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x)
 
-        x = UpSampling2D(size=(2, 2))(x)
+        # x = UpSampling2D(size=(2, 2))(x)
 
         # Layer 2 - reverse
-        x = Conv2DTranspose(filters=96, kernel_size=(6, 6))(x)
+        x = Conv2DTranspose(filters=96, kernel_size=(3, 3), strides=(2, 2))(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x)
 
-        x = UpSampling2D(size=(2, 2))(x)
+        # x = UpSampling2D(size=(2, 2))(x)
 
         # Layer 1 - revese
         # x = UpSampling2D(size=(2, 2))(x)
-        x = Conv2DTranspose(filters=self.input_dim[-1], kernel_size=(12, 12), strides=(4, 4))(x)
+        x = Conv2DTranspose(filters=self.input_dim[-1], kernel_size=(8, 8), strides=(2, 2))(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         decoder_output = x = Activation('sigmoid')(x)
