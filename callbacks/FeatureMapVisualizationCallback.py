@@ -118,10 +118,10 @@ class FeatureMapVisualizationCallback(Callback):
                     ax[i + 1, sample_nr].imshow(fmas_stacked, origin='lower', interpolation="none")
                     ax[i + 1, sample_nr].set(xlabel="#feature map", ylabel="# batch")
                     ax[i + 1, sample_nr].set_yticks(np.arange(len(self.batch_nrs), step=2), self.batch_nrs[0::2])
-            plt.colorbar(ax[1, 0].get_images()[0])
-            plt.savefig(
+            fig.colorbar(ax[1, 0].get_images()[0])
+            fig.savefig(
                 os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen), "feature_map",
                              'activations.png'))
-            plt.close()
+            fig.close()
             # set back to default
             plt.rcParams["figure.figsize"] = (8.0, 6.0)
