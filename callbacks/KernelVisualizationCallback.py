@@ -54,5 +54,5 @@ class KernelVisualizationCallback(Callback):
             img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
                                     "layer1_kernels")
             os.makedirs(img_path, exist_ok=True)
-            Thread(target=self._plot_kernels, args=(filters, img_path, self._fig_num))
+            Thread(target=self._plot_kernels, args=(filters, img_path, self._fig_num)).start()
             self._fig_num += 1
