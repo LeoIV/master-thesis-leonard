@@ -34,7 +34,9 @@ class ModelWrapper(ABC):
     def compile(self, learning_rate: float, r_loss_factor: float):
         raise NotImplementedError
 
-    def save(self, folder: str):
+    def save(self):
+        folder = os.path.join(self.log_dir, 'saved_model')
+        os.makedirs(folder, exist_ok=True)
         if not os.path.exists(folder):
             os.makedirs(folder)
         if not os.path.exists(os.path.join(folder, 'visualizations')):
@@ -116,7 +118,7 @@ class VAEWrapper(ModelWrapper, ABC):
         optimizer = Adam(lr=learning_rate)
         self.model.compile(optimizer=optimizer, loss=vae_loss, metrics=[vae_r_loss, vae_kl_loss])
 
-    def save(self, folder: str):
+    def save(self):
         if not hasattr(self, 'encoder') and not hasattr(self, 'decoder'):
             raise AttributeError(
                 "Your VAE should have an attribute 'encoder' and an attribute 'decoder' representing a Keras model "
@@ -127,7 +129,7 @@ class VAEWrapper(ModelWrapper, ABC):
         elif not hasattr(self, 'decoder'):
             raise AttributeError("Your VAE should have an attribute 'decoder' representing a Keras model for the "
                                  "decoder")
-        super().save(folder)
+        super().save()
 
     def train(self, training_data, batch_size, epochs, run_folder, print_every_n_batches=100, initial_epoch=0,
               lr_decay=1, embedding_samples: int = 5000):

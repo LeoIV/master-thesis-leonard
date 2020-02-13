@@ -14,6 +14,7 @@ from keras_preprocessing.image import DirectoryIterator, Iterator
 from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
 from callbacks.LossLoggingCallback import LossLoggingCallback
+from models.model_abstract import ModelWrapper
 from utils.callbacks import step_decay_schedule
 
 
@@ -25,7 +26,7 @@ class AlexNet(ModelWrapper):
     def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, use_batch_norm: bool = False,
                  use_dropout: bool = False,
                  dropout_rate: float = 0.5, feature_map_layers=None, kernel_visualization_layer: int = -1,
-                 num_samples: int = 5):
+                 num_samples: int = 5, use_fc: bool = True):
 
         super().__init__(input_dim, log_dir)
         if feature_map_layers is None:
@@ -85,19 +86,19 @@ class AlexNet(ModelWrapper):
         x = MaxPool2D(pool_size=(2, 2), strides=(2, 2), padding='same')(x)
         # Flatten
         x = Flatten()(x)
+        if self.use_fc:
+            # FC1
+            x = Dense(4096)(x)
+            # , input_shape=(np.prod(self.input_dim),)
+            x = LeakyReLU()(x)
+            if self.use_dropout:
+                x = Dropout(rate=self.dropout_rate)(x)
 
-        # FC1
-        x = Dense(4096)(x)
-        # , input_shape=(np.prod(self.input_dim),)
-        x = LeakyReLU()(x)
-        if self.use_dropout:
-            x = Dropout(rate=self.dropout_rate)(x)
-
-        # FC2
-        x = Dense(4096)(x)
-        x = LeakyReLU()(x)
-        if self.use_dropout:
-            x = Dropout(rate=self.dropout_rate)(x)
+            # FC2
+            x = Dense(4096)(x)
+            x = LeakyReLU()(x)
+            if self.use_dropout:
+                x = Dropout(rate=self.dropout_rate)(x)
 
         # Output Layer
         x = Dense(1000)(x)
@@ -116,7 +117,6 @@ class AlexNet(ModelWrapper):
 
         optimizer = Adam(lr=learning_rate)
         self.model.compile(optimizer=optimizer, loss=categorical_crossentropy, metrics=['accuracy'])
-
 
     def train(self, training_data, batch_size, epochs, run_folder, print_every_n_batches=100, initial_epoch=0,
               lr_decay=1, embedding_samples: int = 5000):

@@ -1,5 +1,6 @@
 import logging
 import os
+from threading import Thread
 from typing import Union, Sequence
 
 import numpy as np
@@ -7,6 +8,7 @@ from PIL import Image
 from keras import Model
 from keras.callbacks import Callback
 from matplotlib import pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 class FeatureMapVisualizationCallback(Callback):
@@ -23,19 +25,28 @@ class FeatureMapVisualizationCallback(Callback):
         self.fmas = {}
         self.batch_nrs = []
         self.epoch = 1
+        self.fig_num = 2
         self.num_samples = num_samples
         idxs = np.random.randint(0, len(self.x_train), num_samples)
         self.samples = [np.copy(self.x_train[idx]) for idx in idxs]
 
     @staticmethod
-    def _save_feature_maps(img_path_layer, fms):
+    def _save_feature_maps(img_path_layer, fms, fig_num):
         feature_maps = np.copy(fms).squeeze()
-        feature_maps = np.moveaxis(feature_maps, [0, 1, 2], [1, 2, 0])
-        feature_maps = (feature_maps - feature_maps.min()) / (feature_maps.max() - feature_maps.min())
-        feature_maps *= 255.0
-        feature_maps = feature_maps.astype(np.uint8)
+        feature_maps = np.moveaxis(feature_maps, -1, 0)
+
+        min_value = fms.min()
+        max_value = fms.max()
+        fig = plt.figure(fig_num, figsize=(8.0, 6.0))
         for i, f_map in enumerate(feature_maps):
-            Image.fromarray(f_map.squeeze()).save(os.path.join(img_path_layer, "map_{}.jpg".format(i)))
+            ax = fig.gca()
+            img = ax.imshow(f_map.squeeze(), vmin=min_value, vmax=max_value)
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes("right", size="5%", pad=0.05)
+            fig.colorbar(img, cax=cax)
+            fig.savefig(os.path.join(img_path_layer, "map_{}.png".format(i)))
+            fig.clear()
+        plt.close(fig)
 
     def on_epoch_end(self, epoch, logs=None):
         self.epoch += 1
@@ -92,8 +103,10 @@ class FeatureMapVisualizationCallback(Callback):
                     img_path_layer = os.path.join(img_path, "{}".format(output_layer.name))
                     os.makedirs(img_path_layer, exist_ok=True)
 
-                    feature_maps = model.predict(sample[np.newaxis, :])
-                    self._save_feature_maps(img_path_layer, feature_maps)
+                    feature_maps = model.predict(sample[np.newaxis, :], batch_size=1, verbose=1)
+                    # as the printing a very long time, we do this in threads
+                    Thread(target=self._save_feature_maps, args=(img_path_layer, feature_maps, self.fig_num)).start()
+                    self.fig_num += 1
                     fmas = np.sum(np.abs(feature_maps), axis=tuple(range(len(feature_maps.shape)))[:-1])
                     fmas = fmas
                     self.fmas.setdefault(sample_nr, {})

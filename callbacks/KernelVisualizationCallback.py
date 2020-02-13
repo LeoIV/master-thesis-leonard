@@ -1,10 +1,13 @@
 import logging
 import os
+from threading import Thread
 from typing import Union
 
 import numpy as np
 from PIL import Image
 from keras.callbacks import Callback
+from matplotlib import pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 class KernelVisualizationCallback(Callback):
@@ -15,8 +18,22 @@ class KernelVisualizationCallback(Callback):
         self.log_dir = log_dir
         self.seen = 0
         self.epoch = 1
+        self._fig_num = 2
         self.print_every_n_batches = print_every_n_batches
         self.layer_idx = layer_idx
+
+    @staticmethod
+    def _plot_kernels(filters, img_path, fig_num):
+        fig = plt.figure(fig_num, figsize=((8.0, 6.0)))
+        for map_nr, f_map in enumerate(filters):
+            ax = fig.gca()
+            img = ax.imshow(f_map.squeeze())
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes("right", size="5%", pad=0.05)
+            fig.colorbar(img, cax=cax)
+            fig.savefig(os.path.join(img_path, "map_{}.png".format(map_nr)))
+            fig.clear()
+        plt.close(fig)
 
     def on_epoch_end(self, epoch, logs=None):
         self.epoch += 1
@@ -37,8 +54,5 @@ class KernelVisualizationCallback(Callback):
             img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
                                     "layer1_kernels")
             os.makedirs(img_path, exist_ok=True)
-            for map_nr, f_map in enumerate(filters):
-                f_min, f_max = f_map.min(), f_map.max()
-                f_map = (f_map - f_min) / (f_max - f_min)
-                f_map = (f_map * 255.0).astype(np.uint8)
-                Image.fromarray(f_map.squeeze()).save(os.path.join(img_path, "map_{}.jpg".format(map_nr)))
+            Thread(target=self._plot_kernels, args=(filters, img_path, self._fig_num))
+            self._fig_num += 1
