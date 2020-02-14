@@ -58,7 +58,8 @@ class FeatureMapVisualizationCallback(Callback):
             plt.rcParams["figure.figsize"] = (7 * self.num_samples, 10 + 10 * (len(self.layer_idxs)))
             self.seen += 1
             self.batch_nrs.append(batch)
-            fig, ax = plt.subplots(1 + len(self.layer_idxs), len(self.samples))
+            fig, ax = plt.subplots(1 + len(self.layer_idxs), len(self.samples), num=self.fig_num)
+            self.fig_num += 1
             for sample_nr, sample in enumerate(self.samples):
 
                 # draw sample from data
