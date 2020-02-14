@@ -5,7 +5,6 @@ from threading import Thread
 from typing import Union
 
 import numpy as np
-from PIL import Image
 from keras.callbacks import Callback
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -54,4 +53,4 @@ class KernelVisualizationCallback(Callback):
             img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
                                     "layer1_kernels")
             os.makedirs(img_path, exist_ok=True)
-            Thread(target=self._plot_kernels, args=(filters, img_path, time.time_ns())).start()
+            Thread(target=self._plot_kernels, args=(filters, img_path, round(time.time() * 10E6))).start()
