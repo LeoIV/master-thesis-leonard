@@ -80,14 +80,14 @@ def main():
     if not os.path.exists(args.logdir):
         logging.info("Creating logdir: {}".format(args.logdir))
         os.mkdir(args.logdir)
-    if not os.path.exists(weights):
-        logging.info("Creating weights dir: {}".format(weights))
-        os.mkdir(weights)
-
-    if not len(os.listdir(args.logdir)) == 0:
+    elif not len(os.listdir(args.logdir)) == 0:
         logging.warning("Logdir not empty. Deleting content...")
         rmtree(args.logdir)
         os.mkdir(args.logdir)
+
+    if not os.path.exists(weights):
+        logging.info("Creating weights dir: {}".format(weights))
+        os.mkdir(weights)
 
     if args.configuration == 'mnist':
         from models.VAE import VariationalAutoencoder
