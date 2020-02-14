@@ -3,7 +3,7 @@ from typing import Sequence, Union, Tuple
 import numpy as np
 from keras import backend as K
 from keras.layers import Input, Conv2D, Flatten, Dense, Conv2DTranspose, Reshape, Lambda, Activation, \
-    BatchNormalization, LeakyReLU, Dropout
+    BatchNormalization, LeakyReLU, Dropout, ReLU
 from keras.models import Model
 from receptivefield.keras import KerasReceptiveField
 
@@ -17,9 +17,11 @@ class VariationalAutoencoder(VAEWrapper):
                  decoder_conv_t_kernel_size: Sequence[Union[int, Tuple[int, int]]],
                  decoder_conv_t_strides: Sequence[Union[int, Tuple[int, int]]], z_dim: int, log_dir: str,
                  feature_map_visualization_layers: Sequence[int], kernel_visualization_layer: int,
-                 use_batch_norm: bool = False, use_dropout: bool = False, num_samples: int = 10):
+                 use_batch_norm: bool = False, use_dropout: bool = False, num_samples: int = 10,
+                 inner_activation: str = "ReLU"):
 
-        super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_visualization_layers)
+        super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_visualization_layers,
+                         inner_activation)
         self.name = 'variational_autoencoder'
 
         self.encoder_conv_filters = encoder_conv_filters
@@ -67,7 +69,7 @@ class VariationalAutoencoder(VAEWrapper):
             if self.use_batch_norm:
                 x = BatchNormalization()(x)
 
-            x = LeakyReLU()(x)
+            x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
             if self.use_dropout:
                 x = Dropout(rate=0.25)(x)

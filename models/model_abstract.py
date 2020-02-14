@@ -84,11 +84,12 @@ class VAEWrapper(ModelWrapper, ABC):
 
     @abstractmethod
     def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, kernel_visualization_layer: int, num_samples: int,
-                 feature_map_layers: Sequence[int]):
+                 feature_map_layers: Sequence[int], inner_activation: str = "ReLU"):
         super().__init__(input_dim, log_dir)
         self.kernel_visualization_layer = kernel_visualization_layer
         self.num_samples = num_samples
         self.feature_map_layers = feature_map_layers
+        self.inner_activation = inner_activation
 
     def compile(self, learning_rate, r_loss_factor):
         if not hasattr(self, 'model'):
@@ -176,7 +177,7 @@ class VAEWrapper(ModelWrapper, ABC):
             steps_per_epoch = math.ceil(training_data.n / batch_size)
             self.model.fit_generator(
                 training_data, shuffle=True, epochs=epochs, initial_epoch=initial_epoch, callbacks=callbacks_list,
-                steps_per_epoch=steps_per_epoch
+                steps_per_epoch=steps_per_epoch, workers=8
             )
         else:
             self.model.fit(

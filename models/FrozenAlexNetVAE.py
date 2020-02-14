@@ -1,6 +1,4 @@
 import logging
-import math
-import os
 import sys
 import traceback
 from typing import Tuple, List
@@ -8,26 +6,20 @@ from typing import Tuple, List
 import numpy as np
 from keras import Model, Input
 from keras import backend as K
-from keras.callbacks import ModelCheckpoint, TensorBoard
-from keras.layers import Dense, Lambda, LeakyReLU, Dropout, Reshape, Conv2DTranspose, BatchNormalization, Activation
-from keras.optimizers import Adam
-from keras.preprocessing.image import DirectoryIterator
-from keras_preprocessing.image import Iterator
+from keras.layers import Dense, Lambda, LeakyReLU, Dropout, Reshape, Conv2DTranspose, BatchNormalization, Activation, \
+    ReLU
 
-from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
-from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
-from callbacks.LossLoggingCallback import LossLoggingCallback
 from models.AlexNet import AlexNet
-from models.model_abstract import ModelWrapper, VAEWrapper
-from utils.callbacks import step_decay_schedule, ReconstructionImagesCallback
+from models.model_abstract import VAEWrapper
 
 
 class FrozenAlexNetVAE(VAEWrapper):
     def __init__(self, z_dim: int, use_dropout: bool, dropout_rate: float, use_batch_norm: bool,
                  shape_before_flattening: Tuple[int, int, int], input_dim: Tuple[int, int, int], log_dir: str,
                  weights_path: str, kernel_visualization_layer: int, feature_map_layers: List[int],
-                 num_samples: int = 10):
-        super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_layers)
+                 num_samples: int = 10, inner_activation: str = "ReLU"):
+        super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_layers,
+                         inner_activation)
         self.weights_path = weights_path
         self.shape_before_flattening = shape_before_flattening
         self.z_dim = z_dim
@@ -92,7 +84,8 @@ class FrozenAlexNetVAE(VAEWrapper):
             x = Dropout(rate=self.dropout_rate)(x)
         # FC1 - reverse
         x = Dense(np.prod(self.shape_before_flattening))(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
+
         if self.use_dropout:
             x = Dropout(rate=self.dropout_rate)(x)
 
@@ -106,25 +99,25 @@ class FrozenAlexNetVAE(VAEWrapper):
         x = Conv2DTranspose(filters=384, kernel_size=(3, 3), strides=(2, 2), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 4 - reverse
         x = Conv2DTranspose(filters=384, kernel_size=(3, 3), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 3 - reverse
         x = Conv2DTranspose(filters=256, kernel_size=(3, 3), padding='same', strides=(2, 2))(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 2 - reverse
         x = Conv2DTranspose(filters=96, kernel_size=(5, 5), padding='same', strides=(2, 2))(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 1 - revese
         # x = UpSampling2D(size=(2, 2))(x)

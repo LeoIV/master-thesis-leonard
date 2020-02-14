@@ -68,6 +68,7 @@ def main():
                         help="Which dataset to use for training. WARNING: Use ImageNet for classification.")
     parser.add_argument('--use_fc', type=str2bool, default=True, help="Whether to use the fully connected layers in "
                                                                       "AlexNet or not.")
+    parser.add_argument('--inner_activation', type=str, choices=["ReLU", "LeakyReLU"], default="ReLU")
     args = parser.parse_args()
 
     dataset_subfolder = 'celeb' if args.dataset == 'celeba' else 'imagenet/ILSVRC/Data/CLS-LOC/train'
@@ -144,8 +145,8 @@ def main():
         INPUT_DIM = (224, 224, 3)
         model = AlexNetVAE(input_dim=INPUT_DIM, log_dir=args.logdir, z_dim=args.z_dim,
                            feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,
-                           kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples)
-        model.decoder.summary()
+                           kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
+                           use_fc=args.use_fc, inner_activation=args.inner_activation)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(
             directory=os.path.join(args.data_path, dataset_subfolder),

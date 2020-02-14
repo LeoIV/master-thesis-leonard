@@ -3,7 +3,7 @@ from typing import Tuple
 import numpy as np
 from keras import backend as K
 from keras.layers import Input, Conv2D, Flatten, Dense, Dropout, MaxPool2D, BatchNormalization, Lambda, \
-    Reshape, Conv2DTranspose, Activation, LeakyReLU, UpSampling2D
+    Reshape, Conv2DTranspose, Activation, LeakyReLU, UpSampling2D, ReLU
 from keras.models import Model
 
 from models.model_abstract import VAEWrapper
@@ -13,9 +13,10 @@ class AlexNetVAE(VAEWrapper):
 
     def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, z_dim: int, kernel_visualization_layer: int = -1,
                  use_batch_norm: bool = False, use_dropout: bool = False, dropout_rate: float = 0.5,
-                 feature_map_layers=None, num_samples: int = 5):
+                 feature_map_layers=None, num_samples: int = 5, inner_activation: str = "ReLU", use_fc: bool = True):
 
-        super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_layers)
+        super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_layers,
+                         inner_activation)
         self.name = 'variational_autoencoder'
 
         self.z_dim = z_dim
@@ -23,6 +24,7 @@ class AlexNetVAE(VAEWrapper):
         self.use_batch_norm = use_batch_norm
         self.use_dropout = use_dropout
         self.dropout_rate = dropout_rate
+        self.use_fc = use_fc
 
         self._build()
 
@@ -34,42 +36,56 @@ class AlexNetVAE(VAEWrapper):
         x = encoder_input
 
         # Layer 1
-        x = Conv2D(filters=96, input_shape=(224, 224, 3), kernel_size=(11, 11), strides=(4, 4), padding='same')(x)
+        x = Conv2D(filters=96, input_shape=(224, 224, 3), kernel_size=(11, 11), strides=(4, 4), padding="same")(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
         x = MaxPool2D(pool_size=(2, 2))(x)
 
         # Layer 2
-        x = Conv2D(filters=256, kernel_size=(5, 5))(x)
+        x = Conv2D(filters=256, kernel_size=(5, 5), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
         x = MaxPool2D(pool_size=(2, 2))(x)
 
         # Layer 3
-        x = Conv2D(filters=384, kernel_size=(3, 3))(x)
+        x = Conv2D(filters=384, kernel_size=(3, 3), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 4
-        x = Conv2D(filters=384, kernel_size=(3, 3))(x)
+        x = Conv2D(filters=384, kernel_size=(3, 3), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 5
-        x = Conv2D(filters=256, kernel_size=(3, 3))(x)
+        x = Conv2D(filters=256, kernel_size=(3, 3), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 6
-        x = MaxPool2D(pool_size=(2, 2), strides=(2, 2))(x)
+        x = MaxPool2D(pool_size=(2, 2), strides=(2, 2), padding='same')(x)
         shape_before_flattening = K.int_shape(x)[1:]
         # Flatten
         x = Flatten()(x)
+
+        if self.use_fc:
+            # FC1
+            x = Dense(4096)(x)
+            # , input_shape=(np.prod(self.input_dim),)
+            x = LeakyReLU()(x)
+            if self.use_dropout:
+                x = Dropout(rate=self.dropout_rate)(x)
+
+            # FC2
+            x = Dense(4096)(x)
+            x = LeakyReLU()(x)
+            if self.use_dropout:
+                x = Dropout(rate=self.dropout_rate)(x)
 
         self.mu = Dense(self.z_dim, name='mu')(x)
         self.log_var = Dense(self.z_dim, name='log_var')(x)
@@ -90,48 +106,57 @@ class AlexNetVAE(VAEWrapper):
 
         x = decoder_input
 
+        if self.use_fc:
+            # FC2 - reverse
+            x = Dense(4096)(x)
+            x = LeakyReLU()(x)
+            if self.use_dropout:
+                x = Dropout(rate=self.dropout_rate)(x)
+            # FC1 - reverse
+            x = Dense(np.prod(shape_before_flattening))(x)
+            x = LeakyReLU()(x)
+            if self.use_dropout:
+                x = Dropout(rate=self.dropout_rate)(x)
+
         # FC1 - reverse
         x = Dense(np.prod(shape_before_flattening))(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
         if self.use_dropout:
             x = Dropout(rate=self.dropout_rate)(x)
 
         # Unflatten
         x = Reshape(shape_before_flattening)(x)
+
         # Layer 6 - reverse
         # x = UpSampling2D(size=(2, 2))(x)
 
         # Layer 5 - reverse
-        x = Conv2DTranspose(filters=384, kernel_size=(2, 2), strides=(2, 2), padding='valid')(x)
+        x = Conv2DTranspose(filters=384, kernel_size=(3, 3), strides=(2, 2), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 4 - reverse
-        x = Conv2DTranspose(filters=384, kernel_size=(2, 2), strides=(3, 3))(x)
+        x = Conv2DTranspose(filters=384, kernel_size=(3, 3), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 3 - reverse
-        x = Conv2DTranspose(filters=256, kernel_size=(2, 2), strides=(3, 3))(x)
+        x = Conv2DTranspose(filters=256, kernel_size=(3, 3), padding='same', strides=(2, 2))(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
-
-        # x = UpSampling2D(size=(2, 2))(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 2 - reverse
-        x = Conv2DTranspose(filters=96, kernel_size=(3, 3), strides=(2, 2))(x)
+        x = Conv2DTranspose(filters=96, kernel_size=(5, 5), padding='same', strides=(2, 2))(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
-
-        # x = UpSampling2D(size=(2, 2))(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 1 - revese
         # x = UpSampling2D(size=(2, 2))(x)
-        x = Conv2DTranspose(filters=self.input_dim[-1], kernel_size=(8, 8), strides=(2, 2))(x)
+        x = Conv2DTranspose(filters=self.input_dim[-1], kernel_size=(11, 11), strides=(4, 4), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         decoder_output = x = Activation('sigmoid')(x)
