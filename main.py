@@ -186,7 +186,7 @@ def main():
     model.model.summary(print_fn=lambda x: logging.info(x))
 
     try:
-        model.train(training_data, epochs=args.num_epochs, run_folder=weights, batch_size=args.batch_size,
+        model.train(training_data, epochs=args.num_epochs, weights_folder=weights, batch_size=args.batch_size,
                     print_every_n_batches=args.print_every_n_batches, initial_epoch=args.initial_epoch)
     except Exception as e:
         logging.error("An error occurred during training:")

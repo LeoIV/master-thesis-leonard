@@ -64,7 +64,7 @@ class ModelWrapper(ABC):
 
         for k, v in models_to_plot.items():
             try:
-                plot_model(v, os.path.join(self.log_dir, '{}}.png'.format(k)))
+                plot_model(v, os.path.join(self.log_dir, '{}.png'.format(k)))
             except Exception as e:
                 logging.error("unable to save model as png")
                 exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -132,7 +132,7 @@ class VAEWrapper(ModelWrapper, ABC):
                                  "decoder")
         super().save()
 
-    def train(self, training_data, batch_size, epochs, run_folder, print_every_n_batches=100, initial_epoch=0,
+    def train(self, training_data, batch_size, epochs, weights_folder, print_every_n_batches=100, initial_epoch=0,
               lr_decay=1, embedding_samples: int = 5000):
 
         if isinstance(training_data, Iterator):
@@ -151,9 +151,9 @@ class VAEWrapper(ModelWrapper, ABC):
 
         lr_sched = step_decay_schedule(initial_lr=self.learning_rate, decay_factor=lr_decay, step_size=1)
 
-        checkpoint_filepath = os.path.join(run_folder, "weights/weights-{epoch:03d}-{loss:.2f}.h5")
+        checkpoint_filepath = os.path.join(weights_folder, "weights-{epoch:03d}-{loss:.2f}.h5")
         checkpoint1 = ModelCheckpoint(checkpoint_filepath, save_weights_only=True, verbose=1)
-        checkpoint2 = ModelCheckpoint(os.path.join(run_folder, 'weights/weights.h5'), save_weights_only=True, verbose=1)
+        checkpoint2 = ModelCheckpoint(os.path.join(weights_folder, 'weights.h5'), save_weights_only=True, verbose=1)
         tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, update_freq="batch")
         if self.kernel_visualization_layer >= 0:
             kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, vae=self,
