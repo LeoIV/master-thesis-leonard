@@ -177,7 +177,7 @@ class VAEWrapper(ModelWrapper, ABC):
             steps_per_epoch = math.ceil(training_data.n / batch_size)
             self.model.fit_generator(
                 training_data, shuffle=True, epochs=epochs, initial_epoch=initial_epoch, callbacks=callbacks_list,
-                steps_per_epoch=steps_per_epoch, workers=8
+                steps_per_epoch=steps_per_epoch, workers=16
             )
         else:
             self.model.fit(
