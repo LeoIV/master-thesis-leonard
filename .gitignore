@@ -1,3 +1,4 @@
 # Project exclude paths
 /data/
 /venv/
+/results/*

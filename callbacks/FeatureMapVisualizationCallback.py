@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 from threading import Thread
 from typing import Union, Sequence
 
@@ -25,7 +26,6 @@ class FeatureMapVisualizationCallback(Callback):
         self.fmas = {}
         self.batch_nrs = []
         self.epoch = 1
-        self.fig_num = 2
         self.num_samples = num_samples
         idxs = np.random.randint(0, len(self.x_train), num_samples)
         self.samples = [np.copy(self.x_train[idx]) for idx in idxs]
@@ -58,8 +58,7 @@ class FeatureMapVisualizationCallback(Callback):
             plt.rcParams["figure.figsize"] = (7 * self.num_samples, 10 + 10 * (len(self.layer_idxs)))
             self.seen += 1
             self.batch_nrs.append(batch)
-            fig, ax = plt.subplots(1 + len(self.layer_idxs), len(self.samples), num=self.fig_num)
-            self.fig_num += 1
+            fig, ax = plt.subplots(1 + len(self.layer_idxs), len(self.samples), num=time.time_ns())
             for sample_nr, sample in enumerate(self.samples):
 
                 # draw sample from data
@@ -106,8 +105,8 @@ class FeatureMapVisualizationCallback(Callback):
 
                     feature_maps = model.predict(sample[np.newaxis, :], batch_size=1, verbose=1)
                     # as the printing a very long time, we do this in threads
-                    Thread(target=self._save_feature_maps, args=(img_path_layer, feature_maps, self.fig_num)).start()
-                    self.fig_num += 1
+                    Thread(target=self._save_feature_maps,
+                           args=(img_path_layer, feature_maps, time.time_ns())).start()
                     fmas = np.sum(np.abs(feature_maps), axis=tuple(range(len(feature_maps.shape)))[:-1])
                     fmas = fmas
                     self.fmas.setdefault(sample_nr, {})
