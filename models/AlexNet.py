@@ -120,7 +120,7 @@ class AlexNet(DeepCNNModelWrapper):
         optimizer = Adam(lr=learning_rate, decay=self.decay_rate)
         self.model.compile(optimizer=optimizer, loss=categorical_crossentropy, metrics=['accuracy'])
 
-    def train(self, training_data, batch_size, epochs, run_folder, print_every_n_batches=100, initial_epoch=0,
+    def train(self, training_data, batch_size, epochs, weights_folder, print_every_n_batches=100, initial_epoch=0,
               lr_decay=1, embedding_samples: int = 5000):
 
         if isinstance(training_data, Iterator):
@@ -139,9 +139,10 @@ class AlexNet(DeepCNNModelWrapper):
 
         lr_sched = step_decay_schedule(initial_lr=self.learning_rate, decay_factor=lr_decay, step_size=1)
 
-        checkpoint_filepath = os.path.join(run_folder, "weights/weights-{epoch:03d}-{loss:.2f}.h5")
+        checkpoint_filepath = os.path.join(weights_folder, "weights/weights-{epoch:03d}-{loss:.2f}.h5")
         checkpoint1 = ModelCheckpoint(checkpoint_filepath, save_weights_only=True, verbose=1)
-        checkpoint2 = ModelCheckpoint(os.path.join(run_folder, 'weights/weights.h5'), save_weights_only=True, verbose=1)
+        checkpoint2 = ModelCheckpoint(os.path.join(weights_folder, 'weights/weights.h5'), save_weights_only=True,
+                                      verbose=1)
         tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, update_freq="batch")
         if self.kernel_visualization_layer >= 0:
             kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, vae=self,
