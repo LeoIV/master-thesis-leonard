@@ -13,10 +13,11 @@ class AlexNetVAE(VAEWrapper):
 
     def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, z_dim: int, kernel_visualization_layer: int = -1,
                  use_batch_norm: bool = False, use_dropout: bool = False, dropout_rate: float = 0.5,
-                 feature_map_layers=None, num_samples: int = 5, inner_activation: str = "ReLU", use_fc: bool = True):
+                 feature_map_layers=None, num_samples: int = 5, inner_activation: str = "ReLU", use_fc: bool = True,
+                 decay_rate: float = 1e-7):
 
         super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_layers,
-                         inner_activation)
+                         inner_activation, decay_rate)
         self.name = 'variational_autoencoder'
 
         self.z_dim = z_dim

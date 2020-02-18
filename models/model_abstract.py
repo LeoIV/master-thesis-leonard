@@ -80,16 +80,22 @@ class ModelWrapper(ABC):
         self.model.load_weights(filepath)
 
 
-class VAEWrapper(ModelWrapper, ABC):
+class DeepCNNModelWrapper(ModelWrapper, ABC):
+    def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, inner_activation: str = "ReLU"):
+        super().__init__(input_dim, log_dir)
+        self.inner_activation = inner_activation
+
+
+class VAEWrapper(DeepCNNModelWrapper, ABC):
 
     @abstractmethod
     def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, kernel_visualization_layer: int, num_samples: int,
-                 feature_map_layers: Sequence[int], inner_activation: str = "ReLU"):
-        super().__init__(input_dim, log_dir)
+                 feature_map_layers: Sequence[int], inner_activation: str, decay_rate: float):
+        super().__init__(input_dim, log_dir, inner_activation)
+        self.decay_rate = decay_rate
         self.kernel_visualization_layer = kernel_visualization_layer
         self.num_samples = num_samples
         self.feature_map_layers = feature_map_layers
-        self.inner_activation = inner_activation
 
     def compile(self, learning_rate, r_loss_factor):
         if not hasattr(self, 'model'):
@@ -116,7 +122,7 @@ class VAEWrapper(ModelWrapper, ABC):
             kl_loss = vae_kl_loss(y_true, y_pred)
             return r_loss + kl_loss
 
-        optimizer = Adam(lr=learning_rate)
+        optimizer = Adam(lr=learning_rate, decay=self.decay_rate)
         self.model.compile(optimizer=optimizer, loss=vae_loss, metrics=[vae_r_loss, vae_kl_loss])
 
     def save(self):

@@ -5,7 +5,7 @@ from typing import Tuple
 
 import numpy as np
 from keras.callbacks import ModelCheckpoint, TensorBoard
-from keras.layers import Input, Conv2D, Flatten, Dense, Dropout, MaxPool2D, Softmax, BatchNormalization, LeakyReLU
+from keras.layers import Input, Conv2D, Flatten, Dense, Dropout, MaxPool2D, Softmax, BatchNormalization, LeakyReLU, ReLU
 from keras.losses import categorical_crossentropy
 from keras.models import Model
 from keras.optimizers import Adam
@@ -14,11 +14,11 @@ from keras_preprocessing.image import DirectoryIterator, Iterator
 from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
 from callbacks.LossLoggingCallback import LossLoggingCallback
-from models.model_abstract import ModelWrapper
+from models.model_abstract import DeepCNNModelWrapper
 from utils.callbacks import step_decay_schedule
 
 
-class AlexNet(ModelWrapper):
+class AlexNet(DeepCNNModelWrapper):
     """
     An AlexNet-like image classification network.
     """
@@ -26,9 +26,11 @@ class AlexNet(ModelWrapper):
     def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, use_batch_norm: bool = False,
                  use_dropout: bool = False,
                  dropout_rate: float = 0.5, feature_map_layers=None, kernel_visualization_layer: int = -1,
-                 num_samples: int = 5, use_fc: bool = True):
+                 num_samples: int = 5, use_fc: bool = True, inner_activation: str = "ReLU", decay_rate: float = 1e-7):
 
-        super().__init__(input_dim, log_dir)
+        super().__init__(input_dim, log_dir, inner_activation)
+        self.decay_rate = decay_rate
+        self.use_fc = use_fc
         if feature_map_layers is None:
             feature_map_layers = []
         self.kernel_visualization_layer = kernel_visualization_layer
@@ -41,9 +43,9 @@ class AlexNet(ModelWrapper):
         self.use_dropout = use_dropout
         self.dropout_rate = dropout_rate
 
-        self._build(self.input_dim)
+        self._build()
 
-    def _build(self, input_dim):
+    def _build(self):
 
         # THE ENCODER
         input = Input(shape=self.input_dim, name='model_input')
@@ -54,33 +56,33 @@ class AlexNet(ModelWrapper):
         x = Conv2D(filters=96, input_shape=(224, 224, 3), kernel_size=(11, 11), strides=(4, 4), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
         x = MaxPool2D(pool_size=(2, 2))(x)
 
         # Layer 2
         x = Conv2D(filters=256, kernel_size=(5, 5), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
         x = MaxPool2D(pool_size=(2, 2))(x)
 
         # Layer 3
         x = Conv2D(filters=384, kernel_size=(3, 3), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 4
         x = Conv2D(filters=384, kernel_size=(3, 3), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 5
         x = Conv2D(filters=256, kernel_size=(3, 3), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
-        x = LeakyReLU()(x)
+        x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 6
         x = MaxPool2D(pool_size=(2, 2), strides=(2, 2), padding='same')(x)
@@ -90,13 +92,13 @@ class AlexNet(ModelWrapper):
             # FC1
             x = Dense(4096)(x)
             # , input_shape=(np.prod(self.input_dim),)
-            x = LeakyReLU()(x)
+            x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
             if self.use_dropout:
                 x = Dropout(rate=self.dropout_rate)(x)
 
             # FC2
             x = Dense(4096)(x)
-            x = LeakyReLU()(x)
+            x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
             if self.use_dropout:
                 x = Dropout(rate=self.dropout_rate)(x)
 
@@ -115,7 +117,7 @@ class AlexNet(ModelWrapper):
     def compile(self, learning_rate, r_loss_factor):
         self.learning_rate = learning_rate
 
-        optimizer = Adam(lr=learning_rate)
+        optimizer = Adam(lr=learning_rate, decay=self.decay_rate)
         self.model.compile(optimizer=optimizer, loss=categorical_crossentropy, metrics=['accuracy'])
 
     def train(self, training_data, batch_size, epochs, run_folder, print_every_n_batches=100, initial_epoch=0,

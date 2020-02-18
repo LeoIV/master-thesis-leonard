@@ -68,7 +68,11 @@ def main():
                         help="Which dataset to use for training. WARNING: Use ImageNet for classification.")
     parser.add_argument('--use_fc', type=str2bool, default=True, help="Whether to use the fully connected layers in "
                                                                       "AlexNet or not.")
-    parser.add_argument('--inner_activation', type=str, choices=["ReLU", "LeakyReLU"], default="ReLU")
+    parser.add_argument('--inner_activation', type=str, choices=["ReLU", "LeakyReLU"], default="ReLU",
+                        help="The activation functions used inside the model (output activation usually won't be "
+                             "affected by this setting).")
+    parser.add_argument('--lr_decay', type=float, default=1e-7,
+                        help="The learning rate decay. Should be in interval [0,1].")
     args = parser.parse_args()
 
     dataset_subfolder = 'celeb' if args.dataset == 'celeba' else 'imagenet/ILSVRC/Data/CLS-LOC/train'
@@ -95,7 +99,10 @@ def main():
         model = VariationalAutoencoder(input_dim=INPUT_DIM, encoder_conv_filters=[32, 64, 64, 64],
                                        encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[1, 2, 2, 1],
                                        decoder_conv_t_filters=[64, 64, 32, 1], decoder_conv_t_kernel_size=[3, 3, 3, 3],
-                                       decoder_conv_t_strides=[1, 2, 2, 1], log_dir=args.logdir, z_dim=args.z_dim)
+                                       decoder_conv_t_strides=[1, 2, 2, 1], log_dir=args.logdir, z_dim=args.z_dim,
+                                       decay_rate=args.lr_decay, inner_activation=args.inner_activation,
+                                       feature_map_visualization_layers=args.feature_map_layers,
+                                       kernel_visualization_layer=args.kernel_visualization_layer)
         (training_data, _), (_, _) = load_mnist()
 
     elif args.configuration == 'celeba':
@@ -106,7 +113,9 @@ def main():
                                        decoder_conv_t_filters=[64, 64, 32, 3], decoder_conv_t_kernel_size=[3, 3, 3, 3],
                                        decoder_conv_t_strides=[2, 2, 2, 2], log_dir=args.logdir, z_dim=args.z_dim,
                                        kernel_visualization_layer=args.kernel_visualization_layer,
-                                       feature_map_visualization_layers=args.feature_map_layers)
+                                       feature_map_visualization_layers=args.feature_map_layers,
+                                       decay_rate=args.lr_decay,
+                                       inner_activation=args.inner_activation)
         data_gen = ImageDataGenerator(rescale=1. / 255)
 
         training_data = data_gen.flow_from_directory(os.path.join(args.data_path, dataset_subfolder),
@@ -122,6 +131,7 @@ def main():
                                        decoder_conv_t_strides=[2, 2, 2, 4], log_dir=args.logdir, z_dim=args.z_dim,
                                        use_batch_norm=args.use_batch_norm, use_dropout=args.use_dropout,
                                        kernel_visualization_layer=args.kernel_visualization_layer,
+                                       inner_activation=args.inner_activation, decay_rate=args.lr_decay,
                                        feature_map_visualization_layers=args.feature_map_layers)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(os.path.join(args.data_path, dataset_subfolder),
@@ -132,7 +142,8 @@ def main():
     elif args.configuration == 'imagenet_classification_alexnet':
         INPUT_DIM = (224, 224, 3)
         model = AlexNet(input_dim=INPUT_DIM, log_dir=args.logdir, feature_map_layers=args.feature_map_layers,
-                        use_batch_norm=args.use_batch_norm,
+                        use_batch_norm=args.use_batch_norm, decay_rate=args.lr_decay,
+                        inner_activation=args.inner_activation,
                         kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
                         use_fc=args.use_fc)
         data_gen = ImageDataGenerator(rescale=1. / 255)
@@ -146,7 +157,7 @@ def main():
         model = AlexNetVAE(input_dim=INPUT_DIM, log_dir=args.logdir, z_dim=args.z_dim,
                            feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,
                            kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
-                           use_fc=args.use_fc, inner_activation=args.inner_activation)
+                           use_fc=args.use_fc, inner_activation=args.inner_activation, decay_rate=args.lr_decay)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(
             directory=os.path.join(args.data_path, dataset_subfolder),
@@ -160,7 +171,8 @@ def main():
         model = FrozenAlexNetVAE(z_dim=args.z_dim, use_dropout=args.use_dropout, dropout_rate=args.dropout_rate,
                                  use_batch_norm=args.use_batch_norm, shape_before_flattening=shape_before_flattening,
                                  input_dim=INPUT_DIM, log_dir=args.logdir, weights_path=args.alexnet_weights_path,
-                                 kernel_visualization_layer=args.kernel_visualization_layer,
+                                 kernel_visualization_layer=args.kernel_visualization_layer, decay_rate=args.lr_decay,
+                                 inner_activation=args.inner_activation,
                                  feature_map_layers=args.feature_map_layers, num_samples=args.num_samples)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(
