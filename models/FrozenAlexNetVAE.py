@@ -1,4 +1,5 @@
 import logging
+import math
 import sys
 import traceback
 from typing import Tuple, List
@@ -79,7 +80,7 @@ class FrozenAlexNetVAE(VAEWrapper):
         x = decoder_input
 
         # FC2 - reverse
-        x = Dense(4096)(x)
+        x = Dense(math.ceil(4096 / self.feature_map_reduction_factor))(x)
         x = LeakyReLU()(x)
         if self.use_dropout:
             x = Dropout(rate=self.dropout_rate)(x)
@@ -97,25 +98,29 @@ class FrozenAlexNetVAE(VAEWrapper):
         # x = UpSampling2D(size=(2, 2))(x)
 
         # Layer 5 - reverse
-        x = Conv2DTranspose(filters=384, kernel_size=(3, 3), strides=(2, 2), padding='same')(x)
+        x = Conv2DTranspose(filters=math.ceil(384 / self.feature_map_reduction_factor), kernel_size=(3, 3),
+                            strides=(2, 2), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 4 - reverse
-        x = Conv2DTranspose(filters=384, kernel_size=(3, 3), padding='same')(x)
+        x = Conv2DTranspose(filters=math.ceil(384 / self.feature_map_reduction_factor), kernel_size=(3, 3),
+                            padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 3 - reverse
-        x = Conv2DTranspose(filters=256, kernel_size=(3, 3), padding='same', strides=(2, 2))(x)
+        x = Conv2DTranspose(filters=math.ceil(256 / self.feature_map_reduction_factor), kernel_size=(3, 3),
+                            padding='same', strides=(2, 2))(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 2 - reverse
-        x = Conv2DTranspose(filters=96, kernel_size=(5, 5), padding='same', strides=(2, 2))(x)
+        x = Conv2DTranspose(filters=math.ceil(96 / self.feature_map_reduction_factor), kernel_size=(5, 5),
+                            padding='same', strides=(2, 2))(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
