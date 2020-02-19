@@ -81,8 +81,10 @@ class ModelWrapper(ABC):
 
 
 class DeepCNNModelWrapper(ModelWrapper, ABC):
-    def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, inner_activation: str = "ReLU"):
+    def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, feature_map_reduction_factor: int,
+                 inner_activation: str = "ReLU"):
         super().__init__(input_dim, log_dir)
+        self.feature_map_reduction_factor = feature_map_reduction_factor
         self.inner_activation = inner_activation
 
 
@@ -90,8 +92,9 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
 
     @abstractmethod
     def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, kernel_visualization_layer: int, num_samples: int,
-                 feature_map_layers: Sequence[int], inner_activation: str, decay_rate: float):
-        super().__init__(input_dim, log_dir, inner_activation)
+                 feature_map_layers: Sequence[int], inner_activation: str, decay_rate: float,
+                 feature_map_reduction_factor: int):
+        super().__init__(input_dim, log_dir, feature_map_reduction_factor, inner_activation)
         self.decay_rate = decay_rate
         self.kernel_visualization_layer = kernel_visualization_layer
         self.num_samples = num_samples

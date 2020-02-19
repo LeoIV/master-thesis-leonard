@@ -17,9 +17,10 @@ class FrozenAlexNetVAE(VAEWrapper):
     def __init__(self, z_dim: int, use_dropout: bool, dropout_rate: float, use_batch_norm: bool,
                  shape_before_flattening: Tuple[int, int, int], input_dim: Tuple[int, int, int], log_dir: str,
                  weights_path: str, kernel_visualization_layer: int, feature_map_layers: List[int],
-                 num_samples: int = 10, inner_activation: str = "ReLU", decay_rate: float = 1e-7):
+                 num_samples: int = 10, inner_activation: str = "ReLU", decay_rate: float = 1e-7,
+                 feature_map_reduction_factor: int = 1):
         super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_layers,
-                         inner_activation, decay_rate)
+                         inner_activation, decay_rate, feature_map_reduction_factor)
         self.weights_path = weights_path
         self.shape_before_flattening = shape_before_flattening
         self.z_dim = z_dim

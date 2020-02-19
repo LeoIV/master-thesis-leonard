@@ -48,10 +48,15 @@ In order to achieve this, the autoencoder is usually trained by minimizing $\mat
 \end{align}
 One common choice for $\mathcal{L}$ is the \ac{MSE} which is defined as
 \begin{align}
-    \mathcal{L}(\mathbf{x}, \mathbf{y}) = \frac{1}{n}\sum (\mathbf{x}_i - \mathbf{y}_i)^2
+    \mathcal{L}(\mathbf{x}, \mathbf{y}) = \frac{1}{n}\sum (\mathbf{x}_i - \mathbf{y}_i)^2 \label{eq:mse}
 \end{align}~\citep[p. 106]{Goodfellow-et-al-2016}.
+Note that for linear activations in the autoencoder, the space spanned by the first $m$ principal components is the optimal solution for equation~\ref{eq:mse}~\citep{chicco2014deep}.
 
 \subsubsection{Variational Autoencoders}
+
+Other than for autoencoders, the goal for \acp{VAE} is \textit{generation} of samples.
+
+Another disadvantage of \acp{VAE} is that they \say{use only a small subset of the dimensions of $\mathbf{z}$}~\citep[p. 694]{Goodfellow-et-al-2016}.
 
 \subsection{Visual Features in Neural Networks}\label{subsec:visual_features_in_neural_networks}
 \begin{itemize}

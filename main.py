@@ -73,6 +73,9 @@ def main():
                              "affected by this setting).")
     parser.add_argument('--lr_decay', type=float, default=1e-7,
                         help="The learning rate decay. Should be in interval [0,1].")
+    parser.add_argument('--feature_map_reduction_factor', type=int, default=1,
+                        help="The factor by which to reduce the number of feature maps. If a layer usually has 50 "
+                             "feature maps, setting a factor to 2 will yield only 25 feature maps.")
     args = parser.parse_args()
 
     dataset_subfolder = 'celeb' if args.dataset == 'celeba' else 'imagenet/ILSVRC/Data/CLS-LOC/train'

@@ -26,9 +26,10 @@ class AlexNet(DeepCNNModelWrapper):
     def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, use_batch_norm: bool = False,
                  use_dropout: bool = False,
                  dropout_rate: float = 0.5, feature_map_layers=None, kernel_visualization_layer: int = -1,
-                 num_samples: int = 5, use_fc: bool = True, inner_activation: str = "ReLU", decay_rate: float = 1e-7):
+                 num_samples: int = 5, use_fc: bool = True, inner_activation: str = "ReLU", decay_rate: float = 1e-7,
+                 feature_map_reduction_factor: int = 1):
 
-        super().__init__(input_dim, log_dir, inner_activation)
+        super().__init__(input_dim, log_dir, feature_map_reduction_factor, inner_activation)
         self.decay_rate = decay_rate
         self.use_fc = use_fc
         if feature_map_layers is None:

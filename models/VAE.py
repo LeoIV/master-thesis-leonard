@@ -18,10 +18,10 @@ class VariationalAutoencoder(VAEWrapper):
                  decoder_conv_t_strides: Sequence[Union[int, Tuple[int, int]]], z_dim: int, log_dir: str,
                  feature_map_visualization_layers: Sequence[int], kernel_visualization_layer: int,
                  use_batch_norm: bool = False, use_dropout: bool = False, num_samples: int = 10,
-                 inner_activation: str = "ReLU", decay_rate: float = 1e-7):
+                 inner_activation: str = "ReLU", decay_rate: float = 1e-7, feature_map_reduction_factor: int = 1):
 
         super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_visualization_layers,
-                         inner_activation, decay_rate)
+                         inner_activation, decay_rate, feature_map_reduction_factor)
         self.name = 'variational_autoencoder'
 
         self.encoder_conv_filters = encoder_conv_filters
