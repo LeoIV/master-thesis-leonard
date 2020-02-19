@@ -15,18 +15,18 @@ Two different datasets were used to train the models.
 \end{wrapfigure}
 
 The \textit{CelebA} dataset~\citep{liu2015faceattributes} consists of 202,599 RGB images of size 178 x 218 pixels representing celebrities, as well as 40 binary attributes.
-The images belong to 10.177 unique identities\footnote{The identities are not revealed.} as well as five ``landmark annotations".
+The images belong to 10.177 unique identities\footnote{The identities are not revealed.} as well as five \say{landmark annotations}.
 They are aligned and cropped resulting in images of same size always showing only one face (see Figure~\ref{fig:celeba_sample} for an example).
 The landmark annotations give the positions of facial attributes in the image, specifically of the left and right eye, the nose, and the left and right corner of the mouth.
 The binary attributes indicate if the image has certain attributes, for example if the person wears eyeglasses, has black hair, is smiling, etc\footnote{See \href{https://www.kaggle.com/jessicali9530/celeba-dataset\#list\_attr\_celeba.csv}{https://www.kaggle.com/jessicali9530/celeba-dataset\#list\_attr\_celeba.csv} for a complete list of the attributes, login required. Last access: 12/02/2020.}.
 
 \subsubsection{ImageNet}\label{ssec:imagenet}
 
-ImageNet\footnote{\href{http://image-net.org/}{http://image-net.org/}, last access: 12/02/2020.} is a large-scale ``image database organized according to the WordNet hierarchy"~\citep{imagenet_cvpr09} consisting of over 14 million images as of February 2020.
-Accordingly to WordNet\footnote{See \href{https://wordnet.princeton.edu/}{https://wordnet.princeton.edu/}, last access: 12/02/2020.}, on different levels of granularity, the images are subdivided into groups called ``synsets"~\citep{imagenet_cvpr09}.
+ImageNet\footnote{\href{http://image-net.org/}{http://image-net.org/}, last access: 12/02/2020.} is a large-scale \say{image database organized according to the WordNet hierarchy}~\citep{imagenet_cvpr09} consisting of over 14 million images as of February 2020.
+Accordingly to WordNet\footnote{See \href{https://wordnet.princeton.edu/}{https://wordnet.princeton.edu/}, last access: 12/02/2020.}, on different levels of granularity, the images are subdivided into groups called \say{synsets}~\citep{imagenet_cvpr09}.
 For example, the group \textit{woman, adult female} is subordinated to \textit{person, individual, someone, somebody, mortal, soul} and is further subdivided into groups like \textit{old woman} or \textit{lady} \footnote{ImageNet 2011 Fall Release, \href{http://image-net.org/explore}{http://image-net.org/explore}, last access: 12/02/2020.}
 
-A smaller version of ImageNet, commonly called \textit{ILSVRC2012} has been used for \ac{ILSVRC2017}~\citep{ILSVRC15}, consisting of approximately 1,3 million images from 1000 different classes, that were selected, such that ``there is no overlap between synsets: for any synsets $i$ and $j$, $i$ is not an ancestor of $j$ in the ImageNet hierarchy"~\citep{imagenet_cvpr09}.
+A smaller version of ImageNet, commonly called \textit{ILSVRC2012} has been used for \ac{ILSVRC2017}~\citep{ILSVRC15}, consisting of approximately 1,3 million images from 1000 different classes, that were selected, such that \say{there is no overlap between synsets: for any synsets $i$ and $j$, $i$ is not an ancestor of $j$ in the ImageNet hierarchy}~\citep{imagenet_cvpr09}.
 
 This curated version is commonly used as a baseline (\textbf{refs}).
 
@@ -35,10 +35,10 @@ Different questions were asked investigate whether \acp{VAE} are a biologically 
 
 One essential prerequisite is the emergence of Gabor wavelets (\textbf{Ref}).
 As discussed in Section~\ref{subsec:visual_features_in_neural_networks}, Gabor wavelets do emerge in deep convolutional networks, trained on image classification~\citep{krizhevsky2012imagenet} (\textbf{Ref: at least one more paper }), specifically on the ImageNet dataset (\textbf{ref}).\par
-The following approaches were taken to see if Gabor wavelets do naturally emerge in \acp{VAE} (\textbf{explain ``naturally"}).\par
+The following approaches were taken to see if Gabor wavelets do naturally emerge in \acp{VAE} (\textbf{explain \say{naturally}}).\par
 First, the convolutional kernels in a \ac{VAE} that was sucessfully trained on the CelebA (\textbf{ref}) dataset in terms of image reconstruction were examined in terms of emergence of Gabor wavelets (\textbf{explain network architecture}).
 Subsequently, the size of the convolutional kernels in the first layer was increased to size 11x11 \footnote{This is the same kernel size of the first layers used in~\citet{krizhevsky2012imagenet}.} as they were too small to successfully represent any Gabor wavelets~\citep{han2019variational}.
-Since still no Gabor wavelets emerged (see Section~\ref{subsec:results_visual_features_in_variational_autoencoders}), the question was raised whether this was because of the different network architectures of AlexNet and the ``CelebA VAE", or the dataset, or both.
+Since still no Gabor wavelets emerged (see Section~\ref{subsec:results_visual_features_in_variational_autoencoders}), the question was raised whether this was because of the different network architectures of AlexNet and the \say{CelebA VAE}, or the dataset, or both.
 
 \begin{figure}
     \centering
@@ -56,7 +56,7 @@ Since still no Gabor wavelets emerged (see Section~\ref{subsec:results_visual_fe
     \label{fig:alexnet-vae-encoder}
 \end{figure}
 
-To further localize the so-far cause for the non-existence of Gabor wavelets, an ``AlexNet-like-VAE'' (subsequently called AlexNet-VAE, see Figure~\ref{fig:alexnet-vae-encoder}) was trained on ImageNet.
+To further localize the so-far cause for the non-existence of Gabor wavelets, an \say{AlexNet-like-VAE} (subsequently called AlexNet-VAE, see Figure~\ref{fig:alexnet-vae-encoder}) was trained on ImageNet.
 This \ac{VAE} consists of an encoder part that closely resembles AlexNet.
 The output-layer, however, was changed in terms of size and activation function.
 First of all, the output size was allowed to be dynamical to allow different embedding sizes, i.e. differently sized multivariate Gaussians.
