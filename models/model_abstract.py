@@ -168,7 +168,7 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
             kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, vae=self,
                                                       print_every_n_batches=print_every_n_batches,
                                                       layer_idx=self.kernel_visualization_layer)
-        rc_callback = ReconstructionImagesCallback(log_dir='./logs', print_every_n_batches=print_every_n_batches,
+        rc_callback = ReconstructionImagesCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
                                                    initial_epoch=initial_epoch, vae=self)
         fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model_wrapper=self,
                                                       print_every_n_batches=print_every_n_batches,
