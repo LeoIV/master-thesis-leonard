@@ -1,7 +1,7 @@
 import logging
 import math
 import os
-from typing import Tuple
+from typing import Tuple, Union
 
 import numpy as np
 from keras.callbacks import ModelCheckpoint, TensorBoard
@@ -23,7 +23,8 @@ class AlexNet(DeepCNNModelWrapper):
     An AlexNet-like image classification network.
     """
 
-    def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, use_batch_norm: bool = False,
+    def __init__(self, input_dim: Tuple[int, int, int], log_dir: str,
+                 use_batch_norm: bool = False,
                  use_dropout: bool = False,
                  dropout_rate: float = 0.5, feature_map_layers=None, kernel_visualization_layer: int = -1,
                  num_samples: int = 5, use_fc: bool = True, inner_activation: str = "ReLU", decay_rate: float = 1e-7,

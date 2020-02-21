@@ -6,6 +6,8 @@ import sys
 from shutil import rmtree
 import traceback
 from keras_preprocessing.image import ImageDataGenerator
+
+from models.AlexAlexNetVAE import AlexAlexNetVAE
 from models.AlexNetVAE import AlexNetVAE
 from models.AlexNet import AlexNet
 from models.FrozenAlexNetVAE import FrozenAlexNetVAE
@@ -23,12 +25,13 @@ def main():
     parser = ArgumentParser(description='Functionality for Leonards master thesis')
     parser.add_argument('--configuration', type=str,
                         choices=['mnist', 'celeba', 'celeba_large_model', 'imagenet_classification_alexnet',
-                                 'alexnet_vae', 'frozen_alexnet_vae'],
+                                 'alexnet_vae', 'frozen_alexnet_vae', 'alexnet_vae_classification_loss'],
                         help="The configuration to execute.\n\n"
                              "mnist: VAE trained on mnist\n"
                              "celeba: VAE trained on (128,128) sized celeba dataset\n"
                              "celeba_large_model: celeba trained on upscaled (224,224) sized images\n"
-                             "imagenet_classification_alexnet: train AlexNet on imagenet classification task",
+                             "imagenet_classification_alexnet: train AlexNet on imagenet classification task\n"
+                             "alexnet_vae_classification_loss: train normal AlexNet but reconstruction loss by difference in AlexNet classification",
                         required=True)
     parser.add_argument('--data_path',
                         help="The path containing the individual datafolders. If the path to the imagenet folder is "
@@ -165,6 +168,20 @@ def main():
                            kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
                            use_fc=args.use_fc, inner_activation=args.inner_activation, decay_rate=args.lr_decay,
                            feature_map_reduction_factor=args.feature_map_reduction_factor)
+        data_gen = ImageDataGenerator(rescale=1. / 255)
+        training_data = data_gen.flow_from_directory(
+            directory=os.path.join(args.data_path, dataset_subfolder),
+            target_size=INPUT_DIM[:2], batch_size=args.batch_size,
+            class_mode='input', interpolation='lanczos',
+            follow_links=True)
+    elif args.configuration == 'alexnet_vae_classification_loss':
+        INPUT_DIM = (224, 224, 3)
+        model = AlexAlexNetVAE(input_dim=INPUT_DIM, log_dir=args.logdir, z_dim=args.z_dim,
+                               feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,
+                               kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
+                               use_fc=args.use_fc, inner_activation=args.inner_activation, decay_rate=args.lr_decay,
+                               feature_map_reduction_factor=args.feature_map_reduction_factor,
+                               alexnet_weights_path=args.alexnet_weights_path)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(
             directory=os.path.join(args.data_path, dataset_subfolder),

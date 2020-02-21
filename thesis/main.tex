@@ -10,12 +10,18 @@
 \usepackage{amsmath}
 \usepackage{dirtytalk}
 \usepackage{hyperref}
+\usepackage{mathtools}
 \usepackage{amsfonts}
-\usepackage{natbib}
 \usepackage{csquotes}
 \addbibresource{literature.bib}
 \renewcommand{\baselinestretch}{1.5}
 \newcounter{savepage}
+
+\DeclarePairedDelimiterX{\infdivx}[2]{(}{)}{%
+    #1\;\delimsize\|\;#2%
+}
+\newcommand{\kldiv}{D_{KL}\infdivx}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 
 \begin{document}
 
@@ -115,6 +121,10 @@
         \acro{ReLU}{Rectified Linear Unit}
         \acro{LeakyReLU}{Leaky Rectified Linear Unit}
         \acro{ILSVRC2017}{Large Scale Visual Recognition Challenge 2017}
+        \acro{MSE}{Mean Squared Error}
+        \acro{KL-divergence}{Kullback-Leibler divergence}
+        \acro{ELBO}{Evidence Lower Bound}
+        \acro{PDF}{Probability Density Function}
         \acro{MSE}{Mean Squared Error}
     \end{acronym}
     \newpage

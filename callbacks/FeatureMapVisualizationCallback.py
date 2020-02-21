@@ -82,7 +82,7 @@ class FeatureMapVisualizationCallback(Callback):
                     # we cannot use instanceof as we aren't allowed to import the model_wrapper class directly since
                     # this would lead to cyclic references
                     if type(self.model_wrapper).__name__ in ['VariationalAutoencoder', 'AlexNetVAE',
-                                                             'FrozenAlexNetVAE']:
+                                                             'FrozenAlexNetVAE', 'AlexAlexNetVAE']:
                         if layer_idx < len(self.model_wrapper.encoder.layers) - 1:
                             output_layer = self.model_wrapper.encoder.layers[layer_idx]
                             model = Model(inputs=self.model_wrapper.encoder.inputs, outputs=output_layer.output)

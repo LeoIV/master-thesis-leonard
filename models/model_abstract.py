@@ -13,8 +13,8 @@ from keras.optimizers import Adam
 from keras.utils import plot_model
 from keras_preprocessing.image import Iterator, DirectoryIterator
 
-from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
+from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.LossLoggingCallback import LossLoggingCallback
 from utils.callbacks import step_decay_schedule, ReconstructionImagesCallback
 

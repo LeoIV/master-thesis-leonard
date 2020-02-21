@@ -54,24 +54,128 @@ Note that for linear activations in the autoencoder, the space spanned by the fi
 
 \subsubsection{Variational Autoencoders}
 
-Other than for autoencoders, the goal for \acp{VAE} is \textit{generation} of samples.
+Autoencoders transform an input image to a \textit{hidden representation} $f(\mathbf{x})$.
+However, the distribution over $f(\mathbf{x})$ is generally unknown.
+Let $\mathbf{z} = f(\mathbf{x})$.
+Assume $\mathbf{\tilde{z}} = \mathbf{z} + \mathbf{\epsilon}$ is a slightly perturbed version of $\mathbf{z}$, created by adding a small amount of noise $\mathbf{\epsilon}$.
+Even though $\mathbf{\tilde{z}} \approx \mathbf{z}$, for example in terms of equation~\ref{eq:mse}, the result after decoding can be very different, i.e. $g(\mathbf{\tilde{z}}) \not\approx g(\mathbf{z})$ (again, in terms of equation~\ref{eq:mse}).
+This is because the distribution $P(\mathbf{z})$ can take any arbitrary form.
+Values of $\mathbf{z}$ that are one close to another\footnote{For example in terms of Euclidean distance} can be likely for very different values of $\mathbf{x}$.
 
+To \textit{generate} new images it would be advantageous to enforce $P(\mathbf{z})$ to follow a certain distribution.
+A common choice is a multivariate normal distribution without covariances~\citep[pp. 24, 25]{kingma2019introduction}.
+\acp{VAE} enforce a certain (usually Gaussian) distribution over $\mathbf{z}$.
+
+\acp{VAE} are trained to generate samples that are likely to occur in the training set.
+Therefore, they aim to maximize $\log p(\mathbf{x})$\footnote{Please not that $\max \log  p(\mathbf{x}) \equiv \max  p(\mathbf{x})$.}~\citep[p. 18]{kingma2019introduction}.
+Assuming a latent distribution $p(\mathbf{z})$ over $\mathbf{z}$, we can write $p(\mathbf{x})$ as the marginal distribution
+\begin{align}
+    p(\mathbf{x}) &= \int p(\mathbf{x}, \mathbf{z})d\mathbf{z} \label{eq:vae_x1}\\
+    &= \int p(\mathbf{x}|\mathbf{z})\,p(\mathbf{z})d\mathbf{z} \label{eq:vae_x2}
+\end{align}
+Unfortunately, due to the integral w.r.t. $\mathbf{z}$ in equations~\ref{eq:vae_x1} and~\ref{eq:vae_x2}, computing $p(\mathbf{x})$ is intractable~\citep[p. 13]{kingma2019introduction}.
+However, if the posterior $p(\mathbf{z}|\mathbf{x})$ was given, $p(\mathbf{x})$ could be obtained by
+\begin{align}
+    p(\mathbf{x}) = \frac{p(\mathbf{x}, \mathbf{z})}{p(\mathbf{z}|\mathbf{x})}
+\end{align}
+since computing $p(\mathbf{x}, \mathbf{z})$ is tractable~\citep[p. 14]{kingma2019introduction}.
+
+\acp{VAE} approximate the posterior by an \textit{inference model} $q_\phi(\mathbf{z}|\mathbf{x}) \approx p_\theta(\mathbf{z}|\mathbf{x})$, also called the \textit{encoder}~\citep[p. 15]{kingma2019introduction}.
+
+To make $q$ to match $p$ closely, usually the \ac{KL-divergence} plus the reconstruction error is minimized.
+The reason for this is explained in the following.
+The starting point is that we cannot compute the posterior $p_\theta(\mathbf{z}|\mathbf{x})$.
+Therefore, we approximate it by another distribution $q_\phi$.
+To make these two as similar as possible we use the \ac{KL-divergence} $\kldiv{q_\phi(\mathbf{z}|\mathbf{x})}{p_\theta(\mathbf{z}|\mathbf{x})}$
+
+\begin{align}
+    \kldiv{q_\phi(\mathbf{z}|\mathbf{x})}{p_\theta(\mathbf{z}|\mathbf{x})} &= -\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{z}|\mathbf{x})}{q_\phi(\mathbf{z}|\mathbf{x})} \\
+    &= -\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{\frac{p_\theta(\mathbf{x},\mathbf{z})}{p_\theta(\mathbf{x})}}{\frac{q_\phi(\mathbf{z}|\mathbf{x})}{1}}\\
+    &= -\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})}\frac{1}{p_\theta(\mathbf{x})}\\
+    &= -\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \left[ \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} - \log p_\theta(\mathbf{x}) \right]\\
+    &= -\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} + \sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log p_\theta(\mathbf{x}) \\
+    &= -\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} + \log p_\theta(\mathbf{x}) \underbrace{\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x})}_{=1} \\
+    &= -\sum_\mathbf{z} q(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} + \log p_\theta(\mathbf{x})
+\end{align}
+Then
+\begin{align}
+    \underbrace{\vphantom{\sum_\mathbf{z} x}\log p_\theta(\mathbf{x})}_{\text{constant}} =  \underbrace{\vphantom{\sum_\mathbf{z} x}\kldiv{q_\phi(\mathbf{z}|\mathbf{x})}{p_\theta(\mathbf{z}|\mathbf{x})}}_{\downarrow}  + \underbrace{\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})}}_{\uparrow}
+\end{align}
+Now, because $\log p_\theta(\mathbf{x})$ is assumed to be fixed, instead of minimizing $\kldiv{q_\phi(\mathbf{z}|\mathbf{x})}{p_\theta(\mathbf{z}|\mathbf{x})}$, we can maximize $\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})}$, as these two always sum to a constant.
+$\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})}$ is called \textit{variational lower bound} or \acfi{ELBO}~\citep[p. 18]{kingma2019introduction}.
+
+The variational lower bound can be written as
+\begin{align}
+    \sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} &= \sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{z}|\mathbf{x})p_\theta(\mathbf{x})}{q_\phi(\mathbf{z}|\mathbf{x})}\\
+    &= \sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \left[ \log p_\theta(\mathbf{x}) + \log \frac{p_\theta(\mathbf{z}|\mathbf{x})}{q_\phi(\mathbf{z}|\mathbf{x})} \right]\\
+    &= \sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x})\log p_\theta(\mathbf{x}) + \sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x})\log \frac{p_\theta(\mathbf{z}|\mathbf{x})}{q_\phi(\mathbf{z}|\mathbf{x})}\\
+    &= \underbrace{\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} \left[ \log p_\theta(\mathbf{x}) \right]}_{=\log p_\theta(\mathbf{x})\, \text{, independent of $\mathbf{z}$}} + \underbrace{\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x})\log \frac{p_\theta(\mathbf{z}|\mathbf{x})}{q_\phi(\mathbf{z}|\mathbf{x})}}_{=\kldiv{q_\phi(\mathbf{z}|\mathbf{x})}{p_\theta(\mathbf{z}|\mathbf{x})}} \label{eq:elbo_lower_bound}
+\end{align}
+but also as
+\begin{align}
+    \sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} &= \sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{x}|\mathbf{z})p_\theta(\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})}\\
+    &= \sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \left[ \log p_\theta(\mathbf{x}|\mathbf{z}) + \log \frac{p_\theta(\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} \right]\\
+    &= \underbrace{\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x})\log p_\theta(\mathbf{x}|\mathbf{z})}_{=\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})}\left[ \log p_\theta(\mathbf{x}|\mathbf{z}) \right]} + \underbrace{\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x})\log \frac{p_\theta(\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})}}_{=\kldiv{q_\phi(\mathbf{z}|\mathbf{x})}{p_\theta(\mathbf{z})}} \label{eq:elbo_error_term}
+\end{align}
+
+Equations~\ref{eq:elbo_lower_bound} and~\ref{eq:elbo_error_term} allow two different interpretations of the \ac{ELBO}.
+Equation~\ref{eq:elbo_lower_bound} justifies the name \textit{\acl{ELBO}}.
+If the \ac{KL-divergence} goes to zero, it approaches the likelihood of the data~\citep[p. 18]{kingma2019introduction}.
+In particular, we cannot even compute $p_\theta(\mathbf{z}|\mathbf{x})$ with our \ac{VAE} setup.
+
+\textbf{I am happy with the VAE part above but the following needs some polishing.
+In particular, I want to work on the difference between propabilities and neural networks.
+The part with the MSE needs clarification and I also have to check the notation.
+Also, I should add more references.}
+
+Equation~\ref{eq:elbo_error_term}, however, is more useful for implementing the error function of an \ac{VAE}.
+Consider the term inside the expectation of the first term.
+$p_\theta(\mathbf{x}|\mathbf{z})$ usually is chosen to be a normal distribution with \ac{PDF}
+\begin{align}
+    f_{\sigma,\mu}(x) = \frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{1}{2}\left( \frac{x-\mu}{\sigma} \right)^2}
+\end{align}
+Then
+\begin{align}
+    \log f_{\sigma,\mu}(x) &= \log \left( \frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{1}{2}\left( \frac{x-\mu}{\sigma} \right)^2} \right)\\
+    &= - \log \sqrt{2\pi}\sigma -\frac{1}{2}\left( \frac{x-\mu}{\sigma} \right)^2 \label{eq:log_normal_distr}
+\end{align}
+Since $\mu$ in this case is a function of $\mathbf{z}$ (parametrized by $\theta$), we can consider this as the reconstruction $\hat{\mathbf{x}} = f_\theta(\mathbf{z})$.
+Then, except for subtracting a constant and scaling by a constant, equation~\ref{eq:log_normal_distr} is the \ac{MSE}.
+
+Since $p(\mathbf{x}|\mathbf{z})$ is a Gaussian, maximizing $\mathbb{E}_{q(z)} \left[ p(x|z) \right]$ is equivalent to minimizing the mean squared error between $x$ and the \textit{reconstruction} $\hat{x}$.
+We can write $\hat{x}$ instead of $z$ because $p(z) = \hat{x}$ and minimizing does not change anything.
+
+Now when actually implementing a \ac{VAE}, $q_\phi$ and $p_\theta$ are realized by neural networks.
+The encoder predicts the mean and variances for a factorized Gaussian distribution whereas the decoder reconstructs an image.
+The usage of neural networks poses a challenge for computing the first term in equation~\ref{eq:elbo_error_term}.
+Usually, one would draw a sufficient number of samples from $q_\phi(\mathbf{z}|\mathbf{x})$ to approximate the expectation.
+However, sampling is not possible if one wants to compute the gradient to train the model by backpropagation.
+
+\paragraph{Disadvantages}
 Another disadvantage of \acp{VAE} is that they \say{use only a small subset of the dimensions of $\mathbf{z}$}~\citep[p. 694]{Goodfellow-et-al-2016}.
+
+\subsubsection{Representation Learning}
+\begin{itemize}
+    \item \citet{tschannen2018recent} give an overview over \say{recent advances in autoencoder-based representation learning}
+\end{itemize}
 
 \subsection{Visual Features in Neural Networks}\label{subsec:visual_features_in_neural_networks}
 \begin{itemize}
-    \item~\cite{krizhevsky2012imagenet} report Gabor wavelets in \acp{CNN} trained on image classification
+    \item~\citet{krizhevsky2012imagenet} report Gabor wavelets in \acp{CNN} trained on image classification
+    \item~\citet{palm2012prediction} found Gabor wavelets in vanilla autoencoders, trained on predicting the next image in a sequence, \citet{walker2016uncertain} did something similar for VAEs
+    \item~\citet{eickenberg2017seeing} and \citet{wen2018neural} compare response of certain brain areas with layers in CNNs (also many more, a good list is in \citet{wen2018neural})
 \end{itemize}
 
 \subsection{Semantic Representations}\label{subsec:semantic-representations}
 
 \subsubsection{Supervised Models}
 \begin{itemize}
-    \item \citet{khaligh2014deep} found evidence for that supervised models may explain \ac{IT} cortical representation.
+    \item \citet{khaligh2014deep} found evidence for that supervised models may explain \ac{IT} cortical representation
+    \item \citet{cadieu2014deep} report more or less the same
 \end{itemize}
 
 \subsubsection{Unsupervised Models}
 \begin{itemize}
-    \item \citet{han2019variational} found no evidence for or against Gabor wavelets in \acp{VAE} due to too small kernel size
+    \item \citet{han2019variational} found no evidence for or against Gabor wavelets in \acp{VAE} due to too small kernel size, however they were able to predict fmri activity from the latent representation in a VAE
     \item \citet{khaligh2014deep} found evidence against the assumption that unsupervised models might explain \ac{IT} cortical representation, however not explicitly for \acp{VAE}
 \end{itemize}
