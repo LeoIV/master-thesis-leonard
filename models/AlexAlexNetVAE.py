@@ -225,7 +225,7 @@ class AlexAlexNetVAE(VAEWrapper):
 
             pred_loss = K.categorical_crossentropy(eval_true, eval_pred, from_logits=False, axis=-1)
             r_loss = K.mean(K.square(y_true - y_pred), axis=[1, 2, 3])
-            return r_loss_factor * (r_loss + 255 * pred_loss)
+            return r_loss_factor * (r_loss + pred_loss)
 
         def vae_kl_loss(y_true, y_pred):
             kl_loss = -0.5 * K.sum(1 + self.log_var - K.square(self.mu) - K.exp(self.log_var), axis=1)
