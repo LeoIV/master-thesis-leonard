@@ -108,6 +108,7 @@ def main():
                                        decoder_conv_t_strides=[1, 2, 2, 1], log_dir=args.logdir, z_dim=args.z_dim,
                                        decay_rate=args.lr_decay, inner_activation=args.inner_activation,
                                        feature_map_visualization_layers=args.feature_map_layers,
+                                       num_samples=args.num_samples,
                                        feature_map_reduction_factor=args.feature_map_reduction_factor,
                                        kernel_visualization_layer=args.kernel_visualization_layer)
         (training_data, _), (_, _) = load_mnist()
@@ -121,7 +122,7 @@ def main():
                                        decoder_conv_t_strides=[2, 2, 2, 2], log_dir=args.logdir, z_dim=args.z_dim,
                                        kernel_visualization_layer=args.kernel_visualization_layer,
                                        feature_map_visualization_layers=args.feature_map_layers,
-                                       decay_rate=args.lr_decay,
+                                       decay_rate=args.lr_decay, num_samples=args.num_samples,
                                        feature_map_reduction_factor=args.feature_map_reduction_factor,
                                        inner_activation=args.inner_activation)
         data_gen = ImageDataGenerator(rescale=1. / 255)
@@ -139,6 +140,7 @@ def main():
                                        decoder_conv_t_strides=[2, 2, 2, 4], log_dir=args.logdir, z_dim=args.z_dim,
                                        use_batch_norm=args.use_batch_norm, use_dropout=args.use_dropout,
                                        kernel_visualization_layer=args.kernel_visualization_layer,
+                                       num_samples=args.num_samples,
                                        inner_activation=args.inner_activation, decay_rate=args.lr_decay,
                                        feature_map_visualization_layers=args.feature_map_layers,
                                        feature_map_reduction_factor=args.feature_map_reduction_factor)
