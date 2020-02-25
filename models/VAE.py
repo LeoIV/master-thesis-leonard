@@ -39,10 +39,7 @@ class VariationalAutoencoder(VAEWrapper):
         self.n_layers_decoder = len(decoder_conv_t_filters)
 
         layer_names = ["encoder_conv_{}".format(i) for i in range(self.n_layers_encoder)]
-        self.rfs = KerasReceptiveField(self._build).compute(input_shape=self.input_dim[0:2],
-                                                            input_layer="encoder_input",
-                                                            output_layers=layer_names)
-        self.rfs = dict(map(lambda x: (x[0], x[1]), zip(layer_names, self.rfs)))
+        self._build()
 
     def _build(self):
 
