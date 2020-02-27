@@ -5,7 +5,6 @@ from keras import backend as K
 from keras.layers import Input, Conv2D, Flatten, Dense, Conv2DTranspose, Reshape, Lambda, Activation, \
     BatchNormalization, LeakyReLU, Dropout, ReLU
 from keras.models import Model
-from receptivefield.keras import KerasReceptiveField
 
 from models.model_abstract import VAEWrapper
 
@@ -16,11 +15,11 @@ class VariationalAutoencoder(VAEWrapper):
                  encoder_conv_strides: Sequence[Union[int, Tuple[int, int]]], decoder_conv_t_filters,
                  decoder_conv_t_kernel_size: Sequence[Union[int, Tuple[int, int]]],
                  decoder_conv_t_strides: Sequence[Union[int, Tuple[int, int]]], z_dim: int, log_dir: str,
-                 feature_map_visualization_layers: Sequence[int], kernel_visualization_layer: int,
+                 feature_map_layers: Sequence[int], kernel_visualization_layer: int,
                  use_batch_norm: bool = False, use_dropout: bool = False, num_samples: int = 10,
                  inner_activation: str = "ReLU", decay_rate: float = 1e-7, feature_map_reduction_factor: int = 1):
 
-        super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_visualization_layers,
+        super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_layers,
                          inner_activation, decay_rate, feature_map_reduction_factor)
         self.name = 'variational_autoencoder'
 

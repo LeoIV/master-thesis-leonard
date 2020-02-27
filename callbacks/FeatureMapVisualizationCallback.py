@@ -92,7 +92,7 @@ class FeatureMapVisualizationCallback(Callback):
                             model = Model(inputs=self.model_wrapper.encoder.inputs,
                                           outputs=Model(self.model_wrapper.decoder.inputs, output_layer.output)(
                                               self.model_wrapper.encoder.outputs))
-                    elif type(self.model_wrapper).__name__ == 'AlexNet':
+                    elif type(self.model_wrapper).__name__ in ['AlexNet', 'SimpleClassifier']:
                         output_layer = self.model_wrapper.model.layers[layer_idx]
                         model = Model(inputs=self.model_wrapper.model.inputs, outputs=output_layer.output)
                     else:

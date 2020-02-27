@@ -1,18 +1,23 @@
+import argparse
 import datetime
 import logging
 import os
-import argparse
 import sys
-from shutil import rmtree
 import traceback
+from argparse import ArgumentParser
+from shutil import rmtree
+
+import numpy as np
+from keras.datasets import cifar10
+from keras.utils import to_categorical
 from keras_preprocessing.image import ImageDataGenerator
 
 from models.AlexAlexNetVAE import AlexAlexNetVAE
-from models.AlexNetVAE import AlexNetVAE
 from models.AlexNet import AlexNet
+from models.AlexNetVAE import AlexNetVAE
 from models.FrozenAlexNetVAE import FrozenAlexNetVAE
+from models.SimpleClassifier import SimpleClassifier
 from utils.loaders import load_mnist
-from argparse import ArgumentParser
 
 
 def main():
@@ -25,9 +30,11 @@ def main():
     parser = ArgumentParser(description='Functionality for Leonards master thesis')
     parser.add_argument('--configuration', type=str,
                         choices=['mnist', 'celeba', 'celeba_large_model', 'imagenet_classification_alexnet',
-                                 'alexnet_vae', 'frozen_alexnet_vae', 'alexnet_vae_classification_loss'],
+                                 'cifar10_classifier', 'alexnet_vae', 'frozen_alexnet_vae',
+                                 'alexnet_vae_classification_loss', 'cifar10_vae'],
                         help="The configuration to execute.\n\n"
                              "mnist: VAE trained on mnist\n"
+                             "cifar10_vae: VAE trained on cifar10\n"
                              "celeba: VAE trained on (128,128) sized celeba dataset\n"
                              "celeba_large_model: celeba trained on upscaled (224,224) sized images\n"
                              "imagenet_classification_alexnet: train AlexNet on imagenet classification task\n"
@@ -35,8 +42,8 @@ def main():
                         required=True)
     parser.add_argument('--data_path',
                         help="The path containing the individual datafolders. If the path to the imagenet folder is "
-                             "/foo/bar/imagenet, the value should be /foo/bar/. Can be absolute or relative.",
-                        required=True)
+                             "/foo/bar/imagenet, the value should be /foo/bar/. Can be absolute or relative. Required for CelebA and Imagenet.",
+                        required=False)
     parser.add_argument('--feature_map_layers', nargs='+', type=int,
                         help="The indices of layers after which to compute the "
                              "feature maps. Exemplary input: 1 2 4 8 13", required=True)
@@ -99,6 +106,8 @@ def main():
         logging.info("Creating weights dir: {}".format(weights))
         os.mkdir(weights)
 
+    training_data, training_labels = None, None
+
     if args.configuration == 'mnist':
         from models.VAE import VariationalAutoencoder
         INPUT_DIM = (28, 28, 1)
@@ -107,21 +116,57 @@ def main():
                                        decoder_conv_t_filters=[64, 64, 32, 1], decoder_conv_t_kernel_size=[3, 3, 3, 3],
                                        decoder_conv_t_strides=[1, 2, 2, 1], log_dir=args.logdir, z_dim=args.z_dim,
                                        decay_rate=args.lr_decay, inner_activation=args.inner_activation,
-                                       feature_map_visualization_layers=args.feature_map_layers,
-                                       num_samples=args.num_samples,
+                                       feature_map_layers=args.feature_map_layers,
+                                       num_samples=args.num_samples, use_batch_norm=args.use_batch_norm,
                                        feature_map_reduction_factor=args.feature_map_reduction_factor,
                                        kernel_visualization_layer=args.kernel_visualization_layer)
         (training_data, _), (_, _) = load_mnist()
 
+    elif args.configuration == 'cifar10_vae':
+        from models.VAE import VariationalAutoencoder
+        INPUT_DIM = (32, 32, 3)
+        model = VariationalAutoencoder(input_dim=INPUT_DIM, encoder_conv_filters=[32, 64, 64, 64],
+                                       encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[1, 2, 2, 1],
+                                       decoder_conv_t_filters=[64, 64, 32, 3], decoder_conv_t_kernel_size=[3, 3, 3, 3],
+                                       decoder_conv_t_strides=[1, 2, 2, 1], log_dir=args.logdir, z_dim=args.z_dim,
+                                       decay_rate=args.lr_decay, inner_activation=args.inner_activation,
+                                       feature_map_layers=args.feature_map_layers,
+                                       num_samples=args.num_samples, use_batch_norm=args.use_batch_norm,
+                                       feature_map_reduction_factor=args.feature_map_reduction_factor,
+                                       kernel_visualization_layer=args.kernel_visualization_layer)
+        (x_train, _), (x_test, _) = cifar10.load_data()
+        x_train = x_train.astype('float32') / 255.
+        x_test = x_test.astype('float32') / 255.
+
+        training_data = np.concatenate([x_train, x_test])
+    elif args.configuration == 'cifar10_classifier':
+        from models.VAE import VariationalAutoencoder
+        INPUT_DIM = (32, 32, 3)
+        model = SimpleClassifier(input_dim=INPUT_DIM, encoder_conv_filters=[32, 64, 64, 64],
+                                 encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[1, 2, 2, 1],
+                                 log_dir=args.logdir, use_batch_norm=args.use_batch_norm, use_dropout=args.use_dropout,
+                                 inner_activation=args.inner_activation, feature_map_layers=args.feature_map_layers,
+                                 feature_map_reduction_factor=args.feature_map_reduction_factor, num_classes=10,
+                                 decay_rate=args.lr_decay, kernel_visualization_layer=args.kernel_visualization_layer,
+                                 num_samples=args.num_samples)
+        (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+        x_train = x_train.astype('float32') / 255.
+        x_test = x_test.astype('float32') / 255.
+
+        training_data = np.concatenate([x_train, x_test])
+        training_labels = np.concatenate([y_train, y_test]).squeeze()
+
+        training_labels = to_categorical(training_labels, num_classes=10)
+
     elif args.configuration == 'celeba':
         from models.VAE import VariationalAutoencoder
         INPUT_DIM = (128, 128, 3)
-        model = VariationalAutoencoder(input_dim=INPUT_DIM, encoder_conv_filters=[32, 64, 64, 32],
+        model = VariationalAutoencoder(input_dim=INPUT_DIM, encoder_conv_filters=[32, 64, 64, 64],
                                        encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[2, 2, 2, 2],
-                                       decoder_conv_t_filters=[32, 64, 32, 3], decoder_conv_t_kernel_size=[3, 3, 3, 3],
+                                       decoder_conv_t_filters=[64, 64, 32, 3], decoder_conv_t_kernel_size=[3, 3, 3, 3],
                                        decoder_conv_t_strides=[2, 2, 2, 2], log_dir=args.logdir, z_dim=args.z_dim,
                                        kernel_visualization_layer=args.kernel_visualization_layer,
-                                       feature_map_visualization_layers=args.feature_map_layers,
+                                       feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,
                                        decay_rate=args.lr_decay, num_samples=args.num_samples,
                                        feature_map_reduction_factor=args.feature_map_reduction_factor,
                                        inner_activation=args.inner_activation)
@@ -142,7 +187,7 @@ def main():
                                        kernel_visualization_layer=args.kernel_visualization_layer,
                                        num_samples=args.num_samples,
                                        inner_activation=args.inner_activation, decay_rate=args.lr_decay,
-                                       feature_map_visualization_layers=args.feature_map_layers,
+                                       feature_map_layers=args.feature_map_layers,
                                        feature_map_reduction_factor=args.feature_map_reduction_factor)
         data_gen = ImageDataGenerator(rescale=1. / 255)
         training_data = data_gen.flow_from_directory(os.path.join(args.data_path, dataset_subfolder),
@@ -226,7 +271,8 @@ def main():
 
     try:
         model.train(training_data, epochs=args.num_epochs, weights_folder=weights, batch_size=args.batch_size,
-                    print_every_n_batches=args.print_every_n_batches, initial_epoch=args.initial_epoch)
+                    print_every_n_batches=args.print_every_n_batches, initial_epoch=args.initial_epoch,
+                    training_labels=training_labels)
     except Exception as e:
         logging.error("An error occurred during training:")
         exc_type, exc_value, exc_traceback = sys.exc_info()

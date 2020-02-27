@@ -1,24 +1,13 @@
 import logging
-import math
-import os
-from typing import Tuple, Union
+from typing import Tuple
 
-import numpy as np
-from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.layers import Input, Conv2D, Flatten, Dense, Dropout, MaxPool2D, Softmax, BatchNormalization, LeakyReLU, ReLU
-from keras.losses import categorical_crossentropy
 from keras.models import Model
-from keras.optimizers import Adam
-from keras_preprocessing.image import DirectoryIterator, Iterator
 
-from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
-from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
-from callbacks.LossLoggingCallback import LossLoggingCallback
-from models.model_abstract import DeepCNNModelWrapper
-from utils.callbacks import step_decay_schedule
+from models.model_abstract import DeepCNNClassifierWrapper
 
 
-class AlexNet(DeepCNNModelWrapper):
+class AlexNet(DeepCNNClassifierWrapper):
     """
     An AlexNet-like image classification network.
     """
@@ -115,62 +104,3 @@ class AlexNet(DeepCNNModelWrapper):
         self.model = Model(model_input, model_output)
         logging.info("Built AlexNet model")
         return self.model
-
-    def compile(self, learning_rate, r_loss_factor):
-        self.learning_rate = learning_rate
-
-        optimizer = Adam(lr=learning_rate, decay=self.decay_rate)
-        self.model.compile(optimizer=optimizer, loss=categorical_crossentropy, metrics=['accuracy'])
-
-    def train(self, training_data, batch_size, epochs, weights_folder, print_every_n_batches=100, initial_epoch=0,
-              lr_decay=1, embedding_samples: int = 5000):
-
-        if isinstance(training_data, Iterator):
-            training_data: DirectoryIterator
-            n_batches = embedding_samples // batch_size
-            if n_batches > training_data.n:
-                n_batches = training_data.n
-            samples = []
-            for i in range(n_batches):
-                samples.append(training_data.next()[0])
-            embeddings_data = np.concatenate(samples, axis=0)
-            training_data.reset()
-
-        else:
-            embeddings_data = training_data[:5000]
-
-        lr_sched = step_decay_schedule(initial_lr=self.learning_rate, decay_factor=lr_decay, step_size=1)
-
-        checkpoint_filepath = os.path.join(weights_folder, "weights-{epoch:03d}-{loss:.2f}.h5")
-        checkpoint1 = ModelCheckpoint(checkpoint_filepath, save_weights_only=True, verbose=1)
-        checkpoint2 = ModelCheckpoint(os.path.join(weights_folder, 'weights.h5'), save_weights_only=True,
-                                      verbose=1)
-        tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, update_freq="batch")
-        if self.kernel_visualization_layer >= 0:
-            kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, vae=self,
-                                                      print_every_n_batches=print_every_n_batches,
-                                                      layer_idx=self.kernel_visualization_layer)
-        fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model_wrapper=self,
-                                                      print_every_n_batches=print_every_n_batches,
-                                                      layer_idxs=self.feature_map_layers,
-                                                      x_train=embeddings_data, num_samples=self.num_samples)
-        ll_callback = LossLoggingCallback()
-        # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [ll_callback, checkpoint1, checkpoint2, tb_callback, fm_callback, lr_sched]
-        if self.kernel_visualization_layer >= 0:
-            callbacks_list.append(kv_callback)
-
-        print("Training for {} epochs".format(epochs))
-
-        if isinstance(training_data, Iterator):
-            steps_per_epoch = math.ceil(training_data.n / batch_size)
-            self.model.fit_generator(
-                training_data, shuffle=True, epochs=epochs, initial_epoch=initial_epoch, callbacks=callbacks_list,
-                steps_per_epoch=steps_per_epoch, workers=16
-            )
-        else:
-            self.model.fit(
-                training_data, training_data, batch_size=batch_size, shuffle=False, epochs=epochs,
-                callbacks=callbacks_list
-            )
-        print("Training finished")
