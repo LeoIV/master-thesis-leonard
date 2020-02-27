@@ -156,7 +156,7 @@ class DeepCNNClassifierWrapper(DeepCNNModelWrapper, ABC):
         else:
             self.model.fit(
                 x=training_data, y=training_data if training_labels is None else training_labels, batch_size=batch_size,
-                shuffle=False, epochs=epochs,
+                shuffle=True, epochs=epochs,
                 callbacks=callbacks_list
             )
         print("Training finished")
@@ -265,7 +265,7 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
         else:
             self.model.fit(
                 training_data, training_data if not training_labels else training_labels, batch_size=batch_size,
-                shuffle=False, epochs=epochs,
+                shuffle=True, epochs=epochs,
                 callbacks=callbacks_list
             )
         logging.info("Training finished")
