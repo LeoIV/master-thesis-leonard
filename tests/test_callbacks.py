@@ -6,7 +6,5 @@ def test_correlation_coefficient():
     a = [1, 0]
     b = [1, 0]
     assert _correlation_coefficient(a, b) == 1
-    a, b = np.random.multivariate_normal((0, 0), np.zeros((2, 2)), 2)
-    print(a)
-    print(b)
-    assert _correlation_coefficient(a, b) == 0
+    a, b = np.random.multivariate_normal((0, 0), np.array([[1, 0], [0, 1]]), 2)
+    assert np.isclose(_correlation_coefficient(a, b), -1)

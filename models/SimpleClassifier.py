@@ -9,7 +9,7 @@ from models.model_abstract import DeepCNNClassifierWrapper
 class SimpleClassifier(DeepCNNClassifierWrapper):
 
     def __init__(self, input_dim: Tuple[int, int, int], encoder_conv_filters,
-                 encoder_conv_kernel_size: Sequence[Union[int, Tuple[int, int]]], num_classes: int,
+                 encoder_conv_kernel_size: Sequence[Union[int, Tuple[int, int]]], num_classes: int, dropout_rate: float,
                  encoder_conv_strides: Sequence[Union[int, Tuple[int, int]]], log_dir: str, decay_rate: float,
                  feature_map_layers: Sequence[int], kernel_visualization_layer: int, num_samples: int,
                  use_batch_norm: bool = False, use_dropout: bool = False, inner_activation: str = "ReLU",
@@ -19,6 +19,7 @@ class SimpleClassifier(DeepCNNClassifierWrapper):
                          feature_map_reduction_factor=feature_map_reduction_factor,
                          feature_map_layers=feature_map_layers, inner_activation=inner_activation,
                          num_samples=num_samples)
+        self.dropout_rate = dropout_rate
         self.kernel_visualization_layer = kernel_visualization_layer
         self.decay_rate = decay_rate
         self.num_classes = num_classes
@@ -63,7 +64,7 @@ class SimpleClassifier(DeepCNNClassifierWrapper):
             x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
             if self.use_dropout:
-                x = Dropout(rate=0.25)(x)
+                x = Dropout(rate=self.dropout_rate)(x)
 
         x = Flatten()(x)
         x = Dense(self.num_classes)(x)

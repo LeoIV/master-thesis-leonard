@@ -248,7 +248,7 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
                                                       print_every_n_batches=print_every_n_batches,
                                                       layer_idxs=self.feature_map_layers,
                                                       x_train=embeddings_data, num_samples=self.num_samples)
-        ll_callback = LossLoggingCallback()
+        ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
         callbacks_list = [ll_callback, checkpoint1, checkpoint2, tb_callback, fm_callback, rc_callback, lr_sched]
         if self.kernel_visualization_layer >= 0:

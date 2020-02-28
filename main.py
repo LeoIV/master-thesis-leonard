@@ -116,7 +116,7 @@ def main():
                                        decoder_conv_t_filters=[64, 64, 32, 1], decoder_conv_t_kernel_size=[3, 3, 3, 3],
                                        decoder_conv_t_strides=[1, 2, 2, 1], log_dir=args.logdir, z_dim=args.z_dim,
                                        decay_rate=args.lr_decay, inner_activation=args.inner_activation,
-                                       feature_map_layers=args.feature_map_layers,
+                                       feature_map_layers=args.feature_map_layers, dropout_rate=args.dropout_rate,
                                        num_samples=args.num_samples, use_batch_norm=args.use_batch_norm,
                                        feature_map_reduction_factor=args.feature_map_reduction_factor,
                                        kernel_visualization_layer=args.kernel_visualization_layer)
@@ -130,7 +130,7 @@ def main():
                                        decoder_conv_t_filters=[64, 64, 32, 3], decoder_conv_t_kernel_size=[3, 3, 3, 3],
                                        decoder_conv_t_strides=[1, 2, 2, 1], log_dir=args.logdir, z_dim=args.z_dim,
                                        decay_rate=args.lr_decay, inner_activation=args.inner_activation,
-                                       feature_map_layers=args.feature_map_layers,
+                                       feature_map_layers=args.feature_map_layers, dropout_rate=args.dropout_rate,
                                        num_samples=args.num_samples, use_batch_norm=args.use_batch_norm,
                                        feature_map_reduction_factor=args.feature_map_reduction_factor,
                                        kernel_visualization_layer=args.kernel_visualization_layer)
@@ -148,7 +148,7 @@ def main():
                                  inner_activation=args.inner_activation, feature_map_layers=args.feature_map_layers,
                                  feature_map_reduction_factor=args.feature_map_reduction_factor, num_classes=10,
                                  decay_rate=args.lr_decay, kernel_visualization_layer=args.kernel_visualization_layer,
-                                 num_samples=args.num_samples)
+                                 num_samples=args.num_samples, dropout_rate=args.dropout_rate)
         (x_train, y_train), (x_test, y_test) = cifar10.load_data()
         x_train = x_train.astype('float32') / 255.
         x_test = x_test.astype('float32') / 255.
@@ -185,7 +185,7 @@ def main():
                                        decoder_conv_t_strides=[2, 2, 2, 4], log_dir=args.logdir, z_dim=args.z_dim,
                                        use_batch_norm=args.use_batch_norm, use_dropout=args.use_dropout,
                                        kernel_visualization_layer=args.kernel_visualization_layer,
-                                       num_samples=args.num_samples,
+                                       num_samples=args.num_samples, dropout_rate=args.dropout_rate,
                                        inner_activation=args.inner_activation, decay_rate=args.lr_decay,
                                        feature_map_layers=args.feature_map_layers,
                                        feature_map_reduction_factor=args.feature_map_reduction_factor)

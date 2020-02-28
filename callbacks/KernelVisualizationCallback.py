@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+from concurrent.futures.thread import ThreadPoolExecutor
 from threading import Thread
 from typing import Union
 
@@ -18,6 +19,7 @@ class KernelVisualizationCallback(Callback):
         self.log_dir = log_dir
         self.seen = 0
         self.epoch = 1
+        self.threadpool = ThreadPoolExecutor(max_workers=5)
         self.print_every_n_batches = print_every_n_batches
         self.layer_idx = layer_idx
 
@@ -53,4 +55,7 @@ class KernelVisualizationCallback(Callback):
             img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
                                     "layer1_kernels")
             os.makedirs(img_path, exist_ok=True)
-            Thread(target=self._plot_kernels, args=(filters, img_path, round(time.time() * 10E6))).start()
+            self.threadpool.submit(self._plot_kernels, *(filters, img_path, round(time.time() * 10E6)))
+
+    def on_train_end(self, logs=None):
+        self.threadpool.shutdown()

@@ -1,7 +1,7 @@
 import logging
 import os
 import time
-from threading import Thread
+from concurrent.futures.thread import ThreadPoolExecutor
 from typing import Union, Sequence
 
 import numpy as np
@@ -25,6 +25,7 @@ class FeatureMapVisualizationCallback(Callback):
         self.x_train = x_train
         self.fmas = {}
         self.batch_nrs = []
+        self.threadpool = ThreadPoolExecutor(max_workers=5)
         self.epoch = 1
         self.num_samples = num_samples
         idxs = np.random.randint(0, len(self.x_train), num_samples)
@@ -105,8 +106,8 @@ class FeatureMapVisualizationCallback(Callback):
 
                     feature_maps = model.predict(sample[np.newaxis, :], batch_size=1, verbose=1)
                     # as the printing a very long time, we do this in threads
-                    Thread(target=self._save_feature_maps,
-                           args=(img_path_layer, feature_maps, round(time.time() * 10E6))).start()
+                    self.threadpool.submit(self._save_feature_maps, *(img_path_layer, feature_maps,
+                                                                      round(time.time() * 10E6)))
                     fmas = np.sum(np.abs(feature_maps), axis=tuple(range(len(feature_maps.shape)))[:-1])
                     fmas = fmas
                     self.fmas.setdefault(sample_nr, {})
@@ -125,3 +126,6 @@ class FeatureMapVisualizationCallback(Callback):
             plt.close(fig)
             # set back to default
             plt.rcParams["figure.figsize"] = (8.0, 6.0)
+
+    def on_train_end(self, logs=None):
+        self.threadpool.shutdown()
