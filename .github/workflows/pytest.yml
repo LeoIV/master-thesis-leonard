@@ -9,4 +9,4 @@ jobs:
       - uses: actions/setup-python@v1
       - uses: dschep/install-pipenv-action@v1
       - run: pipenv sync
-      - run: pipenv run pytest
+      - run: pipenv run python -m pytest
