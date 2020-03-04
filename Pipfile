@@ -6,6 +6,9 @@ name = "pypi"
 [requires]
 python_version = "3.6"
 
+[dev-packages]
+pytest="*"
+
 [packages]
 keras = "*"
 plaidml-keras = "*"

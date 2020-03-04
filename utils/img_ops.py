@@ -5,6 +5,13 @@ from PIL import Image
 
 
 def resize_array(arr: np.ndarray, size: Tuple[int, int]):
+    """
+    Resize an numpy array containing images according to size.
+    Assumes following structure [num_images, width, height, [num_channels]]
+    :param arr:
+    :param size:
+    :return: the array with width and height set to the desired structure
+    """
     arr = arr.copy()
     has_empty_dimension = arr.shape[-1] == 1
     arr = arr.squeeze()

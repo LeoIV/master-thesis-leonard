@@ -8,7 +8,8 @@ from argparse import ArgumentParser
 from shutil import rmtree
 from typing import List, Tuple
 
-from keras.datasets import cifar10
+import numpy as np
+from keras.datasets import cifar10, mnist
 from keras.utils import to_categorical
 from keras_preprocessing.image import ImageDataGenerator
 
@@ -19,9 +20,6 @@ from models.FrozenAlexNetVAE import FrozenAlexNetVAE
 from models.SimpleClassifier import SimpleClassifier
 from models.model_abstract import DeepCNNClassifierWrapper, VAEWrapper
 from utils.img_ops import resize_array
-from utils.loaders import load_mnist
-
-import numpy as np
 
 
 def main(args: List[str]):
@@ -185,7 +183,7 @@ def main(args: List[str]):
                                  feature_map_reduction_factor=args.feature_map_reduction_factor,
                                  feature_map_layers=args.feature_map_layers, num_samples=args.num_samples)
     if args.dataset in ['cifar10', 'mnist']:
-        (x_train, y_train), (x_val, y_val) = cifar10.load_data() if args.dataset == 'cifar10' else load_mnist()
+        (x_train, y_train), (x_val, y_val) = cifar10.load_data() if args.dataset == 'cifar10' else mnist.load_data()
 
         if x_train.shape[1:] != input_dim:
             x_train = resize_array(x_train, input_dim[:2])
@@ -293,4 +291,4 @@ def infer_input_dim(size: Tuple[int, int], args: argparse.Namespace) -> Tuple[in
 
 
 if __name__ == '__main__':
-    main(sys.argv[1])
+    main(sys.argv[1:])

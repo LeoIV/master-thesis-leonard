@@ -5,8 +5,7 @@ jobs:
     name: GitHub Action for pytest
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - name: GitHub Action for pytest
-      uses: cclauss/GitHub-Action-for-pytest@master
-      with:
-        args: pytest -x 
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@v1
+      - uses: dschep/install-pipenv-action@v1
+      - run: pipenv run pytest
