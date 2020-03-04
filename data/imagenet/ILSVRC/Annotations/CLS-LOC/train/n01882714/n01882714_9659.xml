@@ -1,0 +1,25 @@
+<annotation>
+	<folder>n01882714</folder>
+	<filename>n01882714_9659</filename>
+	<source>
+		<database>ILSVRC_2012</database>
+	</source>
+	<size>
+		<width>380</width>
+		<height>380</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>n01882714</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>31</xmin>
+			<ymin>52</ymin>
+			<xmax>334</xmax>
+			<ymax>326</ymax>
+		</bndbox>
+	</object>
+</annotation>

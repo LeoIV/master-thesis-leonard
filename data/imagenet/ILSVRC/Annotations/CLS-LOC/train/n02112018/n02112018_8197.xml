@@ -1,0 +1,25 @@
+<annotation>
+	<folder>n02112018</folder>
+	<filename>n02112018_8197</filename>
+	<source>
+		<database>ILSVRC_2012</database>
+	</source>
+	<size>
+		<width>500</width>
+		<height>375</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>n02112018</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>75</xmin>
+			<ymin>36</ymin>
+			<xmax>314</xmax>
+			<ymax>336</ymax>
+		</bndbox>
+	</object>
+</annotation>
