@@ -48,7 +48,7 @@ def main(args: List[str]):
                         required=False)
     parser.add_argument('--feature_map_layers', nargs='+', type=int,
                         help="The indices of layers after which to compute the "
-                             "feature maps. Exemplary input: 1 2 4 8 13", required=True)
+                             "feature maps. Exemplary input: 1 2 4 8 13", required=False)
     parser.add_argument('--kernel_visualization_layer', type=int,
                         help="The index of layer after which to compute the max stimuli.", default=-1)
     parser.add_argument('--logdir', type=str, default="logs/",
@@ -70,6 +70,7 @@ def main(args: List[str]):
     parser.add_argument('--use_dropout', type=str2bool, default=False)
     parser.add_argument('--dropout_rate', type=float, default=0.5)
     parser.add_argument('--num_samples', type=int, default=5)
+    parser.add_argument('--steps_per_epoch', type=int, required=False)
     parser.add_argument('--weights_path', type=str, required=False,
                         help="The path to restore the model from. Is only considered if --mode=load You usually might "
                              "want to also set initial_epoch.")
@@ -260,7 +261,7 @@ def main(args: List[str]):
         model.train(x_train=x_train, y_train=y_train, epochs=args.num_epochs, weights_folder=weights,
                     batch_size=args.batch_size,
                     print_every_n_batches=args.print_every_n_batches, initial_epoch=args.initial_epoch,
-                    x_test=x_val, y_test=y_val)
+                    x_test=x_val, y_test=y_val, steps_per_epoch=args.steps_per_epoch)
     except Exception as e:
         logging.error("An error occurred during training:")
         exc_type, exc_value, exc_traceback = sys.exc_info()

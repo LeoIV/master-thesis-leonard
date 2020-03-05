@@ -49,8 +49,9 @@ class ModelWrapper(ABC):
         self.plot_model(folder)
 
     @abstractmethod
-    def train(self, training_data, batch_size, epochs, run_folder, print_every_n_batches=100, initial_epoch=0,
-              lr_decay=1, training_labels: Optional[np.ndarray] = None, **kwargs):
+    def train(self, x_train, batch_size, epochs, run_folder, print_every_n_batches=100, initial_epoch=0,
+              y_train: Optional[np.ndarray] = None, x_test: Optional[Union[Iterator, np.ndarray]] = None,
+              y_test: Optional[np.ndarray] = None, lr_decay=1, training_labels: Optional[np.ndarray] = None, **kwargs):
         raise NotImplementedError
 
     def plot_model(self, run_folder: str):
@@ -107,22 +108,24 @@ class DeepCNNClassifierWrapper(DeepCNNModelWrapper, ABC):
         optimizer = Adam(lr=learning_rate, decay=self.decay_rate)
         self.model.compile(optimizer=optimizer, loss=categorical_crossentropy, metrics=['accuracy'])
 
-    def train(self, training_data, batch_size, epochs, weights_folder, print_every_n_batches=100, initial_epoch=0,
-              lr_decay=1, embedding_samples: int = 5000, training_labels: Optional[np.ndarray] = None):
+    def train(self, x_train, batch_size, epochs, weights_folder, print_every_n_batches=100, initial_epoch=0,
+              lr_decay=1, embedding_samples: int = 5000, y_train: Optional[np.ndarray] = None,
+              x_test: Optional[Union[Iterator, np.ndarray]] = None, y_test: Optional[np.ndarray] = None,
+              steps_per_epoch: int = None):
 
-        if isinstance(training_data, Iterator):
-            training_data: DirectoryIterator
+        if isinstance(x_train, Iterator):
+            x_train: DirectoryIterator
             n_batches = embedding_samples // batch_size
-            if n_batches > training_data.n:
-                n_batches = training_data.n
+            if n_batches > x_train.n:
+                n_batches = x_train.n
             samples = []
             for i in range(n_batches):
-                samples.append(training_data.next()[0])
+                samples.append(x_train.next()[0])
             embeddings_data = np.concatenate(samples, axis=0)
-            training_data.reset()
+            x_train.reset()
 
         else:
-            embeddings_data = training_data[:5000]
+            embeddings_data = x_train[:5000]
 
         lr_sched = step_decay_schedule(initial_lr=self.learning_rate, decay_factor=lr_decay, step_size=1)
 
@@ -147,17 +150,19 @@ class DeepCNNClassifierWrapper(DeepCNNModelWrapper, ABC):
 
         print("Training for {} epochs".format(epochs))
 
-        if isinstance(training_data, Iterator):
-            steps_per_epoch = math.ceil(training_data.n / batch_size)
+        if isinstance(x_train, Iterator):
+            steps_per_epoch = steps_per_epoch if steps_per_epoch is not None else math.ceil(x_train / batch_size)
             self.model.fit_generator(
-                training_data, shuffle=True, epochs=epochs, initial_epoch=initial_epoch, callbacks=callbacks_list,
-                steps_per_epoch=steps_per_epoch, workers=16
+                generator=x_train, shuffle=True, epochs=epochs, initial_epoch=initial_epoch, callbacks=callbacks_list,
+                steps_per_epoch=steps_per_epoch, workers=16, validation_data=x_test
             )
         else:
             self.model.fit(
-                x=training_data, y=training_data if training_labels is None else training_labels, batch_size=batch_size,
+                x=x_train, y=y_train, batch_size=batch_size if steps_per_epoch is None else None,
                 shuffle=True, epochs=epochs,
-                callbacks=callbacks_list
+                steps_per_epoch=steps_per_epoch if steps_per_epoch is not None else None,
+                callbacks=callbacks_list, validation_data=(x_test, y_test),
+                validation_steps=steps_per_epoch if steps_per_epoch is not None else None,
             )
         print("Training finished")
 
@@ -216,9 +221,9 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
         super().save()
 
     def train(self, x_train: Union[Iterator, np.ndarray], batch_size, epochs, weights_folder, print_every_n_batches=100,
-              initial_epoch=0,
-              lr_decay=1, embedding_samples: int = 5000, y_train: Optional[np.ndarray] = None,
-              x_test: Optional[Union[Iterator, np.ndarray]] = None, y_test: Optional[np.ndarray] = None):
+              initial_epoch=0, lr_decay=1, embedding_samples: int = 5000, y_train: Optional[np.ndarray] = None,
+              x_test: Optional[Union[Iterator, np.ndarray]] = None, y_test: Optional[np.ndarray] = None,
+              steps_per_epoch: int = None):
 
         if isinstance(x_train, Iterator):
             x_train: DirectoryIterator
@@ -259,15 +264,17 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
         logging.info("Training for {} epochs".format(epochs))
 
         if isinstance(x_train, Iterator):
-            steps_per_epoch = math.ceil(x_train.n / batch_size)
+            steps_per_epoch = steps_per_epoch if steps_per_epoch is not None else math.ceil(x_train.n / batch_size)
             self.model.fit_generator(
                 generator=x_train, shuffle=True, epochs=epochs, initial_epoch=initial_epoch, callbacks=callbacks_list,
                 steps_per_epoch=steps_per_epoch, workers=16, validation_data=x_test
             )
         else:
             self.model.fit(
-                x=x_train, y=y_train, batch_size=batch_size,
+                x=x_train, y=y_train, batch_size=batch_size if steps_per_epoch is None else None,
                 shuffle=True, epochs=epochs,
-                callbacks=callbacks_list, validation_data=(x_test, y_test)
+                steps_per_epoch=steps_per_epoch if steps_per_epoch is not None else None,
+                callbacks=callbacks_list, validation_data=(x_test, y_test),
+                validation_steps=steps_per_epoch if steps_per_epoch is not None else None,
             )
         logging.info("Training finished")
