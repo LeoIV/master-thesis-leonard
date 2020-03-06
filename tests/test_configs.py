@@ -1,5 +1,6 @@
 import itertools
 
+import numpy as np
 import pytest
 from keras import Model
 
@@ -7,8 +8,7 @@ from main import main
 
 
 def configs_fixture():
-    model_configs = ['vanilla_vae', 'large_vanilla_vae', 'alexnet_classifier', 'simple_classifier', 'alexnet_vae',
-                     'alexnet_vae_classification_loss']
+    model_configs = ['vanilla_vae', 'large_vanilla_vae', 'alexnet_classifier', 'simple_classifier', 'alexnet_vae']
     data_paths = ["../data/"]
     batch_sizes = [8]
     z_dims = [10]
@@ -31,6 +31,14 @@ def datasets_fixture():
 def test_configs(mocker, config):
     mocker.patch.object(Model, 'fit')
     mocker.patch.object(Model, 'fit_generator')
+    mocker.patch('keras.datasets.cifar10.load_data',
+                 return_value=((np.ones((3, 32, 32, 3), dtype=np.uint8), np.ones(3, dtype=np.uint8)),
+                               (np.ones((3, 32, 32, 3), dtype=np.uint8), np.ones(
+                                   3, dtype=np.uint8))))
+    mocker.patch('keras.datasets.mnist.load_data',
+                 return_value=((np.ones((3, 28, 28, 3), dtype=np.uint8), np.ones(3, dtype=np.uint8)),
+                               (np.ones((3, 28, 28, 3), dtype=np.uint8), np.ones(
+                                   3, dtype=np.uint8))))
     cl_config = [
         "--num_epochs=1",
         "--steps_per_epoch=2",
@@ -45,10 +53,11 @@ def test_configs(mocker, config):
         "--feature_map_reduction_factor={}".format(config[7])
     ]
     main(cl_config)
-    assert Model.fit.called or Model.fit_generator.called
+    assert Model.fit.called or Model.fit_generator.called \
+ \
+           @ pytest.mark.parametrize('dataset', datasets_fixture())
 
 
-@pytest.mark.parametrize('dataset', datasets_fixture())
 def test_datasets_pass(mocker, dataset):
     mocker.patch.object(Model, 'fit')
     mocker.patch.object(Model, 'fit_generator')
@@ -72,3 +81,13 @@ def test_datasets_pass(mocker, dataset):
         assert len(ds['x']) == dataset[1]
     else:
         assert ds['generator'].n == dataset[1]
+
+
+def test_frozen_alexnet():
+    # TODO implement
+    assert True
+
+
+def test_alexnet_vae_classification_loss():
+    # TODO implement
+    assert True
