@@ -34,6 +34,7 @@ def test_configs(mocker, config):
     cl_config = [
         "--num_epochs=1",
         "--steps_per_epoch=2",
+        "--rgb=True",
         "--configuration={}".format(config[0]),
         "--data_path={}".format(config[1]),
         "--batch_size={}".format(config[2]),
@@ -57,6 +58,7 @@ def test_datasets_pass(mocker, dataset):
         "--configuration=vanilla_vae",
         "--data_path=../data/",
         "--batch_size=32",
+        "--rgb=True",
         "--z_dim=2",
         "--use_dropout=True",
         "--use_batch_norm=True",
