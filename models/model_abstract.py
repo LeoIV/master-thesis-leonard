@@ -238,6 +238,7 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
             x_train_subset = np.concatenate(samples, axis=0)
             x_train.reset()
             y_train = None
+            y_embedding = None
 
         else:
             x_train_subset = x_train[:5000]

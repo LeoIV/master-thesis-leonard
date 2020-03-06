@@ -22,9 +22,8 @@ def configs_fixture():
                                      feature_map_reduction_factors)
     return list(config_perms)
 
-
 def datasets_fixture():
-    return [('mnist', 60000, 10000), ('celeba', 144, 16), ('imagenet', 6000, 0), ('cifar10', 50000, 10000)]
+    return [('mnist', 7, 7), ('celeba', 144, 16), ('imagenet', 6000, 0), ('cifar10', 3, 3)]
 
 
 @pytest.mark.parametrize('config', configs_fixture())
@@ -58,9 +57,18 @@ def test_configs(mocker, config):
            @ pytest.mark.parametrize('dataset', datasets_fixture())
 
 
+@pytest.mark.parametrize('dataset', datasets_fixture())
 def test_datasets_pass(mocker, dataset):
     mocker.patch.object(Model, 'fit')
     mocker.patch.object(Model, 'fit_generator')
+    mocker.patch('keras.datasets.cifar10.load_data',
+                 return_value=((np.ones((3, 32, 32, 3), dtype=np.uint8), np.ones(3, dtype=np.uint8)),
+                               (np.ones((3, 32, 32, 3), dtype=np.uint8), np.ones(
+                                   3, dtype=np.uint8))))
+    mocker.patch('keras.datasets.mnist.load_data',
+                 return_value=((np.ones((7, 28, 28, 3), dtype=np.uint8), np.ones(7, dtype=np.uint8)),
+                               (np.ones((7, 28, 28, 3), dtype=np.uint8), np.ones(
+                                   7, dtype=np.uint8))))
     cl_config = [
         "--num_epochs=1",
         "--steps_per_epoch=2",
