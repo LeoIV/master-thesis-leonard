@@ -73,7 +73,7 @@ def test_datasets_pass(mocker, dataset):
         "--num_epochs=1",
         "--steps_per_epoch=2",
         "--configuration=vanilla_vae",
-        "--data_path=../data/",
+        "--data_path=./data/",
         "--batch_size=32",
         "--rgb=True",
         "--z_dim=2",
