@@ -1,7 +1,8 @@
 import itertools
-from keras import Model
+
 import pytest
-import numpy as np
+from keras import Model
+
 from main import main
 
 
