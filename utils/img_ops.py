@@ -4,10 +4,11 @@ import numpy as np
 from PIL import Image
 
 
-def resize_array(arr: np.ndarray, size: Tuple[int, int]):
+def resize_array(arr: np.ndarray, size: Tuple[int, int], rgb: bool):
     """
     Resize an numpy array containing images according to size.
     Assumes following structure [num_images, width, height, [num_channels]]
+    :param rgb: whether images should be rgb or grayscale
     :param arr:
     :param size:
     :return: the array with width and height set to the desired structure
@@ -18,9 +19,15 @@ def resize_array(arr: np.ndarray, size: Tuple[int, int]):
     new_arr_shape = (arr.shape[0], *size)
     if len(arr.shape) > 3:
         new_arr_shape = (*new_arr_shape, arr.shape[3])
-    new_arr = np.zeros(new_arr_shape)
+    was_gray = len(arr.shape) <= 3
+    new_arr_shape = new_arr_shape if not was_gray or (was_gray and not rgb) else (*new_arr_shape, 3)
+    new_arr = np.zeros(new_arr_shape, dtype=arr.dtype)
     for i, img in enumerate(arr):
         p_img = Image.fromarray(img.squeeze())
+        if not rgb:
+            p_img = p_img.convert('L')
+        else:
+            p_img = p_img.convert('RGB')
         p_img = p_img.resize(size=size, resample=Image.LANCZOS)
         img = np.array(p_img)
         new_arr[i] = img

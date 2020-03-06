@@ -92,52 +92,7 @@ class FeatureMapActivationCorrelationCallback(Callback):
             self.writer.flush()
 
 
-class ReconstructionImagesCallback(Callback):
-    """
-    Randomly draw 9 Gaussians and reconstruct their images with fixed seeds (consistency over batches)
-    """
 
-    def __init__(self, log_dir: str, print_every_n_batches: int, initial_epoch: int, vae: 'VariationalAutoencoder',
-                 num_reconstructions: int = 10):
-        """
-
-        :param log_dir:
-        :param print_every_n_batches:
-        :param initial_epoch:
-        :param vae:
-        """
-        super().__init__()
-        self.epoch = initial_epoch
-        self.print_every_n_batches = print_every_n_batches
-        self.vae = vae
-        self.seeds = list(range(num_reconstructions))
-        self.seen = 0
-        self.epoch = 1
-        self.log_dir = log_dir
-
-    def on_epoch_end(self, epoch, logs=None):
-        self.epoch += 1
-
-    def on_batch_end(self, batch, logs=None):
-        if logs is None:
-            logs = {}
-        if batch % self.print_every_n_batches == 0:
-            self.seen += 1
-            logging.info("Visualizing reconstructions")
-            img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
-                                    "reconstructions")
-            os.makedirs(img_path, exist_ok=True)
-            for seed in self.seeds:
-                # make sure we always reconstruct the same image
-                np.random.seed(seed)
-                z_new = np.random.normal(size=(1, self.vae.z_dim))
-                np.random.seed(None)
-                # predictions are in [0-1] float format
-                reconst = self.vae.decoder.predict(np.array(z_new))
-                # make byte array
-                k = (reconst.squeeze() * 255.0).astype(np.uint8)
-
-                Image.fromarray(k.squeeze()).save(os.path.join(img_path, "sample_{}.jpg".format(seed)))
 
 
 def step_decay_schedule(initial_lr, decay_factor=0.5, step_size=1):

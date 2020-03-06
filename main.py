@@ -86,6 +86,7 @@ def main(args: List[str]):
                              "affected by this setting).")
     parser.add_argument('--lr_decay', type=float, default=1e-7,
                         help="The learning rate decay. Should be in interval [0,1].")
+    parser.add_argument('--rgb', type=str2bool, default=True)
     parser.add_argument('--feature_map_reduction_factor', type=int, default=1,
                         help="The factor by which to reduce the number of feature maps. If a layer usually has 50 "
                              "feature maps, setting a factor to 2 will yield only 25 feature maps.")
@@ -114,7 +115,6 @@ def main(args: List[str]):
     x_val, y_val = None, None
 
     if args.configuration == 'simple_classifier':
-        from models.VAE import VariationalAutoencoder
         input_dim = infer_input_dim((32, 32), args)
         model = SimpleClassifier(input_dim=input_dim, encoder_conv_filters=[32, 64, 64, 64],
                                  encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[1, 2, 2, 1],
@@ -129,7 +129,8 @@ def main(args: List[str]):
         input_dim = infer_input_dim((128, 128), args)
         model = VariationalAutoencoder(input_dim=input_dim, encoder_conv_filters=[32, 64, 64, 64],
                                        encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[2, 2, 2, 2],
-                                       decoder_conv_t_filters=[64, 64, 32, 3], decoder_conv_t_kernel_size=[3, 3, 3, 3],
+                                       decoder_conv_t_filters=[64, 64, 32, 3 if args.rgb else 1],
+                                       decoder_conv_t_kernel_size=[3, 3, 3, 3],
                                        decoder_conv_t_strides=[2, 2, 2, 2], log_dir=args.logdir, z_dim=args.z_dim,
                                        kernel_visualization_layer=args.kernel_visualization_layer,
                                        feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,
@@ -141,7 +142,8 @@ def main(args: List[str]):
         input_dim = infer_input_dim((224, 224), args)
         model = VariationalAutoencoder(input_dim=input_dim, encoder_conv_filters=[32, 64, 64, 64],
                                        encoder_conv_kernel_size=[11, 7, 5, 3], encoder_conv_strides=[4, 2, 2, 2],
-                                       decoder_conv_t_filters=[64, 64, 32, 1], decoder_conv_t_kernel_size=[3, 5, 7, 11],
+                                       decoder_conv_t_filters=[64, 64, 32, 3 if args.rgb else 1],
+                                       decoder_conv_t_kernel_size=[3, 5, 7, 11],
                                        decoder_conv_t_strides=[2, 2, 2, 4], log_dir=args.logdir, z_dim=args.z_dim,
                                        use_batch_norm=args.use_batch_norm, use_dropout=args.use_dropout,
                                        kernel_visualization_layer=args.kernel_visualization_layer,
@@ -186,9 +188,8 @@ def main(args: List[str]):
     if args.dataset in ['cifar10', 'mnist']:
         (x_train, y_train), (x_val, y_val) = cifar10.load_data() if args.dataset == 'cifar10' else mnist.load_data()
 
-        if x_train.shape[1:] != input_dim:
-            x_train = resize_array(x_train, input_dim[:2])
-            x_val = resize_array(x_val, input_dim[:2])
+        x_train = resize_array(x_train, input_dim[:2], args.rgb)
+        x_val = resize_array(x_val, input_dim[:2], args.rgb)
 
         x_train = x_train.astype('float32') / 255.
         x_val = x_val.astype('float32') / 255.
@@ -203,10 +204,6 @@ def main(args: List[str]):
             y_val = y_val.squeeze()
             y_train = to_categorical(y_train, num_classes=10)
             y_val = to_categorical(y_val, num_classes=10)
-        elif isinstance(model, VAEWrapper):
-            y_train, y_val = x_train, x_val
-        else:
-            raise AttributeError("unrecognized model instance {}".format(model.__type__))
     elif args.dataset == 'celeba':
         # TODO variable validation split size
         data_gen = ImageDataGenerator(rescale=1. / 255, validation_split=0.1)
@@ -214,12 +211,12 @@ def main(args: List[str]):
             directory=os.path.join(args.data_path, dataset_subfolder),
             target_size=input_dim[:2], batch_size=args.batch_size,
             class_mode='input', interpolation='lanczos',
-            follow_links=True, subset='training')
+            follow_links=True, subset='training', color_mode='rgb' if args.rgb else 'grayscale')
         y_train = data_gen.flow_from_directory(
             directory=os.path.join(args.data_path, dataset_subfolder),
             target_size=input_dim[:2], batch_size=args.batch_size,
             class_mode='input', interpolation='lanczos',
-            follow_links=True, subset='validation')
+            follow_links=True, subset='validation', color_mode='rgb' if args.rgb else 'grayscale')
     elif args.dataset == 'imagenet':
         if isinstance(model, DeepCNNClassifierWrapper):
             class_mode = 'categorical'
@@ -233,12 +230,12 @@ def main(args: List[str]):
             directory=os.path.join(args.data_path, dataset_subfolder, 'train'),
             target_size=input_dim[:2], batch_size=args.batch_size,
             class_mode=class_mode, interpolation='lanczos',
-            follow_links=True, subset='training')
+            follow_links=True, subset='training', color_mode='rgb' if args.rgb else 'grayscale')
         y_train = data_gen.flow_from_directory(
             directory=os.path.join(args.data_path, dataset_subfolder, 'val'),
             target_size=input_dim[:2], batch_size=args.batch_size,
             class_mode=class_mode, interpolation='lanczos',
-            follow_links=True, subset='validation')
+            follow_links=True, subset='validation', color_mode='rgb' if args.rgb else 'grayscale')
 
     if args.mode == 'build':
         model.save()
@@ -282,13 +279,10 @@ def str2bool(v):
 
 
 def infer_input_dim(size: Tuple[int, int], args: argparse.Namespace) -> Tuple[int, int, int]:
-    if args.dataset in ["mnist"]:
-        input_dim = (*size, 1)
-    elif args.dataset in ["celeba", "imagenet", "cifar10"]:
-        input_dim = (*size, 3)
+    if args.rgb:
+        return (*size, 3)
     else:
-        raise AttributeError("got unrecognized dataset {}".format(args.dataset))
-    return input_dim
+        return (*size, 1)
 
 
 if __name__ == '__main__':

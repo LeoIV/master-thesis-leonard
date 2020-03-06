@@ -1,4 +1,5 @@
 import logging
+import math
 import os
 import time
 from concurrent.futures.thread import ThreadPoolExecutor
@@ -9,7 +10,8 @@ from PIL import Image
 from keras import Model
 from keras.callbacks import Callback
 from matplotlib import pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+from utils.future_handling import check_finished_futures_and_return_unfinished
 
 
 class FeatureMapVisualizationCallback(Callback):
@@ -27,6 +29,7 @@ class FeatureMapVisualizationCallback(Callback):
         self.batch_nrs = []
         self.threadpool = ThreadPoolExecutor(max_workers=5)
         self.epoch = 1
+        self.futures = []
         self.num_samples = num_samples
         idxs = np.random.randint(0, len(self.x_train), num_samples)
         self.samples = [np.copy(self.x_train[idx]) for idx in idxs]
@@ -38,15 +41,25 @@ class FeatureMapVisualizationCallback(Callback):
 
         min_value = fms.min()
         max_value = fms.max()
-        fig = plt.figure(fig_num, figsize=(8.0, 6.0))
+
+        columns = 10
+        rows = math.ceil((len(feature_maps) + 1) / columns)
+
+        fig, axs = plt.subplots(rows, columns, figsize=(columns * 2, rows * 2), num=fig_num)
+
+        for xax in axs:
+            for yax in xax:
+                yax.set_xticks([])
+                yax.set_yticks([])
+
         for i, f_map in enumerate(feature_maps):
-            ax = fig.gca()
-            img = ax.imshow(f_map.squeeze(), vmin=min_value, vmax=max_value)
-            divider = make_axes_locatable(ax)
-            cax = divider.append_axes("right", size="5%", pad=0.05)
-            fig.colorbar(img, cax=cax)
-            fig.savefig(os.path.join(img_path_layer, "map_{}.png".format(i)))
-            fig.clear()
+            row = i // columns
+            column = i % columns
+            (axs[row, column] if rows > 1 else axs[column]).imshow(f_map.squeeze(), vmin=min_value,
+                                                                   vmax=max_value)
+        fig.colorbar((axs[0, 0] if rows > 1 else axs[0]).get_images()[0], cax=axs[-1, -1] if rows > 1 else axs[-1])
+        fig.savefig("{}.png".format(img_path_layer))
+        fig.clear()
         plt.close(fig)
 
     def on_epoch_end(self, epoch, logs=None):
@@ -55,6 +68,7 @@ class FeatureMapVisualizationCallback(Callback):
     def on_batch_end(self, batch, logs=None):
         if logs is None:
             logs = {}
+        self.futures = check_finished_futures_and_return_unfinished(self.futures)
         if batch % self.print_every_n_batches == 0:
             plt.rcParams["figure.figsize"] = (7 * self.num_samples, 10 + 10 * (len(self.layer_idxs)))
             self.seen += 1
@@ -102,12 +116,12 @@ class FeatureMapVisualizationCallback(Callback):
                             "FrozenAlexNetVAE or AlexNet")
 
                     img_path_layer = os.path.join(img_path, "{}".format(output_layer.name))
-                    os.makedirs(img_path_layer, exist_ok=True)
 
                     feature_maps = model.predict(sample[np.newaxis, :], batch_size=1, verbose=1)
                     # as the printing a very long time, we do this in threads
-                    self.threadpool.submit(self._save_feature_maps, *(img_path_layer, feature_maps,
-                                                                      round(time.time() * 10E6)))
+                    f = self.threadpool.submit(self._save_feature_maps, *(img_path_layer, feature_maps,
+                                                                          round(time.time() * 10E6)))
+                    self.futures.append(f)
                     fmas = np.sum(np.abs(feature_maps), axis=tuple(range(len(feature_maps.shape)))[:-1])
                     fmas = fmas
                     self.fmas.setdefault(sample_nr, {})
@@ -129,3 +143,5 @@ class FeatureMapVisualizationCallback(Callback):
 
     def on_train_end(self, logs=None):
         self.threadpool.shutdown()
+        for f in self.futures:
+            f.result()

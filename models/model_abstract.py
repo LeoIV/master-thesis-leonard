@@ -14,10 +14,12 @@ from keras.optimizers import Adam
 from keras.utils import plot_model
 from keras_preprocessing.image import Iterator, DirectoryIterator
 
+from callbacks.HiddenSpaceCallback import HiddenSpaceCallback
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
 from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.LossLoggingCallback import LossLoggingCallback
-from utils.callbacks import step_decay_schedule, ReconstructionImagesCallback
+from callbacks.ReconstructionCallback import ReconstructionImagesCallback
+from utils.callbacks import step_decay_schedule
 
 
 class ModelWrapper(ABC):
@@ -233,11 +235,13 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
             samples = []
             for i in range(n_batches):
                 samples.append(x_train.next()[0])
-            embeddings_data = np.concatenate(samples, axis=0)
+            x_train_subset = np.concatenate(samples, axis=0)
             x_train.reset()
+            y_train = None
 
         else:
-            embeddings_data = x_train[:5000]
+            x_train_subset = x_train[:5000]
+            y_embedding = y_train[:5000] if y_train is not None else None
 
         lr_sched = step_decay_schedule(initial_lr=self.learning_rate, decay_factor=lr_decay, step_size=1)
 
@@ -246,18 +250,20 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
         checkpoint2 = ModelCheckpoint(os.path.join(weights_folder, 'weights.h5'), save_weights_only=True, verbose=1)
         tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, update_freq="batch")
         if self.kernel_visualization_layer >= 0:
-            kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, vae=self,
-                                                      print_every_n_batches=print_every_n_batches,
+            kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
                                                       layer_idx=self.kernel_visualization_layer)
         rc_callback = ReconstructionImagesCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
-                                                   initial_epoch=initial_epoch, vae=self)
+                                                   initial_epoch=initial_epoch, vae=self, x_train=x_train_subset)
         fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model_wrapper=self,
                                                       print_every_n_batches=print_every_n_batches,
                                                       layer_idxs=self.feature_map_layers,
-                                                      x_train=embeddings_data, num_samples=self.num_samples)
+                                                      x_train=x_train_subset, num_samples=self.num_samples)
+        hs_callback = HiddenSpaceCallback(log_dir=self.log_dir, vae=self, batch_size=batch_size,
+                                          x_train=x_train_subset, y_train=y_embedding, max_samples=5000)
         ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [ll_callback, checkpoint1, checkpoint2, tb_callback, fm_callback, rc_callback, lr_sched]
+        callbacks_list = [hs_callback, ll_callback, checkpoint1, checkpoint2, tb_callback, fm_callback, rc_callback,
+                          lr_sched]
         if self.kernel_visualization_layer >= 0:
             callbacks_list.append(kv_callback)
 
@@ -271,10 +277,10 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
             )
         else:
             self.model.fit(
-                x=x_train, y=y_train, batch_size=batch_size if steps_per_epoch is None else None,
+                x=x_train, y=x_train, batch_size=batch_size if steps_per_epoch is None else None,
                 shuffle=True, epochs=epochs,
                 steps_per_epoch=steps_per_epoch if steps_per_epoch is not None else None,
-                callbacks=callbacks_list, validation_data=(x_test, y_test),
+                callbacks=callbacks_list, validation_data=(x_test, x_test),
                 validation_steps=steps_per_epoch if steps_per_epoch is not None else None,
             )
         logging.info("Training finished")
