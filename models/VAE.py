@@ -7,6 +7,7 @@ from keras.layers import Input, Conv2D, Flatten, Dense, Conv2DTranspose, Reshape
 from keras.models import Model
 
 from models.model_abstract import VAEWrapper
+from utils.vae_utils import sampling
 
 
 class VariationalAutoencoder(VAEWrapper):
@@ -20,7 +21,7 @@ class VariationalAutoencoder(VAEWrapper):
                  inner_activation: str = "ReLU", decay_rate: float = 1e-7, feature_map_reduction_factor: int = 1):
 
         super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_layers,
-                         inner_activation, decay_rate, feature_map_reduction_factor)
+                         inner_activation, decay_rate, feature_map_reduction_factor, z_dim)
         self.dropout_rate = dropout_rate
         self.name = 'variational_autoencoder'
 
@@ -30,7 +31,6 @@ class VariationalAutoencoder(VAEWrapper):
         self.decoder_conv_t_filters = decoder_conv_t_filters
         self.decoder_conv_t_kernel_size = decoder_conv_t_kernel_size
         self.decoder_conv_t_strides = decoder_conv_t_strides
-        self.z_dim = z_dim
 
         self.use_batch_norm = use_batch_norm
         self.use_dropout = use_dropout
@@ -77,11 +77,6 @@ class VariationalAutoencoder(VAEWrapper):
         self.log_var = Dense(self.z_dim, name='log_var')(x)
 
         self.encoder_mu_log_var = Model(encoder_input, (self.mu, self.log_var))
-
-        def sampling(args):
-            mu, log_var = args
-            epsilon = K.random_normal(shape=K.shape(mu), mean=0., stddev=1.)
-            return mu + K.exp(log_var / 2) * epsilon
 
         encoder_output = Lambda(sampling, name='encoder_output')([self.mu, self.log_var])
 

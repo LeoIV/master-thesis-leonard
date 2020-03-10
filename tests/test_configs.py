@@ -8,7 +8,8 @@ from main import main
 
 
 def configs_fixture():
-    model_configs = ['vanilla_vae', 'large_vanilla_vae', 'alexnet_classifier', 'simple_classifier', 'alexnet_vae']
+    model_configs = ['vlae', 'vanilla_vae', 'large_vanilla_vae', 'alexnet_classifier', 'simple_classifier',
+                     'alexnet_vae']
     data_paths = ["../data/"]
     batch_sizes = [8]
     z_dims = [10]
@@ -21,6 +22,7 @@ def configs_fixture():
                                      datasets,
                                      feature_map_reduction_factors)
     return list(config_perms)
+
 
 def datasets_fixture():
     return [('mnist', 7, 7), ('celeba', 144, 16), ('imagenet', 6000, 0), ('cifar10', 3, 3)]

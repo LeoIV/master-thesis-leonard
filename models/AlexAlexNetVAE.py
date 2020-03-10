@@ -13,6 +13,7 @@ from keras.optimizers import Adam
 
 from models.AlexNet import AlexNet
 from models.model_abstract import VAEWrapper
+from utils.vae_utils import sampling
 
 
 class AlexAlexNetVAE(VAEWrapper):
@@ -24,10 +25,8 @@ class AlexAlexNetVAE(VAEWrapper):
                  feature_map_reduction_factor: int = 1):
 
         super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_layers,
-                         inner_activation, decay_rate, feature_map_reduction_factor)
+                         inner_activation, decay_rate, feature_map_reduction_factor, z_dim)
         self.name = 'variational_autoencoder'
-
-        self.z_dim = z_dim
 
         self.use_batch_norm = use_batch_norm
         self.use_dropout = use_dropout
@@ -113,11 +112,6 @@ class AlexAlexNetVAE(VAEWrapper):
         self.mu = Dense(self.z_dim, name='mu')(x)
         self.log_var = Dense(self.z_dim, name='log_var')(x)
         self.encoder_mu_log_var = Model(encoder_input, (self.mu, self.log_var))
-
-        def sampling(args):
-            mu, log_var = args
-            epsilon = K.random_normal(shape=K.shape(mu), mean=0., stddev=1.)
-            return mu + K.exp(log_var / 2) * epsilon
 
         encoder_output = Lambda(sampling, name='encoder_output')([self.mu, self.log_var])
 
