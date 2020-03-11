@@ -50,7 +50,7 @@ class HiddenSpaceCallback(Callback):
 
     @staticmethod
     def _print_embeddings(mus: np.ndarray, y: Optional[np.ndarray], fig_path: str, layer_name: str):
-        mus_embedded = TSNE().fit_transform(mus)
+        mus_embedded = TSNE().fit_transform(mus) if mus.shape[-1] != 2 else mus
         fig, ax = plt.subplots(num=round(time.time() * 10E6), figsize=(8, 6))
 
         ax.scatter(mus_embedded[:, 0], mus_embedded[:, 1], c=y, alpha=0.7)
