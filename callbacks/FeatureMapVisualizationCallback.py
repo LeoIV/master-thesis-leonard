@@ -48,9 +48,13 @@ class FeatureMapVisualizationCallback(Callback):
         fig, axs = plt.subplots(rows, columns, figsize=(columns * 2, rows * 2), num=fig_num)
 
         for xax in axs:
-            for yax in xax:
-                yax.set_xticks([])
-                yax.set_yticks([])
+            if rows > 1:
+                for yax in xax:
+                    yax.set_xticks([])
+                    yax.set_yticks([])
+            else:
+                xax.set_xticks([])
+                xax.set_yticks([])
 
         for i, f_map in enumerate(feature_maps):
             row = i // columns
@@ -97,7 +101,7 @@ class FeatureMapVisualizationCallback(Callback):
                     # we cannot use instanceof as we aren't allowed to import the model_wrapper class directly since
                     # this would lead to cyclic references
                     if type(self.model_wrapper).__name__ in ['VariationalAutoencoder', 'AlexNetVAE',
-                                                             'FrozenAlexNetVAE', 'AlexAlexNetVAE']:
+                                                             'FrozenAlexNetVAE', 'AlexAlexNetVAE', 'VLAE']:
                         if layer_idx < len(self.model_wrapper.encoder.layers) - 1:
                             output_layer = self.model_wrapper.encoder.layers[layer_idx]
                             model = Model(inputs=self.model_wrapper.encoder.inputs, outputs=output_layer.output)

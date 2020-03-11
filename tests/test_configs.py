@@ -44,6 +44,7 @@ def test_configs(mocker, config):
         "--num_epochs=1",
         "--steps_per_epoch=2",
         "--rgb=True",
+        "--logdir=test",
         "--configuration={}".format(config[0]),
         "--data_path={}".format(config[1]),
         "--batch_size={}".format(config[2]),
@@ -76,6 +77,7 @@ def test_datasets_pass(mocker, dataset):
         "--steps_per_epoch=2",
         "--configuration=vanilla_vae",
         "--data_path=./data/",
+        "--logdir=test",
         "--batch_size=32",
         "--rgb=True",
         "--z_dim=2",
@@ -91,6 +93,35 @@ def test_datasets_pass(mocker, dataset):
         assert len(ds['x']) == dataset[1]
     else:
         assert ds['generator'].n == dataset[1]
+
+
+@pytest.mark.parametrize('configuration',
+                         ['vlae', 'vanilla_vae', 'large_vanilla_vae', 'alexnet_classifier', 'simple_classifier',
+                          'alexnet_vae'])
+@pytest.mark.parametrize('dataset', ['mnist', 'cifar10'])
+def test_train_on_small_mnist(mocker, configuration, dataset):
+    mocker.patch('keras.datasets.cifar10.load_data',
+                 return_value=((np.ones((3, 32, 32, 3), dtype=np.uint8), np.ones(3, dtype=np.uint8)),
+                               (np.ones((3, 32, 32, 3), dtype=np.uint8), np.ones(
+                                   3, dtype=np.uint8))))
+    mocker.patch('keras.datasets.mnist.load_data',
+                 return_value=((np.ones((7, 28, 28, 3), dtype=np.uint8), np.ones(7, dtype=np.uint8)),
+                               (np.ones((7, 28, 28, 3), dtype=np.uint8), np.ones(
+                                   7, dtype=np.uint8))))
+    cl_config = [
+        "--num_epochs=1",
+        "--steps_per_epoch=2",
+        "--configuration={}".format(configuration),
+        "--data_path=./data/",
+        "--batch_size=32",
+        "--logdir=test",
+        "--rgb=True",
+        "--z_dim=2",
+        "--use_dropout=True",
+        "--use_batch_norm=True",
+        "--dataset={}".format(dataset)
+    ]
+    main(cl_config)
 
 
 def test_frozen_alexnet():

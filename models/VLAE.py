@@ -1,14 +1,16 @@
-from typing import Tuple, Sequence
+from typing import Tuple, Sequence, Optional, Union, Iterator
 
 from keras import Input, Sequential, Model
 from keras.layers import Conv2D, BatchNormalization, ReLU, SpatialDropout2D, Flatten, Dense, Concatenate, Reshape, \
-    UpSampling2D, Activation, LeakyReLU, Lambda
+    UpSampling2D, Activation, LeakyReLU, Lambda, Conv2DTranspose
 from keras.optimizers import Adam
 
 from models.model_abstract import VAEWrapper
 from utils.vae_utils import NormalVariational, sampling
 
 from keras import backend as K
+
+import numpy as np
 
 
 class VLAE(VAEWrapper):
@@ -22,125 +24,111 @@ class VLAE(VAEWrapper):
         self._build()
 
     def _build(self):
-        ### ENCODER ###
-
         inputs = Input(self.input_dim)
-        h_1_layers = Sequential([
-            Conv2D(8, 3),
-            BatchNormalization(trainable=False),
-            ReLU(),
-            Conv2D(16, 3),
-            BatchNormalization(trainable=False),
-            SpatialDropout2D(self.dropout_rate),
-            ReLU()], name='h_1')
-        h_1 = h_1_layers(inputs)
-        h_1_flatten = Flatten()(h_1)
 
-        h_2_layers = Sequential([
-            Conv2D(16, 3),
-            BatchNormalization(trainable=False),
-            ReLU(),
-            Conv2D(16, 3),
-            BatchNormalization(trainable=False),
-            SpatialDropout2D(self.dropout_rate),
-            ReLU()], name='h_2')
-        h_2 = h_2_layers(h_1)
-        h_2_flatten = Flatten()(h_2)
-        h_3_layers = Sequential([
-            Conv2D(16, 3),
-            BatchNormalization(trainable=False),
-            ReLU(),
-            Conv2D(16, 3),
-            BatchNormalization(trainable=False),
-            SpatialDropout2D(self.dropout_rate),
-            ReLU()], name='h_3')
-        h_3 = h_3_layers(h_2)
-        h_3_flatten = Flatten()(h_3)
+        # INFERENCE 0
+        i0 = Conv2D(filters=64, kernel_size=[4, 4], strides=2)(inputs)
+        i0 = BatchNormalization()(i0)
+        i0 = ReLU()(i0)
+        i0 = Conv2D(filters=128, kernel_size=[4, 4], strides=2)(i0)
+        i0 = BatchNormalization()(i0)
+        i0 = ReLU()(i0)
 
-        self.mu = Dense(self.z_dim, name='mu')(h_1_flatten)
-        self.log_var = Dense(self.z_dim, name='log_var')(h_1_flatten)
-        z_1 = Lambda(sampling, name="z_1_latent")([self.mu, self.log_var])
-        # z_1 = NormalVariational(self.z_dim, name='z_1_latent')(h_1)
-        self.mu_2 = Dense(self.z_dim, name='mu_2')(h_2_flatten)
-        self.log_var_2 = Dense(self.z_dim, name='log_var_2')(h_2_flatten)
-        z_2 = Lambda(sampling, name="z_2_latent")([self.mu_2, self.log_var_2])
-        # z_2 = NormalVariational(self.z_dim, name='z_2_latent')(h_2)
-        self.mu_3 = Dense(self.z_dim, name='mu_3')(h_3_flatten)
-        self.log_var_3 = Dense(self.z_dim, name='log_var_3')(h_3_flatten)
-        z_3 = Lambda(sampling, name="z_3_latent")([self.mu_3, self.log_var_3])
-        # z_3 = NormalVariational(self.z_dim, name='z_3_latent')(h_3)
+        # LADDER 0
+        l0 = Conv2D(filters=64, kernel_size=4, strides=2)(inputs)
+        l0 = BatchNormalization()(l0)
+        l0 = ReLU()(l0)
+        l0 = Flatten()(l0)
+        self.mu_0 = Dense(self.z_dim, name='mu_1')(l0)
+        self.log_var_0 = Dense(self.z_dim, name='log_var_1')(l0)
+        z_0 = Lambda(sampling, name="z_1_latent")([self.mu_0, self.log_var_0])
 
-        self.encoder = Model(inputs, [z_1, z_2, z_3], name='encoder')
+        # INFERENCE 1
+        i1 = Dense(1024)(i0)
+        i1 = BatchNormalization()(i1)
+        i1 = ReLU()(i1)
+        i1 = Dense(1024)(i1)
+        i1 = BatchNormalization()(i1)
+        i1 = ReLU()(i1)
+
+        # LADDER 1
+        l1 = Dense(1024)(i0)
+        l1 = BatchNormalization()(l1)
+        l1 = ReLU()(l1)
+        l1 = Dense(1024)(l1)
+        l1 = BatchNormalization()(l1)
+        l1 = ReLU()(l1)
+        l1 = Flatten()(l1)
+        self.mu_1 = Dense(self.z_dim, name='mu_2')(l1)
+        self.log_var_1 = Dense(self.z_dim, name='log_var_2')(l1)
+        z_1 = Lambda(sampling, name="z_2_latent")([self.mu_1, self.log_var_1])
+
+        # LADDER 2
+        l2 = Dense(1024)(i1)
+        l2 = BatchNormalization()(l2)
+        l2 = ReLU()(l2)
+        l2 = Dense(1024)(l2)
+        l2 = BatchNormalization()(l2)
+        l2 = ReLU()(l2)
+        l2 = Flatten()(l2)
+        self.mu_2 = Dense(self.z_dim, name='mu_3')(l2)
+        self.log_var_2 = Dense(self.z_dim, name='log_var_3')(l2)
+        z_2 = Lambda(sampling, name="z_3_latent")([self.mu_2, self.log_var_2])
+
+        encoder_output = [z_0, z_1, z_2]
+
+        self.encoder = Model(inputs, encoder_output, name='encoder')
 
         ### DECODER ###
 
         z_1_input, z_2_input, z_3_input = Input((self.z_dim,), name='z_1'), Input((self.z_dim,), name='z_2'), Input(
             (self.z_dim,), name='z_3')
 
-        z_3 = Dense(1024, activation='relu')(z_3_input)
-        z_tilde_3_layers = Sequential([
-            Dense(1024),
-            BatchNormalization(trainable=False),
-            ReLU(), Dense(1024),
-            BatchNormalization(trainable=False),
-            ReLU(), Dense(1024),
-            BatchNormalization(trainable=False),
-            ReLU()], name='z_tilde_3')
-        z_tilde_3 = z_tilde_3_layers(z_3)
+        # GENERATIVE 2
+        g2 = Dense(1024)(z_3_input)
+        g2 = BatchNormalization()(g2)
+        g2 = ReLU()(g2)
+        g2 = Dense(1024)(g2)
+        g2 = BatchNormalization()(g2)
+        g2 = ReLU()(g2)
+        g2 = Dense(1024)(g2)
 
-        z_2 = Dense(128, activation='relu')(z_2_input)
-        z_tilde_2_layers = Sequential([
-            Dense(128),
-            BatchNormalization(trainable=False),
-            ReLU(), Dense(128),
-            BatchNormalization(trainable=False),
-            ReLU(), Dense(128),
-            BatchNormalization(trainable=False),
-            ReLU()], name='z_tilde_2')
-        input_z_tilde_2 = Concatenate()([z_tilde_3, z_2])
-        z_tilde_2 = z_tilde_2_layers(input_z_tilde_2)
+        # GENERATIVE 1
+        g1 = Concatenate()([g2, z_2_input])
+        g1 = Dense(1024)(g1)
+        g1 = BatchNormalization()(g1)
+        g1 = ReLU()(g1)
+        g1 = Dense(1024)(g1)
+        g1 = BatchNormalization()(g1)
+        g1 = ReLU()(g1)
+        g1 = Dense(1024)(g1)
 
-        z_1 = Dense(128, activation='relu')(z_1_input)
-        z_tilde_1_layers = Sequential([
-            Dense(128),
-            BatchNormalization(trainable=False),
-            ReLU(), Dense(128),
-            BatchNormalization(trainable=False),
-            ReLU(), Dense(128),
-            BatchNormalization(trainable=False),
-            ReLU()], name='z_tilde_1')
-        input_z_tilde_1 = Concatenate()([z_tilde_2, z_1])
-        z_tilde_1 = z_tilde_1_layers(input_z_tilde_1)
+        # GENERATIVE 0
+        g0 = Concatenate()([g1, z_1_input])
+        g0 = Dense(6 * 6 * 128)(g0)  # TODO make dynamic
+        g0 = BatchNormalization()(g0)
+        g0 = ReLU()(g0)
+        g0 = Reshape((6, 6, 128))(g0)  # TODO make dynamic
+        g0 = Conv2DTranspose(filters=64, kernel_size=3, strides=2)(g0)
+        g0 = BatchNormalization()(g0)
+        g0 = ReLU()(g0)
+        g0 = Conv2DTranspose(filters=self.input_dim[-1], kernel_size=4, strides=2)(g0)
+        g0 = Activation('sigmoid')(g0)
 
-        decoder = Reshape((2, 2, 32))(z_tilde_1)
-        decoder = UpSampling2D(2)(decoder)  # 4x4
-        decoder = Conv2D(32, 3)(decoder)  # 2x2
-        decoder = BatchNormalization(trainable=False)(decoder)
-        decoder = ReLU()(decoder)
-        decoder = UpSampling2D(4)(decoder)  # 8x8
-        decoder = Conv2D(16, 3)(decoder)  # 6x6
-        decoder = BatchNormalization(trainable=False)(decoder)
-        decoder = ReLU()(decoder)
-        decoder = UpSampling2D(2)(decoder)  # 12x12
-        decoder = Conv2D(8, 3)(decoder)  # 10x10
-        decoder = BatchNormalization(trainable=False)(decoder)
-        decoder = ReLU()(decoder)
-        decoder = UpSampling2D(2)(decoder)  # 20x20
-        decoder = Conv2D(4, 5)(decoder)  # 16x16
-        decoder = BatchNormalization(trainable=False)(decoder)
-        decoder = LeakyReLU()(decoder)
-        decoder = UpSampling2D(2)(decoder)  # 32x32
-        decoder = Conv2D(1, 5)(decoder)  # 28x28
-        decoder = Activation('sigmoid')(decoder)
+        self.decoder = Model([z_1_input, z_2_input, z_3_input], g0, name='decoder')
+        decoder_output = self.decoder(encoder_output)
 
-        self.decoder = Model([z_1_input, z_2_input, z_3_input], decoder, name='decoder')
-
-        # def _make_vlae(latent_size):
-
-        z_1, z_2, z_3 = self.encoder(inputs)
-        decoded = self.decoder([z_1, z_2, z_3])
-        self.model = Model(inputs, decoded, name='vlae')
+        self.model = Model(inputs, decoder_output, name='vlae')
         return self.encoder
+
+    def train(self, x_train: Union[Iterator, np.ndarray], batch_size, epochs, weights_folder, print_every_n_batches=100,
+              initial_epoch: int = 0, lr_decay: float = 1, embedding_samples: int = 5000,
+              y_train: Optional[np.ndarray] = None,
+              x_test: Optional[Union[Iterator, np.ndarray]] = None, y_test: Optional[np.ndarray] = None,
+              steps_per_epoch: int = None, num_zdims: int = 1,
+              embedding_layer_names: Sequence[str] = ["mu_1", "mu_2", "mu_3"]):
+        super().train(x_train, batch_size, epochs, weights_folder, print_every_n_batches, initial_epoch, lr_decay,
+                      embedding_samples, y_train, x_test, y_test, steps_per_epoch, 3, embedding_layer_names)
 
     def compile(self, learning_rate, r_loss_factor):
         self.learning_rate = learning_rate
@@ -150,7 +138,9 @@ class VLAE(VAEWrapper):
             return r_loss_factor * r_loss
 
         def vae_kl_loss(y_true, y_pred):
-            kl_loss = -0.5 * K.sum(1 + self.log_var - K.square(self.mu) - K.exp(self.log_var), axis=1)
+            kl_loss = 0.0
+            for lv, m in zip([self.log_var_0, self.log_var_1, self.log_var_2], [self.mu_0, self.mu_1, self.mu_2]):
+                kl_loss += -0.5 * K.sum(1 + lv - K.square(m) - K.exp(lv), axis=1)
             return kl_loss
 
         def vae_loss(y_true, y_pred):

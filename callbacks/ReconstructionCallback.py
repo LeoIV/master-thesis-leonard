@@ -12,15 +12,17 @@ class ReconstructionImagesCallback(Callback):
     """
 
     def __init__(self, log_dir: str, print_every_n_batches: int, initial_epoch: int, vae: 'VariationalAutoencoder',
-                 x_train: np.ndarray, num_reconstructions: int = 10):
+                 x_train: np.ndarray, num_reconstructions: int = 10, num_inputs: int = 1):
         """
 
+        :type num_inputs: vlae has multiple z_dim inputs, other vaes one
         :param log_dir:
         :param print_every_n_batches:
         :param initial_epoch:
         :param vae:
         """
         super().__init__()
+        self.num_inputs = num_inputs
         self.x_train = x_train
         self.epoch = initial_epoch
         self.print_every_n_batches = print_every_n_batches
@@ -47,10 +49,10 @@ class ReconstructionImagesCallback(Callback):
             for seed in self.seeds:
                 # make sure we always reconstruct the same image
                 np.random.seed(seed)
-                z_new = np.random.normal(size=(1, self.vae.z_dim))
+                z_news = [np.random.normal(size=(1, self.vae.z_dim)) for _ in range(self.num_inputs)]
                 np.random.seed(None)
                 # predictions are in [0-1] float format
-                gen = self.vae.decoder.predict(np.array(z_new))
+                gen = self.vae.decoder.predict(z_news if len(z_news) > 1 else z_news[0])
                 # make byte array
                 k = (gen.squeeze() * 255.0).astype(np.uint8)
                 Image.fromarray(k.squeeze()).save(os.path.join(img_path, "generated_{}.jpg".format(seed)))

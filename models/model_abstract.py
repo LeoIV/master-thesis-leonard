@@ -64,7 +64,7 @@ class ModelWrapper(ABC):
         if hasattr(self, 'encoder'):
             models_to_plot["encoder"] = self.encoder
         if hasattr(self, 'decoder'):
-            models_to_plot["decoder"] = self.encoder
+            models_to_plot["decoder"] = self.decoder
 
         for k, v in models_to_plot.items():
             try:
@@ -226,7 +226,7 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
     def train(self, x_train: Union[Iterator, np.ndarray], batch_size, epochs, weights_folder, print_every_n_batches=100,
               initial_epoch=0, lr_decay=1, embedding_samples: int = 5000, y_train: Optional[np.ndarray] = None,
               x_test: Optional[Union[Iterator, np.ndarray]] = None, y_test: Optional[np.ndarray] = None,
-              steps_per_epoch: int = None):
+              steps_per_epoch: int = None, num_zdims: int = 1, embedding_layer_names: Sequence[str] = ["mu"]):
 
         if isinstance(x_train, Iterator):
             x_train: DirectoryIterator
@@ -255,13 +255,15 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
             kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
                                                       layer_idx=self.kernel_visualization_layer)
         rc_callback = ReconstructionImagesCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
-                                                   initial_epoch=initial_epoch, vae=self, x_train=x_train_subset)
+                                                   initial_epoch=initial_epoch, vae=self, x_train=x_train_subset,
+                                                   num_reconstructions=self.num_samples, num_inputs=num_zdims)
         fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model_wrapper=self,
                                                       print_every_n_batches=print_every_n_batches,
                                                       layer_idxs=self.feature_map_layers,
                                                       x_train=x_train_subset, num_samples=self.num_samples)
         hs_callback = HiddenSpaceCallback(log_dir=self.log_dir, vae=self, batch_size=batch_size,
-                                          x_train=x_train_subset, y_train=y_embedding, max_samples=5000)
+                                          x_train=x_train_subset, y_train=y_embedding, max_samples=5000,
+                                          layer_names=embedding_layer_names)
         ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
         callbacks_list = [hs_callback, ll_callback, checkpoint1, checkpoint2, tb_callback, fm_callback, rc_callback,
