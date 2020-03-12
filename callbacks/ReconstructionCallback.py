@@ -49,7 +49,7 @@ class ReconstructionImagesCallback(Callback):
             for seed in self.seeds:
                 # make sure we always reconstruct the same image
                 np.random.seed(seed)
-                z_news = [np.random.normal(size=(1, self.vae.z_dim)) for _ in range(self.num_inputs)]
+                z_news = [np.random.normal(size=(1, self.vae.z_dims[i])) for i in range(self.num_inputs)]
                 np.random.seed(None)
                 # predictions are in [0-1] float format
                 gen = self.vae.decoder.predict(z_news if len(z_news) > 1 else z_news[0])
