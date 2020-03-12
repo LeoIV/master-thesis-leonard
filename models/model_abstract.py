@@ -3,10 +3,10 @@ import math
 import os
 import sys
 import traceback
-import numpy as np
 from abc import ABC, abstractmethod
 from typing import Tuple, Sequence, Optional, Union
 
+import numpy as np
 from keras import backend as K
 from keras.backend import categorical_crossentropy
 from keras.callbacks import ModelCheckpoint, TensorBoard
@@ -14,12 +14,13 @@ from keras.optimizers import Adam
 from keras.utils import plot_model
 from keras_preprocessing.image import Iterator, DirectoryIterator
 
+from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.HiddenSpaceCallback import HiddenSpaceCallback
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
-from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.LossLoggingCallback import LossLoggingCallback
 from callbacks.ReconstructionCallback import ReconstructionImagesCallback
 from utils.callbacks import step_decay_schedule
+from utils.set_utils import has_intersection
 
 
 class ModelWrapper(ABC):
@@ -174,24 +175,41 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
     @abstractmethod
     def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, kernel_visualization_layer: int, num_samples: int,
                  feature_map_layers: Sequence[int], inner_activation: str, decay_rate: float,
-                 feature_map_reduction_factor: int, z_dim: int):
+                 feature_map_reduction_factor: int, z_dims: Sequence[int], mu_layer_names: Sequence[str],
+                 logvar_layer_names: Sequence[str]):
         super().__init__(input_dim, log_dir, feature_map_reduction_factor, inner_activation)
-        self.z_dim = z_dim
+
+        self.logvar_layer_names = logvar_layer_names
+        self.mu_layer_names = mu_layer_names
+        self.z_dims = z_dims
         self.decay_rate = decay_rate
         self.kernel_visualization_layer = kernel_visualization_layer
         self.num_samples = num_samples
         self.feature_map_layers = feature_map_layers
+        self.mu_layers = []
+        self.logvar_layers = []
+        if not (len(self.z_dims) == len(self.mu_layer_names) == len(self.logvar_layer_names)):
+            raise RuntimeError("Length of z_dims, mu_layer_names, and logvar_layer_names must be equal.")
 
     def compile(self, learning_rate, r_loss_factor):
         if not hasattr(self, 'model'):
             raise AttributeError(
                 "Your implementation of VAE should have an attribute model representing the whole Keras model.")
-        if not hasattr(self, 'log_var'):
-            raise AttributeError(
-                "Your implementation of VAE should have a layer 'log_var'.")
-        if not hasattr(self, 'mu'):
-            raise AttributeError(
-                "Your implementation of VAE should have a layer 'mu'.")
+        for layer in self.model.layers:
+            for mu_layer_name in self.mu_layer_names:
+                if layer.name == mu_layer_name:
+                    self.mu_layers.append(layer)
+            for logvar_layer_name in self.logvar_layer_names:
+                if layer.name == logvar_layer_name:
+                    self.logvar_layers.append(layer)
+        if has_intersection(self.mu_layers, self.logvar_layers):
+            raise RuntimeError(
+                "There is an intersection between mu_layers and logvar_layers. That should not occur. Check your naming.")
+        if len(self.mu_layers) != len(self.mu_layer_names):
+            raise RuntimeError("Did not find all mu layers given by mu_layer_names")
+        if len(self.logvar_layers) != len(self.logvar_layer_names):
+            raise RuntimeError("Did not find all logvar layers given by logvar_layer_names")
+
         self.learning_rate = learning_rate
 
         def vae_r_loss(y_true, y_pred):
@@ -199,7 +217,9 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
             return r_loss_factor * r_loss
 
         def vae_kl_loss(y_true, y_pred):
-            kl_loss = -0.5 * K.sum(1 + self.log_var - K.square(self.mu) - K.exp(self.log_var), axis=1)
+            kl_loss = 0.0
+            for lv, m in zip(self.logvar_layers, self.mu_layers):
+                kl_loss += -0.5 * K.sum(1 + lv.output - K.square(m.output) - K.exp(lv.output), axis=1)
             return kl_loss
 
         def vae_loss(y_true, y_pred):
@@ -226,7 +246,7 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
     def train(self, x_train: Union[Iterator, np.ndarray], batch_size, epochs, weights_folder, print_every_n_batches=100,
               initial_epoch=0, lr_decay=1, embedding_samples: int = 5000, y_train: Optional[np.ndarray] = None,
               x_test: Optional[Union[Iterator, np.ndarray]] = None, y_test: Optional[np.ndarray] = None,
-              steps_per_epoch: int = None, num_zdims: int = 1, embedding_layer_names: Sequence[str] = ["mu"]):
+              steps_per_epoch: int = None):
 
         if isinstance(x_train, Iterator):
             x_train: DirectoryIterator
@@ -256,14 +276,14 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
                                                       layer_idx=self.kernel_visualization_layer)
         rc_callback = ReconstructionImagesCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
                                                    initial_epoch=initial_epoch, vae=self, x_train=x_train_subset,
-                                                   num_reconstructions=self.num_samples, num_inputs=num_zdims)
+                                                   num_reconstructions=self.num_samples, num_inputs=len(self.z_dims))
         fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model_wrapper=self,
                                                       print_every_n_batches=print_every_n_batches,
                                                       layer_idxs=self.feature_map_layers,
                                                       x_train=x_train_subset, num_samples=self.num_samples)
         hs_callback = HiddenSpaceCallback(log_dir=self.log_dir, vae=self, batch_size=batch_size,
                                           x_train=x_train_subset, y_train=y_embedding, max_samples=5000,
-                                          layer_names=embedding_layer_names)
+                                          layer_names=self.mu_layer_names)
         ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
         callbacks_list = [hs_callback, ll_callback, checkpoint1, checkpoint2, tb_callback, fm_callback, rc_callback,

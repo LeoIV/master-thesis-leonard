@@ -1,4 +1,4 @@
-from typing import Sequence, Union, Tuple
+from typing import Sequence, Union, Tuple, List
 
 import numpy as np
 from keras import backend as K
@@ -15,13 +15,16 @@ class VariationalAutoencoder(VAEWrapper):
                  encoder_conv_kernel_size: Sequence[Union[int, Tuple[int, int]]],
                  encoder_conv_strides: Sequence[Union[int, Tuple[int, int]]], decoder_conv_t_filters,
                  decoder_conv_t_kernel_size: Sequence[Union[int, Tuple[int, int]]],
-                 decoder_conv_t_strides: Sequence[Union[int, Tuple[int, int]]], z_dim: int, log_dir: str,
+                 decoder_conv_t_strides: Sequence[Union[int, Tuple[int, int]]], z_dims: Sequence[int], log_dir: str,
                  feature_map_layers: Sequence[int], kernel_visualization_layer: int, dropout_rate: float,
                  use_batch_norm: bool = False, use_dropout: bool = False, num_samples: int = 10,
                  inner_activation: str = "ReLU", decay_rate: float = 1e-7, feature_map_reduction_factor: int = 1):
 
         super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_layers,
-                         inner_activation, decay_rate, feature_map_reduction_factor, z_dim)
+                         inner_activation, decay_rate, feature_map_reduction_factor, z_dims, ["mu"], ["log_var"])
+        if len(self.z_dims) > 1:
+            raise RuntimeError("Only one z_dim allowed for this model")
+
         self.dropout_rate = dropout_rate
         self.name = 'variational_autoencoder'
 
@@ -73,18 +76,16 @@ class VariationalAutoencoder(VAEWrapper):
         shape_before_flattening = K.int_shape(x)[1:]
 
         x = Flatten()(x)
-        self.mu = Dense(self.z_dim, name='mu')(x)
-        self.log_var = Dense(self.z_dim, name='log_var')(x)
+        mu = Dense(self.z_dims[0], name='mu')(x)
+        log_var = Dense(self.z_dims[0], name='log_var')(x)
 
-        self.encoder_mu_log_var = Model(encoder_input, (self.mu, self.log_var))
-
-        encoder_output = Lambda(sampling, name='encoder_output')([self.mu, self.log_var])
+        encoder_output = Lambda(sampling, name='encoder_output')([mu, log_var])
 
         self.encoder = Model(encoder_input, encoder_output)
 
         # THE DECODER
 
-        decoder_input = Input(shape=(self.z_dim,), name='decoder_input')
+        decoder_input = Input(shape=(self.z_dims[0],), name='decoder_input')
 
         x = Dense(np.prod(shape_before_flattening))(decoder_input)
         x = Reshape(shape_before_flattening)(x)

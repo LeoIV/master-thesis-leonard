@@ -13,7 +13,7 @@ from keras import backend as K
 import numpy as np
 
 
-class VLAE(VAEWrapper):
+class HLAE(VAEWrapper):
 
     def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, kernel_visualization_layer: int, num_samples: int,
                  feature_map_layers: Sequence[int], inner_activation: str, decay_rate: float,
@@ -27,19 +27,11 @@ class VLAE(VAEWrapper):
     def _build(self):
         inputs = Input(self.input_dim)
 
-        # INFERENCE 0
-        i0 = Conv2D(filters=64, kernel_size=[4, 4], strides=2)(inputs)
-        i0 = BatchNormalization()(i0)
-        i0 = ReLU()(i0)
-        i0 = Conv2D(filters=128, kernel_size=[4, 4], strides=2)(i0)
-        i0 = BatchNormalization()(i0)
-        i0 = ReLU()(i0)
-
         # LADDER 0
         l0 = Conv2D(filters=64, kernel_size=4, strides=2)(inputs)
         l0 = BatchNormalization()(l0)
         l0 = ReLU()(l0)
-        l0 = Conv2D(filters=128, kernel_size=4, strides=2)(l0)
+        l0 = Conv2D(filters=64, kernel_size=4, strides=2)(l0)
         l0 = BatchNormalization()(l0)
         l0 = ReLU()(l0)
         l0 = Flatten()(l0)
@@ -47,16 +39,8 @@ class VLAE(VAEWrapper):
         log_var_0 = Dense(self.z_dims[0], name='log_var_1')(l0)
         z_0 = Lambda(sampling, name="z_1_latent")([mu_0, log_var_0])
 
-        # INFERENCE 1
-        i1 = Dense(1024)(i0)
-        i1 = BatchNormalization()(i1)
-        i1 = ReLU()(i1)
-        i1 = Dense(1024)(i1)
-        i1 = BatchNormalization()(i1)
-        i1 = ReLU()(i1)
-
         # LADDER 1
-        l1 = Dense(1024)(i0)
+        l1 = Dense(1024)(z_0)
         l1 = BatchNormalization()(l1)
         l1 = ReLU()(l1)
         l1 = Dense(1024)(l1)
@@ -68,7 +52,7 @@ class VLAE(VAEWrapper):
         z_1 = Lambda(sampling, name="z_2_latent")([mu_1, log_var_1])
 
         # LADDER 2
-        l2 = Dense(1024)(i1)
+        l2 = Dense(1024)(z_1)
         l2 = BatchNormalization()(l2)
         l2 = ReLU()(l2)
         l2 = Dense(1024)(l2)

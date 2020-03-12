@@ -12,7 +12,7 @@ def configs_fixture():
                      'alexnet_vae']
     data_paths = ["../data/"]
     batch_sizes = [8, 16]
-    z_dims = [10, 15]
+    z_dims = [["10", "11", "12"], ["13", "14", "15"]]
     use_dropouts = [True, False]
     use_batch_norms = [True, False]
     datasets = ['mnist']
@@ -48,12 +48,17 @@ def test_configs(mocker, config):
         "--configuration={}".format(config[0]),
         "--data_path={}".format(config[1]),
         "--batch_size={}".format(config[2]),
-        "--z_dim={}".format(config[3]),
-        "--use_dropout={}".format(config[4]),
-        "--use_batch_norm={}".format(config[5]),
-        "--dataset={}".format(config[6]),
-        "--feature_map_reduction_factor={}".format(config[7])
+        "--z_dim"
     ]
+    if config[0] != 'vlae':
+        cl_config.append(config[3][0])
+    else:
+        cl_config += config[3]
+    cl_config += ["--use_dropout={}".format(config[4]),
+                  "--use_batch_norm={}".format(config[5]),
+                  "--dataset={}".format(config[6]),
+                  "--feature_map_reduction_factor={}".format(config[7])
+                  ]
     main(cl_config)
     assert Model.fit.called or Model.fit_generator.called
 

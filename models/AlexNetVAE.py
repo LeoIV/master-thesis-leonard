@@ -1,5 +1,5 @@
 import math
-from typing import Tuple
+from typing import Tuple, Sequence
 
 import numpy as np
 from keras import backend as K
@@ -13,13 +13,16 @@ from utils.vae_utils import sampling
 
 class AlexNetVAE(VAEWrapper):
 
-    def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, z_dim: int, kernel_visualization_layer: int = -1,
+    def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, z_dims: Sequence[int],
+                 kernel_visualization_layer: int = -1,
                  use_batch_norm: bool = False, use_dropout: bool = False, dropout_rate: float = 0.5,
                  feature_map_layers=None, num_samples: int = 5, inner_activation: str = "ReLU", use_fc: bool = True,
                  decay_rate: float = 1e-7, feature_map_reduction_factor: int = 1):
 
         super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_layers,
-                         inner_activation, decay_rate, feature_map_reduction_factor, z_dim)
+                         inner_activation, decay_rate, feature_map_reduction_factor, z_dims, ["mu"], ["log_var"])
+        if len(self.z_dims) > 1:
+            raise RuntimeError("Only one z_dim allowed for this model")
         self.name = 'variational_autoencoder'
 
         self.use_batch_norm = use_batch_norm
@@ -89,17 +92,16 @@ class AlexNetVAE(VAEWrapper):
             if self.use_dropout:
                 x = Dropout(rate=self.dropout_rate)(x)
 
-        self.mu = Dense(self.z_dim, name='mu')(x)
-        self.log_var = Dense(self.z_dim, name='log_var')(x)
-        self.encoder_mu_log_var = Model(encoder_input, (self.mu, self.log_var))
+        mu = Dense(self.z_dims[0], name='mu')(x)
+        log_var = Dense(self.z_dims[0], name='log_var')(x)
 
-        encoder_output = Lambda(sampling, name='encoder_output')([self.mu, self.log_var])
+        encoder_output = Lambda(sampling, name='encoder_output')([mu, log_var])
 
         self.encoder = Model(encoder_input, encoder_output)
 
         # THE DECODER
 
-        decoder_input = Input(shape=(self.z_dim,), name='decoder_input')
+        decoder_input = Input(shape=(self.z_dims[0],), name='decoder_input')
 
         x = decoder_input
 

@@ -65,8 +65,8 @@ def main(args: List[str]):
                         help="The factor by which to weigh the reconstruction loss in case of variational autoencoder")
     parser.add_argument('--mode', type=str, choices=['build', 'load'], default='build',
                         help="Whether to build a new model or load an existing one.")
-    parser.add_argument('--z_dim', type=int, default=200,
-                        help="The embedding space dimensionality. Only considered for VAEs.")
+    parser.add_argument('--z_dims', nargs='+', type=int,
+                        help="The dimensionalities of the embedding spaces", default=[10], required=False)
     parser.add_argument('--use_batch_norm', type=str2bool, default=False)
     parser.add_argument('--use_dropout', type=str2bool, default=False)
     parser.add_argument('--dropout_rate', type=float, default=0.5)
@@ -132,7 +132,7 @@ def main(args: List[str]):
                                        encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[2, 2, 2, 2],
                                        decoder_conv_t_filters=[64, 64, 32, 3 if args.rgb else 1],
                                        decoder_conv_t_kernel_size=[3, 3, 3, 3],
-                                       decoder_conv_t_strides=[2, 2, 2, 2], log_dir=args.logdir, z_dim=args.z_dim,
+                                       decoder_conv_t_strides=[2, 2, 2, 2], log_dir=args.logdir, z_dims=args.z_dims,
                                        kernel_visualization_layer=args.kernel_visualization_layer,
                                        feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,
                                        decay_rate=args.lr_decay, num_samples=args.num_samples,
@@ -145,7 +145,7 @@ def main(args: List[str]):
                                        encoder_conv_kernel_size=[11, 7, 5, 3], encoder_conv_strides=[4, 2, 2, 2],
                                        decoder_conv_t_filters=[64, 64, 32, 3 if args.rgb else 1],
                                        decoder_conv_t_kernel_size=[3, 5, 7, 11],
-                                       decoder_conv_t_strides=[2, 2, 2, 4], log_dir=args.logdir, z_dim=args.z_dim,
+                                       decoder_conv_t_strides=[2, 2, 2, 4], log_dir=args.logdir, z_dims=args.z_dims,
                                        use_batch_norm=args.use_batch_norm, use_dropout=args.use_dropout,
                                        kernel_visualization_layer=args.kernel_visualization_layer,
                                        num_samples=args.num_samples, dropout_rate=args.dropout_rate,
@@ -161,14 +161,14 @@ def main(args: List[str]):
                         use_fc=args.use_fc, feature_map_reduction_factor=args.feature_map_reduction_factor)
     elif args.configuration == 'alexnet_vae':
         input_dim = infer_input_dim((224, 224), args)
-        model = AlexNetVAE(input_dim=input_dim, log_dir=args.logdir, z_dim=args.z_dim,
+        model = AlexNetVAE(input_dim=input_dim, log_dir=args.logdir, z_dims=args.z_dims,
                            feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,
                            kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
                            use_fc=args.use_fc, inner_activation=args.inner_activation, decay_rate=args.lr_decay,
                            feature_map_reduction_factor=args.feature_map_reduction_factor)
     elif args.configuration == 'alexnet_vae_classification_loss':
         input_dim = infer_input_dim((224, 224), args)
-        model = AlexAlexNetVAE(input_dim=input_dim, log_dir=args.logdir, z_dim=args.z_dim,
+        model = AlexAlexNetVAE(input_dim=input_dim, log_dir=args.logdir, z_dims=args.z_dims,
                                feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,
                                kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
                                use_fc=args.use_fc, inner_activation=args.inner_activation, decay_rate=args.lr_decay,
@@ -179,7 +179,7 @@ def main(args: List[str]):
 
         # TODO remove static requirements
         shape_before_flattening = (7, 7, 256)
-        model = FrozenAlexNetVAE(z_dim=args.z_dim, use_dropout=args.use_dropout, dropout_rate=args.dropout_rate,
+        model = FrozenAlexNetVAE(z_dims=args.z_dims, use_dropout=args.use_dropout, dropout_rate=args.dropout_rate,
                                  use_batch_norm=args.use_batch_norm, shape_before_flattening=shape_before_flattening,
                                  input_dim=input_dim, log_dir=args.logdir, weights_path=args.alexnet_weights_path,
                                  kernel_visualization_layer=args.kernel_visualization_layer, decay_rate=args.lr_decay,
@@ -193,7 +193,7 @@ def main(args: List[str]):
                      kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
                      feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
                      decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
-                     z_dim=args.z_dim, dropout_rate=args.dropout_rate)
+                     z_dims=args.z_dims, dropout_rate=args.dropout_rate)
     if args.dataset in ['cifar10', 'mnist']:
         (x_train, y_train), (x_val, y_val) = cifar10.load_data() if args.dataset == 'cifar10' else mnist.load_data()
 

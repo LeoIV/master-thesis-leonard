@@ -2,7 +2,7 @@ import logging
 import math
 import sys
 import traceback
-from typing import Tuple, List
+from typing import Tuple, List, Sequence
 
 import numpy as np
 from keras import Model, Input
@@ -15,13 +15,16 @@ from utils.vae_utils import sampling
 
 
 class FrozenAlexNetVAE(VAEWrapper):
-    def __init__(self, z_dim: int, use_dropout: bool, dropout_rate: float, use_batch_norm: bool,
+    def __init__(self, z_dims: Sequence[int], use_dropout: bool, dropout_rate: float, use_batch_norm: bool,
                  shape_before_flattening: Tuple[int, int, int], input_dim: Tuple[int, int, int], log_dir: str,
                  weights_path: str, kernel_visualization_layer: int, feature_map_layers: List[int],
                  num_samples: int = 10, inner_activation: str = "ReLU", decay_rate: float = 1e-7,
                  feature_map_reduction_factor: int = 1):
         super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_layers,
-                         inner_activation, decay_rate, feature_map_reduction_factor, z_dim)
+                         inner_activation, decay_rate, feature_map_reduction_factor, z_dims, ["mu"], ["log_var"])
+
+        if len(self.z_dims) > 1:
+            raise RuntimeError("Only one z_dim allowed for this model")
         self.weights_path = weights_path
         self.shape_before_flattening = shape_before_flattening
         self.use_dropout = use_dropout
@@ -61,15 +64,14 @@ class FrozenAlexNetVAE(VAEWrapper):
         model_input = model.inputs
         # chop of last fc layer (uncluding softmax and leaky relu)
         last_layer = model.layers[-4].output
-        self.mu = Dense(self.z_dim, name='mu')(last_layer)
-        self.log_var = Dense(self.z_dim, name='log_var')(last_layer)
-        self.encoder_mu_log_var = Model(model_input, (self.mu, self.log_var))
+        mu = Dense(self.z_dims[0], name='mu')(last_layer)
+        log_var = Dense(self.z_dims[0], name='log_var')(last_layer)
 
-        encoder_output = Lambda(sampling, name='encoder_output')([self.mu, self.log_var])
+        encoder_output = Lambda(sampling, name='encoder_output')([mu, log_var])
 
         self.encoder = Model(model_input, encoder_output)
 
-        decoder_input = Input(shape=(self.z_dim,), name='decoder_input')
+        decoder_input = Input(shape=(self.z_dims[0],), name='decoder_input')
 
         x = decoder_input
 
