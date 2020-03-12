@@ -57,7 +57,7 @@ class ReconstructionImagesCallback(Callback):
                 k = (gen.squeeze() * 255.0).astype(np.uint8)
                 Image.fromarray(k.squeeze()).save(os.path.join(img_path, "generated_{}.jpg".format(seed)))
             for i, sample in enumerate(self.samples):
-                Image.fromarray((sample * 255.0).astype(np.uint8)).save(
+                Image.fromarray((sample.squeeze() * 255.0).astype(np.uint8)).save(
                     os.path.join(img_path, "original_{}.jpg".format(i)))
                 reconst = self.vae.model.predict(np.expand_dims(sample, 0))
                 k = (reconst.squeeze() * 255.0).astype(np.uint8)
