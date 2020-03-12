@@ -17,6 +17,7 @@ from models.AlexAlexNetVAE import AlexAlexNetVAE
 from models.AlexNet import AlexNet
 from models.AlexNetVAE import AlexNetVAE
 from models.FrozenAlexNetVAE import FrozenAlexNetVAE
+from models.HVAE import HVAE
 from models.SimpleClassifier import SimpleClassifier
 from models.VLAE import VLAE
 from models.model_abstract import DeepCNNClassifierWrapper, VAEWrapper
@@ -34,7 +35,7 @@ def main(args: List[str]):
     parser.add_argument('--configuration', type=str,
                         choices=['vanilla_vae', 'large_vanilla_vae', 'alexnet_classifier',
                                  'simple_classifier', 'alexnet_vae', 'frozen_alexnet_vae',
-                                 'alexnet_vae_classification_loss', 'vlae'],
+                                 'alexnet_vae_classification_loss', 'vlae', 'hvae'],
                         help="The configuration to execute.\n\n"
                              "mnist: VAE trained on mnist\n"
                              "cifar10_vae: VAE trained on cifar10\n"
@@ -190,6 +191,13 @@ def main(args: List[str]):
     elif args.configuration == 'vlae':
         input_dim = infer_input_dim((28, 28), args)
         model = VLAE(input_dim=input_dim, log_dir=args.logdir,
+                     kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
+                     feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
+                     decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
+                     z_dims=args.z_dims, dropout_rate=args.dropout_rate)
+    elif args.configuration == 'hvae':
+        input_dim = infer_input_dim((28, 28), args)
+        model = HVAE(input_dim=input_dim, log_dir=args.logdir,
                      kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
                      feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
                      decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,

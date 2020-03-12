@@ -13,7 +13,7 @@ from keras import backend as K
 import numpy as np
 
 
-class HLAE(VAEWrapper):
+class HVAE(VAEWrapper):
 
     def __init__(self, input_dim: Tuple[int, int, int], log_dir: str, kernel_visualization_layer: int, num_samples: int,
                  feature_map_layers: Sequence[int], inner_activation: str, decay_rate: float,
@@ -30,35 +30,36 @@ class HLAE(VAEWrapper):
         # LADDER 0
         l0 = Conv2D(filters=64, kernel_size=4, strides=2)(inputs)
         l0 = BatchNormalization()(l0)
-        l0 = ReLU()(l0)
-        l0 = Conv2D(filters=64, kernel_size=4, strides=2)(l0)
-        l0 = BatchNormalization()(l0)
-        l0 = ReLU()(l0)
+        l0_before_flatten = l0 = ReLU()(l0)
         l0 = Flatten()(l0)
         mu_0 = Dense(self.z_dims[0], name='mu_1')(l0)
         log_var_0 = Dense(self.z_dims[0], name='log_var_1')(l0)
         z_0 = Lambda(sampling, name="z_1_latent")([mu_0, log_var_0])
 
         # LADDER 1
-        l1 = Dense(1024)(z_0)
+        l1 = Conv2D(filters=64, kernel_size=4, strides=2)(l0_before_flatten)
         l1 = BatchNormalization()(l1)
         l1 = ReLU()(l1)
-        l1 = Dense(1024)(l1)
+        l1 = Conv2D(filters=64, kernel_size=4, strides=2)(l1)
         l1 = BatchNormalization()(l1)
         l1 = ReLU()(l1)
         l1 = Flatten()(l1)
+        l1 = Concatenate()([l1, z_0])
+        l1 = Dense(1024)(l1)
+        l1 = BatchNormalization()(l1)
+        l1 = ReLU()(l1)
         mu_1 = Dense(self.z_dims[1], name='mu_2')(l1)
         log_var_1 = Dense(self.z_dims[1], name='log_var_2')(l1)
         z_1 = Lambda(sampling, name="z_2_latent")([mu_1, log_var_1])
 
         # LADDER 2
-        l2 = Dense(1024)(z_1)
+        l2 = Concatenate()([l1, z_1])
+        l2 = Dense(1024)(l2)
         l2 = BatchNormalization()(l2)
         l2 = ReLU()(l2)
         l2 = Dense(1024)(l2)
         l2 = BatchNormalization()(l2)
         l2 = ReLU()(l2)
-        l2 = Flatten()(l2)
         mu_2 = Dense(self.z_dims[2], name='mu_3')(l2)
         log_var_2 = Dense(self.z_dims[2], name='log_var_3')(l2)
         z_2 = Lambda(sampling, name="z_3_latent")([mu_2, log_var_2])

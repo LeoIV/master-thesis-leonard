@@ -9,7 +9,7 @@ from main import main
 
 def configs_fixture():
     model_configs = ['vlae', 'vanilla_vae', 'large_vanilla_vae', 'alexnet_classifier', 'simple_classifier',
-                     'alexnet_vae']
+                     'alexnet_vae', 'hvae']
     data_paths = ["../data/"]
     batch_sizes = [8, 16]
     z_dims = [["10", "11", "12"], ["13", "14", "15"]]
@@ -50,7 +50,7 @@ def test_configs(mocker, config):
         "--batch_size={}".format(config[2]),
         "--z_dim"
     ]
-    if config[0] != 'vlae':
+    if config[0] not in ['vlae', 'hvae']:
         cl_config.append(config[3][0])
     else:
         cl_config += config[3]
@@ -83,7 +83,8 @@ def test_datasets_pass(mocker, dataset):
         "--logdir=test",
         "--batch_size=32",
         "--rgb=True",
-        "--z_dim=2",
+        "--z_dims",
+        "2",
         "--use_dropout=True",
         "--use_batch_norm=True",
         "--dataset={}".format(dataset[0])
