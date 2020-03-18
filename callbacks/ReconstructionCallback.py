@@ -52,7 +52,7 @@ class ReconstructionImagesCallback(Callback):
                 z_news = [np.random.normal(size=(1, self.vae.z_dims[i])) for i in range(self.num_inputs)]
                 np.random.seed(None)
                 # predictions are in [0-1] float format
-                gen = self.vae.decoder.predict(z_news if len(z_news) > 1 else z_news[0])
+                gen = self.vae.decoder.predict(z_news)
                 # make byte array
                 k = (gen.squeeze() * 255.0).astype(np.uint8)
                 Image.fromarray(k.squeeze()).save(os.path.join(img_path, "generated_{}.jpg".format(seed)))

@@ -13,6 +13,7 @@
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/data" />
       <excludeFolder url="file://$MODULE_DIR$/logs" />
+      <excludeFolder url="file://$MODULE_DIR$/logs1" />
       <excludeFolder url="file://$MODULE_DIR$/logs_25_01_2020" />
       <excludeFolder url="file://$MODULE_DIR$/logs_28_01_2020" />
       <excludeFolder url="file://$MODULE_DIR$/logs_29_01_2020" />

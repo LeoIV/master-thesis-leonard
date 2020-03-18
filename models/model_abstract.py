@@ -4,7 +4,7 @@ import os
 import sys
 import traceback
 from abc import ABC, abstractmethod
-from typing import Tuple, Sequence, Optional, Union
+from typing import Tuple, Sequence, Optional, Union, Dict
 
 import numpy as np
 from keras import backend as K
@@ -114,7 +114,7 @@ class DeepCNNClassifierWrapper(DeepCNNModelWrapper, ABC):
     def train(self, x_train, batch_size, epochs, weights_folder, print_every_n_batches=100, initial_epoch=0,
               lr_decay=1, embedding_samples: int = 5000, y_train: Optional[np.ndarray] = None,
               x_test: Optional[Union[Iterator, np.ndarray]] = None, y_test: Optional[np.ndarray] = None,
-              steps_per_epoch: int = None):
+              steps_per_epoch: int = None, **kwargs):
 
         if isinstance(x_train, Iterator):
             x_train: DirectoryIterator
@@ -195,7 +195,13 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
         if not hasattr(self, 'model'):
             raise AttributeError(
                 "Your implementation of VAE should have an attribute model representing the whole Keras model.")
-        for layer in self.model.layers:
+        if not hasattr(self, 'encoder'):
+            raise AttributeError(
+                "Your implementation of VAE should have an attribute encoder representing the encoder Keras model.")
+        if not hasattr(self, 'decoder'):
+            raise AttributeError(
+                "Your implementation of VAE should have an attribute decoder representing the whole Keras model.")
+        for layer in self.model.layers + self.model.layers[-1].layers:
             for mu_layer_name in self.mu_layer_names:
                 if layer.name == mu_layer_name:
                     self.mu_layers.append(layer)
@@ -246,7 +252,9 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
     def train(self, x_train: Union[Iterator, np.ndarray], batch_size, epochs, weights_folder, print_every_n_batches=100,
               initial_epoch=0, lr_decay=1, embedding_samples: int = 5000, y_train: Optional[np.ndarray] = None,
               x_test: Optional[Union[Iterator, np.ndarray]] = None, y_test: Optional[np.ndarray] = None,
-              steps_per_epoch: int = None):
+              steps_per_epoch: int = None, **kwargs):
+
+        embedding_callback_params = kwargs.get('embedding_callback_params', {})
 
         if isinstance(x_train, Iterator):
             x_train: DirectoryIterator
@@ -283,7 +291,7 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
                                                       x_train=x_train_subset, num_samples=self.num_samples)
         hs_callback = HiddenSpaceCallback(log_dir=self.log_dir, vae=self, batch_size=batch_size,
                                           x_train=x_train_subset, y_train=y_embedding, max_samples=5000,
-                                          layer_names=self.mu_layer_names)
+                                          layer_names=self.mu_layer_names, plot_params=embedding_callback_params)
         ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
         callbacks_list = [hs_callback, ll_callback, checkpoint1, checkpoint2, tb_callback, fm_callback, rc_callback,

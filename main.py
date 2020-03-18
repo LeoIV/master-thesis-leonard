@@ -1,17 +1,21 @@
 import argparse
+import csv
 import datetime
 import logging
 import os
 import sys
 import traceback
 from argparse import ArgumentParser
+from random import random, randint
 from shutil import rmtree
 from typing import List, Tuple
 
 import numpy as np
+import sklearn
 from keras.datasets import cifar10, mnist
 from keras.utils import to_categorical
 from keras_preprocessing.image import ImageDataGenerator
+from sklearn.utils import shuffle
 
 from models.AlexAlexNetVAE import AlexAlexNetVAE
 from models.AlexNet import AlexNet
@@ -46,7 +50,7 @@ def main(args: List[str]):
                         required=True)
     parser.add_argument('--data_path',
                         help="The path containing the individual datafolders. If the path to the imagenet folder is "
-                             "/foo/bar/imagenet, the value should be /foo/bar/. Can be absolute or relative. Required for CelebA and Imagenet.",
+                             "/foo/bar/imagenet, the value should be /foo/bar/. Can be absolute or relative. Required for CelebA, Imagenet, and MNIST.",
                         required=False)
     parser.add_argument('--feature_map_layers', nargs='+', type=int,
                         help="The indices of layers after which to compute the "
@@ -115,6 +119,7 @@ def main(args: List[str]):
     input_dim = None
     x_train, y_train = None, None
     x_val, y_val = None, None
+    embedding_callback_params = []
 
     if args.configuration == 'simple_classifier':
         input_dim = infer_input_dim((32, 32), args)
@@ -202,14 +207,106 @@ def main(args: List[str]):
                      feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
                      decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
                      z_dims=args.z_dims, dropout_rate=args.dropout_rate)
-    if args.dataset in ['cifar10', 'mnist']:
-        (x_train, y_train), (x_val, y_val) = cifar10.load_data() if args.dataset == 'cifar10' else mnist.load_data()
+    if args.dataset == 'cifar10':
+        (x_train, y_train), (x_val, y_val) = cifar10.load_data()
 
         x_train = resize_array(x_train, input_dim[:2], args.rgb)
         x_val = resize_array(x_val, input_dim[:2], args.rgb)
 
         x_train = x_train.astype('float32') / 255.
         x_val = x_val.astype('float32') / 255.
+
+        if len(x_train.shape) == 3:
+            x_train = np.expand_dims(x_train, -1)
+        if len(x_val.shape) == 3:
+            x_val = np.expand_dims(x_val, -1)
+
+        if isinstance(model, DeepCNNClassifierWrapper):
+            y_train = y_train.squeeze()
+            y_val = y_val.squeeze()
+            y_train = to_categorical(y_train, num_classes=10)
+            y_val = to_categorical(y_val, num_classes=10)
+    elif args.dataset == 'mnist':
+        seed = randint(0, 2 ** 32 - 1)
+        (x_train, y_train), (x_val, y_val) = mnist.load_data()
+
+        x_train, y_train = shuffle(x_train, y_train, random_state=seed)
+        x_val, y_val = shuffle(x_val, y_val, random_state=seed)
+
+        x_train = resize_array(x_train, input_dim[:2], args.rgb)
+        x_val = resize_array(x_val, input_dim[:2], args.rgb)
+
+        x_train = x_train.astype('float32') / 255.
+        x_val = x_val.astype('float32') / 255.
+
+        # read morpho mnist
+        morpho_headers = []
+        morpho_train = {}
+        morpho_test = {}
+        with open(os.path.join(args.data_path, 'train-morpho.csv'), newline='') as csvfile:
+            spamreader = csv.reader(csvfile, delimiter=',', quotechar="'")
+            for i, row in enumerate(spamreader):
+                if i == 0:
+                    for header in row:
+                        morpho_train.setdefault(header, [])
+                        morpho_headers.append(header)
+                else:
+                    for j, cell in enumerate(row):
+                        morpho_train[morpho_headers[j]].append(float(cell))
+
+        with open(os.path.join(args.data_path, 't10k-morpho.csv'), newline='') as csvfile:
+            spamreader = csv.reader(csvfile, delimiter=',', quotechar="'")
+            for i, row in enumerate(spamreader):
+                if i == 0:
+                    for header in row:
+                        morpho_test.setdefault(header, [])
+                else:
+                    for j, cell in enumerate(row):
+                        morpho_test[morpho_headers[j]].append(float(cell))
+
+        # normalize all values to [0,1]
+        for morpho_dict in [morpho_train, morpho_test]:
+            for k, v in morpho_dict.items():
+                v = np.array(v)
+                v = (v - v.min()) / (v.max() - v.min())
+                morpho_dict[k] = shuffle(v, random_state=seed)
+
+        x_train = x_train
+        y_train = y_train
+        x_val = x_val
+        y_val = y_val
+
+        bins = np.arange(0.0, 1.0, 0.1)
+        embedding_callback_params += [
+            {
+                'c': np.digitize(morpho_train['slant'], bins),
+                'label': 'Slant',
+            },
+            {
+                'c': np.digitize(morpho_train['thickness'], bins),
+                'label': 'Thickness',
+            },
+            {
+                'c': np.digitize(morpho_train['area'], bins),
+                'label': 'Area'
+            },
+            {
+                'c': np.digitize(morpho_train['length'], bins),
+                'label': 'Length'
+            },
+            {
+                'c': np.digitize(morpho_train['width'], bins),
+                'label': 'Width'
+            },
+            {
+                'c': np.digitize(morpho_train['height'], bins),
+                'label': 'Height'
+            },
+            {
+                'c': y_train,
+                'label': 'Class Identity'
+            }
+        ]
 
         if len(x_train.shape) == 3:
             x_train = np.expand_dims(x_train, -1)
@@ -272,10 +369,12 @@ def main(args: List[str]):
     model.model.summary(print_fn=lambda x: logging.info(x))
 
     try:
-        model.train(x_train=x_train, y_train=y_train, epochs=args.num_epochs, weights_folder=weights,
+        model.train(x_train=x_train, y_train=y_train, epochs=args.num_epochs,
+                    weights_folder=weights,
                     batch_size=args.batch_size,
                     print_every_n_batches=args.print_every_n_batches, initial_epoch=args.initial_epoch,
-                    x_test=x_val, y_test=y_val, steps_per_epoch=args.steps_per_epoch)
+                    x_test=x_val, y_test=y_val, steps_per_epoch=args.steps_per_epoch,
+                    embedding_callback_params=embedding_callback_params)
     except Exception as e:
         logging.error("An error occurred during training:")
         exc_type, exc_value, exc_traceback = sys.exc_info()

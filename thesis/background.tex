@@ -95,7 +95,7 @@ To make these two as similar as possible we use the \ac{KL-divergence} $\kldiv{q
     &= -\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \left[ \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} - \log p_\theta(\mathbf{x}) \right]\\
     &= -\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} + \sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log p_\theta(\mathbf{x}) \\
     &= -\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} + \log p_\theta(\mathbf{x}) \underbrace{\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x})}_{=1} \\
-    &= -\sum_\mathbf{z} q(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} + \log p_\theta(\mathbf{x})
+    &= -\sum_\mathbf{z} q_\phi(\mathbf{z}|\mathbf{x}) \log \frac{p_\theta(\mathbf{x},\mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} + \log p_\theta(\mathbf{x})
 \end{align}
 Then
 \begin{align}
