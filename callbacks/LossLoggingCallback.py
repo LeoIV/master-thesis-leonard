@@ -35,7 +35,7 @@ class LossLoggingCallback(Callback):
         string = []
         losses = [datetime.now(), batch]
         for k, v in logs.items():
-            if isinstance(v, (np.float32, np.float64)):
+            if isinstance(v, (np.float32, np.float64, float)):
                 if self.batch_lines_written == 0:
                     self.batch_headers.append(k)
                 losses.append(v)
@@ -53,7 +53,7 @@ class LossLoggingCallback(Callback):
         string = []
         losses = [datetime.now(), epoch]
         for k, v in logs.items():
-            if isinstance(v, (np.float32, np.float64)):
+            if isinstance(v, (np.float32, np.float64, float)):
                 if self.epoch_lines_written == 0:
                     self.epoch_headers.append(k)
                 losses.append(v)
