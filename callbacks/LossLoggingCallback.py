@@ -83,8 +83,8 @@ class LossLoggingCallback(Callback):
         loss_names = self.epoch_headers[2:]
         fig = plt.figure(num=round(time.time() * 10E6))
         ax = fig.gca()
+        losses = losses[np.newaxis, :] if len(losses.shape) == 1 else losses
         arr = np.arange(len(losses))
-        losses = losses[:, np.newaxis] if len(losses.shape) == 1 else losses
         for loss in losses.T:
             ax.plot(arr, loss)
         ax.legend(loss_names, loc='upper right')
