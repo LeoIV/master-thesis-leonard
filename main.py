@@ -218,7 +218,7 @@ def main(args: List[str]):
 
         embedding_callback_params += [
             {
-                'c': y_train,
+                'c': y_train / np.max(y_train),
                 'label': 'Class Identity',
             }]
 
