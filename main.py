@@ -216,6 +216,12 @@ def main(args: List[str]):
         x_train = x_train.astype('float32') / 255.
         x_val = x_val.astype('float32') / 255.
 
+        embedding_callback_params += [
+            {
+                'c': y_train,
+                'label': 'Class Identity',
+            }]
+
         if len(x_train.shape) == 3:
             x_train = np.expand_dims(x_train, -1)
         if len(x_val.shape) == 3:
