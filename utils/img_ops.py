@@ -17,10 +17,8 @@ def resize_array(arr: np.ndarray, size: Tuple[int, int], rgb: bool):
     has_empty_dimension = arr.shape[-1] == 1
     arr = arr.squeeze()
     new_arr_shape = (arr.shape[0], *size)
-    if len(arr.shape) > 3:
-        new_arr_shape = (*new_arr_shape, arr.shape[3])
-    was_gray = len(arr.shape) <= 3
-    new_arr_shape = new_arr_shape if not was_gray or (was_gray and not rgb) else (*new_arr_shape, 3)
+    if rgb:
+        new_arr_shape = (*new_arr_shape, 3)
     new_arr = np.zeros(new_arr_shape, dtype=arr.dtype)
     for i, img in enumerate(arr):
         p_img = Image.fromarray(img.squeeze())
