@@ -3,7 +3,7 @@ import os
 import time
 from collections import Iterable
 from concurrent.futures.thread import ThreadPoolExecutor
-from typing import Optional, Sequence, Dict
+from typing import Optional, Sequence, Dict, List
 
 import numpy as np
 from keras import Model
@@ -17,7 +17,7 @@ from utils.future_handling import check_finished_futures_and_return_unfinished
 class HiddenSpaceCallback(Callback):
     def __init__(self, log_dir: str, vae: 'VAEWrapper', batch_size: int, x_train: np.ndarray,
                  layer_names: Sequence[str], y_train: Optional[np.ndarray] = None, max_samples: int = 1000,
-                 plot_params: Dict[str, any] = None):
+                 plot_params: List[Dict[str, any]] = None):
         """
         Visualize the embedding space using T-SNE
         :param log_dir:
@@ -28,7 +28,7 @@ class HiddenSpaceCallback(Callback):
         """
         super().__init__()
         if plot_params is None:
-            plot_params = {}
+            plot_params = []
         self.plot_params = plot_params
         self.batch_size = batch_size
         self.y_train = y_train
@@ -84,10 +84,16 @@ class HiddenSpaceCallback(Callback):
             mus = encoder_til_mu.predict(self.x_train)
             fig_path = os.path.join(self.log_dir, "epoch_{}".format(epoch + 1), "embeddings")
             os.makedirs(fig_path, exist_ok=True)
-            for i, plot_params in enumerate(self.plot_params):
+            if len(self.plot_params) > 0:
+                for i, plot_params in enumerate(self.plot_params):
+                    f = self.threadpool.submit(self._print_embeddings,
+                                               *(mus, self.y_train, fig_path,
+                                                 "{}_{}".format(encoder_til_mu.layers[-1].name, i), plot_params))
+                    self.futures.append(f)
+            else:
                 f = self.threadpool.submit(self._print_embeddings,
                                            *(mus, self.y_train, fig_path,
-                                             "{}_{}".format(encoder_til_mu.layers[-1].name, i), plot_params))
+                                             encoder_til_mu.layers[-1].name))
                 self.futures.append(f)
 
     def on_train_end(self, logs=None):
