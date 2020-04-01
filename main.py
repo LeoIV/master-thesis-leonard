@@ -6,12 +6,11 @@ import os
 import sys
 import traceback
 from argparse import ArgumentParser
-from random import random, randint
+from random import randint
 from shutil import rmtree
 from typing import List, Tuple
 
 import numpy as np
-import sklearn
 from keras.datasets import cifar10, mnist
 from keras.utils import to_categorical
 from keras_preprocessing.image import ImageDataGenerator
@@ -218,7 +217,7 @@ def main(args: List[str]):
 
         embedding_callback_params += [
             {
-                'c': y_train / np.max(y_train),
+                'c': y_train.squeeze(),
                 'label': 'Class Identity',
             }]
 

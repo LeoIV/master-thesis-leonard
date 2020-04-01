@@ -10,7 +10,7 @@ from main import main
 def configs_fixture():
     model_configs = ['vlae', 'vanilla_vae', 'large_vanilla_vae', 'alexnet_classifier', 'simple_classifier',
                      'alexnet_vae', 'hvae']
-    data_paths = ["../data/"]
+    data_paths = ["./data/"]
     batch_sizes = [8, 16]
     z_dims = [["10", "11", "12"], ["13", "14", "15"]]
     use_dropouts = [True, False]

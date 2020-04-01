@@ -2,6 +2,7 @@ import logging
 import math
 import os
 import time
+from asyncio import Future
 from concurrent.futures.thread import ThreadPoolExecutor
 from typing import Union, Sequence
 
@@ -29,7 +30,7 @@ class FeatureMapVisualizationCallback(Callback):
         self.batch_nrs = []
         self.threadpool = ThreadPoolExecutor(max_workers=5)
         self.epoch = 1
-        self.futures = []
+        self.futures: Sequence[Future] = []
         self.num_samples = num_samples
         idxs = np.random.randint(0, len(self.x_train), num_samples)
         self.samples = [np.copy(self.x_train[idx]) for idx in idxs]
