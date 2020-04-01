@@ -86,7 +86,7 @@ class HVAE(VAEWrapper):
         x = BatchNormalization()(x)
         x = ReLU()(x)
         x = Reshape((6, 6, 128))(x)  # TODO make dynamic
-        x = Conv2DTranspose(filters=(64 / self.feature_map_reduction_factor), kernel_size=3, strides=2)(x)
+        x = Conv2DTranspose(filters=math.ceil(64 / self.feature_map_reduction_factor), kernel_size=3, strides=2)(x)
         x = BatchNormalization()(x)
         x = ReLU()(x)
         x = Conv2DTranspose(filters=self.input_dim[-1], kernel_size=4, strides=2)(x)

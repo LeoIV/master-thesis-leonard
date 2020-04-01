@@ -25,7 +25,7 @@ def configs_fixture():
 
 
 def datasets_fixture():
-    return [('mnist', 7, 7), ('celeba', 144, 16), ('imagenet', 6000, 0), ('cifar10', 3, 3)]
+    return [('mnist', 7, 7), ('celeba', 45, 16), ('imagenet', 6000, 0), ('cifar10', 3, 3)]
 
 
 @pytest.mark.parametrize('config', configs_fixture())
@@ -52,8 +52,10 @@ def test_configs(mocker, config):
     ]
     if config[0] not in ['vlae', 'hvae']:
         cl_config.append(config[3][0])
-    else:
+    elif config[0] == 'vlae':
         cl_config += config[3]
+    else:
+        cl_config += config[3] + config[3][:-1]
     cl_config += ["--use_dropout={}".format(config[4]),
                   "--use_batch_norm={}".format(config[5]),
                   "--dataset={}".format(config[6]),
