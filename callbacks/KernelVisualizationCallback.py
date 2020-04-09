@@ -50,7 +50,7 @@ class KernelVisualizationCallback(Callback):
             # summarize filter shapes
             # get filter weights
             # retrieve weights from the second hidden layer
-            filters, biases = self.model.layers[self.layer_idx].get_weights()
+            filters = self.model.layers[self.layer_idx].get_weights()[0]
             # normalize filter values to 0-1 so we can visualize them
             filters = np.moveaxis(filters, (0, 1), (-2, -1))
             filters = (filters.reshape(((-1,) + filters.shape[-2:])))
