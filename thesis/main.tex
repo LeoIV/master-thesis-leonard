@@ -13,6 +13,7 @@
 \usepackage{mathtools}
 \usepackage{amsfonts}
 \usepackage{csquotes}
+\usepackage{pgffor}
 % bold math symbols
 \usepackage{bm}
 \addbibresource{literature.bib}
@@ -90,6 +91,103 @@
     It is easy to see that in many kernels, Gabor wavelet-like filters emerge.
 
     \subsection{Activity Correlation in \acp{VAE}}\label{subsec:results_activity-correlation-in-vaes}
+
+    \subsection{Feature Map Stripes}\label{subsec:feature-map-stripes}
+
+    \begin{figure}
+        \centering
+        \begin{subfigure}{0.3\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{images/stripes/original.jpg}
+            \caption{The original image.}
+            \label{subfig:stripes_original}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{0.3\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{images/stripes/leaky_re_lu_5.png}
+            \caption{The feature maps after LeakyReLU 5}
+            \label{subfig:lakyrelu5}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{0.3\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{images/stripes/max_pooling2d_3.png}
+            \caption{The feature maps after max pooling of LeakyReLU 5}
+            \label{subfig:maxpool}
+        \end{subfigure}
+        \caption{The original image and the feature maps after passing the image through the network until after the specified layer. The stripe artifacts can be observed in many feature maps in Subfigure~\ref{subfig:lakyrelu5}. They vanish after max-pooling (Subfigure~\ref{subfig:maxpool}).}
+        \label{fig:stripes}
+    \end{figure}
+
+
+    One observation being made during the analysis of the networks was the emergence of striped artifacts in the networks feature maps (Figure~\ref{fig:stripes}).
+    These stripes were observed in the Vanilla VAE, AlexNetVAE, as well as the AlexNet Classifier and might be also present in other networks (\textbf{CHECK THIS}).
+    Apparently, the stripes are either always horizontal or vertical for one network type.
+    If they are vertical, they can appear on the left or the right side of the same network.
+    If they are horizontal, they appear either on the top or on the bottom of the same network.
+    The exact reason why the networks show this behavior was not found, however some insights were won.
+
+    \paragraph{Padding}
+    The stripes occur due to the zero-padding in the network and the resulting contrast observed by the convolutional filters.
+    Take Figure~\ref{fig:stripes}.
+    Here, the stripes appear strongest on the bottom left of the image.
+    Noteworthy, the stripes indicate less active regions in the feature map: The feature map has an activity of around zero everywhere except for the location of the stripes.
+    Here, the activity is strongly negative.
+
+    A comparison with the original image (Figure~\ref{subfig:stripes_original}) shows that for the left side of the image, the contrast is highest on the bottom if the image is zero-padded\footnote{Zero-padding can be understood as adding black pixels around the image.}.
+    Importantly, the contrast is as high on the bottom of the image, the right side, and the right side of the top of the image.
+    However, for this network, the stripes seem to occur for a sharp shift of black on the left to white on the right.
+
+    \begin{figure}
+        \centering
+        \foreach \n in {0,...,11}{
+            \begin{subfigure}{0.05\textwidth}
+                \frame{\includegraphics[width=\textwidth]{images/stripes/test_images/original\n.jpg}}
+                \caption{}
+                \label{subfig:test_images_stripes\n}
+            \end{subfigure}
+            \hfill
+        }
+        \caption{The test images used to analyze the networks behavior.}
+        \label{fig:test_images_stripes}
+    \end{figure}
+
+    To better understand the behavior, the network was applied to a set of artifical test images (Figure~\ref{fig:test_images_stripes}).
+    All different feature maps with respect to each image can be found in the appendix.
+
+    \begin{figure}
+        \centering
+        \begin{subfigure}{0.45\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{images/stripes/test_img_9/leaky_re_lu_5.png}
+            \caption{The original image.}
+            \label{subfig:stipes_test_img_leakyrelu5}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{0.45\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{images/stripes/test_img_9/max_pooling2d_3.png}
+            \caption{The feature maps after LeakyReLU 5}
+            \label{subfig:stripes_test_img_maxpool3}
+        \end{subfigure}
+        \caption{The feature maps with respect to test image~\ref{subfig:test_images_stripes8}.}
+        \label{fig:stripes_test_img}
+    \end{figure}
+
+    Subfigure~\ref{subfig:test_images_stripes8} and~\ref{subfig:test_images_stripes11} turned to be most equally high insightful.
+    Figure~\ref{fig:stripes_test_img} shows the feature map after the last LeakyReLU (LeakyReLU 5) activation of the network given this input image (Subfigure~\ref{subfig:stipes_test_img_leakyrelu5}) as well as the feature map after max-pooling of this feature map (Subfigure~\ref{subfig:stripes_test_img_maxpool3}).
+    Multiple things can be observed in Subfigure~\ref{subfig:stipes_test_img_leakyrelu5}.
+    Firstly, the feature map in the first column of the fifth row resembles the input stimulus itself.
+    The fact that this feature map shows most of the activity (especially after max-pooling, see Subfigure~\ref{subfig:stripes_test_img_maxpool3}) has been observed for natural images as well, however not the resemblance of the input stimulus.
+    Except for this feature map, stripes emerge either on the bottom of the left side or the bottom of the right side of the feature map.
+    For the bottom of the left side, this is where the sharp black-white contrast is.
+    The bottom of the right side is more complicated.
+    Here the test image was black and the \say{contrast} is a black-black contrast - or no contrast at all.
+    However, this is only true for the first feature map\footnote{The first feature maps are not shown here.}.
+    The following feature maps, again, are zero-padded.
+    However, due to the bias term in the convolutions, these might be non-zero in the bottom-right and top-left square of the image, thus leading to a contrast.
+    This explains why the network can be sensitive towards these black-black contrasts in the input image.
 
 
     \section{Discussion}\label{sec:discussion}

@@ -92,6 +92,7 @@ def main(args: List[str]):
     parser.add_argument('--lr_decay', type=float, default=1e-7,
                         help="The learning rate decay. Should be in interval [0,1].")
     parser.add_argument('--rgb', type=str2bool, default=True)
+    parser.add_argument('--bias', type=str2bool, default=True)
     parser.add_argument('--feature_map_reduction_factor', type=int, default=1,
                         help="The factor by which to reduce the number of feature maps. If a layer usually has 50 "
                              "feature maps, setting a factor to 2 will yield only 25 feature maps.")
@@ -170,7 +171,7 @@ def main(args: List[str]):
                            feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,
                            kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
                            use_fc=args.use_fc, inner_activation=args.inner_activation, decay_rate=args.lr_decay,
-                           feature_map_reduction_factor=args.feature_map_reduction_factor)
+                           feature_map_reduction_factor=args.feature_map_reduction_factor, use_bias=args.bias)
     elif args.configuration == 'alexnet_vae_classification_loss':
         input_dim = infer_input_dim((224, 224), args)
         model = AlexAlexNetVAE(input_dim=input_dim, log_dir=args.logdir, z_dims=args.z_dims,

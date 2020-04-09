@@ -17,10 +17,11 @@ class AlexNetVAE(VAEWrapper):
                  kernel_visualization_layer: int = -1,
                  use_batch_norm: bool = False, use_dropout: bool = False, dropout_rate: float = 0.5,
                  feature_map_layers=None, num_samples: int = 5, inner_activation: str = "ReLU", use_fc: bool = True,
-                 decay_rate: float = 1e-7, feature_map_reduction_factor: int = 1):
+                 decay_rate: float = 1e-7, feature_map_reduction_factor: int = 1, use_bias: bool = True):
 
         super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_layers,
                          inner_activation, decay_rate, feature_map_reduction_factor, z_dims, ["mu"], ["log_var"])
+        self.use_bias = use_bias
         if len(self.z_dims) > 1:
             raise RuntimeError("Only one z_dim allowed for this model")
         self.name = 'variational_autoencoder'
@@ -40,34 +41,38 @@ class AlexNetVAE(VAEWrapper):
         x = encoder_input
 
         # Layer 1
-        x = Conv2D(filters=math.ceil(96 / self.feature_map_reduction_factor), input_shape=(224, 224, 3),
-                   kernel_size=(11, 11), strides=(4, 4), padding="same")(x)
+        x = Conv2D(filters=math.ceil(96 / self.feature_map_reduction_factor), input_shape=self.input_dim,
+                   kernel_size=(11, 11), strides=(4, 4), padding="same", use_bias=self.use_bias)(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
         x = MaxPool2D(pool_size=(2, 2))(x)
 
         # Layer 2
-        x = Conv2D(filters=math.ceil(256 / self.feature_map_reduction_factor), kernel_size=(5, 5), padding='same')(x)
+        x = Conv2D(filters=math.ceil(256 / self.feature_map_reduction_factor), kernel_size=(5, 5), padding='same',
+                   use_bias=self.use_bias)(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
         x = MaxPool2D(pool_size=(2, 2))(x)
 
         # Layer 3
-        x = Conv2D(filters=math.ceil(384 / self.feature_map_reduction_factor), kernel_size=(3, 3), padding='same')(x)
+        x = Conv2D(filters=math.ceil(384 / self.feature_map_reduction_factor), kernel_size=(3, 3), padding='same',
+                   use_bias=self.use_bias)(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 4
-        x = Conv2D(filters=math.ceil(384 / self.feature_map_reduction_factor), kernel_size=(3, 3), padding='same')(x)
+        x = Conv2D(filters=math.ceil(384 / self.feature_map_reduction_factor), kernel_size=(3, 3), padding='same',
+                   use_bias=self.use_bias)(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 5
-        x = Conv2D(filters=math.ceil(256 / self.feature_map_reduction_factor), kernel_size=(3, 3), padding='same')(x)
+        x = Conv2D(filters=math.ceil(256 / self.feature_map_reduction_factor), kernel_size=(3, 3), padding='same',
+                   use_bias=self.use_bias)(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
@@ -82,13 +87,13 @@ class AlexNetVAE(VAEWrapper):
             # FC1
             x = Dense(math.ceil(4096 / self.feature_map_reduction_factor))(x)
             # , input_shape=(np.prod(self.input_dim),)
-            x = LeakyReLU()(x)
+            x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
             if self.use_dropout:
                 x = Dropout(rate=self.dropout_rate)(x)
 
             # FC2
             x = Dense(math.ceil(4096 / self.feature_map_reduction_factor))(x)
-            x = LeakyReLU()(x)
+            x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
             if self.use_dropout:
                 x = Dropout(rate=self.dropout_rate)(x)
 
@@ -108,12 +113,12 @@ class AlexNetVAE(VAEWrapper):
         if self.use_fc:
             # FC2 - reverse
             x = Dense(math.ceil(4096 / self.feature_map_reduction_factor))(x)
-            x = LeakyReLU()(x)
+            x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
             if self.use_dropout:
                 x = Dropout(rate=self.dropout_rate)(x)
             # FC1 - reverse
             x = Dense(np.prod(shape_before_flattening))(x)
-            x = LeakyReLU()(x)
+            x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
             if self.use_dropout:
                 x = Dropout(rate=self.dropout_rate)(x)
 
@@ -131,35 +136,36 @@ class AlexNetVAE(VAEWrapper):
 
         # Layer 5 - reverse
         x = Conv2DTranspose(filters=math.ceil(384 / self.feature_map_reduction_factor), kernel_size=(3, 3),
-                            strides=(2, 2), padding='same')(x)
+                            strides=(2, 2), padding='same', use_bias=self.use_bias)(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 4 - reverse
         x = Conv2DTranspose(filters=math.ceil(384 / self.feature_map_reduction_factor), kernel_size=(3, 3),
-                            padding='same')(x)
+                            padding='same', use_bias=self.use_bias)(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 3 - reverse
         x = Conv2DTranspose(filters=math.ceil(256 / self.feature_map_reduction_factor), kernel_size=(3, 3),
-                            padding='same', strides=(2, 2))(x)
+                            padding='same', strides=(2, 2), use_bias=self.use_bias)(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 2 - reverse
         x = Conv2DTranspose(filters=math.ceil(96 / self.feature_map_reduction_factor), kernel_size=(5, 5),
-                            padding='same', strides=(2, 2))(x)
+                            padding='same', strides=(2, 2), use_bias=self.use_bias)(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 1 - revese
         # x = UpSampling2D(size=(2, 2))(x)
-        x = Conv2DTranspose(filters=self.input_dim[-1], kernel_size=(11, 11), strides=(4, 4), padding='same')(x)
+        x = Conv2DTranspose(filters=self.input_dim[-1], kernel_size=(11, 11), strides=(4, 4), padding='same',
+                            use_bias=self.use_bias)(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         decoder_output = x = Activation('sigmoid')(x)

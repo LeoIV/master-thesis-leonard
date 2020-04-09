@@ -32,7 +32,8 @@ class FeatureMapVisualizationCallback(Callback):
         self.epoch = 1
         self.futures: Sequence[Future] = []
         self.num_samples = num_samples
-        idxs = np.random.randint(0, len(self.x_train), num_samples)
+        assert self.num_samples > 0
+        idxs = np.random.randint(0, len(self.x_train), self.num_samples)
         self.samples = [np.copy(self.x_train[idx]) for idx in idxs]
 
     @staticmethod
@@ -92,7 +93,8 @@ class FeatureMapVisualizationCallback(Callback):
                                         "feature_map",
                                         "sample_{}".format(sample_nr))
                 os.makedirs(img_path, exist_ok=True)
-                ax[0, sample_nr].imshow(sample.squeeze(), cmap='gray')
+                ax[0, sample_nr].imshow(sample.squeeze(), cmap='gray') if len(self.samples) > 1 else ax[0].imshow(
+                    sample.squeeze(), cmap='gray')
                 Image.fromarray(sample_as_uint8).save(
                     os.path.join(img_path, "original.jpg"))
                 for i, layer_idx in enumerate(self.layer_idxs):
@@ -134,11 +136,12 @@ class FeatureMapVisualizationCallback(Callback):
                     self.fmas[sample_nr][layer_idx].append(fmas)
                     fmas_stacked = np.copy(np.stack(self.fmas[sample_nr][layer_idx]))
                     fmas_stacked /= np.max(fmas_stacked)
-                    ax[i + 1, sample_nr].set_title('Normalized activations - Layer {}'.format(output_layer.name))
-                    ax[i + 1, sample_nr].imshow(fmas_stacked, origin='lower', interpolation="none")
-                    ax[i + 1, sample_nr].set(xlabel="#feature map", ylabel="# batch")
-                    ax[i + 1, sample_nr].set_yticks(np.arange(len(self.batch_nrs), step=2), self.batch_nrs[0::2])
-            fig.colorbar(ax[1, 0].get_images()[0])
+                    axx = ax[i + 1, sample_nr] if len(self.samples) > 1 else ax[i + 1]
+                    axx.set_title('Normalized activations - Layer {}'.format(output_layer.name))
+                    axx.imshow(fmas_stacked, origin='lower', interpolation="none")
+                    axx.set(xlabel="#feature map", ylabel="# batch")
+                    axx.set_yticks(np.arange(len(self.batch_nrs), step=2), self.batch_nrs[0::2])
+            fig.colorbar(ax[1, 0].get_images()[0]) if len(self.samples) > 1 else fig.colorbar(ax[1].get_images()[0])
             fig.savefig(
                 os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen), "feature_map",
                              'activations.png'))
