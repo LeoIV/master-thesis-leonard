@@ -189,6 +189,10 @@
     However, due to the bias term in the convolutions, these might be non-zero in the bottom-right and top-left square of the image, thus leading to a contrast.
     This explains why the network can be sensitive towards these black-black contrasts in the input image.
 
+    Noteworthy, if the bias term in the convolutions is removed, the black-black contrast sensitivity vanishes because the network is not able anymore to add a constant to the black pixel values on the bottom-right or top-left of the image.
+    For this purpose, the batch normalization has to be removed too since it uses a bias term as well.
+    This, however, does not qualitatively change the networks behavior on real images.
+
 
     \section{Discussion}\label{sec:discussion}
 
@@ -227,6 +231,8 @@
         \acro{PDF}{Probability Density Function}
         \acro{MSE}{Mean Squared Error}
         \acro{GAN}{Generative Adversarial Network}
+        \acro{VLAE}{Variational Ladder Autoencoder}
+        \acro{LVAE}{Ladder Variational Autoencoder}
     \end{acronym}
     \newpage
     \listoffigures

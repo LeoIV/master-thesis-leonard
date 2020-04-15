@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.cluster.vq import whiten
 
 
 def cross_cumulants(data: np.ndarray):
@@ -7,8 +6,8 @@ def cross_cumulants(data: np.ndarray):
     data = data.reshape((data.shape[0], -1))
 
     # center data
-    mean = data.mean(axis=1)
-    data = data - mean[:, np.newaxis]
+    mean = data.mean(axis=0)
+    data = data - np.expand_dims(mean, axis=0)
     # whiten data
     # data = whiten(data)
 

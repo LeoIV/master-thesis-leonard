@@ -222,7 +222,40 @@ $\bm{c}_2$ and $\bm{c}_3$ are drawn from a uniform distribution over $[-1, 1]$.
 Figure~\ref{fig:infogan} shows the representation disentaglement by varying the $\bm{c}_i$-values.
 Noteworthy, InfoGAN seems to generalize as $\bm{c}_2$ and $\bm{c}_3$ varied between $[-2, 2]$ whereas these values took values in $[-1, 1]$ at training time.
 
+\paragraph{\acl{LVAE}}
 
+\aclp{LVAE}~\citep{sonderby2016ladder} address the problem of hierarchical learning in \acp{VAE}.
+Hierarchical \acp{VAE} only use the first few layers to learn meaningful semantics of an input.
+In case of \citet{sonderby2016ladder}, the first two layers are sufficient.
+\citet{zhao2017learning} state that, given a sufficiently large encoder network in the first layer, the first layer learns all the semantics.
+While this is not always true, they \say{demonstrate that this phenomen occurs in practive [\ldots]}.
+
+\acp{LVAE} is a model designed to, instead of using just the first few layers, use all embedding layers to learn a representation.
+They do this by passing information top-down in the inference network.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.2\textwidth]{images/gerben.png}
+    \caption{Illustration of context-dependent semantic ambiguity. Taken from \citet[p. 61]{van2016auto}}
+    \label{fig:gerben_ambiguity}
+\end{figure}
+Figure~\ref{fig:gerben_ambiguity} gives an intuition why passing information top-down can be advantegous.
+Here, the two rows show two different alphanumeric strings.
+Apparently, the first row shows a sequence of alphabetic characters (\say{GERBEN}) whereas the second row shows a sequence of numeric characters (\say{10 11 12 13 14 15}).
+However, the \say{R} and the \say{B} in the first row are the exact same symbols as the \say{12} and the \say{13} in the second one.
+A pure feed-forward systems would be unable to discriminate between the low-level features \textit{R} and \textit{13}.
+Incorporating high-level features like \textit{alphabetic string} helps to improve the posterior low-level feature representation.
+Furthermore, the additional top-down pass is more biologically plausible compared to a pure feedforward network (\textbf{REFERENCE}).
+
+In fact, \acp{LVAE} model this top down pass by \textbf{BY WHAT? CONTINUE}
+\begin{itemize}
+    \item Explain LVAE detailed
+    \item Dont forget the warm-up phase
+    \item Also mention that batch normalization and warm-up alone help a lot in disentangling the feature learning
+\end{itemize}
+
+\paragraph{\acl{VLAE}}
+
+\paragraph{Other stuff}
 \begin{itemize}
     \item \citet{tschannen2018recent} give an overview over \say{recent advances in autoencoder-based representation learning}
 \end{itemize}
