@@ -56,6 +56,30 @@ Furthermore, the neocortex is structured \textit{topographically}, i.e.~neurons 
 
 \subsubsection{Visual Cortex}\label{subsubsec:visual-cortex}
 
+The first cortical region receiving retinal signals is the \acf{V1}~\citep[p. 559]{mack2013principles}.
+The \ac{V1} does not receive input directly from the retina, but the signal travels through the \textit{primary visual pathway} that includes the \ac{LGN}~\citep[p. 559]{mack2013principles}.
+Two other pathways transport signals from the retina to other brain regions but are not concerned with object recognition but controlling movements and pupillary reflexes~\citep[p. 559]{mack2013principles}.
+
+The \ac{LGN} contains so-called \textit{on-center} and \textit{off-center} cells that respond strongly to stimuli having either a bright center and a dark surrounding or a dark center and a bright surrounding~\citep[pp. 564-566]{mack2013principles}.
+Noteworthy, the \ac{LGN} receives strong feedback from \ac{V1}.
+However, the function of these feedback connections, outnumbering the number of feedforward neurons from the \ac{LGN} by the factor ten, \say{is largely unknown}~\citep[p. 573]{mack2013principles}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.8\textwidth]{images/ventral_dorsal.jpeg}
+    \caption{The ventral and dorsal pathways, carrying information from \ac{V1} to other brain regions. Taken from \citet[p. 571]{mack2013principles}}
+    \label{fig:ventral_dorsal_pathway}
+\end{figure}
+
+From \ac{V1}, information is propagated to other brain regions via the \textit{ventral} and \textit{dorsal} pathways~\citep[pp. 563, 563]{mack2013principles}.
+The dorsal pathway is responsible for the pass of information regarding the direction of movements whereas the ventral pathway is more concerned with object recognition~\citep[p. 564]{mack2013principles}.
+Figure~\ref{fig:ventral_dorsal_pathway} shows the two pathways and the flow of information.
+Importantly, Figure~\ref{fig:ventral_dorsal_pathway} does not show the complete pathways.
+From V4, the Ventral pathways has feedback and feedforward connections from and to \ac{TEO}, and from \ac{TEO} it has feedback and feedforward connections from and to \ac{IT}, which, in turn, has feedback connections to \ac{V1} \citep[p. 563]{mack2013principles}.
+
+According to the two-stream hypothesis~\citep{goodale1992separate}, the two pathways are assumed to encode the \textit{what} (dorsal) and \textit{where} (ventral) in a visual scene~\citep[p. 520]{mack2013principles}.
+Even though the two pathways can exchange information \citep[p. 564]{mack2013principles}, they encode two different qualities of a stimulus: the identity and the location.
+
 \subsection{Visual Object Perception}\label{subsec:visual-object-perception}
 
 \begin{wrapfigure}[12]{r}{0.3\textwidth}
@@ -233,7 +257,7 @@ However, sampling is not possible if one wants to compute the gradient to train 
 \paragraph{Disadvantages}
 Another disadvantage of \acp{VAE} is that they \say{use only a small subset of the dimensions of $\bm{z}$}~\citep[p. 694]{Goodfellow-et-al-2016}.
 
-\subsubsection{Representation Learning}
+\subsubsection{Representation Learning}\label{subsubsec:representation_learning}
 
 Representation learning can be understood as \say{learning representations of the data that make it easier to extract useful information when building classifiers or other predictors}~\citep{bengio2013representation}.
 While this is a rather broad definition, this thesis focuses on \textit{hierarchical representations}, since this is what can be observed in the visual cortex (\textbf{QUELLE}).

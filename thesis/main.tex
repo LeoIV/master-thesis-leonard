@@ -14,9 +14,12 @@
 \usepackage{amsfonts}
 \usepackage{csquotes}
 \usepackage{pgffor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 % bold math symbols
 \usepackage{bm}
 \usepackage{graphicx}
+\usepackage{amssymb}
 \addbibresource{literature.bib}
 \renewcommand{\baselinestretch}{1.5}
 \newcounter{savepage}
@@ -90,6 +93,86 @@
 
     Figure~\ref{fig:classification_layer1_kernels} shows all 256 convolutional kernels of the image classification network.
     It is easy to see that in many kernels, Gabor wavelet-like filters emerge.
+
+    \subsection{Independence of VLAE Embeddings}\label{subsec:independence-of-vlae-embeddings}
+
+    \begin{figure}[t]
+        \centering
+        \begin{subfigure}{0.3\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{images/vlae_plots1.png}
+            \caption{Exploring $z_1$}
+            \label{subfig:vlae_plots1}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{0.3\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{images/vlae_plots2.png}
+            \caption{Exploring $z_{2}$}
+            \label{subfig:vlae_plots2}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{0.3\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{images/vlae_plots3.png}
+            \caption{Exploring $z_3$}
+            \label{subfig:vlae_plots3}
+        \end{subfigure}
+        \caption{Reconstructions of the VLAE model when systematically exploring one latent space and randomly choosing the other two latent spaces. The space explored systematically is sampled from -3 SD to 3 SD in both dimensions, the other values are chosen by drawing from an uniform distribution over $[-1; 1]$. Created analogously to \citet[Figure 5]{zhao2017learning}.}
+        \label{fig:vlae_plots}
+    \end{figure}
+    The VLAE learns embeddings on different levels.
+    For MNIST, \citet{zhao2017learning} used three two-dimensional layers to learn image semantics of different granularity.
+    They claim that their model is able to learn disentangled hierarchical features.
+    Figure~\ref{fig:vlae_plots} shows reconstructions of this model when systematically exploring one dimensions and randomly choosing the others.
+    Apparently, the model is able to learn disentangled representations to some extent.
+
+    For example, $z_1$ seems to mainly encode the digit orientation, $z_2$ seems to primarily encode digit width, whereas $z_3$ seems to encode digit identity.
+    However, it is not obvious how disentangled the representations actually are.
+    \begin{algorithm}
+        \caption{Generating Layer Representative Samples by Averaging Out Other Embedding Layers}\label{alg:layer_representative_samples}
+        \begin{algorithmic}[1]
+            \Function{LayerRepresentativeSamples}{numSamples,numApproximations}
+            \State $j \gets 0$
+            \State $\mathcal{L}\gets \varnothing$
+            \While{$i < \text{numSamples}$}
+            \State $\bm{v} \gets \bm{v} \sim \mathcal{N}(\bm{0}, \bm{I})$\label{line:fixing_v}
+            \ForAll{$j \in \{1,2,3\}$}
+            \State $\bm{s}_j \gets$ \Call{LayerRepresentativeSample}{$\bm{v}$, numApproximations, $j$}
+            \EndFor
+            \State $\mathcal{L} \gets \mathcal{L} \cup \{\{\bm{s}_1, \bm{s}_2, \bm{s}_3\}\}$
+
+            \EndWhile
+            \State \Return $\mathcal{L}$
+            \EndFunction
+
+            \Function{LayerRepresentativeSample}{fixedDimensionValue, numApproximations, dimensionIndex}
+            \State $\mathcal{D} \gets \{1,2,3\}$
+            \State $\alpha \gets \text{fixedDimensionValue}$
+            \State $\beta \gets (D \setminus \text{dimensionIndex})_1$
+            \State $\gamma \gets (D \setminus \text{dimensionIndex})_2$
+            \State $\bm{z}_{\alpha} \gets \bm{a} \sim \mathcal{N}(\bm{0}, \bm{I})$
+            \State $\mathcal{L}\gets \varnothing$
+            \State $i \gets 0$
+            \While{$i < \text{numApproximations}$}
+            \State $\bm{z}_{\beta}^i \gets \bm{b}_i \sim \mathcal{N}(\bm{0}, \bm{I})$
+            \State $\bm{z}_{\gamma}^i \gets \bm{c}_i \sim \mathcal{N}(\bm{0}, \bm{I})$
+            \State $\mathcal{L} \gets \mathcal{L} \cup \{$ \Call{VLAE-Decoder}{$\bm{z}_{\alpha}, \bm{z}_{\beta}^j, \bm{z}_{\gamma}^j$} $\}$
+            \State $i \gets i + 1$
+            \EndWhile
+            \State \Return $\frac{1}{|\mathcal{L}|}\sum_j \mathcal{L}_j$
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+
+    Consider Algorithm~\ref{alg:layer_representative_samples}.
+    Calling the function \textsc{LayerRepresentativeSamples} returns an ordered set $\mathcal{L}$ of \say{layer representative samples}.
+    Each sample $i$ contains three items, say $\bm{x}_1^i, \bm{x}_2^i, \bm{x}_3^i$ that were created by fixing a value $\bm{v}$ in Line \ref{line:fixing_v} of Algorithm \ref{alg:layer_representative_samples}.
+    What is meant by the term \say{layer representative samples} is that for example $\bm{x}_1^i$ is approximately drawn from the marginal distribution
+    \begin{align}
+        \bm{x}_1^i \sim p_\theta(\bm{v} | \bm{z}_1) = \int_{\bm{z}_2} \int_{\bm{z}_3} p_\theta(\bm{v} | \bm{z}_1, \bm{z}_2, \bm{z}_3)
+    \end{align}
+    \textbf{CONTINUE}
 
     \subsection{Activity Correlation in \acp{VAE}}\label{subsec:results_activity-correlation-in-vaes}
 
@@ -197,6 +280,20 @@
 
     \section{Discussion}\label{sec:discussion}
 
+    \subsection{Feedback Connections of the \acl{LGN}}\label{subsec:feedback-connections-of-the-lateral-geniculate-nucleus}
+
+    As discussed in Section~\ref{subsubsec:visual-cortex}, the \ac{LGN} receives strong feedback connections from the \ac{V1}.
+    Consider the \ac{LVAE}-model in Section~\ref{subsubsec:representation_learning} and the discussion concerning the top-down pass.
+    It is stated that, compared to the Vanilla VAE, the \ac{LVAE} model is more biologically plausible because top-down connections resemble the feedback connections in the ventral and primary visual pathway.
+    \citet{sonderby2016ladder} claim that the top-down pass helps improving the low-level feature representation because it enables the model to incorporate the higher-level context.
+
+    Maybe the feedback connections fulfil this very function, i.e.\ allowing visual regions operating on a lower semantic level to incorporate the high-level context to disambiguate the lower-level representations.
+
+    \subsection{Criticism on \citet{zhao2017learning}}
+    \citet{zhao2017learning} compared their model to a HVAE and showed the difference on a plot.
+    However, the plots are not really comparable.
+    \textbf{CONTINUE}
+
     \subsection{Visual Features in Variational Autoencoders}\label{subsec:discussion_visual_features_in_variational_autoencoders}
     \begin{itemize}
         \item Reconstructions of AlexNet-VAE don't look natural at all, this might be because ImageNet, unlike CelebA, is not properly aligned and contains images from a large variety of classes.
@@ -235,6 +332,10 @@
         \acro{VLAE}{Variational Ladder Autoencoder}
         \acro{LVAE}{Ladder Variational Autoencoder}
         \acro{CNS}{Central Nervous System}
+        \acro{V1}{Primary Visual Cortex}
+        \acro{LGN}{Lateral Geniculate Nucleus}
+        \acro{IT}{Inferior Temporal Cortex}
+        \acro{TEO}{Temporo-Occipital Area}
     \end{acronym}
     \newpage
     \listoffigures
