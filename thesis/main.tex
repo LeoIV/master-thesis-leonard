@@ -18,7 +18,6 @@
 \usepackage{algpseudocode}
 % bold math symbols
 \usepackage{bm}
-\usepackage{graphicx}
 \usepackage{amssymb}
 \addbibresource{literature.bib}
 \renewcommand{\baselinestretch}{1.5}
@@ -30,29 +29,52 @@
 \newcommand{\kldiv}{D_{KL}\infdivx}
 \DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 
+\makeatletter
+\newenvironment{breakablealgorithm}
+{% \begin{breakablealgorithm}
+    \begin{center}
+        \refstepcounter{algorithm}% New algorithm
+        \vspace{1em}
+        \hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+        \renewcommand{\caption}[2][\relax]{% Make a new \caption
+            {\raggedright\textbf{\ALG@name~\thealgorithm} ##2\par}%
+            \ifx\relax##1\relax % #1 is \relax
+            \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
+            \else % #1 is not \relax
+            \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
+            \fi
+            \kern2pt\hrule\kern4pt
+        }
+}{% \end{breakablealgorithm}
+    \kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+    \vspace{1em}
+\end{center}
+}
+\makeatother
+
 \begin{document}
 
-    \begin{titlepage}
-        \centering
-        \includegraphics[width=0.25\textwidth]{rublogo.png}\par
-        {\scshape\huge\bfseries Semantic Representations in Variational Autoencoders as a Model of the Visual System \par}
-        {\scshape\large Schriftliche Prüfungsarbeit für die Master-Prüfung des Studiengangs Angewandte Informatik an der Ruhr-Universität Bochum\par}
-        \vspace{1em}
-        vorgelegt von\par
-        \vspace{2em}
-        Leonard Papenmeier\par 108017257755\par
-        \vspace{2em}
-        01.01.1980\par
+\begin{titlepage}
+\centering
+\includegraphics[width=0.25\textwidth]{rublogo.png}\par
+{\scshape\huge\bfseries Semantic Representations in Variational Autoencoders as a Model of the Visual System \par}
+{\scshape\large Schriftliche Prüfungsarbeit für die Master-Prüfung des Studiengangs Angewandte Informatik an der Ruhr-Universität Bochum\par}
+\vspace{1em}
+vorgelegt von\par
+\vspace{2em}
+Leonard Papenmeier\par 108017257755\par
+\vspace{2em}
+01.01.1980\par
 
-        \vfill
-        Prof. Dr. Laurenz Wiskott\par
-        M.Sc. Zahra Fayyaz
+\vfill
+Prof. Dr. Laurenz Wiskott\par
+M.Sc. Zahra Fayyaz
 
 
-    \end{titlepage}
-    \pagenumbering{Roman}
-    \tableofcontents
-    \newpage
+\end{titlepage}
+\pagenumbering{Roman}
+\tableofcontents
+\newpage
     \setcounter{savepage}{\arabic{page}}
     \pagenumbering{arabic}
 
@@ -65,222 +87,15 @@
 
 
     \section{Methods}\label{sec:methods}
-    \input{methods}
+\input{methods}
 
 
-    \section{Results}\label{sec:results}
+\section{Results}\label{sec:results}
+\input{results}
 
-    \subsection{Visual Features in Variational Autoencoders}\label{subsec:results_visual_features_in_variational_autoencoders}
-    The following sections describe the results of the experiments on visual features in variational autoencoders.
+\section{Discussion}\label{sec:discussion}
 
-    \begin{itemize}
-        \item Results non-AlexNet-like-VAE on CelebA: especially layer 1 kernels
-        \item Results AlexNet-like-VAE on ImageNet: especially layer 1 kernels
-        \item Results AlexNet-like image classification CNN on ImageNet: especially layer 1 kernels
-        \item Results AlexNet-like-VAE with frozen decoder from classification network
-    \end{itemize}
-
-    \subsubsection{AlexNet Image Classification}
-    To make sure that the network structure of the \ac{VAE} is apt to generate Gabor wavelets, image classification was performed on ImageNet (see Figure~\ref{fig:alexnet} and Section~\ref{subsec:visual-features-variational-autoencoders} for the used network, see Section~\ref{ssec:imagenet} for ImageNet).
-    As the accuracy was not of primary concern, the training was stopped during the tenth epoch (\textbf{If time: train all 100 epochs}), the top-1 training accuracy at this time was at 0.85.
-
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.9\textwidth]{images/alexnet_classification_l1_kernels.png}
-        \caption[Image classification - Layer 1 Kernels]{Convolutional Kernels in the first layer of the image classification network. The filters are shown in their original size (11x11).}
-        \label{fig:classification_layer1_kernels}
-    \end{figure}
-
-    Figure~\ref{fig:classification_layer1_kernels} shows all 256 convolutional kernels of the image classification network.
-    It is easy to see that in many kernels, Gabor wavelet-like filters emerge.
-
-    \subsection{Independence of VLAE Embeddings}\label{subsec:independence-of-vlae-embeddings}
-
-    \begin{figure}[t]
-        \centering
-        \begin{subfigure}{0.3\textwidth}
-            \centering
-            \includegraphics[width=\textwidth]{images/vlae_plots1.png}
-            \caption{Exploring $z_1$}
-            \label{subfig:vlae_plots1}
-        \end{subfigure}
-        \hfill
-        \begin{subfigure}{0.3\textwidth}
-            \centering
-            \includegraphics[width=\textwidth]{images/vlae_plots2.png}
-            \caption{Exploring $z_{2}$}
-            \label{subfig:vlae_plots2}
-        \end{subfigure}
-        \hfill
-        \begin{subfigure}{0.3\textwidth}
-            \centering
-            \includegraphics[width=\textwidth]{images/vlae_plots3.png}
-            \caption{Exploring $z_3$}
-            \label{subfig:vlae_plots3}
-        \end{subfigure}
-        \caption{Reconstructions of the VLAE model when systematically exploring one latent space and randomly choosing the other two latent spaces. The space explored systematically is sampled from -3 SD to 3 SD in both dimensions, the other values are chosen by drawing from an uniform distribution over $[-1; 1]$. Created analogously to \citet[Figure 5]{zhao2017learning}.}
-        \label{fig:vlae_plots}
-    \end{figure}
-    The VLAE learns embeddings on different levels.
-    For MNIST, \citet{zhao2017learning} used three two-dimensional layers to learn image semantics of different granularity.
-    They claim that their model is able to learn disentangled hierarchical features.
-    Figure~\ref{fig:vlae_plots} shows reconstructions of this model when systematically exploring one dimensions and randomly choosing the others.
-    Apparently, the model is able to learn disentangled representations to some extent.
-
-    For example, $z_1$ seems to mainly encode the digit orientation, $z_2$ seems to primarily encode digit width, whereas $z_3$ seems to encode digit identity.
-    However, it is not obvious how disentangled the representations actually are.
-    \begin{algorithm}
-        \caption{Generating Layer Representative Samples by Averaging Out Other Embedding Layers}\label{alg:layer_representative_samples}
-        \begin{algorithmic}[1]
-            \Function{LayerRepresentativeSamples}{numSamples,numApproximations}
-            \State $j \gets 0$
-            \State $\mathcal{L}\gets \varnothing$
-            \While{$i < \text{numSamples}$}
-            \State $\bm{v} \gets \bm{v} \sim \mathcal{N}(\bm{0}, \bm{I})$\label{line:fixing_v}
-            \ForAll{$j \in \{1,2,3\}$}
-            \State $\bm{s}_j \gets$ \Call{LayerRepresentativeSample}{$\bm{v}$, numApproximations, $j$}
-            \EndFor
-            \State $\mathcal{L} \gets \mathcal{L} \cup \{\{\bm{s}_1, \bm{s}_2, \bm{s}_3\}\}$
-
-            \EndWhile
-            \State \Return $\mathcal{L}$
-            \EndFunction
-
-            \Function{LayerRepresentativeSample}{fixedDimensionValue, numApproximations, dimensionIndex}
-            \State $\mathcal{D} \gets \{1,2,3\}$
-            \State $\alpha \gets \text{fixedDimensionValue}$
-            \State $\beta \gets (D \setminus \text{dimensionIndex})_1$
-            \State $\gamma \gets (D \setminus \text{dimensionIndex})_2$
-            \State $\bm{z}_{\alpha} \gets \bm{a} \sim \mathcal{N}(\bm{0}, \bm{I})$
-            \State $\mathcal{L}\gets \varnothing$
-            \State $i \gets 0$
-            \While{$i < \text{numApproximations}$}
-            \State $\bm{z}_{\beta}^i \gets \bm{b}_i \sim \mathcal{N}(\bm{0}, \bm{I})$
-            \State $\bm{z}_{\gamma}^i \gets \bm{c}_i \sim \mathcal{N}(\bm{0}, \bm{I})$
-            \State $\mathcal{L} \gets \mathcal{L} \cup \{$ \Call{VLAE-Decoder}{$\bm{z}_{\alpha}, \bm{z}_{\beta}^j, \bm{z}_{\gamma}^j$} $\}$
-            \State $i \gets i + 1$
-            \EndWhile
-            \State \Return $\frac{1}{|\mathcal{L}|}\sum_j \mathcal{L}_j$
-            \EndFunction
-        \end{algorithmic}
-    \end{algorithm}
-
-    Consider Algorithm~\ref{alg:layer_representative_samples}.
-    Calling the function \textsc{LayerRepresentativeSamples} returns an ordered set $\mathcal{L}$ of \say{layer representative samples}.
-    Each sample $i$ contains three items, say $\bm{x}_1^i, \bm{x}_2^i, \bm{x}_3^i$ that were created by fixing a value $\bm{v}$ in Line \ref{line:fixing_v} of Algorithm \ref{alg:layer_representative_samples}.
-    What is meant by the term \say{layer representative samples} is that for example $\bm{x}_1^i$ is approximately drawn from the marginal distribution
-    \begin{align}
-        \bm{x}_1^i \sim p_\theta(\bm{v} | \bm{z}_1) = \int_{\bm{z}_2} \int_{\bm{z}_3} p_\theta(\bm{v} | \bm{z}_1, \bm{z}_2, \bm{z}_3)
-    \end{align}
-    \textbf{CONTINUE}
-
-    \subsection{Activity Correlation in \acp{VAE}}\label{subsec:results_activity-correlation-in-vaes}
-
-    \subsection{Feature Map Stripes}\label{subsec:feature-map-stripes}
-
-    \begin{figure}
-        \centering
-        \begin{subfigure}{0.3\textwidth}
-            \centering
-            \includegraphics[width=\textwidth]{images/stripes/original.jpg}
-            \caption{The original image.}
-            \label{subfig:stripes_original}
-        \end{subfigure}
-        \hfill
-        \begin{subfigure}{0.3\textwidth}
-            \centering
-            \includegraphics[width=\textwidth]{images/stripes/leaky_re_lu_5.png}
-            \caption{The feature maps after LeakyReLU 5}
-            \label{subfig:lakyrelu5}
-        \end{subfigure}
-        \hfill
-        \begin{subfigure}{0.3\textwidth}
-            \centering
-            \includegraphics[width=\textwidth]{images/stripes/max_pooling2d_3.png}
-            \caption{The feature maps after max pooling of LeakyReLU 5}
-            \label{subfig:maxpool}
-        \end{subfigure}
-        \caption{The original image and the feature maps after passing the image through the network until after the specified layer. The stripe artifacts can be observed in many feature maps in Subfigure~\ref{subfig:lakyrelu5}. They vanish after max-pooling (Subfigure~\ref{subfig:maxpool}).}
-        \label{fig:stripes}
-    \end{figure}
-
-
-    One observation being made during the analysis of the networks was the emergence of striped artifacts in the networks feature maps (Figure~\ref{fig:stripes}).
-    These stripes were observed in the Vanilla VAE, AlexNetVAE, as well as the AlexNet Classifier and might be also present in other networks (\textbf{CHECK THIS}).
-    Apparently, the stripes are either always horizontal or vertical for one network type.
-    If they are vertical, they can appear on the left or the right side of the same network.
-    If they are horizontal, they appear either on the top or on the bottom of the same network.
-    The exact reason why the networks show this behavior was not found, however some insights were won.
-
-    \paragraph{Padding}
-    The stripes occur due to the zero-padding in the network and the resulting contrast observed by the convolutional filters.
-    Take Figure~\ref{fig:stripes}.
-    Here, the stripes appear strongest on the bottom left of the image.
-    Noteworthy, the stripes indicate less active regions in the feature map: The feature map has an activity of around zero everywhere except for the location of the stripes.
-    Here, the activity is strongly negative.
-
-    A comparison with the original image (Figure~\ref{subfig:stripes_original}) shows that for the left side of the image, the contrast is highest on the bottom if the image is zero-padded\footnote{Zero-padding can be understood as adding black pixels around the image.}.
-    Importantly, the contrast is as high on the bottom of the image, the right side, and the right side of the top of the image.
-    However, for this network, the stripes seem to occur for a sharp shift of black on the left to white on the right.
-
-    \begin{figure}
-        \centering
-        \foreach \n in {0,...,11}{
-            \begin{subfigure}{0.05\textwidth}
-                \frame{\includegraphics[width=\textwidth]{images/stripes/test_images/original\n.jpg}}
-                \caption{}
-                \label{subfig:test_images_stripes\n}
-            \end{subfigure}
-            \hfill
-        }
-        \caption{The test images used to analyze the networks behavior.}
-        \label{fig:test_images_stripes}
-    \end{figure}
-
-    To better understand the behavior, the network was applied to a set of artifical test images (Figure~\ref{fig:test_images_stripes}).
-    All different feature maps with respect to each image can be found in the appendix.
-
-    \begin{figure}
-        \centering
-        \begin{subfigure}{0.45\textwidth}
-            \centering
-            \includegraphics[width=\textwidth]{images/stripes/test_img_9/leaky_re_lu_5.png}
-            \caption{The original image.}
-            \label{subfig:stipes_test_img_leakyrelu5}
-        \end{subfigure}
-        \hfill
-        \begin{subfigure}{0.45\textwidth}
-            \centering
-            \includegraphics[width=\textwidth]{images/stripes/test_img_9/max_pooling2d_3.png}
-            \caption{The feature maps after LeakyReLU 5}
-            \label{subfig:stripes_test_img_maxpool3}
-        \end{subfigure}
-        \caption{The feature maps with respect to test image~\ref{subfig:test_images_stripes8}.}
-        \label{fig:stripes_test_img}
-    \end{figure}
-
-    Subfigure~\ref{subfig:test_images_stripes8} and~\ref{subfig:test_images_stripes11} turned to be most equally high insightful.
-    Figure~\ref{fig:stripes_test_img} shows the feature map after the last LeakyReLU (LeakyReLU 5) activation of the network given this input image (Subfigure~\ref{subfig:stipes_test_img_leakyrelu5}) as well as the feature map after max-pooling of this feature map (Subfigure~\ref{subfig:stripes_test_img_maxpool3}).
-    Multiple things can be observed in Subfigure~\ref{subfig:stipes_test_img_leakyrelu5}.
-    Firstly, the feature map in the first column of the fifth row resembles the input stimulus itself.
-    The fact that this feature map shows most of the activity (especially after max-pooling, see Subfigure~\ref{subfig:stripes_test_img_maxpool3}) has been observed for natural images as well, however not the resemblance of the input stimulus.
-    Except for this feature map, stripes emerge either on the bottom of the left side or the bottom of the right side of the feature map.
-    For the bottom of the left side, this is where the sharp black-white contrast is.
-    The bottom of the right side is more complicated.
-    Here the test image was black and the \say{contrast} is a black-black contrast - or no contrast at all.
-    However, this is only true for the first feature map\footnote{The first feature maps are not shown here.}.
-    The following feature maps, again, are zero-padded.
-    However, due to the bias term in the convolutions, these might be non-zero in the bottom-right and top-left square of the image, thus leading to a contrast.
-    This explains why the network can be sensitive towards these black-black contrasts in the input image.
-
-    Noteworthy, if the bias term in the convolutions is removed, the black-black contrast sensitivity vanishes because the network is not able anymore to add a constant to the black pixel values on the bottom-right or top-left of the image.
-    For this purpose, the batch normalization has to be removed too since it uses a bias term as well.
-    This, however, does not qualitatively change the networks behavior on real images.
-
-
-    \section{Discussion}\label{sec:discussion}
-
-    \subsection{Feedback Connections of the \acl{LGN}}\label{subsec:feedback-connections-of-the-lateral-geniculate-nucleus}
+\subsection{Feedback Connections of the \acl{LGN}}\label{subsec:feedback-connections-of-the-lateral-geniculate-nucleus}
 
     As discussed in Section~\ref{subsubsec:visual-cortex}, the \ac{LGN} receives strong feedback connections from the \ac{V1}.
     Consider the \ac{LVAE}-model in Section~\ref{subsubsec:representation_learning} and the discussion concerning the top-down pass.
@@ -290,6 +105,7 @@
     Maybe the feedback connections fulfil this very function, i.e.\ allowing visual regions operating on a lower semantic level to incorporate the high-level context to disambiguate the lower-level representations.
 
     \subsection{Criticism on \citet{zhao2017learning}}
+
     \citet{zhao2017learning} compared their model to a HVAE and showed the difference on a plot.
     However, the plots are not really comparable.
     \textbf{CONTINUE}
@@ -301,40 +117,54 @@
         \item How does it come that supervised models seem to be a good representation of \ac{IT} cortical representation~\citep{khaligh2014deep}? Maybe the brain learns in a \say{supervised} manner in the sense that if you have never seen a horse, you need someone to tell you that that is a horse in order to make sense out of it.
         However, you might, at least, be able to recognize that it is an animal.
         Also, if someone tells you \say{This is a horse.}, you'll be able to recognize horses from different orientations and in different body positions without further training.
-        This is quite different from how \acp{CNN} capture animals and is a strong hint to that supervised \acp{CNN} alone a no sufficient model for cortical IT representations.
-    \end{itemize}
+This is quite different from how \acp{CNN} capture animals and is a strong hint to that supervised \acp{CNN} alone a no sufficient model for cortical IT representations.
+\end{itemize}
 
 
-    \section{Conclusion}\label{sec:conclusion}
+\section{Conclusion}\label{sec:conclusion}
 
-    \newpage
-    \printbibliography
+\newpage
+\printbibliography
 
-    \newpage
-    \pagenumbering{Roman}
-    \setcounter{page}{\thesavepage}
-    \section*{Acronyms}
-    \begin{acronym}[TDMA]
-        \acro{VAE}{Variational Autoencoder}
-        \acrodefplural{VAE}{Variational Autoencoders}
-        \acro{CNN}{Convolutional Neural Network}
-        \acrodefplural{CNN}{Convolutional Neural Networks}
-        \acro{IT}{Inferior Temporal Cortex}
-        \acro{ReLU}{Rectified Linear Unit}
-        \acro{LeakyReLU}{Leaky Rectified Linear Unit}
-        \acro{ILSVRC2017}{Large Scale Visual Recognition Challenge 2017}
-        \acro{MSE}{Mean Squared Error}
-        \acro{KL-divergence}{Kullback-Leibler divergence}
+\newpage
+\appendix
+\section{Additional Plots for Section~\ref{subsec:independence-of-vlae-embeddings}}\label{sec:additional-plots-for-section_independence}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/appendix_plots/notprop_1_3.png}
+\caption{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_3=\varphi$. Created accordingly to Figure~\ref{fig:notprop}.}
+\label{fig:notprop_1_3}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/appendix_plots/notprop_2_3.png}
+\caption{Proportionality of pixel intensities when fixing $\bm{z}_2 = \bm{z}_3=\varphi$. Created accordingly to Figure~\ref{fig:notprop}.}
+\label{fig:notprop_2_3}
+\end{figure}
+
+
+\newpage
+\pagenumbering{Roman}
+\setcounter{page}{\thesavepage}
+\section*{Acronyms}
+\begin{acronym}[TDMA]
+\acro{VAE}{Variational Autoencoder}
+\acro{CNN}{Convolutional Neural Network}
+\acro{IT}{Inferior Temporal Cortex}
+\acro{ReLU}{Rectified Linear Unit}
+\acro{LeakyReLU}{Leaky Rectified Linear Unit}
+\acro{ILSVRC2017}{Large Scale Visual Recognition Challenge 2017}
+\acro{MSE}{Mean Squared Error}
+\acro{KL-divergence}{Kullback-Leibler divergence}
         \acro{ELBO}{Evidence Lower Bound}
         \acro{PDF}{Probability Density Function}
-        \acro{MSE}{Mean Squared Error}
         \acro{GAN}{Generative Adversarial Network}
         \acro{VLAE}{Variational Ladder Autoencoder}
         \acro{LVAE}{Ladder Variational Autoencoder}
         \acro{CNS}{Central Nervous System}
         \acro{V1}{Primary Visual Cortex}
         \acro{LGN}{Lateral Geniculate Nucleus}
-        \acro{IT}{Inferior Temporal Cortex}
         \acro{TEO}{Temporo-Occipital Area}
     \end{acronym}
     \newpage
