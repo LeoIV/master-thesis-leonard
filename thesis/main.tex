@@ -16,12 +16,15 @@
 \usepackage{pgffor}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
-% bold math symbols
+\usepackage{booktabs}
+\usepackage{listings}
 \usepackage{bm}
 \usepackage{amssymb}
 \addbibresource{literature.bib}
 \renewcommand{\baselinestretch}{1.5}
 \newcounter{savepage}
+
+\lstset{lineskip=-0.7ex,frame=single}
 
 \DeclarePairedDelimiterX{\infdivx}[2]{(}{)}{%
     #1\;\delimsize\|\;#2%
@@ -81,28 +84,33 @@ M.Sc. Zahra Fayyaz
 
     \section{Introduction}\label{sec:introduction}
 
+    \textbf{tbd}
+
 
     \section{Theoretical Background}\label{sec:theoretical-background}
-    \include{background}
+    \input{background}
 
 
     \section{Methods}\label{sec:methods}
-\input{methods}
+    \input{methods}
 
 
-\section{Results}\label{sec:results}
-\input{results}
+    \section{Results}\label{sec:results}
+    \input{results}
 
-\section{Discussion}\label{sec:discussion}
+    \section{Discussion}\label{sec:discussion}
+
+    \subsection{Disentangled Representations of VLAE}
+    \textbf{Discuss the result from section \ref{subsec:morpho-mnist-on-vlae}. For example, digit identity is encoded in} $\bm{z}_2$ and $\bm{z}_3$ \textbf{. That is another indicator to why VLAE does not learn fully independent representation (Ref \ref{subsec:independence-of-vlae-embeddings})}
 
 \subsection{Feedback Connections of the \acl{LGN}}\label{subsec:feedback-connections-of-the-lateral-geniculate-nucleus}
 
-    As discussed in Section~\ref{subsubsec:visual-cortex}, the \ac{LGN} receives strong feedback connections from the \ac{V1}.
-    Consider the \ac{LVAE}-model in Section~\ref{subsubsec:representation_learning} and the discussion concerning the top-down pass.
-    It is stated that, compared to the Vanilla VAE, the \ac{LVAE} model is more biologically plausible because top-down connections resemble the feedback connections in the ventral and primary visual pathway.
-    \citet{sonderby2016ladder} claim that the top-down pass helps improving the low-level feature representation because it enables the model to incorporate the higher-level context.
+As discussed in Section~\ref{subsubsec:visual-cortex}, the \ac{LGN} receives strong feedback connections from the \ac{V1}.
+Consider the \ac{LVAE}-model in Section~\ref{subsubsec:representation_learning} and the discussion concerning the top-down pass.
+It is stated that, compared to the Vanilla VAE, the \ac{LVAE} model is more biologically plausible because top-down connections resemble the feedback connections in the ventral and primary visual pathway.
+\citet{sonderby2016ladder} claim that the top-down pass helps improving the low-level feature representation because it enables the model to incorporate the higher-level context.
 
-    Maybe the feedback connections fulfil this very function, i.e.\ allowing visual regions operating on a lower semantic level to incorporate the high-level context to disambiguate the lower-level representations.
+Maybe the feedback connections fulfil this very function, i.e.\ allowing visual regions operating on a lower semantic level to incorporate the high-level context to disambiguate the lower-level representations.
 
     \subsection{Criticism on \citet{zhao2017learning}}
 
@@ -115,11 +123,14 @@ M.Sc. Zahra Fayyaz
         \item Reconstructions of AlexNet-VAE don't look natural at all, this might be because ImageNet, unlike CelebA, is not properly aligned and contains images from a large variety of classes.
         This might be another hint towards the assumption that \acp{VAE} are no suitable model for semantic representations
         \item How does it come that supervised models seem to be a good representation of \ac{IT} cortical representation~\citep{khaligh2014deep}? Maybe the brain learns in a \say{supervised} manner in the sense that if you have never seen a horse, you need someone to tell you that that is a horse in order to make sense out of it.
-        However, you might, at least, be able to recognize that it is an animal.
-        Also, if someone tells you \say{This is a horse.}, you'll be able to recognize horses from different orientations and in different body positions without further training.
+However, you might, at least, be able to recognize that it is an animal.
+Also, if someone tells you \say{This is a horse.}, you'll be able to recognize horses from different orientations and in different body positions without further training.
 This is quite different from how \acp{CNN} capture animals and is a strong hint to that supervised \acp{CNN} alone a no sufficient model for cortical IT representations.
 \end{itemize}
 
+\subsection{MNIST vs. VAE and VLAE Embeddings}
+
+\textbf{Discuss in how far the models are comparable because they have different architectures.}
 
 \section{Conclusion}\label{sec:conclusion}
 
@@ -142,6 +153,56 @@ This is quite different from how \acp{CNN} capture animals and is a strong hint 
 \caption{Proportionality of pixel intensities when fixing $\bm{z}_2 = \bm{z}_3=\varphi$. Created accordingly to Figure~\ref{fig:notprop}.}
 \label{fig:notprop_2_3}
 \end{figure}
+
+\section{Additional Plots for Section~\ref{subsec:morpho-mnist-on-vlae}}\label{sec:additional-plots-for-section_morpho_mnist}
+\foreach \i in {1,...,3}{
+\begin{figure}[H]
+\centering
+\foreach \j in {0,...,6}{
+\begin{subfigure}{0.3\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/vlae_embeddings/embeddings_mu_\i_\j.png}
+\end{subfigure}
+\hfill
+}
+\end{figure}
+}
+\pagebreak
+
+\section{Discriminator Network used in Section \ref{subsec:vae-generated-samples-vs-true-samples}}\label{sec:listing_discriminator_network}
+\begin{lstlisting}[caption={The discriminator network used to distinguish generated \ac{VAE}/\ac{VLAE} samples from true \textsc{MNIST} images.},captionpos=b]
+_________________________________________________________________
+Layer (type)                 Output Shape Param #
+=================================================================
+input_2 (InputLayer)         (None, 28, 28, 1)         0
+_________________________________________________________________
+conv2d_4 (Conv2D)            (None, 24, 24, 20)        520
+_________________________________________________________________
+leaky_re_lu_4 (LeakyReLU)    (None, 24, 24, 20)        0
+_________________________________________________________________
+batch_normalization_23 (Batc (None, 24, 24, 20)        80
+_________________________________________________________________
+conv2d_5 (Conv2D)            (None, 22, 22, 20)        3620
+_________________________________________________________________
+leaky_re_lu_5 (LeakyReLU)    (None, 22, 22, 20)        0
+_________________________________________________________________
+batch_normalization_24 (Batc (None, 22, 22, 20)        80
+_________________________________________________________________
+flatten_5 (Flatten)          (None, 9680)              0
+_________________________________________________________________
+dense_15 (Dense)             (None, 100)               968100
+_________________________________________________________________
+leaky_re_lu_6 (LeakyReLU)    (None, 100)               0
+_________________________________________________________________
+batch_normalization_25 (Batc (None, 100)               400
+_________________________________________________________________
+dense_16 (Dense)             (None, 1)                 101
+=================================================================
+Total params: 972,901
+Trainable params: 972,621
+Non-trainable params: 280
+_________________________________________________________________
+\end{lstlisting}
 
 
 \newpage
@@ -166,13 +227,13 @@ This is quite different from how \acp{CNN} capture animals and is a strong hint 
         \acro{V1}{Primary Visual Cortex}
         \acro{LGN}{Lateral Geniculate Nucleus}
         \acro{TEO}{Temporo-Occipital Area}
-    \end{acronym}
-    \newpage
-    \listoffigures
-    \newpage
-    \listoftables
-    \newpage
-    \include{erklaerung}
+\end{acronym}
+\newpage
+\listoffigures
+\newpage
+\listoftables
+\newpage
+\input{erklaerung}
 
 
 \end{document}
