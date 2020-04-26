@@ -302,6 +302,11 @@ $\bm{c}_2$ and $\bm{c}_3$ are drawn from a uniform distribution over $[-1, 1]$.
 Figure~\ref{fig:infogan} shows the representation disentaglement by varying the $\bm{c}_i$-values.
 Noteworthy, InfoGAN seems to generalize as $\bm{c}_2$ and $\bm{c}_3$ varied between $[-2, 2]$ whereas these values took values in $[-1, 1]$ at training time.
 
+\paragraph{StyleGAN}
+\begin{itemize}
+    \item \citet{karras2019style} is a GAN approach addressing feature disentanglement in the Generator
+\end{itemize}
+
 \paragraph{\acl{LVAE}}
 
 \aclp{LVAE}~\citep{sonderby2016ladder} address the problem of hierarchical learning in \acp{VAE}.
@@ -327,6 +332,7 @@ Incorporating high-level features like \textit{alphabetic string} helps to impro
 Furthermore, the additional top-down pass is more biologically plausible compared to a pure feedforward network (\textbf{REFERENCE}).
 
 In fact, \acp{LVAE} model this top down pass by \textbf{BY WHAT? CONTINUE}
+\textbf{DRAFT!}
 \begin{itemize}
     \item Explain LVAE detailed
     \item Dont forget the warm-up phase
@@ -335,19 +341,46 @@ In fact, \acp{LVAE} model this top down pass by \textbf{BY WHAT? CONTINUE}
 
 \paragraph{\acl{VLAE}}
 
+\paragraph{Adversarial Latent Autoencoder}
+\textbf{DRAFT!}
+\citet{pidhorskyi2020adversarial} describe a model combining \acp{VAE} and \acp{GAN} that particularly addresses feature disentanglement.
+They combine \acp{VAE} and StyleGAN~\citep{karras2019style}.
+In particular, they do not use a pixel-wise loss.
+By splitting up both, the Generator and the Discriminator into two networks, they map the latent distribution $\bm{z}$ into another latent distribution $\bm{w}$.
+By introducing noise, they are able to traverse the $\bm{w}$-space, however I am not sure what form this space has.
+Using this architecture, they are able to use an $l^2$ loss on the latent space, mitigating the problem of the pixelwise loss on the reconstructions.
+Forcing reconstruction to map the data distribution is done by using the discriminator.
+
+There are some open questions w.r.t. this paper:
+\begin{itemize}
+    \item Is this approach biologically plausible? It seems as if encoder and decoder are feedforward as opposed to \ac{VLAE} and \ac{LVAE}.
+    \item How exactly are samples generated. The interpolation between numbers is clear but how do you sample from $\bm{w}$-space?
+\end{itemize}
+
 \paragraph{Other stuff}
+\textbf{DRAFT!}
 \begin{itemize}
     \item \citet{tschannen2018recent} give an overview over \say{recent advances in autoencoder-based representation learning}
+    \item Discuss VAEs on sequences of images.
+    \item Check \citet{pidhorskyi2020adversarial} for more related work.
 \end{itemize}
 
 \subsection{Visual Features in Neural Networks}\label{subsec:visual_features_in_neural_networks}
+\textbf{DRAFT!}
 \begin{itemize}
     \item~\citet{krizhevsky2012imagenet} report Gabor wavelets in \acp{CNN} trained on image classification
     \item~\citet{palm2012prediction} found Gabor wavelets in vanilla autoencoders, trained on predicting the next image in a sequence, \citet{walker2016uncertain} did something similar for VAEs
     \item~\citet{eickenberg2017seeing} and \citet{wen2018neural} compare response of certain brain areas with layers in CNNs (also many more, a good list is in \citet{wen2018neural})
 \end{itemize}
 
+\subsection{Feature Disentanglement}
+\textbf{DRAFT!}
+\begin{itemize}
+    \item \citet{karras2019style} describe two means to measure feature entanglement: \textit{Perceptual Path Length} and \textit{Linear Separability}
+\end{itemize}
+
 \subsection{Semantic Representations}\label{subsec:semantic-representations}
+\textbf{DRAFT!}
 
 \subsubsection{Supervised Models}
 \begin{itemize}
@@ -356,6 +389,7 @@ In fact, \acp{LVAE} model this top down pass by \textbf{BY WHAT? CONTINUE}
 \end{itemize}
 
 \subsubsection{Unsupervised Models}
+\textbf{DRAFT!}
 \begin{itemize}
     \item \citet{han2019variational} found no evidence for or against Gabor wavelets in \acp{VAE} due to too small kernel size, however they were able to predict fmri activity from the latent representation in a VAE
     \item \citet{khaligh2014deep} found evidence against the assumption that unsupervised models might explain \ac{IT} cortical representation, however not explicitly for \acp{VAE}

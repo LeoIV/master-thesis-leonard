@@ -104,7 +104,7 @@ M.Sc. Zahra Fayyaz
     \textbf{Discuss the result from section \ref{subsec:morpho-mnist-on-vlae}. For example, digit identity is encoded in} $\bm{z}_2$ and $\bm{z}_3$ \textbf{. That is another indicator to why VLAE does not learn fully independent representation (Ref \ref{subsec:independence-of-vlae-embeddings})}
 
 \subsection{Feedback Connections of the \acl{LGN}}\label{subsec:feedback-connections-of-the-lateral-geniculate-nucleus}
-
+\textbf{DRAFT!}
 As discussed in Section~\ref{subsubsec:visual-cortex}, the \ac{LGN} receives strong feedback connections from the \ac{V1}.
 Consider the \ac{LVAE}-model in Section~\ref{subsubsec:representation_learning} and the discussion concerning the top-down pass.
 It is stated that, compared to the Vanilla VAE, the \ac{LVAE} model is more biologically plausible because top-down connections resemble the feedback connections in the ventral and primary visual pathway.
@@ -112,25 +112,42 @@ It is stated that, compared to the Vanilla VAE, the \ac{LVAE} model is more biol
 
 Maybe the feedback connections fulfil this very function, i.e.\ allowing visual regions operating on a lower semantic level to incorporate the high-level context to disambiguate the lower-level representations.
 
-    \subsection{Criticism on \citet{zhao2017learning}}
+\subsection{Criticism on \citet{zhao2017learning}}
+\textbf{DRAFT!}
+\citet{zhao2017learning} compared their model to a HVAE and showed the difference on a plot.
+However, the plots are not really comparable.
 
-    \citet{zhao2017learning} compared their model to a HVAE and showed the difference on a plot.
-    However, the plots are not really comparable.
-    \textbf{CONTINUE}
 
-    \subsection{Visual Features in Variational Autoencoders}\label{subsec:discussion_visual_features_in_variational_autoencoders}
-    \begin{itemize}
-        \item Reconstructions of AlexNet-VAE don't look natural at all, this might be because ImageNet, unlike CelebA, is not properly aligned and contains images from a large variety of classes.
-        This might be another hint towards the assumption that \acp{VAE} are no suitable model for semantic representations
-        \item How does it come that supervised models seem to be a good representation of \ac{IT} cortical representation~\citep{khaligh2014deep}? Maybe the brain learns in a \say{supervised} manner in the sense that if you have never seen a horse, you need someone to tell you that that is a horse in order to make sense out of it.
+\subsection{Visual Features in Variational Autoencoders}\label{subsec:discussion_visual_features_in_variational_autoencoders}
+\textbf{DRAFT!}
+\begin{itemize}
+\item Reconstructions of AlexNet-VAE don't look natural at all, this might be because ImageNet, unlike CelebA, is not properly aligned and contains images from a large variety of classes.
+This might be another hint towards the assumption that \acp{VAE} are no suitable model for semantic representations
+\item How does it come that supervised models seem to be a good representation of \ac{IT} cortical representation~\citep{khaligh2014deep}? Maybe the brain learns in a \say{supervised} manner in the sense that if you have never seen a horse, you need someone to tell you that that is a horse in order to make sense out of it.
 However, you might, at least, be able to recognize that it is an animal.
 Also, if someone tells you \say{This is a horse.}, you'll be able to recognize horses from different orientations and in different body positions without further training.
 This is quite different from how \acp{CNN} capture animals and is a strong hint to that supervised \acp{CNN} alone a no sufficient model for cortical IT representations.
 \end{itemize}
 
 \subsection{MNIST vs. VAE and VLAE Embeddings}
-
+\textbf{DRAFT!}
 \textbf{Discuss in how far the models are comparable because they have different architectures.}
+
+\subsection{Comparison to \ac{IT}}
+\textbf{DRAFT!}
+Talk about how to compare network activites to IT activities.
+
+\subsection{Sequences of Images}
+\textbf{DRAFT!}
+The brain operates on sequences of images.
+Discuss in how far the models discussed in this thesis could profit from using sequences as opposed to static images.
+
+\subsection{\citet{pidhorskyi2020adversarial} (Adversarial Latent Autoencoders)}
+\textbf{DRAFT!}
+It would be interesting to see how \citet{pidhorskyi2020adversarial} performs on more natural dataset such as ImageNet.
+For this paper, it seems to remain unclear how new samples are generated.
+By looking into the code it seems as if they are sampling from a factorized Gaussian but this does not really make sense as the $\bm{w}$ space is unrestricted.
+This would be a major problem for us as the borders of the semantic representations would remain undefined.
 
 \section{Conclusion}\label{sec:conclusion}
 
