@@ -20,6 +20,8 @@
 \usepackage{listings}
 \usepackage{bm}
 \usepackage{amssymb}
+\usepackage{tikz}
+\usetikzlibrary{shapes,positioning,decorations.pathreplacing}
 \addbibresource{literature.bib}
 \renewcommand{\baselinestretch}{1.5}
 \newcounter{savepage}
@@ -142,12 +144,17 @@ Talk about how to compare network activites to IT activities.
 The brain operates on sequences of images.
 Discuss in how far the models discussed in this thesis could profit from using sequences as opposed to static images.
 
-\subsection{\citet{pidhorskyi2020adversarial} (Adversarial Latent Autoencoders)}
+\subsection{\acp{VAE} on natural images}
 \textbf{DRAFT!}
+For \acp{VAE}, the pixelwise loss seems to be the reason for blurry reconstructions.
+For more diverse datasets such as ImageNet, the VAE reconstructions look horrible.
+Here the reason might also be the pixelwise loss because for ImageNet, semantically close objects can be in very different corners of the image.
+
+In contrast, \citet{pidhorskyi2020adversarial} does not use pixelwise loss at all.
 It would be interesting to see how \citet{pidhorskyi2020adversarial} performs on more natural dataset such as ImageNet.
-For this paper, it seems to remain unclear how new samples are generated.
-By looking into the code it seems as if they are sampling from a factorized Gaussian but this does not really make sense as the $\bm{w}$ space is unrestricted.
-This would be a major problem for us as the borders of the semantic representations would remain undefined.
+This might be a further improvement of \acp{VAE}.
+
+Is an extension of \citet{pidhorskyi2020adversarial} in the sense of VLAE possible?
 
 \section{Conclusion}\label{sec:conclusion}
 
@@ -179,9 +186,12 @@ This would be a major problem for us as the borders of the semantic representati
 \begin{subfigure}{0.3\textwidth}
 \centering
 \includegraphics[width=\textwidth]{images/vlae_embeddings/embeddings_mu_\i_\j.png}
+\label{subfig:vlae_morpho_z\i_\j}
 \end{subfigure}
 \hfill
 }
+\caption{Embeddings on VLAE layer $\bm{z}_{\i}$ colored by means of MorphoMNIST}
+\label{fig:vlae_morpho_z\i}
 \end{figure}
 }
 \pagebreak
@@ -228,6 +238,7 @@ _________________________________________________________________
 \section*{Acronyms}
 \begin{acronym}[TDMA]
 \acro{AdaIN}{Adaptive Instance Normalization}
+\acro{ALAE}{Adversarial Latent Autoencoder}
 \acro{VAE}{Variational Autoencoder}
 \acro{CNN}{Convolutional Neural Network}
 \acro{IT}{Inferior Temporal Cortex}
@@ -236,8 +247,8 @@ _________________________________________________________________
 \acro{ILSVRC2017}{Large Scale Visual Recognition Challenge 2017}
 \acro{MSE}{Mean Squared Error}
 \acro{KL-divergence}{Kullback-Leibler divergence}
-        \acro{ELBO}{Evidence Lower Bound}
-        \acro{PDF}{Probability Density Function}
+\acro{ELBO}{Evidence Lower Bound}
+\acro{PDF}{Probability Density Function}
         \acro{GAN}{Generative Adversarial Network}
         \acro{VLAE}{Variational Ladder Autoencoder}
         \acro{LVAE}{Ladder Variational Autoencoder}

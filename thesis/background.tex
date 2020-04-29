@@ -110,12 +110,54 @@ They are no longer able to generalize from tasks learned in one half of the visu
 \citet[p. 1071]{squire2012fundamental} explicitly point out \say{the crucial role of the inferior temporal cortex during object perception and recognition}.
 
 \subsection{Types of Learning}\label{subsec:types-of-learning}
-\begin{itemize}
-    \item Supervised
-    \item Unsupervised
-    \item Self-Supervised
-    \item Reinforcement
-\end{itemize}
+
+In machine learning, one often distinguishes between the three fundamentally different types of learning that are roughly described in the following.
+
+\paragraph{Supervised Learning} An example for supervised learning is \textit{object detection} where one is interested in predicting what is present in an image or a sequence of images.
+Datasets for this type of learning usually consist of sets of images (or \textit{samples}) $\bm{x}_i$ and \textit{labels} $y_i$ where the label describes what is present in the image, e.g. \say{dog} or \say{cat}.
+Algorithms employing supervised learning learn to predict the label for images representative for the training set.
+
+In the former example, it was assumed that the complete dataset of samples and labels was present beforehand.
+However, there are setting where this is not the case.
+
+In \textit{active learning} the learning algorithm has no beforehand-dataset but has to query labels for self-chosen datapoints in the sample space.
+In this setting, the learning algorithm chooses itself what points to use for learning.
+An example for this setting are \textit{Gaussian Processes} \textbf{REF}.
+
+In the introductory example of this paragraph, the dataset was present beforehand.
+In such settings, the learning algorithm learns the mapping function and does not update it once the learning is finished.
+Contrary to this is \textit{online learning} where the mapping function is updated during the lifetime of a system.
+An example for this are recommender systems, e.g.~for streaming services.
+Users get recommendations while they are using the service but also provide new labels for the algorithm as they rate watched movies.
+
+\textit{Self-supervised learning} can be seen as a special case of supervised learning where the learning algorithm creates the labels itself.
+An example for this type of learning is the prediction of the next frame in a video \textbf{REF}.
+The dataset has no labels as in the introductory example of this paragraph.
+However, given a sequence $\bm{x}_{i,1},\bm{x}_{i,2},\dots,\bm{x}_{i,n}$ of images in a video, the sample at time $t$ can be considered as the supervised training set $((\bm{x}_{i,1},\bm{x}_{i,2},\dots,\bm{x}_{i,t}),\bm{x}_{i,t+1}), \quad 1\leq t\leq n-1$.
+Self-supervised learning can also be seen as a subtype of unsupervised learning, however algorithms employing this approach usually use classical supervised learning techniques.
+Another example for self-supervised learning are word embeddings \textbf{REF}.
+
+\paragraph{Unsupervised Learning}
+\begin{wrapfigure}[11]{r}{0.5\textwidth}
+    \centering
+    \includegraphics[width=.48\textwidth]{images/vlae_embeddings/embeddings_mu_3_6.png}
+    \caption{Clustering of hand-written digits in a latent space.}
+    \label{fig:clustering_example}
+\end{wrapfigure}
+Just like in self-supervised learning, unsupervised learning works with unlabeled data, i.e.~the dataset only consists of samples $\bm{x}_i$.
+A typical example for unsupervised learning is clustering, an approach that can be used if the datapoints can be compared in terms of a distance measure.
+Consider Figure~\ref{fig:clustering_example}.
+It shows hand-written digits from the \textsc{Mnist} dataset (see Section~\ref{subsubsec:mnist}) mapped into a latent space.
+The mapping is performed by a \ac{VLAE}, a model discussed in the later course of this thesis (see Section~\ref{subsubsec:representation_learning})
+The dots are colord by digit identity.
+In this case, the \ac{VLAE} learns a clustering of \textsc{Mnist} digits by digit identity.
+
+\paragraph{Reinforcement Learning}
+Reinforcement learning is a very different paradigm compared to supervised and unsupervised learning.
+Here, the aim to is train an \textit{agent} to show some meaningful behavior, e.g.~to play a computer game.
+Reinforcement learning algorithms achieve this by letting the agent explore the action space\footnote{In the case of a computer game, this would mean to carry out different moves.}.
+If the outcome of an action is good, the agent is getting rewarded.
+The agent, in turn, aims at maximizing its reward.
 
 \subsection{Generative Methods}\label{subsec:generative-methods}
 
@@ -262,6 +304,8 @@ The usage of neural networks poses a challenge for computing the first term in e
 Usually, one would draw a sufficient number of samples from $q_\phi(\bm{z}|\bm{x})$ to approximate the expectation.
 However, sampling is not possible if one wants to compute the gradient to train the model by backpropagation.
 
+\textbf{TODO: Posterior Collapse}
+
 \paragraph{Disadvantages}
 Another disadvantage of \acp{VAE} is that they \say{use only a small subset of the dimensions of $\bm{z}$}~\citep[p. 694]{Goodfellow-et-al-2016}.
 
@@ -271,6 +315,10 @@ Representation learning can be understood as \say{learning representations of th
 While this is a rather broad definition, this thesis focuses on \textit{hierarchical representations}, since this is what can be observed in the visual cortex (\textbf{QUELLE}).
 
 The following paragraphs introduce different (hierarchical) representation learning approaches relevant to the techniques used in the course of this thesis.
+
+\paragraph{The Latent Space}
+\citet{shao2018riemannian,arvanitidis2017latent} discuss if the latent space is a Riemann space.
+Elaborate on this and the consequences of this assumption in terms of latent space traversal and smoothness of the latent / semantic space.
 
 \paragraph{InfoGAN}
 InfoGANs~\cite{chen2016infogan} address feature learning in \acp{GAN} by \say{decomposing the input noise vector into two parts}~\citep{chen2016infogan}.
@@ -398,21 +446,84 @@ In fact, \acp{LVAE} model this top down pass by \textbf{BY WHAT? CONTINUE}
 
 \paragraph{\acl{VLAE}}
 
-\paragraph{Adversarial Latent Autoencoder}
-\textbf{DRAFT!}
-\citet{pidhorskyi2020adversarial} describe a model combining \acp{VAE} and \acp{GAN} that particularly addresses feature disentanglement.
-They combine \acp{VAE} and StyleGAN~\citep{karras2019style}.
-In particular, they do not use a pixel-wise loss.
-By splitting up both, the Generator and the Discriminator into two networks, they map the latent distribution $\bm{z}$ into another latent distribution $\bm{w}$.
-By introducing noise, they are able to traverse the $\bm{w}$-space, however I am not sure what form this space has.
-Using this architecture, they are able to use an $l^2$ loss on the latent space, mitigating the problem of the pixelwise loss on the reconstructions.
-Forcing reconstruction to map the data distribution is done by using the discriminator.
+\paragraph{$\beta$-VAE}
+\citet{higgins2017beta}
 
-There are some open questions w.r.t. this paper:
-\begin{itemize}
-    \item Is this approach biologically plausible? It seems as if encoder and decoder are feedforward as opposed to \ac{VLAE} and \ac{LVAE}.
-    \item How exactly are samples generated. The interpolation between numbers is clear but how do you sample from $\bm{w}$-space?
-\end{itemize}
+\paragraph{\ac{VAE}-\ac{GAN}}
+\citet{larsen2015autoencoding}
+
+\paragraph{Adversarial Latent Autoencoder}
+\begin{figure}
+    \begin{tikzpicture}
+        % Nodes
+        \node[draw,circle] (z) {$\bm{z}$};
+        \node[draw,rectangle,right=of z] (F) {$\mathcal{F}$};
+        \node[draw,circle,right=of F] (w) {$\bm{w}$};
+        \node[draw,rectangle,right=of w] (G) {$\mathcal{G}$};
+        \node[draw,circle,right=of G] (xt) {$\tilde{\bm{x}}$};
+        \node[draw,rectangle,right=of xt] (E1) {$\mathcal{E}$};
+        \node[draw,circle,right=of E1] (zt1) {$\tilde{\bm{z}}_1$};
+        \node[draw,rectangle,right=of zt1] (D1) {$\mathcal{D}$};
+        \node[right= of D1] (realfake1) {real / fake};
+        \node[below=of G] (eta) {$\eta$};
+
+        \node[draw,circle,below=of xt] (x) {$\bm{x}$};
+        \node[draw,rectangle,right=of x] (E2) {$\mathcal{E}$};
+        \node[draw,circle,right=of E2] (zt2) {$\tilde{\bm{z}}_2$};
+        \node[draw,rectangle,right=of zt2] (D2) {$\mathcal{D}$};
+        \node[right= of D2] (realfake2) {real / fake};
+        % Arrows
+        \draw[->] (z.east) -- (F.west);
+        \draw[->] (F.east) -- (w.west);
+        \draw[->] (w.east) -- (G.west);
+        \draw[->] (G.east) -- (xt.west);
+        \draw[->] (xt.east) -- (E1.west);
+        \draw[->] (E1.east) -- (zt1.west);
+        \draw[->] (zt1.east) -- (D1.west);
+        \draw[->] (D1.east) -- (realfake1.west);
+        \draw[->] (eta.north) -- (G.south);
+
+        \draw[->] (x.east) -- (E2.west);
+        \draw[->] (E2.east) -- (zt2.west);
+        \draw[->] (zt2.east) -- (D2.west);
+        \draw[->] (D2.east) -- (realfake2.west);
+
+        \draw [decorate,decoration={brace,amplitude=10pt,raise=0.7cm},rotate=90] (F.west) -- (G.east) node [black,midway,yshift=1.5cm] {$G$};
+        \draw [decorate,decoration={brace,amplitude=10pt,raise=0.7cm},rotate=90] (E1.west) -- (D1.east) node [black,midway,yshift=1.5cm] {$D$};
+    \end{tikzpicture}
+    \caption{Training of \ac{ALAE}, adapted from \citet{pidhorskyi2020adversarial}}
+    \label{fig:alae_flow}
+\end{figure}
+\acfp{ALAE}~\citep{pidhorskyi2020adversarial} are a hybrid model between \acp{VAE} and \acp{GAN}.
+\acp{ALAE} are not based on variational inference but on \acp{GAN}.
+
+The starting point of the \ac{ALAE} model is to decompose both, the generator $G$ and discriminator $D$, into two parts, i.e.~$G=\mathcal{G}\circ \mathcal{F}$ and $D=\mathcal{D}\circ \mathcal{E}$ (see Figure~\ref{fig:alae_flow}).
+$\mathcal{G}$ uses noise $\eta$ as an additional input.
+$\mathcal{F}$ maps the Gaussian random noise $\bm{z} \sim \mathcal{N}(\bm{0}, \bm{I})$ to another latent representation $\bm{w}$.
+The loss function requires the outputs of $\mathcal{F}$ and $\mathcal{E}$ to be similar in terms of the $l^2$-norm.
+Apart from this, the $\bm{w}$-space is unregularized.
+In addition to the $l^2$-loss, the model is optimized towards minimizing the discriminator and the generator loss.
+
+Because $p_{\mathcal{E}}(w) \approx p_{\mathcal{F}}(w)$, \ac{ALAE} can generate reconstructions by
+\begin{align}
+    \bm{x}\approx (\mathcal{E}\circ \mathcal{G}_\eta)(\bm{x})
+\end{align}
+$\mathcal{G}_\eta$ here indicates that $\mathcal{G}$ uses $\eta$ as an additional input.
+
+Furthermore, just like for the \ac{VAE}, the Gaussian latent space $Z$ can be traversed to generate new samples by
+\begin{align}
+    \bm{x}_{\text{new}} = (\mathcal{F}\circ \mathcal{G}_\eta)(\bm{z})
+\end{align}
+
+\citet{pidhorskyi2020adversarial} show that (linearly) interpolating in $\bm{w}$-space yields smoother transitions than interpolation between two corresponding points in $\bm{z}$-space.
+This indicates that the $\bm{w}$-space is less entangled than the $\bm{z}$-space~\citep{shao2018riemannian,arvanitidis2017latent}.
+However, traversing the $\bm{w}$-space is not easily possible as its structure is unknown.
+Compared to \acp{VAE} where a linear interpolation between points in the latent $\bm{z}$-space leads to an almost geodesic path in $\bm{x}$-space\footnote{Therefore, points that are close in $\bm{z}$-space of an \ac{VAE} lead to images that are close in the feature space.}, the mapping function $\mathcal{F}$ seems to be non-smooth.
+Therefore, traversing $\bm{z}$ for an \ac{ALAE} seems to lead to a non-smooth path in the feature space.
+
+Compared to the \ac{VAE} that uses a pixelwise loss on the reconstructions, \ac{ALAE} penalizes the $l^2$-norm of $\bm{w}$ and $\tilde{\bm{w}}$.
+Except for this loss, \ac{ALAE} by no means forces the input to be similar to the reconstruction.
+This mitigates the problem of the pixelwise loss in \acp{VAE} that is assumed to be the reason for blurry reconstructions.
 
 \paragraph{Other stuff}
 \textbf{DRAFT!}
@@ -434,6 +545,7 @@ There are some open questions w.r.t. this paper:
 \textbf{DRAFT!}
 \begin{itemize}
     \item \citet{karras2019style} describe two means to measure feature entanglement: \textit{Perceptual Path Length} and \textit{Linear Separability}
+    \item \citet{kim2018disentangling} give an overview of feature disentanglement for \acp{VAE}. They propose a new metric to measure feature disentanglement and a new VAE model tackling this problem.
 \end{itemize}
 
 \subsection{Semantic Representations}\label{subsec:semantic-representations}
