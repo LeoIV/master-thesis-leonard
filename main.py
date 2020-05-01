@@ -341,10 +341,13 @@ def main(args: List[str]):
         x_train = x_train.astype('float32') / 255.
         x_val = x_val.astype('float32') / 255.
 
+        for i in range(2, 6):
+            y_train[:, i] = (y_train[:, i] - y_train[:, i].min()) / (y_train[:, i].max() - y_train[:, i].min())
+
         bins = np.arange(0.0, 1.0, 0.1)
         embedding_callback_params += [
             {
-                'c': np.digitize(y_train[:, 1], bins),
+                'c': y_train[:, 1],
                 'label': 'Shape',
             },
             {
