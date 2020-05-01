@@ -2,11 +2,11 @@
 
 \subsubsection{Cells}
 
-\begin{wrapfigure}[18]{r}{0.3\textwidth}
+\begin{wrapfigure}[18]{R}{0.3\textwidth}
     \begin{center}
         \includegraphics[width=0.28\textwidth]{images/neuron.jpeg}
     \end{center}
-    \caption[Neuron]{The morphological structure of a neuron, taken from \citet[p. 22]{mack2013principles}}
+    \caption[Neuron structure]{The morphological structure of a neuron, taken from \citet[p. 22]{mack2013principles}}
     \label{fig:neuron_structure}
 \end{wrapfigure}
 
@@ -26,7 +26,7 @@ Together with the spinal cord, it constitutes the \ac{CNS}~\citep[p. 340]{mack20
 \begin{figure}
     \centering
     \includegraphics[width=.4\textwidth]{images/brain_regions.jpeg}
-    \caption{Five divisions of the human brain, the cerebral cortex as part of the cerebral hemispheres, and the spinal cord. Taken from \citet[p. 340]{mack2013principles}.}
+    \caption[Divisions of the human brain]{Five divisions of the human brain, the cerebral cortex as part of the cerebral hemispheres, and the spinal cord. Taken from \citet[p. 340]{mack2013principles}.}
     \label{fig:human_brain_divisions}
 \end{figure}
 
@@ -67,7 +67,7 @@ However, the function of these feedback connections, outnumbering the number of 
 \begin{figure}
     \centering
     \includegraphics[width=.8\textwidth]{images/ventral_dorsal.jpeg}
-    \caption{The ventral and dorsal pathways, carrying information from \ac{V1} to other brain regions. Taken from \citet[p. 571]{mack2013principles}}
+    \caption[Ventral and dorsal pathways]{The ventral and dorsal pathways, carrying information from \ac{V1} to other brain regions. Taken from \citet[p. 571]{mack2013principles}}
     \label{fig:ventral_dorsal_pathway}
 \end{figure}
 
@@ -82,7 +82,7 @@ Even though the two pathways can exchange information \citep[p. 564]{mack2013pri
 
 \subsection{Visual Object Perception}\label{subsec:visual-object-perception}
 
-\begin{wrapfigure}[12]{r}{0.3\textwidth}
+\begin{wrapfigure}[12]{R}{0.3\textwidth}
     \begin{center}
         \includegraphics[width=0.28\textwidth]{images/rubens_sketches.jpg}
     \end{center}
@@ -138,10 +138,10 @@ Self-supervised learning can also be seen as a subtype of unsupervised learning,
 Another example for self-supervised learning are word embeddings \textbf{REF}.
 
 \paragraph{Unsupervised Learning}
-\begin{wrapfigure}[11]{r}{0.5\textwidth}
+\begin{wrapfigure}[11]{R}{0.5\textwidth}
     \centering
     \includegraphics[width=.48\textwidth]{images/vlae_embeddings/embeddings_mu_3_6.png}
-    \caption{Clustering of hand-written digits in a latent space.}
+    \caption[Clustering of hand-written digits]{Clustering of hand-written digits in a latent space.}
     \label{fig:clustering_example}
 \end{wrapfigure}
 Just like in self-supervised learning, unsupervised learning works with unlabeled data, i.e.~the dataset only consists of samples $\bm{x}_i$.
@@ -176,7 +176,7 @@ The generator $G$ is trained towards minimizing the probability that $D$ is capa
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/gan_samples.png}
-    \caption{\ac{GAN}-generated samples, taken from \citet{brock2018large}.}
+    \caption[\ac{GAN}-generated samples]{\ac{GAN}-generated samples, taken from \citet{brock2018large}.}
     \label{fig:gan_samples}
 \end{figure}
 
@@ -348,7 +348,7 @@ where $V(D, G)$ is the training objective defined in Equation~\ref{eq:gan_object
         \includegraphics[width=.8\textwidth]{images/infogan_c3.png}
         \caption{Varying $\bm{c}_3 \in [-2, 2]$}
     \end{subfigure}
-    \caption{Exploration of $\bm{c}$ on MNIST by systematically exploring either, $\bm{c}_1$, $\bm{c}_2$, or $\bm{c}_3$. Rows correspond to different noise values $\bm{z}$ but are equal for the three figures, columns correspond to different values for $\bm{c}_i$. $\bm{c}_1$ takes discrete values, $\bm{c}_2$ and $\bm{c}_3$ take continuous values. Taken from \citet{chen2016infogan}.}
+    \caption[InfoGAN latent space traversal]{Exploration of $\bm{c}$ for InfoGAN on MNIST by traversing either, $\bm{c}_1$, $\bm{c}_2$, or $\bm{c}_3$. Rows correspond to different noise values $\bm{z}$ but are equal for the three figures, columns correspond to different values for $\bm{c}_i$. $\bm{c}_1$ takes discrete values, $\bm{c}_2$ and $\bm{c}_3$ take continuous values. Taken from \citet{chen2016infogan}.}
     \label{fig:infogan}
 \end{figure}
 
@@ -414,6 +414,55 @@ Therefore, they assumed that $\mathcal{Z}$ is more entangled than $\mathcal{W}$.
 
 \paragraph{\acl{LVAE}}
 
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        % Nodes
+        \node[draw,circle,minimum size=1.3cm] (x1) {$\bm{x}$};
+        \node[draw,diamond,above=of x1,minimum size=1.3cm] (d1) {$\bm{d}_1$};
+        \node[draw,diamond,above=of d1,minimum size=1.3cm] (d2) {$\bm{d}_2$};
+        \node[above=of d2,minimum size=1.3cm] (ddots) {\vdots};
+        \node[draw,diamond,above=of ddots,minimum size=1.3cm] (dL) {$\bm{d}_L$};
+        \node[draw,circle,right=of dL,minimum size=1.3cm] (zL1) {$\bm{z}_L$};
+        \node[below=of zL1,minimum size=1.3cm] (zdots1) {\vdots};
+        \node[draw,circle,right=of d2,minimum size=1.3cm] (z21) {$\bm{z}_2$};
+        \node[draw,circle,right=of d1,minimum size=1.3cm] (z11) {$\bm{z}_1$};
+
+        \node[draw,circle,right=of zL1,minimum size=1.3cm] (zL2) {$\bm{z}_L$};
+        \node[below=of zL2,minimum size=1.3cm] (zdots2) {\vdots};
+        \node[draw,circle,right=of z21,minimum size=1.3cm] (z22) {$\bm{z}_2$};
+        \node[draw,circle,right=of z11,minimum size=1.3cm] (z12) {$\bm{z}_1$};
+        \node[draw,circle,below=of z12,minimum size=1.3cm] (x2) {$\bm{x}$};
+
+        % Arrows
+        \draw[->] (x1.north) -- (d1.south);
+        \draw[->] (d1.north) -- (d2.south);
+        \draw[->] (d2.north) -- (ddots.south);
+        \draw[->] (ddots.north) -- (dL.south);
+
+        \draw[->] (d1.east) -- (z11.west);
+        \draw[->] (d2.east) -- (z21.west);
+        \draw[->] (dL.east) -- (zL1.west);
+
+        \draw[->] (zL1.south) -- (zdots1.north);
+        \draw[->] (zdots1.south) -- (z21.north);
+        \draw[->] (z21.south) -- (z11.north);
+        \draw[->] (z22.south) -- (z12.north);
+        \draw[->] (z12.south) -- (x2.north);
+        \draw[->] (zL2.south) -- (zdots2.north);
+        \draw[->] (zdots2.south) -- (z22.north);
+
+        \draw[<-,dashed] (z21.east) -- (z22.west);
+        \draw[<-,dashed] (z11.east) -- (z12.west);
+        \draw[<-,dashed] (zL1.east) -- (zL2.west);
+
+        \draw [decorate,decoration={brace,amplitude=5pt,raise=0.7cm},rotate=90] (dL.west) -- (zL1.east) node [black,midway,yshift=1.5cm] {Encoder};
+        \draw [decorate,decoration={brace,amplitude=5pt,raise=0.7cm},rotate=90] (zL2.west) -- (zL2.east) node [black,midway,yshift=1.5cm] {Decoder};
+    \end{tikzpicture}
+    \caption[\ac{VLAE} structure]{\ac{LVAE} structure, adapted from \citet{sonderby2016ladder}. Solid arrows indicate feedforward connections, dashed arrows indicate weight sharing. Diamonds indicate stochastic variables, circles deterministic variables.}
+    \label{fig:lvae}
+\end{figure}
+
 \aclp{LVAE}~\citep{sonderby2016ladder} address the problem of hierarchical learning in \acp{VAE}.
 Hierarchical \acp{VAE} only use the first few layers to learn meaningful semantics of an input.
 In case of \citet{sonderby2016ladder}, the first two layers are sufficient.
@@ -425,7 +474,7 @@ They do this by passing information top-down in the inference network.
 \begin{figure}
     \centering
     \includegraphics[width=0.2\textwidth]{images/gerben.png}
-    \caption{Illustration of context-dependent semantic ambiguity. Taken from \citet[p. 61]{van2016auto}}
+    \caption[Context-Dependent Semantic Ambiguity]{Illustration of context-dependent semantic ambiguity. Taken from \citet[p. 61]{van2016auto}}
     \label{fig:gerben_ambiguity}
 \end{figure}
 Figure~\ref{fig:gerben_ambiguity} gives an intuition why passing information top-down can be advantegous.
@@ -436,15 +485,54 @@ A pure feed-forward systems would be unable to discriminate between the low-leve
 Incorporating high-level features like \textit{alphabetic string} helps to improve the posterior low-level feature representation.
 Furthermore, the additional top-down pass is more biologically plausible compared to a pure feedforward network (\textbf{REFERENCE}).
 
-In fact, \acp{LVAE} model this top down pass by \textbf{BY WHAT? CONTINUE}
-\textbf{DRAFT!}
-\begin{itemize}
-    \item Explain LVAE detailed
-    \item Dont forget the warm-up phase
-    \item Also mention that batch normalization and warm-up alone help a lot in disentangling the feature learning
-\end{itemize}
+Unlike hierarchical \acp{VAE}, \acp{LVAE} do not use the output of lower stochastic embedding layers as input for higher layers.
+Instead, they use a deterministic multi-layer network in the encoder (see Figure~\ref{fig:vlae}) and pass information from intermediate layers to the stochastic embedding layers.
+\begin{align}
+    \bm{d}_i &= \text{NN}(\bm{d}_{i-1})\\
+    \hat{\bm{\mu}}_{q,i}&=\text{NN}(\bm{d}_i)\\
+    \hat{\bm{\sigma}}^2_{q,i}&=\text{NN}(\bm{d}_i)
+\end{align}
+Output from higher stochastic embedding layers is passed to lower layers via the decoder $p$:
+\begin{align}
+    \bm{\sigma}_{q,i}&=\frac{1}{\hat{\bm{\sigma}}^{-2}_{q,i}+\hat{\bm{\sigma}}^{-2}_{p,i}}\\
+    \bm{\mu}_{q,i}&=\frac{\hat{\bm{\mu}}_{q,i}\hat{\bm{\sigma}}^{-2}_{q,i}+\hat{\bm{\mu}}_{p,i}\hat{\bm{\sigma}}^{-2}_{p,i}}{\hat{\bm{\sigma}}^{-2}_{q,i}+\hat{\bm{\sigma}}^{-2}_{p,i}}
+\end{align}
+The latent variables then are sampled conditionally:
+\begin{align}
+    q(\bm{z}_i|\cdot)=\mathcal{N}(\bm{z}_i|\bm{\mu}_{q,i},\bm{\sigma}^2_{q,i})
+\end{align}
+
+\citet{sonderby2016ladder} show that gradually increasing the weight of the KL-term in the \ac{VAE} training criterion leads to a better usage of the latent spaces in terms of active units.
+Without this \textit{warm-up} phase, \acp{VAE} show many inactive units.
+\citet{sonderby2016ladder} discuss that \acp{VAE} show this behavior because it allows them to minimize the KL-term in the \ac{VAE} loss function fast.
+
+Using batch-normalization and warm-up alone already leads to more meaningful representations in the higher layers of a hierarchical VAE~\citep{sonderby2016ladder}.
+Using all these techniques on the \ac{LVAE} model allows meaningful representations in even higher layers compared to a hierarchical VAE\footnote{In \citet{sonderby2016ladder}, a hierarchical \ac{VAE} with batch-normalization and warm-up learns meaningful representations up to the fourth layer where as 5-layer \ac{LVAE} also learns meaningful representations in the fifth layers. Deeper models were not investigated.}.
 
 \paragraph{\acl{VLAE}}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[height=.8\textheight]{images/vlae_encoder.png}
+        \caption{Varying $\bm{c}_1 \in [0, 10]$}
+    \end{subfigure}%
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[height=.8\textheight]{images/vlae_decoder.png}
+        \caption{Varying $\bm{c}_2 \in [-2, 2]$}
+    \end{subfigure}
+    \caption[\ac{VLAE} structure]{Structure of the \ac{VLAE} model}
+    \label{fig:vlae_structure}
+\end{figure}
+
+Unlike the \ac{LVAE}, the \ac{VLAE} is a pure feedforward network.
+It's design is driven by the idea that \say{[i]f $\bm{z}_i$ is more abstract than $\bm{z}_j$, then the inference mapping $q(\bm{z}_i|\bm{x})$ and generative mapping when other layers are fixed $p(\bm{x}|\bm{z}_i, \bm{z}_{\neg i}=z^0_{\neg i})$ requires a more expressive network to capture}~\citep{zhao2017learning}.
+Figure~\ref{fig:vlae_structure} shows an exemplary network structure of a \ac{VLAE}.
+Early embedding layers like $\bm{z}_1$ are equipped with a less expressive network that, according to \citet{zhao2017learning}, should not allow to learn abstract features\footnote{In case of \textsc{Mnist}, more abstract features are for example the digit identity.}.
+
+These assumptions are discussed in Section~\ref{subseq:criticism_vlae}.
 
 \paragraph{$\beta$-VAE}
 \citet{higgins2017beta}
@@ -491,7 +579,7 @@ In fact, \acp{LVAE} model this top down pass by \textbf{BY WHAT? CONTINUE}
         \draw [decorate,decoration={brace,amplitude=10pt,raise=0.7cm},rotate=90] (F.west) -- (G.east) node [black,midway,yshift=1.5cm] {$G$};
         \draw [decorate,decoration={brace,amplitude=10pt,raise=0.7cm},rotate=90] (E1.west) -- (D1.east) node [black,midway,yshift=1.5cm] {$D$};
     \end{tikzpicture}
-    \caption{Training of \ac{ALAE}, adapted from \citet{pidhorskyi2020adversarial}}
+    \caption[\ac{ALAE} training]{Training of \ac{ALAE}, adapted from \citet{pidhorskyi2020adversarial}}
     \label{fig:alae_flow}
 \end{figure}
 \acfp{ALAE}~\citep{pidhorskyi2020adversarial} are a hybrid model between \acp{VAE} and \acp{GAN}.

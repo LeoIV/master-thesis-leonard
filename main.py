@@ -14,6 +14,7 @@ import numpy as np
 from keras.datasets import cifar10, mnist
 from keras.utils import to_categorical
 from keras_preprocessing.image import ImageDataGenerator
+import sklearn
 from sklearn.utils import shuffle
 
 from models.AlexAlexNetVAE import AlexAlexNetVAE
@@ -53,7 +54,7 @@ def main(args: List[str]):
                         required=False)
     parser.add_argument('--feature_map_layers', nargs='+', type=int,
                         help="The indices of layers after which to compute the "
-                             "feature maps. Exemplary input: 1 2 4 8 13", required=False)
+                             "feature maps. Exemplary input: 1 2 4 8 13", required=False, default=[])
     parser.add_argument('--kernel_visualization_layer', type=int,
                         help="The index of layer after which to compute the max stimuli.", default=-1)
     parser.add_argument('--logdir', type=str, default="logs/",
@@ -82,7 +83,7 @@ def main(args: List[str]):
     parser.add_argument('--alexnet_weights_path', type=str,
                         help="Only for configuration 'frozen_alexnet_vae'. The path to (and including) the .h5 file "
                              "to restore the AlexNet classifier from.")
-    parser.add_argument('--dataset', type=str, choices=['celeba', 'imagenet', 'cifar10', 'mnist'],
+    parser.add_argument('--dataset', type=str, choices=['celeba', 'imagenet', 'cifar10', 'mnist', 'dsprites'],
                         help="Which dataset to use for training. WARNING: Use ImageNet for classification.")
     parser.add_argument('--use_fc', type=str2bool, default=True, help="Whether to use the fully connected layers in "
                                                                       "AlexNet or not.")
@@ -324,6 +325,50 @@ def main(args: List[str]):
             y_val = y_val.squeeze()
             y_train = to_categorical(y_train, num_classes=10)
             y_val = to_categorical(y_val, num_classes=10)
+    elif args.dataset == 'dsprites':
+        dsprites = np.load(os.path.join(args.data_path, 'dsprites.npz'))
+        X = dsprites['imgs']
+        y = dsprites['latents_values']
+        x_train, x_val, y_train, y_val = sklearn.model_selection.train_test_split(X, y, random_state=42,
+                                                                                  test_size=0.1)
+
+        x_train = (x_train * 255.0).astype('uint8')
+        x_val = (x_val * 255.).astype('uint8')
+
+        x_train = resize_array(x_train, input_dim[:2], args.rgb)
+        x_val = resize_array(x_val, input_dim[:2], args.rgb)
+
+        x_train = x_train.astype('float32') / 255.
+        x_val = x_val.astype('float32') / 255.
+
+        bins = np.arange(0.0, 1.0, 0.1)
+        embedding_callback_params += [
+            {
+                'c': np.digitize(y_train[:, 1], bins),
+                'label': 'Shape',
+            },
+            {
+                'c': np.digitize(y_train[:, 2], bins),
+                'label': 'Scale',
+            },
+            {
+                'c': np.digitize(y_train[:, 3], bins),
+                'label': 'Orientation'
+            },
+            {
+                'c': np.digitize(y_train[:, 4], bins),
+                'label': 'x-position'
+            },
+            {
+                'c': np.digitize(y_train[:, 5], bins),
+                'label': 'y-position'
+            }
+        ]
+        if len(x_train.shape) == 3:
+            x_train = np.expand_dims(x_train, -1)
+        if len(x_val.shape) == 3:
+            x_val = np.expand_dims(x_val, -1)
+
     elif args.dataset == 'celeba':
         # TODO variable validation split size
         data_gen = ImageDataGenerator(rescale=1. / 255, validation_split=0.1)

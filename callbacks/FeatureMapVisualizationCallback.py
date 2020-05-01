@@ -75,7 +75,7 @@ class FeatureMapVisualizationCallback(Callback):
         if logs is None:
             logs = {}
         self.futures = check_finished_futures_and_return_unfinished(self.futures)
-        if batch % self.print_every_n_batches == 0:
+        if batch % self.print_every_n_batches == 0 and len(self.layer_idxs) > 0:
             plt.rcParams["figure.figsize"] = (7 * self.num_samples, 10 + 10 * (len(self.layer_idxs)))
             self.seen += 1
             self.batch_nrs.append(batch)

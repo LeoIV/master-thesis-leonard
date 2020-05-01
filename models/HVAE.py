@@ -17,8 +17,8 @@ class HVAE(VAEWrapper):
                  feature_map_reduction_factor: int, z_dims: Sequence[int], dropout_rate: float = 0.05):
         super().__init__(input_dim, log_dir, kernel_visualization_layer, num_samples, feature_map_layers,
                          inner_activation, decay_rate, feature_map_reduction_factor, z_dims,
-                         ["mu_{}".format(i) for i in range(1, 6)],
-                         ["log_var_{}".format(i) for i in range(1, 6)])
+                         ["mu_{}".format(i) for i in range(1, 4)],
+                         ["log_var_{}".format(i) for i in range(1, 4)])
         self.dropout_rate = dropout_rate
         self._build()
 
@@ -68,20 +68,11 @@ class HVAE(VAEWrapper):
         x = ReLU()(x)
         x = Dense(math.ceil(1024 / self.feature_map_reduction_factor))(x)
 
-        mu_4 = Dense(self.z_dims[1], name='mu_4')(x)
-        log_var_4 = Dense(self.z_dims[1], name='log_var_4')(x)
-        x = Lambda(sampling, name="z_4_latent")([mu_4, log_var_4])
-
         # GENERATIVE 1
         x = Dense(math.ceil(1024 / self.feature_map_reduction_factor))(x)
         x = BatchNormalization()(x)
         x = ReLU()(x)
 
-        mu_5 = Dense(self.z_dims[0], name='mu_5')(x)
-        log_var_5 = Dense(self.z_dims[0], name='log_var_5')(x)
-        x = Lambda(sampling, name="z_5_latent")([mu_5, log_var_5])
-
-        # GENERATIVE 0
         x = Dense(6 * 6 * 128)(x)  # TODO make dynamic
         x = BatchNormalization()(x)
         x = ReLU()(x)
