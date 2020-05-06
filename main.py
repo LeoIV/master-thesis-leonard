@@ -24,6 +24,7 @@ from models.FrozenAlexNetVAE import FrozenAlexNetVAE
 from models.HVAE import HVAE
 from models.SimpleClassifier import SimpleClassifier
 from models.VLAE import VLAE
+from models.VLAE_GAN import VLAEGAN
 from models.model_abstract import DeepCNNClassifierWrapper, VAEWrapper
 from utils.img_ops import resize_array
 
@@ -37,7 +38,7 @@ def main(args: List[str]):
 
     parser = ArgumentParser(description='Functionality for Leonards master thesis')
     parser.add_argument('--configuration', type=str,
-                        choices=['vae_128', 'vae_224', 'vae_28', 'vae_64', 'alexnet_classifier',
+                        choices=['vlae_gan', 'vae_128', 'vae_224', 'vae_28', 'vae_64', 'alexnet_classifier',
                                  'simple_classifier', 'alexnet_vae', 'frozen_alexnet_vae',
                                  'alexnet_vae_classification_loss', 'vlae_28', 'vlae_64', 'hvae'],
                         help="The configuration to execute.\n\n"
@@ -208,6 +209,22 @@ def main(args: List[str]):
                                  feature_map_reduction_factor=args.feature_map_reduction_factor,
                                  feature_map_layers=args.feature_map_layers, num_samples=args.num_samples)
 
+    elif args.configuration == 'vlae_gan':
+        input_dim = infer_input_dim((28, 28), args)
+        model = VLAEGAN(input_dim=input_dim, log_dir=args.logdir,
+                        inf0_kernels_strides_featuremaps=[(5, 2, 64)],
+                        inf1_kernels_strides_featuremaps=[(3, 2, 64)],
+                        ladder0_kernels_strides_featuremaps=[(5, 2, 64)],
+                        ladder1_kernels_strides_featuremaps=[(5, 1, 64)],
+                        ladder2_kernels_strides_featuremaps=[(3, 1, 64), (3, 1, 64)],
+                        gen2_num_units=[1024, 1024],
+                        gen1_num_units=[1024, 1024],
+                        gen0_kernels_strides_featuremaps=[(5, 2, 64), (5, 2, input_dim[-1])],
+                        kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
+                        feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
+                        decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
+                        z_dims=args.z_dims, dropout_rate=args.dropout_rate,
+                        use_dropout=args.use_dropout, use_batch_norm=args.use_batch_norm)
     elif args.configuration == 'vlae_28':
         dim = int(args.configuration.split('_')[-1])
         input_dim = infer_input_dim((dim, dim), args)
@@ -376,8 +393,9 @@ def main(args: List[str]):
         x_train = (x_train * 255.0).astype('uint8')
         x_val = (x_val * 255.).astype('uint8')
 
-        x_train = resize_array(x_train, input_dim[:2], args.rgb)
-        x_val = resize_array(x_val, input_dim[:2], args.rgb)
+        if input_dim[:2] != (64, 64):
+            x_train = resize_array(x_train, input_dim[:2], args.rgb)
+            x_val = resize_array(x_val, input_dim[:2], args.rgb)
 
         x_train = x_train.astype('float32') / 255.
         x_val = x_val.astype('float32') / 255.
