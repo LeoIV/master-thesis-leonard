@@ -275,8 +275,8 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
 
         lr_sched = step_decay_schedule(initial_lr=self.learning_rate, decay_factor=lr_decay, step_size=1)
 
-        checkpoint_filepath = os.path.join(weights_folder, "weights-{epoch:03d}-{loss:.2f}.h5")
-        checkpoint1 = ModelCheckpoint(checkpoint_filepath, save_weights_only=True, verbose=1)
+        # checkpoint_filepath = os.path.join(weights_folder, "weights-{epoch:03d}-{loss:.2f}.h5")
+        # checkpoint1 = ModelCheckpoint(checkpoint_filepath, save_weights_only=True, verbose=1)
         checkpoint2 = ModelCheckpoint(os.path.join(weights_folder, 'weights.h5'), save_weights_only=True, verbose=1)
         tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, update_freq="batch")
         if self.kernel_visualization_layer >= 0:
@@ -294,7 +294,7 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
                                           layer_names=self.mu_layer_names, plot_params=embedding_callback_params)
         ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [hs_callback, ll_callback, checkpoint1, checkpoint2, tb_callback, fm_callback, rc_callback,
+        callbacks_list = [hs_callback, ll_callback, checkpoint2, tb_callback, fm_callback, rc_callback,
                           lr_sched]
         if self.kernel_visualization_layer >= 0:
             callbacks_list.append(kv_callback)
