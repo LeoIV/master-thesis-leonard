@@ -68,7 +68,7 @@ class VLAEGAN(VAEWrapper):
             x = x_feat = MaxPool2D()(x)
             x = BatchNormalization()(x)
             x = Flatten()(x)
-            x = Dense(100)(x)
+            x = Dense(512)(x)
             x = BatchNormalization()(x)
             x = Dense(1, activation='sigmoid')(x)
 
