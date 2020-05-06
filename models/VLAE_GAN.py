@@ -57,16 +57,18 @@ class VLAEGAN(VAEWrapper):
         def _discriminator(input_shape: Tuple[int, int, int]):
             x = inpt = Input(shape=input_shape)
             x = Conv2D(batch_input_shape=input_shape, filters=20, kernel_size=5)(x)
-            x = LeakyReLU()(x)
-            x = MaxPool2D()(x)
             x = BatchNormalization()(x)
+            x = LeakyReLU()(x)
             x = Conv2D(filters=20, kernel_size=3)(x)
+            x = BatchNormalization()(x)
+            x = LeakyReLU()(x)
+            x = Conv2D(filters=20, kernel_size=3)(x)
+            x = BatchNormalization()(x)
             x = LeakyReLU()(x)
             x = x_feat = MaxPool2D()(x)
             x = BatchNormalization()(x)
             x = Flatten()(x)
             x = Dense(100)(x)
-            x = LeakyReLU()(x)
             x = BatchNormalization()(x)
             x = Dense(1, activation='sigmoid')(x)
 
@@ -294,9 +296,9 @@ class VLAEGAN(VAEWrapper):
             for layer in model.layers:
                 layer.trainable = trainable
 
+        set_trainable(self.discriminator, True)
         set_trainable(self.encoder, False)
         set_trainable(self.decoder, False)
-        set_trainable(self.discriminator, True)
         self.discriminator_train.compile(rmsprop, ['binary_crossentropy'] * 3, ['acc'] * 3)
         self.discriminator_train.summary()
 
