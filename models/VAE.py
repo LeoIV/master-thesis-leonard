@@ -10,7 +10,7 @@ from models.model_abstract import VAEWrapper
 from utils.vae_utils import sampling
 
 
-class VariationalAutoencoder(VAEWrapper):
+class VAE(VAEWrapper):
     def __init__(self, input_dim: Tuple[int, int, int], encoder_conv_filters,
                  encoder_conv_kernel_size: Sequence[Union[int, Tuple[int, int]]],
                  encoder_conv_strides: Sequence[Union[int, Tuple[int, int]]], decoder_conv_t_filters,

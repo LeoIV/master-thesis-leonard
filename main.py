@@ -37,9 +37,9 @@ def main(args: List[str]):
 
     parser = ArgumentParser(description='Functionality for Leonards master thesis')
     parser.add_argument('--configuration', type=str,
-                        choices=['vanilla_vae', 'large_vanilla_vae', 'alexnet_classifier',
+                        choices=['vae_128', 'vae_224', 'vae_28', 'vae_64', 'alexnet_classifier',
                                  'simple_classifier', 'alexnet_vae', 'frozen_alexnet_vae',
-                                 'alexnet_vae_classification_loss', 'vlae', 'hvae'],
+                                 'alexnet_vae_classification_loss', 'vlae_28', 'vlae_64', 'hvae'],
                         help="The configuration to execute.\n\n"
                              "mnist: VAE trained on mnist\n"
                              "cifar10_vae: VAE trained on cifar10\n"
@@ -132,33 +132,47 @@ def main(args: List[str]):
                                  decay_rate=args.lr_decay, kernel_visualization_layer=args.kernel_visualization_layer,
                                  num_samples=args.num_samples, dropout_rate=args.dropout_rate)
 
-    elif args.configuration == 'vanilla_vae':
-        from models.VAE import VariationalAutoencoder
-        input_dim = infer_input_dim((128, 128), args)
-        model = VariationalAutoencoder(input_dim=input_dim, encoder_conv_filters=[32, 64, 64, 64],
-                                       encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[2, 2, 2, 2],
-                                       decoder_conv_t_filters=[64, 64, 32, 3 if args.rgb else 1],
-                                       decoder_conv_t_kernel_size=[3, 3, 3, 3],
-                                       decoder_conv_t_strides=[2, 2, 2, 2], log_dir=args.logdir, z_dims=args.z_dims,
-                                       kernel_visualization_layer=args.kernel_visualization_layer,
-                                       feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,
-                                       decay_rate=args.lr_decay, num_samples=args.num_samples,
-                                       feature_map_reduction_factor=args.feature_map_reduction_factor,
-                                       inner_activation=args.inner_activation, dropout_rate=args.dropout_rate)
-    elif args.configuration == 'large_vanilla_vae':
-        from models.VAE import VariationalAutoencoder
+    elif args.configuration == 'vae_28':
+        from models.VAE import VAE
+        input_dim = infer_input_dim((28, 28), args)
+        model = VAE(input_dim=input_dim, encoder_conv_filters=[32, 64, 64, 64],
+                    encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[2, 2, 1, 1],
+                    decoder_conv_t_filters=[64, 64, 32, 3 if args.rgb else 1],
+                    decoder_conv_t_kernel_size=[3, 3, 3, 3],
+                    decoder_conv_t_strides=[1, 1, 2, 2], log_dir=args.logdir, z_dims=args.z_dims,
+                    kernel_visualization_layer=args.kernel_visualization_layer,
+                    feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,
+                    decay_rate=args.lr_decay, num_samples=args.num_samples,
+                    feature_map_reduction_factor=args.feature_map_reduction_factor,
+                    inner_activation=args.inner_activation, dropout_rate=args.dropout_rate)
+    elif args.configuration in ['vae_128', 'vae_64']:
+        from models.VAE import VAE
+        dim = int(args.configuration.split('_')[-1])
+        input_dim = infer_input_dim((dim, dim), args)
+        model = VAE(input_dim=input_dim, encoder_conv_filters=[32, 64, 64, 64],
+                    encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[2, 2, 2, 2],
+                    decoder_conv_t_filters=[64, 64, 32, 3 if args.rgb else 1],
+                    decoder_conv_t_kernel_size=[3, 3, 3, 3],
+                    decoder_conv_t_strides=[2, 2, 2, 2], log_dir=args.logdir, z_dims=args.z_dims,
+                    kernel_visualization_layer=args.kernel_visualization_layer,
+                    feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,
+                    decay_rate=args.lr_decay, num_samples=args.num_samples,
+                    feature_map_reduction_factor=args.feature_map_reduction_factor,
+                    inner_activation=args.inner_activation, dropout_rate=args.dropout_rate)
+    elif args.configuration == 'vae_224':
+        from models.VAE import VAE
         input_dim = infer_input_dim((224, 224), args)
-        model = VariationalAutoencoder(input_dim=input_dim, encoder_conv_filters=[32, 64, 64, 64],
-                                       encoder_conv_kernel_size=[11, 7, 5, 3], encoder_conv_strides=[4, 2, 2, 2],
-                                       decoder_conv_t_filters=[64, 64, 32, 3 if args.rgb else 1],
-                                       decoder_conv_t_kernel_size=[3, 5, 7, 11],
-                                       decoder_conv_t_strides=[2, 2, 2, 4], log_dir=args.logdir, z_dims=args.z_dims,
-                                       use_batch_norm=args.use_batch_norm, use_dropout=args.use_dropout,
-                                       kernel_visualization_layer=args.kernel_visualization_layer,
-                                       num_samples=args.num_samples, dropout_rate=args.dropout_rate,
-                                       inner_activation=args.inner_activation, decay_rate=args.lr_decay,
-                                       feature_map_layers=args.feature_map_layers,
-                                       feature_map_reduction_factor=args.feature_map_reduction_factor)
+        model = VAE(input_dim=input_dim, encoder_conv_filters=[32, 64, 64, 64],
+                    encoder_conv_kernel_size=[11, 7, 5, 3], encoder_conv_strides=[4, 2, 2, 2],
+                    decoder_conv_t_filters=[64, 64, 32, 3 if args.rgb else 1],
+                    decoder_conv_t_kernel_size=[3, 5, 7, 11],
+                    decoder_conv_t_strides=[2, 2, 2, 4], log_dir=args.logdir, z_dims=args.z_dims,
+                    use_batch_norm=args.use_batch_norm, use_dropout=args.use_dropout,
+                    kernel_visualization_layer=args.kernel_visualization_layer,
+                    num_samples=args.num_samples, dropout_rate=args.dropout_rate,
+                    inner_activation=args.inner_activation, decay_rate=args.lr_decay,
+                    feature_map_layers=args.feature_map_layers,
+                    feature_map_reduction_factor=args.feature_map_reduction_factor)
     elif args.configuration == 'alexnet_classifier':
         input_dim = infer_input_dim((224, 224), args)
         model = AlexNet(input_dim=input_dim, log_dir=args.logdir, feature_map_layers=args.feature_map_layers,
@@ -194,9 +208,34 @@ def main(args: List[str]):
                                  feature_map_reduction_factor=args.feature_map_reduction_factor,
                                  feature_map_layers=args.feature_map_layers, num_samples=args.num_samples)
 
-    elif args.configuration == 'vlae':
-        input_dim = infer_input_dim((28, 28), args)
+    elif args.configuration == 'vlae_28':
+        dim = int(args.configuration.split('_')[-1])
+        input_dim = infer_input_dim((dim, dim), args)
         model = VLAE(input_dim=input_dim, log_dir=args.logdir,
+                     inf0_kernels_strides_featuremaps=[(5, 2, 64)],
+                     inf1_kernels_strides_featuremaps=[(3, 2, 64)],
+                     ladder0_kernels_strides_featuremaps=[(5, 2, 64)],
+                     ladder1_kernels_strides_featuremaps=[(5, 1, 64)],
+                     ladder2_kernels_strides_featuremaps=[(3, 1, 64), (3, 1, 64)],
+                     gen2_num_units=[1024, 1024, 1024],
+                     gen1_num_units=[1024, 1024, 1024],
+                     gen0_kernels_strides_featuremaps=[(5, 2, 64), (5, 2, input_dim[-1])],
+                     kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
+                     feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
+                     decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
+                     z_dims=args.z_dims, dropout_rate=args.dropout_rate)
+    elif args.configuration == 'vlae_64':
+        dim = int(args.configuration.split('_')[-1])
+        input_dim = infer_input_dim((dim, dim), args)
+        model = VLAE(input_dim=input_dim, log_dir=args.logdir,
+                     inf0_kernels_strides_featuremaps=[(5, 2, 64)],
+                     inf1_kernels_strides_featuremaps=[(3, 2, 64)],
+                     ladder0_kernels_strides_featuremaps=[(5, 2, 64)],
+                     ladder1_kernels_strides_featuremaps=[(3, 2, 64)],
+                     ladder2_kernels_strides_featuremaps=[(3, 2, 64), (3, 1, 64)],
+                     gen2_num_units=[1024, 1024, 1024],
+                     gen1_num_units=[1024, 1024, 1024],
+                     gen0_kernels_strides_featuremaps=[(5, 2, 64), (3, 2, 64), (5, 2, input_dim[-1])],
                      kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
                      feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
                      decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
