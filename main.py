@@ -217,13 +217,14 @@ def main(args: List[str]):
                      ladder0_kernels_strides_featuremaps=[(5, 2, 64)],
                      ladder1_kernels_strides_featuremaps=[(5, 1, 64)],
                      ladder2_kernels_strides_featuremaps=[(3, 1, 64), (3, 1, 64)],
-                     gen2_num_units=[32, 32],
-                     gen1_num_units=[32],
-                     gen0_kernels_strides_featuremaps=[(5, 2, 64), (3, 1, 64), (5, 2, input_dim[-1])],
+                     gen2_num_units=[256, 256],
+                     gen1_num_units=[512, 512],
+                     gen0_kernels_strides_featuremaps=[(5, 2, 64), (5, 2, input_dim[-1])],
                      kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
                      feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
                      decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
-                     z_dims=args.z_dims, dropout_rate=args.dropout_rate)
+                     z_dims=args.z_dims, dropout_rate=args.dropout_rate,
+                     use_dropout=args.use_dropout, use_batch_norm=args.use_batch_norm)
     elif args.configuration == 'vlae_64':
         dim = int(args.configuration.split('_')[-1])
         input_dim = infer_input_dim((dim, dim), args)
@@ -233,13 +234,14 @@ def main(args: List[str]):
                      ladder0_kernels_strides_featuremaps=[(5, 2, 64)],
                      ladder1_kernels_strides_featuremaps=[(3, 2, 64)],
                      ladder2_kernels_strides_featuremaps=[(3, 2, 64), (3, 1, 64)],
-                     gen2_num_units=[32, 32],
-                     gen1_num_units=[32],
-                     gen0_kernels_strides_featuremaps=[(5, 2, 32), (3, 2, 64), (3, 1, 64), (5, 2, input_dim[-1])],
+                     gen2_num_units=[256, 256],
+                     gen1_num_units=[512, 512],
+                     gen0_kernels_strides_featuremaps=[(5, 2, 32), (3, 2, 64), (5, 2, input_dim[-1])],
                      kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
                      feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
                      decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
-                     z_dims=args.z_dims, dropout_rate=args.dropout_rate)
+                     z_dims=args.z_dims, dropout_rate=args.dropout_rate, use_dropout=args.use_dropout,
+                     use_batch_norm=args.use_batch_norm)
     elif args.configuration == 'hvae':
         input_dim = infer_input_dim((28, 28), args)
         model = HVAE(input_dim=input_dim, log_dir=args.logdir,
