@@ -287,7 +287,7 @@ class VLAEGAN(VAEWrapper):
 
         ###
 
-        rmsprop = RMSprop(lr=0.0003)
+        rmsprop = Adam(lr=0.0001)
 
         def set_trainable(model, trainable):
             model.trainable = trainable
@@ -296,6 +296,7 @@ class VLAEGAN(VAEWrapper):
 
         set_trainable(self.encoder, False)
         set_trainable(self.decoder, False)
+        set_trainable(self.discriminator, True)
         self.discriminator_train.compile(rmsprop, ['binary_crossentropy'] * 3, ['acc'] * 3)
         self.discriminator_train.summary()
 
@@ -325,7 +326,7 @@ class VLAEGAN(VAEWrapper):
             else:
                 steps_per_epoch = len(x_train) // batch_size
             with tqdm(total=steps_per_epoch,
-                      bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}] | {postfix[0]} {postfix[1][value]} | {postfix[2]} {postfix[3][value]} | {postfix[4]} {postfix[5][value]}",
+                      bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}] | {postfix[0]} {postfix[1][value]:.3f} | {postfix[2]} {postfix[3][value]:.3f} | {postfix[4]} {postfix[5][value]:.3f}",
                       postfix=["Discriminator", dict(value=0), "Decoder", dict(value=0), "Encoder",
                                dict(value=0)]) as t:
                 for steps_done in range(steps_per_epoch):
@@ -361,5 +362,6 @@ class VLAEGAN(VAEWrapper):
                     batch_index += 1
             for cb in callbacks_list:
                 cb.on_epoch_end(epoch)
+            epoch += 1
 
         ###
