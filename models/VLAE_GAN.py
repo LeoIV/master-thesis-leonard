@@ -65,12 +65,12 @@ class VLAEGAN(VAEWrapper):
             x = Conv2D(filters=20, kernel_size=3)(x)
             x = BatchNormalization()(x)
             x = ReLU()(x)
-            x = MaxPool2D()(x)
+            x = x_feat = MaxPool2D()(x)
             x = BatchNormalization()(x)
             x = Flatten()(x)
             x = Dense(512)(x)
             x = BatchNormalization()(x)
-            x = x_feat = ReLU()(x)
+            x = ReLU()(x)
             x = Dense(1, activation='sigmoid')(x)
 
             return Model(inpt, [x_feat, x])
@@ -229,7 +229,7 @@ class VLAEGAN(VAEWrapper):
         self.encoder_train.add_loss(dis_nl_loss)
 
         self.decoder_train = Model([self.inputs, *self.decoder.inputs], [self.dis_x_tilde, self.dis_x_p])
-        self.decoder_train.add_loss((1e-6 / (1. - 1e-6)) * dis_nl_loss)
+        self.decoder_train.add_loss((1e-5) * dis_nl_loss)
 
         self.discriminator_train = Model([self.inputs, *self.decoder.inputs],
                                          [self.dis_x, self.dis_x_tilde, self.dis_x_p])
@@ -290,7 +290,7 @@ class VLAEGAN(VAEWrapper):
 
         ###
 
-        rmsprop = RMSprop(lr=0.0003)
+        rmsprop = Adam(lr=0.0002, beta_1=0.5)
 
         def set_trainable(model, trainable):
             model.trainable = trainable
