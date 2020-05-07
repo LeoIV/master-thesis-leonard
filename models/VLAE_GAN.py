@@ -58,18 +58,19 @@ class VLAEGAN(VAEWrapper):
             x = inpt = Input(shape=input_shape)
             x = Conv2D(batch_input_shape=input_shape, filters=20, kernel_size=5)(x)
             x = BatchNormalization()(x)
-            x = LeakyReLU()(x)
+            x = ReLU()(x)
             x = Conv2D(filters=20, kernel_size=3)(x)
             x = BatchNormalization()(x)
-            x = LeakyReLU()(x)
+            x = ReLU()(x)
             x = Conv2D(filters=20, kernel_size=3)(x)
             x = BatchNormalization()(x)
-            x = LeakyReLU()(x)
-            x = x_feat = MaxPool2D()(x)
+            x = ReLU()(x)
+            x = MaxPool2D()(x)
             x = BatchNormalization()(x)
             x = Flatten()(x)
             x = Dense(512)(x)
             x = BatchNormalization()(x)
+            x = x_feat = ReLU()(x)
             x = Dense(1, activation='sigmoid')(x)
 
             return Model(inpt, [x_feat, x])
@@ -289,7 +290,7 @@ class VLAEGAN(VAEWrapper):
 
         ###
 
-        rmsprop = Adam(lr=0.0001)
+        rmsprop = RMSprop(lr=0.0003)
 
         def set_trainable(model, trainable):
             model.trainable = trainable
