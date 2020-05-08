@@ -371,7 +371,9 @@ class VLAEGAN(VAEWrapper):
                             y_fake = np.zeros((batch_size,), dtype='float32')
                             y = [y_real, y_fake, y_fake]
                             outs = model.train_on_batch(x, y)
-                            t.postfix[1]["value"] = "{:.3f} {:.3f} {:.3f}".format(outs[4], outs[7], outs[10])
+                            t.postfix[1]["value"] = "{:.3f} {:.3f} {:.3f}".format(outs[4],
+                                                                                  outs[7 if len(outs) > 7 else 5],
+                                                                                  outs[10 if len(outs) > 7 else 6])
                             losses['discriminator_loss'] = outs[0]
                             losses['discriminator_loss_x_true'] = outs[1]
                             losses['discriminator_loss_x_reconstr'] = outs[2]
