@@ -274,7 +274,7 @@ class VLAEGAN(VAEWrapper):
             x_train_subset = x_train[:5000]
             y_embedding = y_train[:5000] if y_train is not None else None
 
-        checkpoint2 = ModelCheckpoint(os.path.join(weights_folder, 'weights.h5'), save_weights_only=True, verbose=1)
+        # checkpoint2 = ModelCheckpoint(os.path.join(weights_folder, 'weights.h5'), save_weights_only=True, verbose=1)
         if self.kernel_visualization_layer >= 0:
             kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
                                                       layer_idx=self.kernel_visualization_layer)
@@ -290,7 +290,7 @@ class VLAEGAN(VAEWrapper):
                                           layer_names=self.mu_layer_names, plot_params=embedding_callback_params)
         ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [hs_callback, checkpoint2, fm_callback, rc_callback, ll_callback]
+        callbacks_list = [hs_callback, fm_callback, rc_callback, ll_callback]
 
         logging.info("Training for {} epochs".format(epochs))
 
@@ -377,8 +377,8 @@ class VLAEGAN(VAEWrapper):
                             losses['discriminator_loss_x_reconstr'] = outs[2]
                             losses['discriminator_loss_x_sampling'] = outs[3]
                             losses['discriminator_acc_x_true'] = outs[4]
-                            losses['discriminator_acc_x_reconstr'] = outs[7]
-                            losses['discriminator_acc_x_sampling'] = outs[10]
+                            losses['discriminator_acc_x_reconstr'] = outs[7 if len(outs) > 7 else 5]
+                            losses['discriminator_acc_x_sampling'] = outs[10 if len(outs) > 7 else 6]
                         elif model == self.decoder_train:
                             x = [x, *[np.random.normal(size=(batch_size, z)) for z in self.z_dims]]
                             y_real = np.ones((batch_size,), dtype='float32')
@@ -410,8 +410,8 @@ class VLAEGAN(VAEWrapper):
                         losses['discriminator_loss_x_reconstr'] = outs[2]
                         losses['discriminator_loss_x_sampling'] = outs[3]
                         losses['discriminator_acc_x_true'] = outs[4]
-                        losses['discriminator_acc_x_reconstr'] = outs[7]
-                        losses['discriminator_acc_x_sampling'] = outs[10]
+                        losses['discriminator_acc_x_reconstr'] = outs[7 if len(outs) > 7 else 5]
+                        losses['discriminator_acc_x_sampling'] = outs[10 if len(outs) > 7 else 6]
                     elif model == self.decoder_train:
                         x = [x_test, *[np.random.normal(size=(test_size, z)) for z in self.z_dims]]
                         y = [y_real, y_real]
@@ -424,6 +424,7 @@ class VLAEGAN(VAEWrapper):
                         losses['encoder_loss'] = mean_loss
             for cb in callbacks_list:
                 cb.on_epoch_end(epoch, losses)
+                self.model.save(os.path.join(self.log_dir, 'weights.h5'))
             epoch += 1
 
         for cb in callbacks_list:
