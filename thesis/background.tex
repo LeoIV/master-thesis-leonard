@@ -538,7 +538,35 @@ These assumptions are discussed in Section~\ref{subseq:criticism_vlae}.
 \citet{higgins2017beta}
 
 \paragraph{\ac{VAE}-\ac{GAN}}
-\citet{larsen2015autoencoding}
+\ac{VAE}-\acp{GAN}~\citep{larsen2015autoencoding} are a variation of \acp{VAE} specifically designed to replace the pixel-wise reconstruction loss.
+Even on highly curated datasets such as \textsc{Mnist} (\textbf{REF}), \acp{VAE} tend to generate blurry images.
+The design of \ac{VAE}-\acp{GAN} is based on the assumption that the pixel-wise loss in the \ac{VAE} training objective (see Equation~\ref{eq:log_normal_distr}) is the reason for blurry output images.
+\citet{larsen2015autoencoding}~motivate this by stating that even small translations result in a high pixel-wise loss\footnote{This depends on the image's frequency as well as the variance of the pixel intensities.}.
+
+Instead of measuring the \ac{MSE} between the true and the generated image, \ac{VAE}-\acp{GAN} train a discriminator network to distinguish between generated and true images, i.e.~to maximize
+\begin{align}
+    \mathcal{L}_{\mathrm{GAN}}=\log (D(\bm{x}))+\log (1-D(G(\bm{z}))) \label{eq:vae_gan_l_gan}
+\end{align}
+where $D$ and $G$ are the discriminator/generator networks, $\bm{x}$ an input image and $\bm{z}\sim \mathcal{N}(\bm{0},\bm{I})$ a random Gaussian sample.
+For \ac{VAE}-\acp{GAN}, the generator network is nothing but the decoder network whereas the discriminator network is an additional network that does not exist for \acp{VAE}.
+
+Equation~\ref{eq:vae_gan_l_gan} is sufficient to train the discriminator network.
+However, it does not force $p(\bm{x}) \approx \mathcal{N}(\bm{0},\bm{I})$ nor does it force reconstructions to resemble the input image.
+
+The latter is achieved by introducing an additional loss term
+\begin{align}
+    \mathcal{L}_{\text {llike}}^{\text {D}}=-\mathbb{E}_{q(\bm{z} | \bm{x})}\left[\log p\left(\operatorname{D}_{l}(\bm{x}) | \bm{z}\right)\right]
+\end{align}
+penalizing differences of intermediate discriminator layer activations between $\bm{x}$ and the reconstruction $\tilde{\bm{x}}$ of $\bm{x}$.
+The former, forcing $p(\bm{x}) \approx \mathcal{N}(\bm{0},\bm{I})$, is achieved by minimizing the \ac{KL}-divergence as in Equation~\ref{eq:elbo_error_term}:
+\begin{align}
+    \mathcal{L}_{\text {prior }}=\kldiv{q(\boldsymbol{z} | \boldsymbol{x})}{p(\boldsymbol{z})}
+\end{align}
+
+The encoder is trained to minimize $\mathcal{L}_{\text {prior }} +  \mathcal{L}_{\text {llike}}^{\text {D}}$, the decoder to minimize $\gamma \mathcal{L}_{\text {llike}}^{\text {D}} - \mathcal{L}_\mathrm{GAN}$, and the discriminator to minimize $-\mathcal{L}_\mathrm{GAN}$.
+Setting $\gamma = 0.75$ led to training convergence for the experiments performed for this thesis.
+
+\citet{larsen2015autoencoding}~show that this training procedure leads to less blurry reconstructions.
 
 \paragraph{Adversarial Latent Autoencoder}
 \begin{figure}
@@ -582,7 +610,7 @@ These assumptions are discussed in Section~\ref{subseq:criticism_vlae}.
     \caption[\ac{ALAE} training]{Training of \ac{ALAE}, adapted from \citet{pidhorskyi2020adversarial}}
     \label{fig:alae_flow}
 \end{figure}
-\acfp{ALAE}~\citep{pidhorskyi2020adversarial} are a hybrid model between \acp{VAE} and \acp{GAN}.
+Similar to \ac{VAE}-\acp{GAN}, \acfp{ALAE}~\citep{pidhorskyi2020adversarial} are a hybrid model between \acp{VAE} and \acp{GAN}.
 \acp{ALAE} are not based on variational inference but on \acp{GAN}.
 
 The starting point of the \ac{ALAE} model is to decompose both, the generator $G$ and discriminator $D$, into two parts, i.e.~$G=\mathcal{G}\circ \mathcal{F}$ and $D=\mathcal{D}\circ \mathcal{E}$ (see Figure~\ref{fig:alae_flow}).
