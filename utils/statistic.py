@@ -17,7 +17,7 @@ def cross_cumulants(data: np.ndarray):
         if len(set(index)) == 1:
             continue
         squared_cumulants.append(np.square(_cumulants(data, *index)))
-    return np.mean(squared_cumulants)
+    return np.mean(np.sqrt(squared_cumulants))
 
 
 def _dot(*arrs):
@@ -46,3 +46,11 @@ def _cumulants(data: np.ndarray, i: int, j: int, k: int, l: int) -> float:
     jk = np.mean(np.prod(data[:, [j, k]], axis=1))
 
     return ijkl - ij * kl - ik * jl - il * jk
+
+
+def correlation_coefficient(a, b):
+    mean_a = np.mean(a)
+    mean_b = np.mean(b)
+    a_centered = a - mean_a
+    b_centered = b - mean_b
+    return np.dot(a_centered, b_centered) / np.sqrt(np.dot(a_centered, a_centered) * np.dot(b_centered, b_centered))

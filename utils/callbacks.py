@@ -10,6 +10,8 @@ from keras import Model
 from keras.callbacks import Callback, LearningRateScheduler, TensorBoard
 from tensorflow.python.summary.writer.writer import FileWriter
 
+from utils.statistic import correlation_coefficient
+
 
 class FeatureMapActivationCorrelationCallback(Callback):
     """
@@ -83,7 +85,7 @@ class FeatureMapActivationCorrelationCallback(Callback):
                 flattened_encoder_maps = (np.stack(sorted_encoder_maps)).flatten()
                 flattened_decoder_maps = (np.stack(sorted_decoder_maps)).flatten()
 
-                corr = _correlation_coefficient(flattened_encoder_maps, flattened_decoder_maps)
+                corr = correlation_coefficient(flattened_encoder_maps, flattened_decoder_maps)
                 summary = tf.Summary(
                     value=[tf.Summary.Value(tag="correlation/{}".format(encoder_layer_name), simple_value=corr)])
                 self.writer.add_summary(summary, global_step=self.seen)
@@ -131,11 +133,3 @@ def image_summary(image: np.ndarray, tag: str, global_step: int, writer: FileWri
 
     writer.add_summary(summary, global_step=global_step)
     writer.flush()
-
-
-def _correlation_coefficient(a, b):
-    mean_a = np.mean(a)
-    mean_b = np.mean(b)
-    a_centered = a - mean_a
-    b_centered = b - mean_b
-    return np.dot(a_centered, b_centered) / np.sqrt(np.dot(a_centered, a_centered) * np.dot(b_centered, b_centered))

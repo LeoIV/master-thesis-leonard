@@ -11,11 +11,15 @@ from utils.vae_utils import sampling
 
 
 class VAE(VAEWrapper):
-    def __init__(self, input_dim: Tuple[int, int, int], encoder_conv_filters,
+    def __init__(self, input_dim: Tuple[int, int, int],
+                 encoder_conv_filters,
                  encoder_conv_kernel_size: Sequence[Union[int, Tuple[int, int]]],
-                 encoder_conv_strides: Sequence[Union[int, Tuple[int, int]]], decoder_conv_t_filters,
+                 encoder_conv_strides: Sequence[Union[int, Tuple[int, int]]],
+                 decoder_conv_t_filters,
                  decoder_conv_t_kernel_size: Sequence[Union[int, Tuple[int, int]]],
-                 decoder_conv_t_strides: Sequence[Union[int, Tuple[int, int]]], z_dims: Sequence[int], log_dir: str,
+                 decoder_conv_t_strides: Sequence[Union[int, Tuple[int, int]]],
+                 z_dims: Sequence[int],
+                 log_dir: str,
                  feature_map_layers: Sequence[int], kernel_visualization_layer: int, dropout_rate: float,
                  use_batch_norm: bool = False, use_dropout: bool = False, num_samples: int = 10,
                  inner_activation: str = "ReLU", decay_rate: float = 1e-7, feature_map_reduction_factor: int = 1):
