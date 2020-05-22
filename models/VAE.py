@@ -1,3 +1,4 @@
+import math
 from typing import Sequence, Union, Tuple, List
 
 import numpy as np
@@ -58,12 +59,14 @@ class VAE(VAEWrapper):
 
             if i == 0:
                 conv_layer = Conv2D(input_shape=self.input_dim,
-                                    filters=self.encoder_conv_filters[i], kernel_size=self.encoder_conv_kernel_size[i],
+                                    filters=math.ceil(self.encoder_conv_filters[i] / self.feature_map_reduction_factor),
+                                    kernel_size=self.encoder_conv_kernel_size[i],
                                     strides=self.encoder_conv_strides[i], padding='same', name='encoder_conv_' + str(i)
                                     )
             else:
                 conv_layer = Conv2D(
-                    filters=self.encoder_conv_filters[i], kernel_size=self.encoder_conv_kernel_size[i],
+                    filters=math.ceil(self.encoder_conv_filters[i] / self.feature_map_reduction_factor),
+                    kernel_size=self.encoder_conv_kernel_size[i],
                     strides=self.encoder_conv_strides[i], padding='same', name='encoder_conv_' + str(i)
                 )
 
@@ -96,7 +99,8 @@ class VAE(VAEWrapper):
 
         for i in range(self.n_layers_decoder):
             conv_t_layer = Conv2DTranspose(
-                filters=self.decoder_conv_t_filters[i], kernel_size=self.decoder_conv_t_kernel_size[i],
+                filters=math.ceil(self.decoder_conv_t_filters[i] / self.feature_map_reduction_factor),
+                kernel_size=self.decoder_conv_t_kernel_size[i],
                 strides=self.decoder_conv_t_strides[i], padding='same', name='decoder_conv_t_' + str(i)
             )
 

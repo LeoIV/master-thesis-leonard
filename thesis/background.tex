@@ -304,7 +304,7 @@ The usage of neural networks poses a challenge for computing the first term in e
 Usually, one would draw a sufficient number of samples from $q_\phi(\bm{z}|\bm{x})$ to approximate the expectation.
 However, sampling is not possible if one wants to compute the gradient to train the model by backpropagation.
 
-\textbf{TODO: Posterior Collapse}
+\textbf{TODO: Posterior Collapse (Dai et al. 2019), Spurious global optima (van den Oord et al. 2018), prior/posterior mismatch (Tolshkin et al. 2018, Dai et al. 2019)}
 
 \paragraph{Disadvantages}
 Another disadvantage of \acp{VAE} is that they \say{use only a small subset of the dimensions of $\bm{z}$}~\citep[p. 694]{Goodfellow-et-al-2016}.

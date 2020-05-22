@@ -13,6 +13,7 @@ from keras.optimizers import Adam
 from keras_preprocessing.image import Iterator, DirectoryIterator
 from tqdm import tqdm
 
+from callbacks.ActivationVisualizationCallback import ActivationVisualizationCallback
 from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.HiddenSpaceCallback import HiddenSpaceCallback
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
@@ -285,12 +286,22 @@ class VLAEGAN(VAEWrapper):
                                                       print_every_n_batches=print_every_n_batches,
                                                       layer_idxs=self.feature_map_layers,
                                                       x_train=x_train_subset, num_samples=self.num_samples)
+        av_encoder_callback = ActivationVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
+                                                              model_name='encoder',
+                                                              x_train=x_train_subset,
+                                                              print_every_n_batches=print_every_n_batches)
+        av_decoder_callback = ActivationVisualizationCallback(log_dir=self.log_dir, model=self.decoder,
+                                                              model_name='decoder',
+                                                              x_train=x_train_subset,
+                                                              print_every_n_batches=print_every_n_batches,
+                                                              x_train_transform=lambda x, m: m.predict(x),
+                                                              transform_params=[self.encoder])
         hs_callback = HiddenSpaceCallback(log_dir=self.log_dir, vae=self, batch_size=batch_size,
                                           x_train=x_train_subset, y_train=y_embedding, max_samples=5000,
                                           layer_names=self.mu_layer_names, plot_params=embedding_callback_params)
         ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [hs_callback, fm_callback, rc_callback, ll_callback]
+        callbacks_list = [av_encoder_callback, av_decoder_callback, hs_callback, fm_callback, rc_callback, ll_callback]
 
         logging.info("Training for {} epochs".format(epochs))
 

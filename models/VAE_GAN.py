@@ -13,6 +13,7 @@ from keras.optimizers import Adam
 from keras_preprocessing.image import Iterator, DirectoryIterator
 from tqdm import tqdm
 
+from callbacks.ActivationVisualizationCallback import ActivationVisualizationCallback
 from callbacks.FeatureMapVisualizationCallback import FeatureMapVisualizationCallback
 from callbacks.HiddenSpaceCallback import HiddenSpaceCallback
 from callbacks.KernelVisualizationCallback import KernelVisualizationCallback
@@ -104,12 +105,14 @@ class VAEGAN(VAEWrapper):
 
             if i == 0:
                 conv_layer = Conv2D(input_shape=self.input_dim,
-                                    filters=self.encoder_conv_filters[i], kernel_size=self.encoder_conv_kernel_size[i],
+                                    filters=math.ceil(self.encoder_conv_filters[i] / self.feature_map_reduction_factor),
+                                    kernel_size=self.encoder_conv_kernel_size[i],
                                     strides=self.encoder_conv_strides[i], padding='same', name='encoder_conv_' + str(i)
                                     )
             else:
                 conv_layer = Conv2D(
-                    filters=self.encoder_conv_filters[i], kernel_size=self.encoder_conv_kernel_size[i],
+                    filters=math.ceil(self.encoder_conv_filters[i] / self.feature_map_reduction_factor),
+                    kernel_size=self.encoder_conv_kernel_size[i],
                     strides=self.encoder_conv_strides[i], padding='same', name='encoder_conv_' + str(i)
                 )
 
@@ -142,7 +145,8 @@ class VAEGAN(VAEWrapper):
 
         for i in range(self.n_layers_decoder):
             conv_t_layer = Conv2DTranspose(
-                filters=self.decoder_conv_t_filters[i], kernel_size=self.decoder_conv_t_kernel_size[i],
+                filters=math.ceil(self.decoder_conv_t_filters[i] / self.feature_map_reduction_factor),
+                kernel_size=self.decoder_conv_t_kernel_size[i],
                 strides=self.decoder_conv_t_strides[i], padding='same', name='decoder_conv_t_' + str(i)
             )
 
@@ -204,6 +208,23 @@ class VAEGAN(VAEWrapper):
               initial_epoch=0, lr_decay=1, embedding_samples: int = 5000, y_train: Optional[np.ndarray] = None,
               x_test: Optional[Union[Iterator, np.ndarray]] = None, y_test: Optional[np.ndarray] = None,
               steps_per_epoch: int = None, **kwargs):
+        """
+
+        :param x_train:
+        :param batch_size: best batch size for this model: 128
+        :param epochs:
+        :param weights_folder:
+        :param print_every_n_batches:
+        :param initial_epoch:
+        :param lr_decay:
+        :param embedding_samples:
+        :param y_train:
+        :param x_test:
+        :param y_test:
+        :param steps_per_epoch:
+        :param kwargs:
+        :return:
+        """
 
         embedding_callback_params = kwargs.get('embedding_callback_params', {})
 
@@ -235,12 +256,22 @@ class VAEGAN(VAEWrapper):
                                                       print_every_n_batches=print_every_n_batches,
                                                       layer_idxs=self.feature_map_layers,
                                                       x_train=x_train_subset, num_samples=self.num_samples)
+        av_encoder_callback = ActivationVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
+                                                              model_name='encoder',
+                                                              x_train=x_train_subset,
+                                                              print_every_n_batches=print_every_n_batches)
+        av_decoder_callback = ActivationVisualizationCallback(log_dir=self.log_dir, model=self.decoder,
+                                                              model_name='decoder',
+                                                              x_train=x_train_subset,
+                                                              print_every_n_batches=print_every_n_batches,
+                                                              x_train_transform=lambda x, m: m.predict(x),
+                                                              transform_params=[self.encoder])
         hs_callback = HiddenSpaceCallback(log_dir=self.log_dir, vae=self, batch_size=batch_size,
                                           x_train=x_train_subset, y_train=y_embedding, max_samples=5000,
                                           layer_names=self.mu_layer_names, plot_params=embedding_callback_params)
         ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [hs_callback, fm_callback, rc_callback, ll_callback]
+        callbacks_list = [hs_callback, av_encoder_callback, av_decoder_callback, fm_callback, rc_callback, ll_callback]
 
         logging.info("Training for {} epochs".format(epochs))
 

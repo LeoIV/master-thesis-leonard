@@ -1,4 +1,5 @@
 import logging
+import math
 from typing import Tuple
 
 from keras.layers import Input, Conv2D, Flatten, Dense, Dropout, MaxPool2D, Softmax, BatchNormalization, LeakyReLU, ReLU
@@ -46,33 +47,34 @@ class AlexNet(DeepCNNClassifierWrapper):
         x = input
 
         # Layer 1
-        x = Conv2D(filters=96, input_shape=(224, 224, 3), kernel_size=(11, 11), strides=(4, 4), padding='same')(x)
+        x = Conv2D(filters=math.ceil(96 / self.feature_map_reduction_factor), input_shape=(224, 224, 3),
+                   kernel_size=(11, 11), strides=(4, 4), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
         x = MaxPool2D(pool_size=(2, 2))(x)
 
         # Layer 2
-        x = Conv2D(filters=256, kernel_size=(5, 5), padding='same')(x)
+        x = Conv2D(filters=math.ceil(256 / self.feature_map_reduction_factor), kernel_size=(5, 5), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
         x = MaxPool2D(pool_size=(2, 2))(x)
 
         # Layer 3
-        x = Conv2D(filters=384, kernel_size=(3, 3), padding='same')(x)
+        x = Conv2D(filters=math.ceil(384 / self.feature_map_reduction_factor), kernel_size=(3, 3), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 4
-        x = Conv2D(filters=384, kernel_size=(3, 3), padding='same')(x)
+        x = Conv2D(filters=math.ceil(384 / self.feature_map_reduction_factor), kernel_size=(3, 3), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
 
         # Layer 5
-        x = Conv2D(filters=256, kernel_size=(3, 3), padding='same')(x)
+        x = Conv2D(filters=math.ceil(256 / self.feature_map_reduction_factor), kernel_size=(3, 3), padding='same')(x)
         if self.use_batch_norm:
             x = BatchNormalization()(x)
         x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
@@ -83,20 +85,20 @@ class AlexNet(DeepCNNClassifierWrapper):
         x = Flatten()(x)
         if self.use_fc:
             # FC1
-            x = Dense(4096)(x)
+            x = Dense(math.ceil(4096 / self.feature_map_reduction_factor))(x)
             # , input_shape=(np.prod(self.input_dim),)
             x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
             if self.use_dropout:
                 x = Dropout(rate=self.dropout_rate)(x)
 
             # FC2
-            x = Dense(4096)(x)
+            x = Dense(math.ceil(4096 / self.feature_map_reduction_factor))(x)
             x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
             if self.use_dropout:
                 x = Dropout(rate=self.dropout_rate)(x)
 
         # Output Layer
-        x = Dense(1000)(x)
+        x = Dense(math.ceil(1000 / self.feature_map_reduction_factor))(x)
         x = Softmax()(x)
 
         # THE FULL VAE

@@ -1,6 +1,7 @@
 import argparse
 import csv
 import datetime
+import json
 import logging
 import os
 import sys
@@ -39,9 +40,10 @@ def main(args: List[str]):
 
     parser = ArgumentParser(description='Functionality for Leonards master thesis')
     parser.add_argument('--configuration', type=str,
-                        choices=['vlae_gan', 'vae_128', 'vae_224', 'vae_28', 'vae_64', 'vae_gan_128', 'vae_gan_224',
-                                 'vae_gan_28', 'vae_gan_64', 'alexnet_classifier', 'simple_classifier', 'alexnet_vae',
-                                 'frozen_alexnet_vae', 'alexnet_vae_classification_loss', 'vlae_28', 'vlae_64', 'hvae'],
+                        choices=['vlae_gan_28', 'vlae_gan_64', 'vlae_gan_128', 'vae_128', 'vae_224', 'vae_28', 'vae_64',
+                                 'vae_gan_128', 'vae_gan_224', 'vae_gan_28', 'vae_gan_64', 'alexnet_classifier',
+                                 'simple_classifier', 'alexnet_vae', 'frozen_alexnet_vae',
+                                 'alexnet_vae_classification_loss', 'vlae_28', 'vlae_64', 'vlae_128', 'hvae'],
                         help="The configuration to execute.\n\n"
                              "mnist: VAE trained on mnist\n"
                              "cifar10_vae: VAE trained on cifar10\n"
@@ -118,6 +120,9 @@ def main(args: List[str]):
     if not os.path.exists(weights):
         logging.info("Creating weights dir: {}".format(weights))
         os.mkdir(weights)
+
+    with open(os.path.join(args.logdir, 'run_config.json'), 'w+') as f:
+        f.write(json.dumps(vars(args)))
 
     input_dim = None
     x_train, y_train = None, None
@@ -247,56 +252,106 @@ def main(args: List[str]):
                                  feature_map_reduction_factor=args.feature_map_reduction_factor,
                                  feature_map_layers=args.feature_map_layers, num_samples=args.num_samples)
 
-    elif args.configuration == 'vlae_gan':
-        input_dim = infer_input_dim((28, 28), args)
-        model = VLAEGAN(input_dim=input_dim, log_dir=args.logdir,
-                        inf0_kernels_strides_featuremaps=[(5, 2, 64)],
-                        inf1_kernels_strides_featuremaps=[(3, 2, 64)],
-                        ladder0_kernels_strides_featuremaps=[(5, 2, 64)],
-                        ladder1_kernels_strides_featuremaps=[(5, 1, 64)],
-                        ladder2_kernels_strides_featuremaps=[(3, 1, 64), (3, 1, 64)],
-                        gen2_num_units=[1024, 1024],
-                        gen1_num_units=[1024, 1024],
-                        gen0_kernels_strides_featuremaps=[(5, 2, 64), (5, 2, input_dim[-1])],
-                        kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
-                        feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
-                        decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
-                        z_dims=args.z_dims, dropout_rate=args.dropout_rate,
-                        use_dropout=args.use_dropout, use_batch_norm=args.use_batch_norm)
-    elif args.configuration == 'vlae_28':
+    elif args.configuration in ['vlae_28', 'vlae_gan_28']:
         dim = int(args.configuration.split('_')[-1])
         input_dim = infer_input_dim((dim, dim), args)
-        model = VLAE(input_dim=input_dim, log_dir=args.logdir,
-                     inf0_kernels_strides_featuremaps=[(5, 2, 64)],
-                     inf1_kernels_strides_featuremaps=[(3, 2, 64)],
-                     ladder0_kernels_strides_featuremaps=[(5, 2, 64)],
-                     ladder1_kernels_strides_featuremaps=[(5, 1, 64)],
-                     ladder2_kernels_strides_featuremaps=[(3, 1, 64), (3, 1, 64)],
-                     gen2_num_units=[1024, 1024],
-                     gen1_num_units=[1024, 1024],
-                     gen0_kernels_strides_featuremaps=[(5, 2, 64), (5, 2, input_dim[-1])],
-                     kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
-                     feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
-                     decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
-                     z_dims=args.z_dims, dropout_rate=args.dropout_rate,
-                     use_dropout=args.use_dropout, use_batch_norm=args.use_batch_norm)
-    elif args.configuration == 'vlae_64':
+        if 'gan' not in args.configuration:
+            model = VLAE(input_dim=input_dim, log_dir=args.logdir,
+                         inf0_kernels_strides_featuremaps=[(5, 2, 64)],
+                         inf1_kernels_strides_featuremaps=[(3, 2, 64)],
+                         ladder0_kernels_strides_featuremaps=[(5, 2, 64)],
+                         ladder1_kernels_strides_featuremaps=[(5, 1, 64)],
+                         ladder2_kernels_strides_featuremaps=[(3, 1, 64), (3, 1, 64)],
+                         gen2_num_units=[1024, 1024],
+                         gen1_num_units=[1024, 1024],
+                         gen0_kernels_strides_featuremaps=[(5, 2, 64), (5, 2, input_dim[-1])],
+                         kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
+                         feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
+                         decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
+                         z_dims=args.z_dims, dropout_rate=args.dropout_rate,
+                         use_dropout=args.use_dropout, use_batch_norm=args.use_batch_norm)
+        else:
+            model = VLAEGAN(input_dim=input_dim, log_dir=args.logdir,
+                            inf0_kernels_strides_featuremaps=[(5, 2, 64)],
+                            inf1_kernels_strides_featuremaps=[(3, 2, 64)],
+                            ladder0_kernels_strides_featuremaps=[(5, 2, 64)],
+                            ladder1_kernels_strides_featuremaps=[(5, 1, 64)],
+                            ladder2_kernels_strides_featuremaps=[(3, 1, 64), (3, 1, 64)],
+                            gen2_num_units=[1024, 1024],
+                            gen1_num_units=[1024, 1024],
+                            gen0_kernels_strides_featuremaps=[(5, 2, 64), (5, 2, input_dim[-1])],
+                            kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
+                            feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
+                            decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
+                            z_dims=args.z_dims, dropout_rate=args.dropout_rate,
+                            use_dropout=args.use_dropout, use_batch_norm=args.use_batch_norm)
+    elif args.configuration in ['vlae_64', 'vlae_gan_64']:
         dim = int(args.configuration.split('_')[-1])
         input_dim = infer_input_dim((dim, dim), args)
-        model = VLAE(input_dim=input_dim, log_dir=args.logdir,
-                     inf0_kernels_strides_featuremaps=[(5, 2, 64)],
-                     inf1_kernels_strides_featuremaps=[(3, 2, 64)],
-                     ladder0_kernels_strides_featuremaps=[(5, 2, 64)],
-                     ladder1_kernels_strides_featuremaps=[(3, 2, 64)],
-                     ladder2_kernels_strides_featuremaps=[(3, 2, 64), (3, 1, 64)],
-                     gen2_num_units=[1024, 1024],
-                     gen1_num_units=[1024, 1024],
-                     gen0_kernels_strides_featuremaps=[(5, 2, 32), (3, 2, 64), (5, 2, input_dim[-1])],
-                     kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
-                     feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
-                     decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
-                     z_dims=args.z_dims, dropout_rate=args.dropout_rate, use_dropout=args.use_dropout,
-                     use_batch_norm=args.use_batch_norm)
+        if 'gan' not in args.configuration:
+            model = VLAE(input_dim=input_dim, log_dir=args.logdir,
+                         inf0_kernels_strides_featuremaps=[(5, 2, 64)],
+                         inf1_kernels_strides_featuremaps=[(3, 2, 64)],
+                         ladder0_kernels_strides_featuremaps=[(5, 2, 64)],
+                         ladder1_kernels_strides_featuremaps=[(3, 2, 64)],
+                         ladder2_kernels_strides_featuremaps=[(3, 2, 64), (3, 1, 64)],
+                         gen2_num_units=[1024, 1024],
+                         gen1_num_units=[1024, 1024],
+                         gen0_kernels_strides_featuremaps=[(5, 2, 32), (3, 2, 64), (5, 2, input_dim[-1])],
+                         kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
+                         feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
+                         decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
+                         z_dims=args.z_dims, dropout_rate=args.dropout_rate, use_dropout=args.use_dropout,
+                         use_batch_norm=args.use_batch_norm)
+        else:
+            model = VLAEGAN(input_dim=input_dim, log_dir=args.logdir,
+                            inf0_kernels_strides_featuremaps=[(5, 2, 64)],
+                            inf1_kernels_strides_featuremaps=[(3, 2, 64)],
+                            ladder0_kernels_strides_featuremaps=[(5, 2, 64)],
+                            ladder1_kernels_strides_featuremaps=[(3, 2, 64)],
+                            ladder2_kernels_strides_featuremaps=[(3, 2, 64), (3, 1, 64)],
+                            gen2_num_units=[1024, 1024],
+                            gen1_num_units=[1024, 1024],
+                            gen0_kernels_strides_featuremaps=[(5, 2, 32), (3, 2, 64), (5, 2, input_dim[-1])],
+                            kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
+                            feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
+                            decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
+                            z_dims=args.z_dims, dropout_rate=args.dropout_rate, use_dropout=args.use_dropout,
+                            use_batch_norm=args.use_batch_norm)
+    elif args.configuration in ['vlae_128', 'vlae_gan_128']:
+        dim = int(args.configuration.split('_')[-1])
+        input_dim = infer_input_dim((dim, dim), args)
+        if 'gan' not in args.configuration:
+            model = VLAE(input_dim=input_dim, log_dir=args.logdir,
+                         inf0_kernels_strides_featuremaps=[(5, 2, 64)],
+                         inf1_kernels_strides_featuremaps=[(3, 2, 64)],
+                         ladder0_kernels_strides_featuremaps=[(5, 2, 64)],
+                         ladder1_kernels_strides_featuremaps=[(3, 2, 64), (3, 2, 64)],
+                         ladder2_kernels_strides_featuremaps=[(3, 2, 64), (3, 1, 64)],
+                         gen2_num_units=[1024, 1024],
+                         gen1_num_units=[1024, 1024],
+                         gen0_kernels_strides_featuremaps=[(5, 2, 32), (3, 2, 64), (3, 1, 64), (5, 2, input_dim[-1])],
+                         kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
+                         feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
+                         decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
+                         z_dims=args.z_dims, dropout_rate=args.dropout_rate, use_dropout=args.use_dropout,
+                         use_batch_norm=args.use_batch_norm)
+        else:
+            model = VLAEGAN(input_dim=input_dim, log_dir=args.logdir,
+                            inf0_kernels_strides_featuremaps=[(5, 2, 64)],
+                            inf1_kernels_strides_featuremaps=[(3, 2, 64)],
+                            ladder0_kernels_strides_featuremaps=[(5, 2, 64)],
+                            ladder1_kernels_strides_featuremaps=[(3, 2, 64), (3, 2, 64)],
+                            ladder2_kernels_strides_featuremaps=[(3, 2, 64), (3, 1, 64)],
+                            gen2_num_units=[1024, 1024],
+                            gen1_num_units=[1024, 1024],
+                            gen0_kernels_strides_featuremaps=[(5, 2, 32), (3, 2, 64), (3, 1, 64),
+                                                              (5, 2, input_dim[-1])],
+                            kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
+                            feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
+                            decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
+                            z_dims=args.z_dims, dropout_rate=args.dropout_rate, use_dropout=args.use_dropout,
+                            use_batch_norm=args.use_batch_norm)
     elif args.configuration == 'hvae':
         input_dim = infer_input_dim((28, 28), args)
         model = HVAE(input_dim=input_dim, log_dir=args.logdir,

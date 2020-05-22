@@ -1,3 +1,4 @@
+import math
 from typing import Sequence, Union, Tuple
 
 from keras.layers import Input, Conv2D, Flatten, Dense, BatchNormalization, LeakyReLU, Dropout, ReLU, Softmax
@@ -47,12 +48,14 @@ class SimpleClassifier(DeepCNNClassifierWrapper):
 
             if i == 0:
                 conv_layer = Conv2D(input_shape=self.input_dim,
-                                    filters=self.encoder_conv_filters[i], kernel_size=self.encoder_conv_kernel_size[i],
+                                    filters=math.ceil(self.encoder_conv_filters[i] / self.feature_map_reduction_factor),
+                                    kernel_size=self.encoder_conv_kernel_size[i],
                                     strides=self.encoder_conv_strides[i], padding='same', name='encoder_conv_' + str(i)
                                     )
             else:
                 conv_layer = Conv2D(
-                    filters=self.encoder_conv_filters[i], kernel_size=self.encoder_conv_kernel_size[i],
+                    filters=math.ceil(self.encoder_conv_filters[i] / self.feature_map_reduction_factor),
+                    kernel_size=self.encoder_conv_kernel_size[i],
                     strides=self.encoder_conv_strides[i], padding='same', name='encoder_conv_' + str(i)
                 )
 

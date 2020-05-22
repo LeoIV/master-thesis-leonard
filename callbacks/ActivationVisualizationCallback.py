@@ -1,26 +1,43 @@
-import logging
+import math
 import os
-from typing import Sequence
+import time
+from typing import Callable, Any, Sequence
 
-from PIL import Image, ImageDraw
-from keras import Input, Model, losses
+import matplotlib.pyplot as plt
+import numpy as np
+from keras import Model
 from keras.callbacks import Callback
-from keras.layers import Conv2D, LeakyReLU
-from keras.optimizers import Adam
-from vis.visualization import get_num_filters, visualize_activation
+from keras.layers import Conv2D, LeakyReLU, Dense, ReLU, Activation
 
 
 class ActivationVisualizationCallback(Callback):
-    def __init__(self, log_dir: str, model_wrapper: 'VariationalAutoencoder', print_every_n_batches: int,
-                 layer_idxs: Sequence[int]):
+    def __init__(self, log_dir: str, model: Model, print_every_n_batches: int, model_name: str, x_train: np.ndarray,
+                 x_train_transform: Callable[[np.ndarray, Any], np.ndarray] = None,
+                 transform_params: Sequence[Any] = None):
+        """
+
+        :param log_dir:
+        :param model:
+        :param print_every_n_batches:
+        :param model_name:
+        :param x_train:
+        :param x_train_transform: optional function to transform x_train before passing it to the model. useful for vae decoder that needs encoded input. function uses x_train at first place and then parameters through transform_params
+        """
         super().__init__()
 
+        self.x_train_transform = x_train_transform
+        self.transform_params = transform_params
+        self.x_train = x_train
         self.log_dir = log_dir
-        self.model_wrapper = model_wrapper
+        self.model = model
+        self.model_name = model_name
         self.print_every_n_batches = print_every_n_batches
-        self.layer_idxs = layer_idxs
         self.seen = 0
         self.epoch = 1
+
+        self._output_layers = [l for l in self.model.layers if
+                               isinstance(l, (Conv2D, Dense, LeakyReLU, ReLU, Activation))]
+        self._multi_output_model = Model(model.inputs, [l.output for l in self._output_layers])
 
     def on_epoch_end(self, epoch, logs=None):
         self.epoch += 1
@@ -28,51 +45,39 @@ class ActivationVisualizationCallback(Callback):
     def on_batch_end(self, batch, logs=None):
         if logs is None:
             logs = {}
-        if batch % self.print_every_n_batches == 0 and batch > 0:
+        if batch % self.print_every_n_batches == 0:
             self.seen += 1
-            for i, layer_idx in enumerate(self.layer_idxs):
-                # get current target layer
-                layer = self.model_wrapper.encoder.layers[layer_idx]
-                if layer.name not in self.model_wrapper.rfs:
-                    raise AttributeError(
-                        "layers of which you want to visualize the optimal stimuli have to have a defined receptive field in self.rfs")
-                # use layer receptive field size as input size
-                # we assume quadratic receptive fields
-                logging.info("Visualizing max activations for layer {}".format(layer.name))
-                input_size = max(self.model_wrapper.rfs[layer.name].rf.size[0:2])
-                input_size = [input_size, input_size, self.model_wrapper.encoder.input.shape[-1].value]
-                inp = x = Input(shape=input_size)
-                for l in self.model_wrapper.encoder.layers[1:]:
-                    if isinstance(l, Conv2D):
-                        x = Conv2D(filters=l.filters, kernel_size=l.kernel_size, strides=l.strides, trainable=False)(x)
-                    elif isinstance(l, LeakyReLU):
-                        x = LeakyReLU(alpha=l.alpha, trainable=False)(x)
-                    else:
-                        raise ValueError("only Conv2D or LeakyReLU layers supported.")
-                    if l.name == layer.name:
+
+            x_train = self.x_train if self.x_train_transform is None else self.x_train_transform(self.x_train,
+                                                                                                 *self.transform_params)
+
+            outputs = self._multi_output_model.predict(x_train)
+
+            rows = int(math.floor(math.sqrt(len(outputs))))
+            cols = int(math.ceil(len(outputs) / rows))
+
+            img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
+                                    'feature_map_activations')
+            os.makedirs(img_path, exist_ok=True)
+
+            fig, axs = plt.subplots(rows, cols, figsize=(cols * 10, rows * 10), num=round(time.time() * 10E6))
+
+            for row in range(rows):
+                for col in range(cols):
+                    fig_idx = row * rows + col
+                    if fig_idx >= len(outputs):
                         break
-                truncated_model = Model(inp, x)
-                for j, _ in enumerate(truncated_model.layers):
-                    if j == 0:
-                        continue
-                    # copy weights for new model
-                    truncated_model.layers[j].set_weights(self.model_wrapper.model.layers[j].get_weights())
+                    output = outputs[fig_idx]
+                    sum_over_fms = np.mean(output, axis=(1, 2)) if len(output.shape) == 4 else output
 
-                truncated_model.compile(optimizer=Adam(lr=self.model_wrapper.learning_rate),
-                                        loss=losses.mean_squared_error)
-
-                filters = list(range(get_num_filters(truncated_model.layers[layer_idx])))
-                img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
-                                        "max_activations",
-                                        "layer_{}".format(layer_idx))
-                os.makedirs(img_path, exist_ok=True)
-                for f_idx in filters:
-                    img = visualize_activation(truncated_model, layer_idx, filter_indices=f_idx, lp_norm_weight=0.01,
-                                               tv_weight=0.01)
-                    '''img = visualize_activation(self.vae.encoder, layer_idx, filter_indices=idx,
-                                               seed_input=img,
-                                               input_modifiers=[Jitter(0.5)])'''
-                    img = Image.fromarray(img.squeeze()).resize((100, 100), resample=Image.NEAREST)
-                    draw = ImageDraw.Draw(img)
-                    draw.text((1, 1), "L{}F{}".format(layer_idx, f_idx), color=0)
-                    img.save(os.path.join(img_path, "filter_{}.jpg".format(f_idx)))
+                    if sum_over_fms.shape[1] >= 100:
+                        std = np.std(sum_over_fms, axis=0)
+                        mean = np.mean(sum_over_fms, axis=0)
+                        axs[row][col].errorbar(list(range(len(mean))), mean, std, linestyle='None', marker='.')
+                    else:
+                        axs[row][col].boxplot(sum_over_fms, showfliers=False, patch_artist=True,
+                                              boxprops=dict(facecolor='lightsteelblue'))
+                        axs[row][col].set_xticks(np.arange(1, sum_over_fms.shape[1] + 1, 10))
+                        axs[row][col].set_xticklabels(np.arange(1, sum_over_fms.shape[1] + 1, 10))
+                    axs[row][col].set_title(self._output_layers[fig_idx].name)
+            fig.savefig(os.path.join(img_path, '{}.png'.format(self.model_name)))
