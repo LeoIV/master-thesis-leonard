@@ -379,7 +379,7 @@ class VLAEGAN(VAEWrapper):
                             x, y = (x_train[batch_index * batch_size:batch_index * batch_size + batch_size],
                                     y_train[batch_index * batch_size:batch_index * batch_size + batch_size])
                         if model == self.discriminator_train:
-                            x = [x, *[np.random.normal(size=(batch_size, z)) for z in self.z_dims]]
+                            x = [x, *[np.random.normal(size=(x.shape[0], z)) for z in self.z_dims]]
                             y_real = np.ones((batch_size,), dtype='float32')
                             y_fake = np.zeros((batch_size,), dtype='float32')
                             y = [y_real, y_fake, y_fake]
@@ -395,7 +395,7 @@ class VLAEGAN(VAEWrapper):
                             losses['discriminator_acc_x_reconstr'] = outs[7 if len(outs) > 7 else 5]
                             losses['discriminator_acc_x_sampling'] = outs[10 if len(outs) > 7 else 6]
                         elif model == self.decoder_train:
-                            x = [x, *[np.random.normal(size=(batch_size, z)) for z in self.z_dims]]
+                            x = [x, *[np.random.normal(size=(x.shape[0], z)) for z in self.z_dims]]
                             y_real = np.ones((batch_size,), dtype='float32')
                             y = [y_real, y_real]
                             outs = model.train_on_batch(x, y)
