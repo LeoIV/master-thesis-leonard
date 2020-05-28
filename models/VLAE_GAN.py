@@ -8,7 +8,7 @@ from keras import Input, Model
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint
 from keras.layers import Conv2D, BatchNormalization, ReLU, Flatten, Dense, Concatenate, Reshape, \
-    Activation, Lambda, Conv2DTranspose, Dropout, LeakyReLU
+    Activation, Lambda, Conv2DTranspose, Dropout, LeakyReLU, MaxPool2D
 from keras.optimizers import Adam
 from keras_preprocessing.image import Iterator, DirectoryIterator
 from tqdm import tqdm
@@ -83,10 +83,14 @@ class VLAEGAN(VAEWrapper):
         def _discriminator(input_shape: Tuple[int, int, int]):
             x = inpt = Input(shape=input_shape)
             x = Conv2D(batch_input_shape=input_shape, filters=128, kernel_size=3)(x)
+            if self.input_dim[0] > 100:
+                x = MaxPool2D()(x)
             x = BatchNormalization()(x)
             x = LeakyReLU()(x)
             x = Conv2D(filters=256, kernel_size=3)(x)
             x = BatchNormalization()(x)
+            if self.input_dim[0] > 100:
+                x = MaxPool2D()(x)
             x = LeakyReLU()(x)
             x = x_feat = Conv2D(filters=256, kernel_size=3)(x)
             x = BatchNormalization()(x)
