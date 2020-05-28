@@ -67,28 +67,30 @@ class LossLoggingCallback(Callback):
 
         self._bf.flush()
         self._ef.flush()
-        losses = np.loadtxt(os.path.join(self.logdir, self.batch_logdir), skiprows=1,
-                            usecols=list(range(len(self.batch_headers)))[2:], delimiter=",")
-        loss_names = self.batch_headers[2:]
-        fig = plt.figure(num=round(time.time() * 10E6))
-        ax = fig.gca()
-        arr = np.arange(len(losses))
-        for loss in losses.T:
-            ax.plot(arr, loss)
-        ax.legend(loss_names, loc='upper right')
-        fig.savefig(os.path.join(self.logdir, "batch_losses.png"), mode="w+")
+        if len(self.batch_headers) > 2:
+            losses = np.loadtxt(os.path.join(self.logdir, self.batch_logdir), skiprows=1,
+                                usecols=list(range(len(self.batch_headers)))[2:], delimiter=",")
+            loss_names = self.batch_headers[2:]
+            fig = plt.figure(num=round(time.time() * 10E6))
+            ax = fig.gca()
+            arr = np.arange(len(losses))
+            for loss in losses.T:
+                ax.plot(arr, loss)
+            ax.legend(loss_names, loc='upper right')
+            fig.savefig(os.path.join(self.logdir, "batch_losses.png"), mode="w+")
 
-        losses = np.loadtxt(os.path.join(self.logdir, self.epoch_logdir), skiprows=1,
-                            usecols=list(range(len(self.epoch_headers)))[2:], delimiter=",")
-        loss_names = self.epoch_headers[2:]
-        fig = plt.figure(num=round(time.time() * 10E6))
-        ax = fig.gca()
-        losses = losses[np.newaxis, :] if len(losses.shape) == 1 else losses
-        arr = np.arange(len(losses))
-        for loss in losses.T:
-            ax.plot(arr, loss)
-        ax.legend(loss_names, loc='upper right')
-        fig.savefig(os.path.join(self.logdir, "epoch_losses.png"), mode="w+")
+        if len(self.epoch_headers) > 2:
+            losses = np.loadtxt(os.path.join(self.logdir, self.epoch_logdir), skiprows=1,
+                                usecols=list(range(len(self.epoch_headers)))[2:], delimiter=",")
+            loss_names = self.epoch_headers[2:]
+            fig = plt.figure(num=round(time.time() * 10E6))
+            ax = fig.gca()
+            losses = losses[np.newaxis, :] if len(losses.shape) == 1 else losses
+            arr = np.arange(len(losses))
+            for loss in losses.T:
+                ax.plot(arr, loss)
+            ax.legend(loss_names, loc='upper right')
+            fig.savefig(os.path.join(self.logdir, "epoch_losses.png"), mode="w+")
 
     def on_train_end(self, logs=None):
         self._bf.close()
