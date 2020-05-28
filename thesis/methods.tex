@@ -2,7 +2,9 @@ The following Sections describe the methods used in the course of this thesis.
 
 \subsection{Datasets}\label{subsec:datasets}
 
-Two different datasets were used to train the models.
+Five different datasets were used to train the models.
+Four of the datasets contain images of different sizes, the fifth dataset provides additional labels for \textsc{Mnist}.
+The images were resized to match the model's excepted input sizes using Lanczos interpolation~\citep[pp. 223, ff]{burger2009principles}.
 
 \subsubsection{CelebA}
 
@@ -43,7 +45,7 @@ This curated version is commonly used as a baseline (\textbf{refs}).
 MNIST\footnote{\href{http://yann.lecun.com/exdb/mnist/}{http://yann.lecun.com/exdb/mnist/}, last access: 23/04/2020}~\citep{lecun1998gradient} is a widely-used dataset of hand-written digits.
 The data is subdivided into a training set of 60.000 images and a test set containing 10.000 images.
 The digits are \say{size-normalized and centered}.
-The samples are grayscale-images of size $28\times 28$pixels.
+The samples are grayscale images of size $28\times 28$pixels.
 
 \subsubsection{Morpho-MNIST}\label{subsubsec:morphomnist}
 
@@ -55,10 +57,28 @@ Besides providing additional labels of low-level MNIST attributes, Morpho-MNIST 
 The perturbation toolbox allows it to thin, thicken, swell, and to add fractures to an image.
 Morpho-MNIST also provides pre-computed datasets that were built using the perturbation toolbox.
 
-\subsubsection{dsprites}
-\textbf{DRAFT!}
-Dataset for feature disentanglement
-\url{https://github.com/deepmind/dsprites-dataset/}{https://github.com/deepmind/dsprites-dataset/}
+\subsubsection{dSprites}
+dSprites\footnote{\href{https://github.com/deepmind/dsprites-dataset/}{https://github.com/deepmind/dsprites-dataset/}, last access: 5/28/2020}~\citep{dsprites17} is a dataset designed \say{to assess the disentanglement properties of unsupervised learning methods.}
+It contains 737,280 grayscale images of size $64\times 64$ pixels.
+The images were generated from \say{6 ground truth independent latent factors}: color, shape, scale, orientation, $x$-position, and $y$-position.
+The color is white in all images.
+The shapes are: square, ellipse, and heart.
+For the other factors, points are chosen evenly along their support: six values in $[0.5, 1]$ (scale), 40 values in $[0, 2\pi]$ (orientation), 32 values in $[0, 1]$ ($x$-position and $y$-position).
+Each factor combination only occurs once in the data set.
+
+The dataset also contains the factor labels for each image.
+
+\subsection{Models}\label{subsec:models}
+
+Four different base models were evaluated in the course of this thesis.
+
+\subsubsection{VAE Model}
+
+\subsubsection{VLAE Model}
+
+\subsubsection{VAE-GAN Model}
+
+\subsubsection{VLAE-GAN Model}
 
 \subsection{Visual Features Variational Autoencoders}\label{subsec:visual-features-variational-autoencoders}
 Different questions were asked investigate whether \acp{VAE} are a biologically plausible model of the Visual Cortex.

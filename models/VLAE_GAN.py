@@ -383,11 +383,11 @@ class VLAEGAN(VAEWrapper):
 
                     for model in models:
                         if model == self.discriminator_train:
-                            x = [x, *[np.random.normal(size=(batch_size, z)) for z in self.z_dims]]
+                            xi = [x, *[np.random.normal(size=(batch_size, z)) for z in self.z_dims]]
                             y_real = np.ones((batch_size,), dtype='float32')
                             y_fake = np.zeros((batch_size,), dtype='float32')
-                            y = [y_real, y_fake, y_fake]
-                            outs = model.train_on_batch(x, y)
+                            yi = [y_real, y_fake, y_fake]
+                            outs = model.train_on_batch(xi, yi)
                             t.postfix[1]["value"] = "{:.3f} {:.3f} {:.3f}".format(outs[4],
                                                                                   outs[7 if len(outs) > 7 else 5],
                                                                                   outs[10 if len(outs) > 7 else 6])
@@ -399,10 +399,10 @@ class VLAEGAN(VAEWrapper):
                             losses['discriminator_acc_x_reconstr'] = outs[7 if len(outs) > 7 else 5]
                             losses['discriminator_acc_x_sampling'] = outs[10 if len(outs) > 7 else 6]
                         elif model == self.decoder_train:
-                            x = [x, *[np.random.normal(size=(batch_size, z)) for z in self.z_dims]]
+                            xi = [x, *[np.random.normal(size=(batch_size, z)) for z in self.z_dims]]
                             y_real = np.ones((batch_size,), dtype='float32')
-                            y = [y_real, y_real]
-                            outs = model.train_on_batch(x, y)
+                            yi = [y_real, y_real]
+                            outs = model.train_on_batch(xi, yi)
                             t.postfix[3]["value"] = outs[3]
                             losses['decoder_acc'] = outs[3]
                             losses['decoder_loss'] = outs[0]
