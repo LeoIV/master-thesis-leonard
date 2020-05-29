@@ -349,7 +349,7 @@ def main(args: List[str]):
                             gen2_num_units=[1024, 1024],
                             gen1_num_units=[1024, 1024],
                             gen0_kernels_strides_featuremaps=[(5, 2, 2, 32), (3, 2, 2, 64), (3, 2, 1, 64),
-                                                              (5, 2, 2, input_dim[-1])],
+                                                              (5, 2, 1, input_dim[-1])],
                             kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
                             feature_map_layers=args.feature_map_layers, inner_activation=args.inner_activation,
                             decay_rate=args.lr_decay, feature_map_reduction_factor=args.feature_map_reduction_factor,
