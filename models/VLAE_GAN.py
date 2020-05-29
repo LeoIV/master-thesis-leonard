@@ -88,11 +88,14 @@ class VLAEGAN(VAEWrapper):
             x = Conv2D(filters=256, kernel_size=3)(x)
             x = BatchNormalization()(x)
             x = LeakyReLU()(x)
-            x = x_feat = Conv2D(filters=256, kernel_size=3)(x)
             if self.input_dim[0] > 100:
-                x = MaxPool2D(pool_size=(4, 4))(x)
+                x = MaxPool2D()(x)
+            x = x_feat = Conv2D(filters=256, kernel_size=3)(x)
             x = BatchNormalization()(x)
             x = LeakyReLU()(x)
+            if self.input_dim[0] > 100:
+                x = MaxPool2D()(x)
+                x_feat = x
             x = Flatten()(x)
             x = Dense(512)(x)
             x = BatchNormalization()(x)
