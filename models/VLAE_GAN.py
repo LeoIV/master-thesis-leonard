@@ -1,6 +1,7 @@
 import logging
 import math
 import os
+import time
 from typing import Tuple, Sequence, List, Union, Optional
 
 import numpy as np
@@ -396,7 +397,11 @@ class VLAEGAN(VAEWrapper):
                             y_real = np.ones((batch_size,), dtype='float32')
                             y_fake = np.zeros((batch_size,), dtype='float32')
                             yi = [y_real, y_fake, y_fake]
+                            then = time.time()
                             outs = model.train_on_batch(xi, yi)
+                            now = time.time()
+
+                            print("Training discriminator took {} seconds".format(int(now - then)))
                             t.postfix[1]["value"] = "{:.3f} {:.3f} {:.3f}".format(outs[4],
                                                                                   outs[7 if len(outs) > 7 else 5],
                                                                                   outs[10 if len(outs) > 7 else 6])
@@ -411,12 +416,19 @@ class VLAEGAN(VAEWrapper):
                             xi = [x, *[np.random.normal(size=(batch_size, z)) for z in self.z_dims]]
                             y_real = np.ones((batch_size,), dtype='float32')
                             yi = [y_real, y_real]
+                            then = time.time()
                             outs = model.train_on_batch(xi, yi)
+                            now = time.time()
+
+                            print("Training decoder took {} seconds".format(int(now - then)))
                             t.postfix[3]["value"] = outs[3]
                             losses['decoder_acc'] = outs[3]
                             losses['decoder_loss'] = outs[0]
                         elif model == self.encoder_train:
+                            then = time.time()
                             outs = model.train_on_batch(x, None)
+                            now = time.time()
+                            print("Training encoder took {} seconds".format(int(now - then)))
                             mean_loss = np.mean(outs)
                             t.postfix[5]["value"] = mean_loss
                             losses['encoder_loss'] = mean_loss
