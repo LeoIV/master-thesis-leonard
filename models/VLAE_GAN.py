@@ -7,9 +7,8 @@ from typing import Tuple, Sequence, List, Union, Optional
 import numpy as np
 from keras import Input, Model
 from keras import backend as K
-from keras.callbacks import ModelCheckpoint
 from keras.layers import Conv2D, BatchNormalization, ReLU, Flatten, Dense, Concatenate, Reshape, \
-    Activation, Lambda, Conv2DTranspose, Dropout, LeakyReLU, MaxPool2D, UpSampling2D
+    Activation, Lambda, Conv2DTranspose, Dropout, LeakyReLU
 from keras.optimizers import Adam
 from keras_preprocessing.image import Iterator, DirectoryIterator
 from tqdm import tqdm
@@ -27,14 +26,14 @@ from utils.vae_utils import sampling
 class VLAEGAN(VAEWrapper):
 
     def __init__(self, input_dim: Tuple[int, int, int],
-                 inf0_kernels_strides_featuremaps: List[Tuple[int, int, int, int]],
-                 inf1_kernels_strides_featuremaps: List[Tuple[int, int, int, int]],
-                 ladder0_kernels_strides_featuremaps: List[Tuple[int, int, int, int]],
-                 ladder1_kernels_strides_featuremaps: List[Tuple[int, int, int, int]],
-                 ladder2_kernels_strides_featuremaps: List[Tuple[int, int, int, int]],
+                 inf0_kernels_strides_featuremaps: List[Tuple[int, int, int]],
+                 inf1_kernels_strides_featuremaps: List[Tuple[int, int, int]],
+                 ladder0_kernels_strides_featuremaps: List[Tuple[int, int, int]],
+                 ladder1_kernels_strides_featuremaps: List[Tuple[int, int, int]],
+                 ladder2_kernels_strides_featuremaps: List[Tuple[int, int, int]],
                  gen2_num_units: List[int],
                  gen1_num_units: List[int],
-                 gen0_kernels_strides_featuremaps: List[Tuple[int, int, int, int]],
+                 gen0_kernels_strides_featuremaps: List[Tuple[int, int, int]],
                  use_dropout: bool,
                  use_batch_norm: bool,
                  log_dir: str, kernel_visualization_layer: int, num_samples: int,
@@ -83,24 +82,21 @@ class VLAEGAN(VAEWrapper):
 
         def _discriminator(input_shape: Tuple[int, int, int]):
             x = inpt = Input(shape=input_shape)
-            x = Conv2D(batch_input_shape=input_shape, filters=128, kernel_size=3)(x)
+            x = Conv2D(batch_input_shape=input_shape, filters=128, kernel_size=3,
+                       strides=1 if self.input_dim[0] <= 100 else 2)(x)
             x = BatchNormalization()(x)
             x = LeakyReLU()(x)
             x = Conv2D(filters=256, kernel_size=3)(x)
             x = BatchNormalization()(x)
-            x = LeakyReLU()(x)
-            if self.input_dim[0] > 100:
-                x = MaxPool2D()(x)
-            x = x_feat = Conv2D(filters=256 if self.input_dim[0] <= 100 else 128, kernel_size=3)(x)
+            x = ReLU()(x) if self.inner_activation == 'ReLU' else LeakyReLU()(x)
+            x = x_feat = Conv2D(filters=256 if self.input_dim[0] <= 100 else 128, kernel_size=3,
+                                strides=1 if self.input_dim[0] <= 100 else 2)(x)
             x = BatchNormalization()(x)
-            x = LeakyReLU()(x)
-            if self.input_dim[0] > 100:
-                x = MaxPool2D()(x)
-                x_feat = x
+            x = ReLU()(x) if self.inner_activation == 'ReLU' else LeakyReLU()(x)
             x = Flatten()(x)
             x = Dense(512)(x)
             x = BatchNormalization()(x)
-            x = LeakyReLU()(x)
+            x = ReLU()(x) if self.inner_activation == 'ReLU' else LeakyReLU()(x)
             x = Dense(1, activation='sigmoid')(x)
 
             return Model(inpt, [x_feat, x])
@@ -113,21 +109,20 @@ class VLAEGAN(VAEWrapper):
         self.inputs = i0 = l0 = Input(self.input_dim)
 
         # INFERENCE 0
-        for kernelsize, poolsize, stride, feature_maps in self.inf0_kernels_strides_featuremaps:
+        for kernelsize, stride, feature_maps in self.inf0_kernels_strides_featuremaps:
             i0 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
                         strides=stride, padding='same')(i0)
+            i0 = Dropout(self.dropout_rate)(i0) if self.use_dropout else i0
             i0 = BatchNormalization()(i0) if self.use_batch_norm else i0
-            i0 = ReLU()(i0)
-            i0 = MaxPool2D(pool_size=poolsize)(i0)
+            i0 = ReLU()(i0) if self.inner_activation == 'ReLU' else LeakyReLU()(i0)
 
         # LADDER 0
-        for kernelsize, poolsize, stride, feature_maps in self.ladder0_kernels_strides_featuremaps:
+        for kernelsize, stride, feature_maps in self.ladder0_kernels_strides_featuremaps:
             l0 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
                         strides=stride, padding='same')(l0)
             l0 = Dropout(self.dropout_rate)(l0) if self.use_dropout else l0
             l0 = BatchNormalization()(l0) if self.use_batch_norm else i0
-            l0 = ReLU()(l0)
-            l0 = MaxPool2D(pool_size=poolsize)(l0)
+            l0 = ReLU()(l0) if self.inner_activation == 'ReLU' else LeakyReLU()(l0)
         l0 = Flatten()(l0)
         l0 = Dropout(self.dropout_rate)(l0) if self.use_dropout else l0
         self.mu_0 = Dense(self.z_dims[0], name='mu_1')(l0)
@@ -136,23 +131,21 @@ class VLAEGAN(VAEWrapper):
 
         # INFERENCE 1
         i1 = i0
-        for kernelsize, poolsize, stride, feature_maps in self.inf1_kernels_strides_featuremaps:
+        for kernelsize, stride, feature_maps in self.inf1_kernels_strides_featuremaps:
             i1 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
                         strides=stride, padding='same')(i1)
             i1 = Dropout(self.dropout_rate)(i1) if self.use_dropout else i1
             i1 = BatchNormalization()(i1) if self.use_batch_norm else i1
-            i1 = ReLU()(i1)
-            i1 = MaxPool2D(pool_size=poolsize)(i1)
+            i1 = ReLU()(i1) if self.inner_activation == 'ReLU' else LeakyReLU()(i1)
 
         # LADDER 1
         l1 = i0
-        for kernelsize, poolsize, stride, feature_maps in self.ladder1_kernels_strides_featuremaps:
+        for kernelsize, stride, feature_maps in self.ladder1_kernels_strides_featuremaps:
             l1 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
                         strides=stride, padding='same')(l1)
             l1 = Dropout(self.dropout_rate)(l1) if self.use_dropout else l1
             l1 = BatchNormalization()(l1) if self.use_batch_norm else l1
-            l1 = ReLU()(l1)
-            l1 = MaxPool2D(pool_size=poolsize)(l1)
+            l1 = ReLU()(l1) if self.inner_activation == 'ReLU' else LeakyReLU()(l1)
         l1 = Flatten()(l1)
         l1 = Dropout(self.dropout_rate)(l1) if self.use_dropout else l1
         self.mu_1 = Dense(self.z_dims[1], name='mu_2')(l1)
@@ -161,13 +154,12 @@ class VLAEGAN(VAEWrapper):
 
         # LADDER 2
         l2 = i1
-        for kernelsize, poolsize, stride, feature_maps in self.ladder2_kernels_strides_featuremaps:
+        for kernelsize, stride, feature_maps in self.ladder2_kernels_strides_featuremaps:
             l2 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
                         strides=stride, padding='same')(l2)
             l2 = Dropout(self.dropout_rate)(l2) if self.use_dropout else l2
             l2 = BatchNormalization()(l2)
-            l2 = ReLU()(l2)
-            l2 = MaxPool2D(pool_size=poolsize)(l2)
+            l2 = ReLU()(l2) if self.inner_activation == 'ReLU' else LeakyReLU()(l2)
         shape_before_flattening = K.int_shape(l2)[1:]
         l2 = Flatten()(l2)
         l2 = Dropout(self.dropout_rate)(l2) if self.use_dropout else l2
@@ -191,7 +183,7 @@ class VLAEGAN(VAEWrapper):
             g2 = Dense(math.ceil(num_units / self.feature_map_reduction_factor))(g2)
             g2 = Dropout(self.dropout_rate)(g2) if self.use_dropout else g2
             g2 = BatchNormalization()(g2) if self.use_batch_norm else g2
-            g2 = ReLU()(g2)
+            g2 = ReLU()(g2) if self.inner_activation == 'ReLU' else LeakyReLU()(g2)
 
         # GENERATIVE 1
         g1 = Concatenate()([g2, z_2_input])
@@ -199,23 +191,23 @@ class VLAEGAN(VAEWrapper):
             g1 = Dense(math.ceil(num_units / self.feature_map_reduction_factor))(g1)
             g1 = Dropout(self.dropout_rate)(g1) if self.use_dropout else g1
             g1 = BatchNormalization()(g1) if self.use_batch_norm else g1
-            g1 = ReLU()(g1)
+            g1 = ReLU()(g1) if self.inner_activation == 'ReLU' else LeakyReLU()(g1)
 
         # GENERATIVE 0
         g0 = Concatenate()([g1, z_1_input])
         g0 = Dense(np.prod(shape_before_flattening))(g0)
         g0 = Dropout(self.dropout_rate)(g0) if self.use_dropout else g0
         g0 = BatchNormalization()(g0) if self.use_batch_norm else g0
-        g0 = ReLU()(g0)
+        g0 = ReLU()(g0) if self.inner_activation == 'ReLU' else LeakyReLU()(g0)
         g0 = Reshape(shape_before_flattening)(g0)
-        for i, (kernelsize, poolsize, stride, feature_maps) in enumerate(self.gen0_kernels_strides_featuremaps):
-            g0 = UpSampling2D(size=poolsize)(g0)
+        for i, (kernelsize, stride, feature_maps) in enumerate(self.gen0_kernels_strides_featuremaps):
             g0 = Conv2DTranspose(filters=math.ceil(feature_maps / self.feature_map_reduction_factor),
                                  kernel_size=kernelsize, strides=stride, padding='same')(g0)
             g0 = Dropout(self.dropout_rate)(g0) if self.use_dropout else g0
             g0 = BatchNormalization()(g0) if i < len(
                 self.gen0_kernels_strides_featuremaps) - 1 and self.use_batch_norm else g0
-            g0 = ReLU()(g0) if i < len(self.gen0_kernels_strides_featuremaps) - 1 else g0
+            g0 = (ReLU()(g0) if self.inner_activation == 'ReLU' else LeakyReLU()(g0)) if i < len(
+                self.gen0_kernels_strides_featuremaps) - 1 else g0
         g0 = Activation('sigmoid')(g0)
 
         self.decoder = Model([z_1_input, z_2_input, z_3_input], g0, name='decoder')
@@ -394,7 +386,7 @@ class VLAEGAN(VAEWrapper):
                     for model in models:
                         if model == self.discriminator_train:
                             xi = [x, *[np.random.normal(size=(batch_size, z)) for z in self.z_dims]]
-                            y_real = np.ones((batch_size,), dtype='float32')
+                            y_real = np.full((batch_size,), dtype='float32', fill_value=0.9)
                             y_fake = np.zeros((batch_size,), dtype='float32')
                             yi = [y_real, y_fake, y_fake]
                             then = time.time()
@@ -414,7 +406,7 @@ class VLAEGAN(VAEWrapper):
                             losses['discriminator_acc_x_sampling'] = outs[10 if len(outs) > 7 else 6]
                         elif model == self.decoder_train:
                             xi = [x, *[np.random.normal(size=(batch_size, z)) for z in self.z_dims]]
-                            y_real = np.ones((batch_size,), dtype='float32')
+                            y_real = np.full((batch_size,), dtype='float32', fill_value=0.9)
                             yi = [y_real, y_real]
                             then = time.time()
                             outs = model.train_on_batch(xi, yi)

@@ -1,29 +1,28 @@
 import math
 from typing import Tuple, Sequence, List
 
+import numpy as np
 from keras import Input, Model
 from keras import backend as K
 from keras.layers import Conv2D, BatchNormalization, ReLU, Flatten, Dense, Concatenate, Reshape, \
-    Activation, Lambda, Conv2DTranspose, Dropout, MaxPool2D
+    Activation, Lambda, Conv2DTranspose, Dropout, MaxPool2D, LeakyReLU
 from keras.optimizers import Adam
 
 from models.model_abstract import VAEWrapper
 from utils.vae_utils import sampling
 
-import numpy as np
-
 
 class VLAE(VAEWrapper):
 
     def __init__(self, input_dim: Tuple[int, int, int],
-                 inf0_kernels_strides_featuremaps: List[Tuple[int, int, int, int]],
-                 inf1_kernels_strides_featuremaps: List[Tuple[int, int, int, int]],
-                 ladder0_kernels_strides_featuremaps: List[Tuple[int, int, int, int]],
-                 ladder1_kernels_strides_featuremaps: List[Tuple[int, int, int, int]],
-                 ladder2_kernels_strides_featuremaps: List[Tuple[int, int, int, int]],
+                 inf0_kernels_strides_featuremaps: List[Tuple[int, int, int]],
+                 inf1_kernels_strides_featuremaps: List[Tuple[int, int, int]],
+                 ladder0_kernels_strides_featuremaps: List[Tuple[int, int, int]],
+                 ladder1_kernels_strides_featuremaps: List[Tuple[int, int, int]],
+                 ladder2_kernels_strides_featuremaps: List[Tuple[int, int, int]],
                  gen2_num_units: List[int],
                  gen1_num_units: List[int],
-                 gen0_kernels_strides_featuremaps: List[Tuple[int, int, int, int]],
+                 gen0_kernels_strides_featuremaps: List[Tuple[int, int, int]],
                  use_dropout: bool,
                  use_batch_norm: bool,
                  log_dir: str, kernel_visualization_layer: int, num_samples: int,
@@ -49,21 +48,20 @@ class VLAE(VAEWrapper):
         inputs = i0 = l0 = Input(self.input_dim)
 
         # INFERENCE 0
-        for kernelsize, poolsize, stride, feature_maps in self.inf0_kernels_strides_featuremaps:
+        for kernelsize, stride, feature_maps in self.inf0_kernels_strides_featuremaps:
             i0 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
                         strides=stride, padding='same')(i0)
+            i0 = Dropout(self.dropout_rate)(i0) if self.use_dropout else i0
             i0 = BatchNormalization()(i0) if self.use_batch_norm else i0
-            i0 = ReLU()(i0)
-            i0 = MaxPool2D(pool_size=poolsize, padding='same')(i0)
+            i0 = ReLU()(i0) if self.inner_activation == 'ReLU' else LeakyReLU()(i0)
 
         # LADDER 0
-        for kernelsize, poolsize, stride, feature_maps in self.ladder0_kernels_strides_featuremaps:
+        for kernelsize, stride, feature_maps in self.ladder0_kernels_strides_featuremaps:
             l0 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
                         strides=stride, padding='same')(l0)
             l0 = Dropout(self.dropout_rate)(l0) if self.use_dropout else l0
             l0 = BatchNormalization()(l0) if self.use_batch_norm else i0
-            l0 = ReLU()(l0)
-            l0 = MaxPool2D(pool_size=poolsize, padding='same')(l0)
+            l0 = ReLU()(l0) if self.inner_activation == 'ReLU' else LeakyReLU()(l0)
         l0 = Flatten()(l0)
         l0 = Dropout(self.dropout_rate)(l0) if self.use_dropout else l0
         self.mu_0 = Dense(self.z_dims[0], name='mu_1')(l0)
@@ -72,23 +70,21 @@ class VLAE(VAEWrapper):
 
         # INFERENCE 1
         i1 = i0
-        for kernelsize, poolsize, stride, feature_maps in self.inf1_kernels_strides_featuremaps:
+        for kernelsize, stride, feature_maps in self.inf1_kernels_strides_featuremaps:
             i1 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
                         strides=stride, padding='same')(i1)
             i1 = Dropout(self.dropout_rate)(i1) if self.use_dropout else i1
             i1 = BatchNormalization()(i1) if self.use_batch_norm else i1
-            i1 = ReLU()(i1)
-            i1 = MaxPool2D(pool_size=poolsize, padding='same')(i1)
+            i1 = ReLU()(i1) if self.inner_activation == 'ReLU' else LeakyReLU()(i1)
 
         # LADDER 1
         l1 = i0
-        for kernelsize, poolsize, stride, feature_maps in self.ladder1_kernels_strides_featuremaps:
+        for kernelsize, stride, feature_maps in self.ladder1_kernels_strides_featuremaps:
             l1 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
                         strides=stride, padding='same')(l1)
             l1 = Dropout(self.dropout_rate)(l1) if self.use_dropout else l1
             l1 = BatchNormalization()(l1) if self.use_batch_norm else l1
-            l1 = ReLU()(l1)
-            l1 = MaxPool2D(pool_size=poolsize, padding='same')(l1)
+            l1 = ReLU()(l1) if self.inner_activation == 'ReLU' else LeakyReLU()(l1)
         l1 = Flatten()(l1)
         l1 = Dropout(self.dropout_rate)(l1) if self.use_dropout else l1
         self.mu_1 = Dense(self.z_dims[1], name='mu_2')(l1)
@@ -97,13 +93,12 @@ class VLAE(VAEWrapper):
 
         # LADDER 2
         l2 = i1
-        for kernelsize, poolsize, stride, feature_maps in self.ladder2_kernels_strides_featuremaps:
+        for kernelsize, stride, feature_maps in self.ladder2_kernels_strides_featuremaps:
             l2 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
                         strides=stride, padding='same')(l2)
             l2 = Dropout(self.dropout_rate)(l2) if self.use_dropout else l2
             l2 = BatchNormalization()(l2)
-            l2 = ReLU()(l2)
-            l2 = MaxPool2D(pool_size=poolsize, padding='same')(l2)
+            l2 = ReLU()(l2) if self.inner_activation == 'ReLU' else LeakyReLU()(l2)
         shape_before_flattening = K.int_shape(l2)[1:]
         l2 = Flatten()(l2)
         l2 = Dropout(self.dropout_rate)(l2) if self.use_dropout else l2
@@ -145,13 +140,13 @@ class VLAE(VAEWrapper):
         g0 = ReLU()(g0)
         g0 = Reshape(shape_before_flattening)(g0)
         for i, (kernelsize, poolsize, stride, feature_maps) in enumerate(self.gen0_kernels_strides_featuremaps):
-            g0 = MaxPool2D(pool_size=poolsize)(g0)
             g0 = Conv2DTranspose(filters=math.ceil(feature_maps / self.feature_map_reduction_factor),
                                  kernel_size=kernelsize, strides=stride, padding='same')(g0)
             g0 = Dropout(self.dropout_rate)(g0) if self.use_dropout else g0
             g0 = BatchNormalization()(g0) if i < len(
                 self.gen0_kernels_strides_featuremaps) - 1 and self.use_batch_norm else g0
-            g0 = ReLU()(g0) if i < len(self.gen0_kernels_strides_featuremaps) - 1 else g0
+            g0 = (ReLU()(g0) if self.inner_activation == 'ReLU' else LeakyReLU()(g0)) if i < len(
+                self.gen0_kernels_strides_featuremaps) - 1 else g0
         g0 = Activation('sigmoid')(g0)
 
         self.decoder = Model([z_1_input, z_2_input, z_3_input], g0, name='decoder')
