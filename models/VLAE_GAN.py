@@ -309,7 +309,7 @@ class VLAEGAN(VAEWrapper):
 
         logging.info("Training for {} epochs".format(epochs))
 
-        optimizer = Adam(lr=0.00005, beta_1=0.5, decay=self.decay_rate)
+        optimizer = Adam(lr=self.learning_rate, beta_1=0.5, decay=self.decay_rate)
 
         def set_trainable(model: Model, trainable: bool):
             """
