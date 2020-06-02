@@ -154,26 +154,57 @@ This is quite different from how \acp{CNN} capture animals and is a strong hint 
 \textbf{DRAFT!}
 Talk about how to compare network activites to IT activities.
 
-\subsection{Sequences of Images}
-\textbf{DRAFT!}
-The brain operates on sequences of images.
-Discuss in how far the models discussed in this thesis could profit from using sequences as opposed to static images.
-
-\subsection{\acp{VAE} on natural images}
-\textbf{DRAFT!}
-For \acp{VAE}, the pixelwise loss seems to be the reason for blurry reconstructions.
-For more diverse datasets such as ImageNet, the VAE reconstructions look horrible.
-Here the reason might also be the pixelwise loss because for ImageNet, semantically close objects can be in very different corners of the image.
-
-In contrast, \citet{pidhorskyi2020adversarial} does not use pixelwise loss at all.
-It would be interesting to see how \citet{pidhorskyi2020adversarial} performs on more natural dataset such as ImageNet.
-This might be a further improvement of \acp{VAE}.
-
-Is an extension of \citet{pidhorskyi2020adversarial} in the sense of VLAE possible?
-
 \subsection{Pixelwise vs. Generative Loss}
+This thesis employed two different methods to train the decoder towards generating natural looking images, namely the pixel-wise or the generative loss.
+The encoder of the generative models furthermore was trained such that the hidden-layer activity of the discriminator is similar for generated and real images (in addition to the KL-term).
+
+Advantages, disadvantages, and use-cases for both loss functions are discussed in the following.
+
+First of all, both loss functions do not seem to be biologically plausible as they are not founded in Hebbian learning.
+For the encoder loss, it could be argued that it is trained such that it elicits a \say{neural response} in the discriminator, similar to the one for real images.
+This \say{activity matching} seems to be at least somewhat related to Hebbian learning as it explicitly considers the amount of activity on the level on single neurons.
+However, discriminator and encoder itself are trained using backpropagation.
+
+\citet{larsen2015autoencoding} state that the pixel-wise loss can lead to very high values even for small translation (see Section~\ref{subsubsec:representation_learning}).
+Intuitively seeming like a disadvantage, this is only true for images with a high frequency and a large variance of pixel values.
+A black-and-white image consisting of alternating black and white rows and the same image shifted by one pixel in $y$-direction in fact would result in a maximum pixel-wise loss as the two images are orthogonal to one another.
+Natural images, however, usually are less susceptible to a large pixel-wise loss for small translation because there are less regions of high contrast.
+In the context of natural images, the pixel-wise loss function for example enables the model to detect if an object is placed in another corner of the image as the loss would incrase for such high translations.
+If, however, the aim is to generate more realistic images, the generative loss should be used since the pixel-wise loss leads to blurry reconstructions.
+Also, \acp{GAN} empirically are not agnostic of an objects position (\textbf{REF: GAN-VLAE on dsprites}).
+
+
 \textbf{DRAFT!}
 Both training are not really biologically plausible. Discuss.
+
+\subsection{Failure on ImageNet}
+
+\subsection{Model Limitations}
+All networks investigated in the course of this thesis are \acp{CNN}.
+A network design has to be chosen for each network type (see Section~\ref{subsec:models}).
+Some of these hyperparameters are context dependent.
+A network operating on \textsc{Mnist}, for example, receives inputs of size $28\times 28$ pixels.
+Such a networks must not be as deep as a network operating on ImageNet, as fewer layers are sufficient for the network to capture the image in it's entirety.
+Other hyperparameters are chosen based on previous research.
+Some configurations are known to be better for a certain task than others (see Section~\ref{subsec:models}).
+
+Another consideration in the context of computational neuroscience is the biological plausibility.
+This thesis aims at anwering in how far \acp{VAE} are reasonable models of the human visual cortex.
+In order to do this, the model structure must allow comparisons with empirical data for the parts under investigation.
+
+Specifically, lower model layers are compared with earlier, higher model layers with later regions in the visual cortex.
+Furthermore, the models are chosen such that similar inputs translate to similar encodings.
+The biological plausibility of the encoding should be further investigated in future research (\textbf{REF TO RELATED SECTION}).
+
+However, due to practial reasons such as the availability of training data or computational resoureces, the model disregards actualities of the human body, a more refined model should incorporate.
+
+Other than in the models used in this thesis, the human eye receives a stream of visual stimuli.
+Perceiving movements of animate objects could play an important role in distinguishing between animate and inanimate objects.
+The dissimilarity between semantic representations of animate and inanimate objects has been shown in \textbf{REF}.
+Recurrent models such as LSTMs could allow to extend the models developed in the course of this thesis to sequences of images.
+
+This thesis only considered image data to form semantic representations even though the human mind perceives the world through more senses.
+Future research could aim at investigating if and by how far semantic representations can be improved by using additional sources of information, for example sound.
 
 \section{Conclusion}\label{sec:conclusion}
 

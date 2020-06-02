@@ -109,7 +109,7 @@ Since still no Gabor wavelets emerged (see Section~\ref{subsec:results_visual_fe
 To further localize the so-far cause for the non-existence of Gabor wavelets, an \say{AlexNet-like-VAE} (subsequently called AlexNet-VAE, see Figure~\ref{fig:alexnet-vae-encoder}) was trained on ImageNet.
 This \ac{VAE} consists of an encoder part that closely resembles AlexNet.
 The output-layer, however, was changed in terms of size and activation function.
-First of all, the output size was allowed to be dynamical to allow different embedding sizes, i.e. differently sized multivariate Gaussians.
+First of all, the output size was allowed to be dynamical to allow different embedding sizes, i.e.\ differently sized multivariate Gaussians.
 Also, the activation function was changed from Softmax (\textbf{ref}) to \ac{LeakyReLU} (\textbf{ref}).
 Furthermore, all other activations were also changed to \ac{LeakyReLU} due to its advantages over \ac{ReLU} (\textbf{which ones? explain}).
 The encoder is was followed by the reparametrization layer and, subsequently, the decoder part which basically consists of the inverse AlexNet structure.\par
@@ -127,23 +127,7 @@ To cross-check the results of the AlexNet-VAE, only the encoder part was trained
 
 As it turned out that also in the AlexNet-VAE no Gabor wavelets emerged (see Section~\ref{subsec:results_visual_features_in_variational_autoencoders}), the image classification AlexNet-like network was used as an encoder with frozen weights and only the decoder part was trained to see if using a network trained on image classification has certain disadvantages when being used as a decoder in a \ac{VAE} compared to a decoder trained from scratch.
 
-\subsection{Activity Correlation in \acp{VAE}}\label{subsec:activity-correlation-in-vaes}
-
-It is known from the visual cortex that the activity following a visual stimulus is propagated forwards and backwards (\textbf{ref}).
-Therefore, the question was asked whether \acp{VAE} do something similar, i.e.\ if the activity in the encoder is similar to the activity in the encoder.
-Here, the activity $a(o_x(\mathcal{K}_{l,i}))$ is defined as the sum over the values of a certain feature map $o_x(\mathcal{K}_{l,i})$ , i.e.\ the result of the $i$-th convolution $\mathcal{K}_{l,i}$ in the $l$-th layer
-\begin{align}
-    a(o_x(\mathcal{K}_{l,i})) = \sum_n \sum_m o_x(\mathcal{K}_{l,i})
-\end{align}
-with $n$ and $m$ indicating the rows and, respectively, the columns of the feature map $o_x(\mathcal{K}_{l,i})$.
-
-In order to compare the activities, each layer in the encoder is matched to its counterpart in the decoder.
-This is possible because encoder and decoder are structured completely symmetrically: Each convolution in the encoder corresponds to a deconvolution in the decoder.
-
-However, as the order of feature maps in one layer is determined by chance, it is not reasonable to expect that the $i$-th feature map in the $l$-th encoder-layer has the same semantic significance as the $i$-th feature map in the counterpart in the decoder.
-Therefore, an order is induced by ordering the feature maps by their activity $a(\cdot)$ given a certain stimulus $x$.
-Given this order, the Pearson correlation coefficient~\citep{freedman2007statistics} is calculated by
-\begin{align}
-    \rho_{X, Y} = \frac{E[(X- \mu_X)(Y- \mu_Y)]}{\sigma_X \sigma_Y}
-\end{align}
-where $X$ and $Y$ are the flattened and under consideration of the order matched feature maps, $\mu_X = E[X]$ is the expectation, and $\sigma_X$ the standard deviation.
+\subsection{Effective Network Capacity}\label{subsec:effective-network-capacity}
+One hyperparameter to choose in the different models is the number of feature maps of one layer.
+During the implementation it could be observed that some feature maps show little activity compared to others, posing the question by how much the number of feature maps can be reduced without increasing the network loss.
+\textbf{CONTINUE, also image of inactive fms}
