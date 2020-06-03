@@ -64,7 +64,7 @@ class ActivationVisualizationCallback(Callback):
 
             for row in range(rows):
                 for col in range(cols):
-                    fig_idx = row * rows + col
+                    fig_idx = row * cols + col
                     if fig_idx >= len(outputs):
                         break
                     output = outputs[fig_idx]
