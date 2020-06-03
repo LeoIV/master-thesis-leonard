@@ -361,10 +361,10 @@ def main(args: List[str]):
         input_dim = infer_input_dim((dim, dim), args)
         if 'gan' not in args.configuration:
             model = VLAE(input_dim=input_dim, log_dir=args.logdir,
-                         inf0_kernels_strides_featuremaps=[(5, 2, 64), (3, 2, 64)],
-                         inf1_kernels_strides_featuremaps=[(3, 2, 64), (3, 2, 64)],
-                         ladder0_kernels_strides_featuremaps=[(5, 2, 64), (3, 2, 64)],
-                         ladder1_kernels_strides_featuremaps=[(3, 2, 64), (3, 2, 64)],
+                         inf0_kernels_strides_featuremaps=[(5, 2, 64), (3, 2, 64), (3, 2, 64)],
+                         inf1_kernels_strides_featuremaps=[(3, 2, 64)],
+                         ladder0_kernels_strides_featuremaps=[(5, 2, 64), (3, 2, 64), (3, 2, 64)],
+                         ladder1_kernels_strides_featuremaps=[(3, 2, 64)],
                          ladder2_kernels_strides_featuremaps=[(3, 2, 64)],
                          gen2_num_units=[1024, 1024],
                          gen1_num_units=[1024, 1024],
@@ -377,9 +377,9 @@ def main(args: List[str]):
                          use_batch_norm=args.use_batch_norm)
         else:
             model = VLAEGAN(input_dim=input_dim, log_dir=args.logdir,
-                            inf0_kernels_strides_featuremaps=[(5, 2, 64), (3, 2, 64)],
-                            inf1_kernels_strides_featuremaps=[(3, 2, 64), (3, 2, 64)],
-                            ladder0_kernels_strides_featuremaps=[(5, 2, 64), (3, 2, 64)],
+                            inf0_kernels_strides_featuremaps=[(5, 2, 64), (3, 2, 64), (3, 2, 64)],
+                            inf1_kernels_strides_featuremaps=[(3, 2, 64)],
+                            ladder0_kernels_strides_featuremaps=[(5, 2, 64), (3, 2, 64), (3, 2, 64)],
                             ladder1_kernels_strides_featuremaps=[(3, 2, 64), (3, 2, 64)],
                             ladder2_kernels_strides_featuremaps=[(3, 2, 64)],
                             gen2_num_units=[1024, 1024],
