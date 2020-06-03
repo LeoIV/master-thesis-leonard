@@ -1,7 +1,6 @@
 import logging
 import math
 import os
-import time
 from typing import Tuple, Sequence, List, Union, Optional
 
 import numpy as np
@@ -389,7 +388,7 @@ class VLAEGAN(VAEWrapper):
                     for model in models:
                         if model == self.discriminator_train:
                             xi = [x, *[np.random.normal(size=(batch_size, z)) for z in self.z_dims]]
-                            y_real = np.random.uniform(0.7, 1.2, size=(batch_size,))
+                            y_real = np.full((batch_size,), fill_value=0.9)
                             y_fake = np.zeros((batch_size,), dtype='float32')
                             yi = [y_real, y_fake, y_fake]
                             outs = model.train_on_batch(xi, yi)
