@@ -60,7 +60,7 @@ class VLAE(VAEWrapper):
             l0 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
                         strides=stride, padding='same')(l0)
             l0 = Dropout(self.dropout_rate)(l0) if self.use_dropout else l0
-            l0 = BatchNormalization()(l0) if self.use_batch_norm else i0
+            l0 = BatchNormalization()(l0) if self.use_batch_norm else l0
             l0 = ReLU()(l0) if self.inner_activation == 'ReLU' else LeakyReLU()(l0)
         l0 = Flatten()(l0)
         l0 = Dropout(self.dropout_rate)(l0) if self.use_dropout else l0
