@@ -85,18 +85,18 @@ class VLAEGAN(VAEWrapper):
             x = Conv2D(batch_input_shape=input_shape, filters=128, kernel_size=3,
                        strides=1 if self.input_dim[0] <= 100 else 2)(x)
             x = BatchNormalization()(x)
-            x = LeakyReLU()(x)
+            x = LeakyReLU(alpha=0.2)(x)
             x = Conv2D(filters=256, kernel_size=3)(x)
             x = BatchNormalization()(x)
-            x = ReLU()(x) if self.inner_activation == 'ReLU' else LeakyReLU()(x)
-            x = x_feat = Conv2D(filters=256 if self.input_dim[0] <= 100 else 128, kernel_size=3,
+            x = LeakyReLU(alpha=0.2)(x)
+            x = x_feat = Conv2D(filters=256, kernel_size=3,
                                 strides=1 if self.input_dim[0] <= 100 else 2)(x)
             x = BatchNormalization()(x)
-            x = ReLU()(x) if self.inner_activation == 'ReLU' else LeakyReLU()(x)
+            x = LeakyReLU(alpha=0.2)(x)
             x = Flatten()(x)
             x = Dense(512)(x)
             x = BatchNormalization()(x)
-            x = ReLU()(x) if self.inner_activation == 'ReLU' else LeakyReLU()(x)
+            x = LeakyReLU(alpha=0.2)(x)
             x = Dense(1, activation='sigmoid')(x)
 
             return Model(inpt, [x_feat, x])
