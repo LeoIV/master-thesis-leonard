@@ -1,13 +1,12 @@
 import logging
 import math
 import os
-from typing import Tuple, Sequence, List, Union, Optional
+from typing import Tuple, Sequence, Union, Optional
 
 import numpy as np
 from keras import Input, Model
 from keras import backend as K
-from keras.callbacks import ModelCheckpoint
-from keras.layers import Conv2D, BatchNormalization, ReLU, Flatten, Dense, Concatenate, Reshape, \
+from keras.layers import Conv2D, BatchNormalization, ReLU, Flatten, Dense, Reshape, \
     Activation, Lambda, Conv2DTranspose, Dropout, LeakyReLU
 from keras.optimizers import Adam
 from keras_preprocessing.image import Iterator, DirectoryIterator

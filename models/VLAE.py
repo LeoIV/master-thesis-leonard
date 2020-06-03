@@ -5,7 +5,7 @@ import numpy as np
 from keras import Input, Model
 from keras import backend as K
 from keras.layers import Conv2D, BatchNormalization, ReLU, Flatten, Dense, Concatenate, Reshape, \
-    Activation, Lambda, Conv2DTranspose, Dropout, MaxPool2D, LeakyReLU
+    Activation, Lambda, Conv2DTranspose, Dropout, LeakyReLU
 from keras.optimizers import Adam
 
 from models.model_abstract import VAEWrapper
