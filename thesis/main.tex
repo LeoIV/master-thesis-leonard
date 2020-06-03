@@ -173,9 +173,11 @@ In the context of natural images, the pixel-wise loss function for example enabl
 If, however, the aim is to generate more realistic images, the generative loss should be used since the pixel-wise loss leads to blurry reconstructions.
 Also, \acp{GAN} empirically are not agnostic of an objects position (\textbf{REF: GAN-VLAE on dsprites}).
 
+Another consideration is training stability.
+Due to the adversarial loss, training \acp{GAN} has many difficulties (mode collapse, error oscillation\textbf{REF}), often resulting in failure modes.
+Training regular \acp{VAE}, in contrast, is far more stable.
 
-\textbf{DRAFT!}
-Both training are not really biologically plausible. Discuss.
+The previous considerations should be regarded when choosing a loss function.
 
 \subsection{Failure on ImageNet}
 

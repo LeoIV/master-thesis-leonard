@@ -139,7 +139,7 @@ class VLAE(VAEWrapper):
         g0 = BatchNormalization()(g0) if self.use_batch_norm else g0
         g0 = ReLU()(g0)
         g0 = Reshape(shape_before_flattening)(g0)
-        for i, (kernelsize, poolsize, stride, feature_maps) in enumerate(self.gen0_kernels_strides_featuremaps):
+        for i, (kernelsize, stride, feature_maps) in enumerate(self.gen0_kernels_strides_featuremaps):
             g0 = Conv2DTranspose(filters=math.ceil(feature_maps / self.feature_map_reduction_factor),
                                  kernel_size=kernelsize, strides=stride, padding='same')(g0)
             g0 = Dropout(self.dropout_rate)(g0) if self.use_dropout else g0

@@ -81,3 +81,4 @@ class ActivationVisualizationCallback(Callback):
                         axs[row][col].set_xticklabels(np.arange(1, sum_over_fms.shape[1] + 1, 10))
                     axs[row][col].set_title(self._output_layers[fig_idx].name)
             fig.savefig(os.path.join(img_path, '{}.png'.format(self.model_name)))
+            plt.close(fig)

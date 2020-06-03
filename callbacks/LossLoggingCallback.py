@@ -78,6 +78,7 @@ class LossLoggingCallback(Callback):
                 ax.plot(arr, loss)
             ax.legend(loss_names, loc='upper right')
             fig.savefig(os.path.join(self.logdir, "batch_losses.png"), mode="w+")
+            plt.close(fig)
 
         if len(self.epoch_headers) > 2:
             losses = np.loadtxt(os.path.join(self.logdir, self.epoch_logdir), skiprows=1,
@@ -91,6 +92,7 @@ class LossLoggingCallback(Callback):
                 ax.plot(arr, loss)
             ax.legend(loss_names, loc='upper right')
             fig.savefig(os.path.join(self.logdir, "epoch_losses.png"), mode="w+")
+            plt.close(fig)
 
     def on_train_end(self, logs=None):
         self._bf.close()
