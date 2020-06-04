@@ -81,20 +81,22 @@ class VLAEGAN(VAEWrapper):
 
         def _discriminator(input_shape: Tuple[int, int, int]):
             x = inpt = Input(shape=input_shape)
-            x = Conv2D(batch_input_shape=input_shape, filters=256, kernel_size=5,
-                       strides=1 if self.input_dim[0] <= 100 else 2, padding='same')(x)
-            x = BatchNormalization()(x)
-            x = LeakyReLU(alpha=0.2)(x)
-            x = Conv2D(filters=256, kernel_size=3, strides=1 if self.input_dim[0] <= 100 else 2, padding='same')(x)
-            x = BatchNormalization()(x)
-            x = LeakyReLU(alpha=0.2)(x)
-            x = x_feat = Conv2D(filters=256, kernel_size=3,
-                                strides=1 if self.input_dim[0] <= 100 else 2, padding='same')(x)
-            x = BatchNormalization()(x)
-            x = LeakyReLU(alpha=0.2)(x)
-            x = Conv2D(filters=256, kernel_size=3, padding='same')(x)
-            x = BatchNormalization()(x)
-            x = LeakyReLU(alpha=0.2)(x)
+            for i in range(2):
+                x = x_feat = Conv2D(batch_input_shape=input_shape, filters=128, kernel_size=5,
+                                    strides=2, padding='same')(x)
+                x = BatchNormalization()(x)
+                x = LeakyReLU(alpha=0.2)(x)
+            if self.input_dim[0] >= 100:
+                for i in range(2):
+                    x = x_feat = Conv2D(batch_input_shape=input_shape, filters=192, kernel_size=5,
+                                        strides=2, padding='same')(x)
+                    x = BatchNormalization()(x)
+                    x = LeakyReLU(alpha=0.2)(x)
+                for i in range(3):
+                    x = Conv2D(batch_input_shape=input_shape, filters=256, kernel_size=5,
+                               strides=2, padding='same')(x)
+                    x = BatchNormalization()(x)
+                    x = LeakyReLU(alpha=0.2)(x)
             x = Flatten()(x)
             x = Dense(512)(x)
             x = BatchNormalization()(x)
