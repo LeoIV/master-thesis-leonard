@@ -80,100 +80,105 @@ class VLAEGAN(VAEWrapper):
         self.dropout_rate = dropout_rate
 
         def _discriminator(input_shape: Tuple[int, int, int]):
-            x = inpt = Input(shape=input_shape)
+            x = inpt = Input(shape=input_shape, name="discriminator_input")
             for i in range(2):
                 x = x_feat = Conv2D(batch_input_shape=input_shape, filters=128, kernel_size=5,
-                                    strides=2, padding='same')(x)
-                x = BatchNormalization()(x)
-                x = LeakyReLU(alpha=0.2)(x)
+                                    strides=2, padding='same', name="discriminator_conv2d_{}".format(i))(x)
+                x = BatchNormalization(name="discriminator_batch_norm_{}".format(i))(x)
+                x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(i))(x)
             if self.input_dim[0] >= 100:
                 for i in range(2):
                     x = x_feat = Conv2D(batch_input_shape=input_shape, filters=192, kernel_size=5,
-                                        strides=2, padding='same')(x)
-                    x = BatchNormalization()(x)
-                    x = LeakyReLU(alpha=0.2)(x)
+                                        strides=2, padding='same', name="discriminator_conv2d_{}".format(i + 2))(x)
+                    x = BatchNormalization(name="discriminator_batch_norm_{}".format(i + 2))(x)
+                    x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(i + 2))(x)
                 for i in range(3):
                     x = Conv2D(batch_input_shape=input_shape, filters=256, kernel_size=5,
-                               strides=2, padding='same')(x)
-                    x = BatchNormalization()(x)
-                    x = LeakyReLU(alpha=0.2)(x)
-            x = Flatten()(x)
-            x = Dense(512)(x)
-            x = BatchNormalization()(x)
-            x = LeakyReLU(alpha=0.2)(x)
-            x = Dense(1, activation='sigmoid')(x)
+                               strides=2, padding='same', name="discriminator_conv2d_{}".format(i + 4))(x)
+                    x = BatchNormalization(name="discriminator_batch_norm_{}".format(i + 4))(x)
+                    x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(i + 4))(x)
+            x = Flatten(name="discriminator_flatten_0")(x)
+            x = Dense(512, name="discriminator_dense_0")(x)
+            x = BatchNormalization(name="discriminator_batch_norm_{}".format(7 if self.input_dim[0] >= 100 else 2))(x)
+            x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(7 if self.input_dim[0] >= 100 else 2))(x)
+            x = Dense(1, activation='sigmoid', name="discriminator_dense_1")(x)
 
-            return Model(inpt, [x_feat, x])
+            return Model(inpt, [x_feat, x], name="vlae_gan_discriminator")
 
         self.discriminator = _discriminator(self.input_dim)
 
         self._build()
 
     def _build(self):
-        self.inputs = i0 = l0 = Input(self.input_dim)
+        self.inputs = i0 = l0 = Input(self.input_dim, name="vlae_gan_encoder_input")
 
         # INFERENCE 0
-        for kernelsize, stride, feature_maps in self.inf0_kernels_strides_featuremaps:
+        for i, (kernelsize, stride, feature_maps) in enumerate(self.inf0_kernels_strides_featuremaps):
             i0 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
-                        strides=stride, padding='same')(i0)
-            i0 = Dropout(self.dropout_rate)(i0) if self.use_dropout else i0
-            i0 = BatchNormalization()(i0) if self.use_batch_norm else i0
-            i0 = ReLU()(i0) if self.inner_activation == 'ReLU' else LeakyReLU()(i0)
+                        strides=stride, padding='same', name="inference_0_conv2d_{}".format(i))(i0)
+            i0 = Dropout(self.dropout_rate, name="inference_0_dropout_{}".format(i))(i0) if self.use_dropout else i0
+            i0 = BatchNormalization(name="inference_0_batch_norm_{}".format(i))(i0) if self.use_batch_norm else i0
+            i0 = ReLU(name="inference_0_relu_{}".format(i))(i0) if self.inner_activation == 'ReLU' else LeakyReLU(
+                name="inference_0_leaky_relu_{}".format(i))(i0)
 
         # LADDER 0
-        for kernelsize, stride, feature_maps in self.ladder0_kernels_strides_featuremaps:
+        for i, (kernelsize, stride, feature_maps) in enumerate(self.ladder0_kernels_strides_featuremaps):
             l0 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
-                        strides=stride, padding='same')(l0)
-            l0 = Dropout(self.dropout_rate)(l0) if self.use_dropout else l0
-            l0 = BatchNormalization()(l0) if self.use_batch_norm else l0
-            l0 = ReLU()(l0) if self.inner_activation == 'ReLU' else LeakyReLU()(l0)
-        l0 = Flatten()(l0)
-        l0 = Dropout(self.dropout_rate)(l0) if self.use_dropout else l0
+                        strides=stride, padding='same', name="ladder_0_conv2d_{}".format(i))(l0)
+            l0 = Dropout(self.dropout_rate, name="ladder_0_dropout_{}".format(i))(l0) if self.use_dropout else l0
+            l0 = BatchNormalization(name="ladder_0_batch_norm_{}".format(i))(l0) if self.use_batch_norm else l0
+            l0 = ReLU(name="ladder_0_relu_{}".format(i))(l0) if self.inner_activation == 'ReLU' else LeakyReLU(
+                name="ladder_0_leaky_relu_{}".format(i))(l0)
+        l0 = Flatten(name="ladder_0_flatten")(l0)
+        l0 = Dropout(self.dropout_rate, name="ladder_0_dropout")(l0) if self.use_dropout else l0
         self.mu_0 = Dense(self.z_dims[0], name='mu_1')(l0)
         self.log_var_0 = Dense(self.z_dims[0], name='log_var_1')(l0)
         z_0 = Lambda(sampling, name="z_1_latent")([self.mu_0, self.log_var_0])
 
         # INFERENCE 1
         i1 = i0
-        for kernelsize, stride, feature_maps in self.inf1_kernels_strides_featuremaps:
+        for i, (kernelsize, stride, feature_maps) in enumerate(self.inf1_kernels_strides_featuremaps):
             i1 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
-                        strides=stride, padding='same')(i1)
-            i1 = Dropout(self.dropout_rate)(i1) if self.use_dropout else i1
-            i1 = BatchNormalization()(i1) if self.use_batch_norm else i1
-            i1 = ReLU()(i1) if self.inner_activation == 'ReLU' else LeakyReLU()(i1)
+                        strides=stride, padding='same', name="inference_1_conv2d_{}".format(i))(i1)
+            i1 = Dropout(self.dropout_rate, name="inference_1_dropout_{}".format(i))(i1) if self.use_dropout else i1
+            i1 = BatchNormalization(name="inference_1_batch_norm_{}".format(i))(i1) if self.use_batch_norm else i1
+            i1 = ReLU(name="inference_1_relu_{}".format(i))(i1) if self.inner_activation == 'ReLU' else LeakyReLU(
+                name="inference_1_leaky_relu_{}".format(i))(i1)
 
         # LADDER 1
         l1 = i0
-        for kernelsize, stride, feature_maps in self.ladder1_kernels_strides_featuremaps:
+        for i, (kernelsize, stride, feature_maps) in enumerate(self.ladder1_kernels_strides_featuremaps):
             l1 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
-                        strides=stride, padding='same')(l1)
-            l1 = Dropout(self.dropout_rate)(l1) if self.use_dropout else l1
-            l1 = BatchNormalization()(l1) if self.use_batch_norm else l1
-            l1 = ReLU()(l1) if self.inner_activation == 'ReLU' else LeakyReLU()(l1)
-        l1 = Flatten()(l1)
-        l1 = Dropout(self.dropout_rate)(l1) if self.use_dropout else l1
+                        strides=stride, padding='same', name="ladder_1_conv2d_{}".format(i))(l1)
+            l1 = Dropout(self.dropout_rate, name="ladder_1_dropout_{}".format(i))(l1) if self.use_dropout else l1
+            l1 = BatchNormalization(name="ladder_1_batch_norm_{}".format(i))(l1) if self.use_batch_norm else l1
+            l1 = ReLU(name="ladder_1_relu_{}".format(i))(l1) if self.inner_activation == 'ReLU' else LeakyReLU(
+                name="ladder_1_leaky_relu_{}".format(i))(l1)
+        l1 = Flatten(name="ladder_1_flatten")(l1)
+        l1 = Dropout(self.dropout_rate, name="ladder_1_dropout")(l1) if self.use_dropout else l1
         self.mu_1 = Dense(self.z_dims[1], name='mu_2')(l1)
         self.log_var_1 = Dense(self.z_dims[1], name='log_var_2')(l1)
         z_1 = Lambda(sampling, name="z_2_latent")([self.mu_1, self.log_var_1])
 
         # LADDER 2
         l2 = i1
-        for kernelsize, stride, feature_maps in self.ladder2_kernels_strides_featuremaps:
+        for i, (kernelsize, stride, feature_maps) in enumerate(self.ladder2_kernels_strides_featuremaps):
             l2 = Conv2D(filters=math.ceil(feature_maps / self.feature_map_reduction_factor), kernel_size=kernelsize,
-                        strides=stride, padding='same')(l2)
-            l2 = Dropout(self.dropout_rate)(l2) if self.use_dropout else l2
-            l2 = BatchNormalization()(l2)
-            l2 = ReLU()(l2) if self.inner_activation == 'ReLU' else LeakyReLU()(l2)
+                        strides=stride, padding='same', name="ladder_2_conv2d_{}".format(i))(l2)
+            l2 = Dropout(self.dropout_rate, name="ladder_2_dropout_{}".format(i))(l2) if self.use_dropout else l2
+            l2 = BatchNormalization(name="ladder_2_batch_norm_{}".format(i))(l2) if self.use_batch_norm else l2
+            l2 = ReLU(name="ladder_2_relu_{}".format(i))(l2) if self.inner_activation == 'ReLU' else LeakyReLU(
+                name="ladder_2_leaky_relu_{}".format(i))(l2)
         shape_before_flattening = K.int_shape(l2)[1:]
-        l2 = Flatten()(l2)
-        l2 = Dropout(self.dropout_rate)(l2) if self.use_dropout else l2
+        l2 = Flatten(name="ladder_2_flatten")(l2)
+        l2 = Dropout(self.dropout_rate, name="ladder_2_dropout")(l2) if self.use_dropout else l2
         self.mu_2 = Dense(self.z_dims[2], name='mu_3')(l2)
         self.log_var_2 = Dense(self.z_dims[2], name='log_var_3')(l2)
         z_2 = Lambda(sampling, name="z_3_latent")([self.mu_2, self.log_var_2])
 
         encoder_output = [z_0, z_1, z_2]
 
-        self.encoder = Model(self.inputs, encoder_output, name='encoder')
+        self.encoder = Model(self.inputs, encoder_output, name='vlae_gan_encoder')
 
         ### DECODER ###
 
@@ -183,41 +188,49 @@ class VLAEGAN(VAEWrapper):
 
         # GENERATIVE 2
         g2 = z_3_input
-        for num_units in self.gen2_num_units:
-            g2 = Dense(math.ceil(num_units / self.feature_map_reduction_factor))(g2)
-            g2 = Dropout(self.dropout_rate)(g2) if self.use_dropout else g2
-            g2 = BatchNormalization()(g2) if self.use_batch_norm else g2
-            g2 = ReLU()(g2) if self.inner_activation == 'ReLU' else LeakyReLU()(g2)
+        for i, num_units in enumerate(self.gen2_num_units):
+            g2 = Dense(math.ceil(num_units / self.feature_map_reduction_factor),
+                       name="generative_2_dense_{}".format(i))(g2)
+            g2 = Dropout(self.dropout_rate, name="generative_2_dropout_{}".format(i))(g2) if self.use_dropout else g2
+            g2 = BatchNormalization(name="generative_2_batch_norm_{}".format(i))(g2) if self.use_batch_norm else g2
+            g2 = ReLU(name="generative_2_relu_{}".format(i))(g2) if self.inner_activation == 'ReLU' else LeakyReLU(
+                name="generative_2_leaky_relu_{}".format(i))(g2)
 
         # GENERATIVE 1
-        g1 = Concatenate()([g2, z_2_input])
-        for num_units in self.gen1_num_units:
-            g1 = Dense(math.ceil(num_units / self.feature_map_reduction_factor))(g1)
-            g1 = Dropout(self.dropout_rate)(g1) if self.use_dropout else g1
-            g1 = BatchNormalization()(g1) if self.use_batch_norm else g1
-            g1 = ReLU()(g1) if self.inner_activation == 'ReLU' else LeakyReLU()(g1)
+        g1 = Concatenate(name="concatenate_2_and_1")([g2, z_2_input])
+        for i, num_units in enumerate(self.gen1_num_units):
+            g1 = Dense(math.ceil(num_units / self.feature_map_reduction_factor),
+                       name="generative_1_dense_{}".format(i))(g1)
+            g1 = Dropout(self.dropout_rate, name="generative_1_dropout_{}".format(i))(g1) if self.use_dropout else g1
+            g1 = BatchNormalization(name="generative_1_batch_norm_{}".format(i))(g1) if self.use_batch_norm else g1
+            g1 = ReLU(name="generative_1_relu_{}".format(i))(g1) if self.inner_activation == 'ReLU' else LeakyReLU(
+                name="generative_1_leaky_relu_{}".format(i))(g1)
 
         # GENERATIVE 0
-        g0 = Concatenate()([g1, z_1_input])
-        g0 = Dense(np.prod(shape_before_flattening))(g0)
-        g0 = Dropout(self.dropout_rate)(g0) if self.use_dropout else g0
-        g0 = BatchNormalization()(g0) if self.use_batch_norm else g0
-        g0 = ReLU()(g0) if self.inner_activation == 'ReLU' else LeakyReLU()(g0)
-        g0 = Reshape(shape_before_flattening)(g0)
+        g0 = Concatenate(name="concatenate_1_and_0")([g1, z_1_input])
+        g0 = Dense(np.prod(shape_before_flattening), name="generative_0_dense_0")(g0)
+        g0 = Dropout(self.dropout_rate, name="generative_0_dropout_0")(g0) if self.use_dropout else g0
+        g0 = BatchNormalization(name="generative_0_batch_norm_0")(g0) if self.use_batch_norm else g0
+        g0 = ReLU(name="generative_0_relu_0")(g0) if self.inner_activation == 'ReLU' else LeakyReLU(
+            name="generative_0_leaky_relu_0")(g0)
+        g0 = Reshape(shape_before_flattening, name="generative_0_reshape_0")(g0)
         for i, (kernelsize, stride, feature_maps) in enumerate(self.gen0_kernels_strides_featuremaps):
             g0 = Conv2DTranspose(filters=math.ceil(feature_maps / self.feature_map_reduction_factor),
-                                 kernel_size=kernelsize, strides=stride, padding='same')(g0)
-            g0 = Dropout(self.dropout_rate)(g0) if self.use_dropout else g0
-            g0 = BatchNormalization()(g0) if i < len(
+                                 kernel_size=kernelsize, strides=stride, padding='same',
+                                 name="generative_0_conv2d_transpose_{}".format(i))(g0)
+            g0 = Dropout(self.dropout_rate, name="generative_0_dropout_{}".format(i + 1))(
+                g0) if self.use_dropout else g0
+            g0 = BatchNormalization(name="generative_0_batch_norm_{}".format(i + 1))(g0) if i < len(
                 self.gen0_kernels_strides_featuremaps) - 1 and self.use_batch_norm else g0
-            g0 = (ReLU()(g0) if self.inner_activation == 'ReLU' else LeakyReLU()(g0)) if i < len(
+            g0 = (ReLU(name="generative_0_relu_{}".format(i + 1))(g0) if self.inner_activation == 'ReLU' else LeakyReLU(
+                name="generative_0_leaky_relu_{}".format(i + 1))(g0)) if i < len(
                 self.gen0_kernels_strides_featuremaps) - 1 else g0
-        g0 = Activation('sigmoid')(g0)
+        g0 = Activation('sigmoid', name="generative_0_activation_0")(g0)
 
-        self.decoder = Model([z_1_input, z_2_input, z_3_input], g0, name='decoder')
+        self.decoder = Model([z_1_input, z_2_input, z_3_input], g0, name='vlae_gan_decoder')
         decoder_output = self.decoder(encoder_output)
 
-        self.model = Model(self.inputs, decoder_output, name='vlae')
+        self.model = Model(self.inputs, decoder_output, name='vlae_gan')
 
         #####
 
@@ -284,16 +297,25 @@ class VLAEGAN(VAEWrapper):
             y_embedding = y_train[:5000] if y_train is not None else None
 
         # checkpoint2 = ModelCheckpoint(os.path.join(weights_folder, 'weights.h5'), save_weights_only=True, verbose=1)
-        if self.kernel_visualization_layer >= 0:
-            kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
-                                                      layer_idx=self.kernel_visualization_layer)
+        kv_encoder_callback = KernelVisualizationCallback(log_dir=self.log_dir,
+                                                          print_every_n_batches=print_every_n_batches,
+                                                          model=self.encoder, model_name="encoder")
+        kv_decoder_callback = KernelVisualizationCallback(log_dir=self.log_dir,
+                                                          print_every_n_batches=print_every_n_batches,
+                                                          model=self.encoder, model_name="decoder")
+        fm_encoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
+                                                              model_name="encoder",
+                                                              print_every_n_batches=print_every_n_batches,
+                                                              x_train=x_train_subset)
+        fm_decoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
+                                                              model_name="encoder",
+                                                              print_every_n_batches=print_every_n_batches,
+                                                              x_train=x_train_subset,
+                                                              x_train_transform=lambda x, m: m.predict(x),
+                                                              transform_params=[self.encoder])
         rc_callback = ReconstructionImagesCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
                                                    initial_epoch=initial_epoch, vae=self, x_train=x_train_subset,
                                                    num_reconstructions=self.num_samples, num_inputs=len(self.z_dims))
-        fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model_wrapper=self,
-                                                      print_every_n_batches=print_every_n_batches,
-                                                      layer_idxs=self.feature_map_layers,
-                                                      x_train=x_train_subset, num_samples=self.num_samples)
         av_encoder_callback = ActivationVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
                                                               model_name='encoder',
                                                               x_train=x_train_subset,
@@ -309,7 +331,8 @@ class VLAEGAN(VAEWrapper):
                                           layer_names=self.mu_layer_names, plot_params=embedding_callback_params)
         ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [av_encoder_callback, av_decoder_callback, hs_callback, fm_callback, rc_callback, ll_callback]
+        callbacks_list = [kv_encoder_callback, kv_decoder_callback, av_encoder_callback, av_decoder_callback,
+                          hs_callback, fm_encoder_callback, fm_decoder_callback, rc_callback, ll_callback]
 
         logging.info("Training for {} epochs".format(epochs))
 

@@ -71,23 +71,30 @@ class VAEGAN(VAEWrapper):
         self.dropout_rate = dropout_rate
 
         def _discriminator(input_shape: Tuple[int, int, int]):
-            x = inpt = Input(shape=input_shape)
-            x = Conv2D(batch_input_shape=input_shape, filters=128, kernel_size=3)(x)
-            x = BatchNormalization()(x)
-            x = LeakyReLU()(x)
-            x = Conv2D(filters=128, kernel_size=3)(x)
-            x = BatchNormalization()(x)
-            x = LeakyReLU()(x)
-            x = x_feat = Conv2D(filters=128, kernel_size=3)(x)
-            x = BatchNormalization()(x)
-            x = LeakyReLU()(x)
-            x = Flatten()(x)
-            x = Dense(512)(x)
-            x = BatchNormalization()(x)
-            x = LeakyReLU()(x)
-            x = Dense(1, activation='sigmoid')(x)
+            x = inpt = Input(shape=input_shape, name="discriminator_input")
+            for i in range(2):
+                x = x_feat = Conv2D(batch_input_shape=input_shape, filters=128, kernel_size=5,
+                                    strides=2, padding='same', name="discriminator_conv2d_{}".format(i))(x)
+                x = BatchNormalization(name="discriminator_batch_norm_{}".format(i))(x)
+                x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(i))(x)
+            if self.input_dim[0] >= 100:
+                for i in range(2):
+                    x = x_feat = Conv2D(batch_input_shape=input_shape, filters=192, kernel_size=5,
+                                        strides=2, padding='same', name="discriminator_conv2d_{}".format(i + 2))(x)
+                    x = BatchNormalization(name="discriminator_batch_norm_{}".format(i + 2))(x)
+                    x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(i + 2))(x)
+                for i in range(3):
+                    x = Conv2D(batch_input_shape=input_shape, filters=256, kernel_size=5,
+                               strides=2, padding='same', name="discriminator_conv2d_{}".format(i + 4))(x)
+                    x = BatchNormalization(name="discriminator_batch_norm_{}".format(i + 4))(x)
+                    x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(i + 4))(x)
+            x = Flatten(name="discriminator_flatten_0")(x)
+            x = Dense(512, name="discriminator_dense_0")(x)
+            x = BatchNormalization(name="discriminator_batch_norm_{}".format(7 if self.input_dim[0] >= 100 else 2))(x)
+            x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(7 if self.input_dim[0] >= 100 else 2))(x)
+            x = Dense(1, activation='sigmoid', name="discriminator_dense_1")(x)
 
-            return Model(inpt, [x_feat, x])
+            return Model(inpt, [x_feat, x], name="vae_gan_discriminator")
 
         self.discriminator = _discriminator(self.input_dim)
 
@@ -245,9 +252,22 @@ class VAEGAN(VAEWrapper):
             y_embedding = y_train[:5000] if y_train is not None else None
 
         # checkpoint2 = ModelCheckpoint(os.path.join(weights_folder, 'weights.h5'), save_weights_only=True, verbose=1)
-        if self.kernel_visualization_layer >= 0:
-            kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
-                                                      layer_idx=self.kernel_visualization_layer)
+        kv_encoder_callback = KernelVisualizationCallback(log_dir=self.log_dir,
+                                                          print_every_n_batches=print_every_n_batches,
+                                                          model=self.encoder, model_name="encoder")
+        kv_decoder_callback = KernelVisualizationCallback(log_dir=self.log_dir,
+                                                          print_every_n_batches=print_every_n_batches,
+                                                          model=self.encoder, model_name="decoder")
+        fm_encoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
+                                                              model_name="encoder",
+                                                              print_every_n_batches=print_every_n_batches,
+                                                              x_train=x_train_subset)
+        fm_decoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
+                                                              model_name="encoder",
+                                                              print_every_n_batches=print_every_n_batches,
+                                                              x_train=x_train_subset,
+                                                              x_train_transform=lambda x, m: m.predict(x),
+                                                              transform_params=[self.encoder])
         rc_callback = ReconstructionImagesCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
                                                    initial_epoch=initial_epoch, vae=self, x_train=x_train_subset,
                                                    num_reconstructions=self.num_samples, num_inputs=len(self.z_dims))
@@ -270,7 +290,8 @@ class VAEGAN(VAEWrapper):
                                           layer_names=self.mu_layer_names, plot_params=embedding_callback_params)
         ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [hs_callback, av_encoder_callback, av_decoder_callback, fm_callback, rc_callback, ll_callback]
+        callbacks_list = [kv_encoder_callback, kv_decoder_callback, fm_encoder_callback, fm_decoder_callback,
+                          hs_callback, av_encoder_callback, av_decoder_callback, fm_callback, rc_callback, ll_callback]
 
         logging.info("Training for {} epochs".format(epochs))
 

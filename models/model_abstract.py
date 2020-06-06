@@ -285,16 +285,15 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
         # checkpoint1 = ModelCheckpoint(checkpoint_filepath, save_weights_only=True, verbose=1)
         checkpoint2 = ModelCheckpoint(os.path.join(weights_folder, 'weights.h5'), save_weights_only=True, verbose=1)
         tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, update_freq="batch")
-        if self.kernel_visualization_layer >= 0:
-            kv_callback = KernelVisualizationCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
-                                                      layer_idx=self.kernel_visualization_layer)
+        kv_encoder_callback = KernelVisualizationCallback(log_dir=self.log_dir,
+                                                          print_every_n_batches=print_every_n_batches,
+                                                          model=self.encoder, model_name="encoder")
+        kv_decoder_callback = KernelVisualizationCallback(log_dir=self.log_dir,
+                                                          print_every_n_batches=print_every_n_batches,
+                                                          model=self.decoder, model_name="decoder")
         rc_callback = ReconstructionImagesCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
                                                    initial_epoch=initial_epoch, vae=self, x_train=x_train_subset,
                                                    num_reconstructions=self.num_samples, num_inputs=len(self.z_dims))
-        fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model_wrapper=self,
-                                                      print_every_n_batches=print_every_n_batches,
-                                                      layer_idxs=self.feature_map_layers,
-                                                      x_train=x_train_subset, num_samples=self.num_samples)
         av_encoder_callback = ActivationVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
                                                               model_name='encoder',
                                                               x_train=x_train_subset,
@@ -305,16 +304,24 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
                                                               print_every_n_batches=print_every_n_batches,
                                                               x_train_transform=lambda x, m: m.predict(x),
                                                               transform_params=[self.encoder])
+        fma_encoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
+                                                               model_name='encoder',
+                                                               print_every_n_batches=print_every_n_batches,
+                                                               x_train=x_train_subset)
+        fma_decoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.decoder,
+                                                               model_name='decoder',
+                                                               print_every_n_batches=print_every_n_batches,
+                                                               x_train=x_train_subset,
+                                                               x_train_transform=lambda x, m: m.predict(x),
+                                                               transform_params=[self.encoder])
         hs_callback = HiddenSpaceCallback(log_dir=self.log_dir, vae=self, batch_size=batch_size,
                                           x_train=x_train_subset, y_train=y_embedding, max_samples=5000,
                                           layer_names=self.mu_layer_names, plot_params=embedding_callback_params)
         ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
-        callbacks_list = [av_encoder_callback, av_decoder_callback, hs_callback, ll_callback, checkpoint2, tb_callback,
-                          fm_callback, rc_callback,
-                          lr_sched]
-        if self.kernel_visualization_layer >= 0:
-            callbacks_list.append(kv_callback)
+        callbacks_list = [kv_encoder_callback, kv_decoder_callback, fma_encoder_callback, fma_decoder_callback,
+                          av_encoder_callback, av_decoder_callback,
+                          hs_callback, ll_callback, checkpoint2, tb_callback, rc_callback, lr_sched]
 
         logging.info("Training for {} epochs".format(epochs))
 

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from keras import Model
 from keras.callbacks import Callback
-from keras.layers import Conv2D, LeakyReLU, Dense, ReLU, Activation
+from keras.layers import Conv2D, LeakyReLU, Dense, ReLU, Activation, BatchNormalization
 
 
 class ActivationVisualizationCallback(Callback):
@@ -36,7 +36,7 @@ class ActivationVisualizationCallback(Callback):
         self.epoch = 1
 
         self._output_layers = [l for l in self.model.layers if
-                               isinstance(l, (Conv2D, Dense, LeakyReLU, ReLU, Activation))]
+                               isinstance(l, (Conv2D, Dense, LeakyReLU, ReLU, Activation, BatchNormalization))]
         self._multi_output_model = Model(model.inputs, [l.output for l in self._output_layers])
 
     def on_epoch_end(self, epoch, logs=None):

@@ -5,7 +5,9 @@ from concurrent import futures
 from concurrent.futures.thread import ThreadPoolExecutor
 
 import numpy as np
+from keras import Model
 from keras.callbacks import Callback
+from keras.layers import Conv2D
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -13,15 +15,17 @@ from utils.future_handling import check_finished_futures_and_return_unfinished
 
 
 class KernelVisualizationCallback(Callback):
-    def __init__(self, log_dir: str, print_every_n_batches: int,
-                 layer_idx: int):
+    def __init__(self, log_dir: str, print_every_n_batches: int, model: Model, model_name: str):
         super().__init__()
+        self.model_name = model_name
+        self.model = model
         self.log_dir = log_dir
         self.seen = 0
         self.epoch = 1
         self.threadpool = ThreadPoolExecutor(max_workers=5)
         self.print_every_n_batches = print_every_n_batches
-        self.layer_idx = layer_idx
+        self._conv_layers = [l for l in self.model.layers if
+                             isinstance(l, Conv2D)]
         self.futures = []
 
     @staticmethod
@@ -50,15 +54,16 @@ class KernelVisualizationCallback(Callback):
             # summarize filter shapes
             # get filter weights
             # retrieve weights from the second hidden layer
-            filters = self.model.layers[self.layer_idx].get_weights()[0]
-            # normalize filter values to 0-1 so we can visualize them
-            filters = np.moveaxis(filters, (0, 1), (-2, -1))
-            filters = (filters.reshape(((-1,) + filters.shape[-2:])))
-            img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
-                                    "layer1_kernels")
-            os.makedirs(img_path, exist_ok=True)
-            f = self.threadpool.submit(self._plot_kernels, *(filters, img_path, round(time.time() * 10E6)))
-            self.futures.append(f)
+            for layer in self._conv_layers:
+                filters = layer.get_weights()[0]
+                # normalize filter values to 0-1 so we can visualize them
+                filters = np.moveaxis(filters, (0, 1), (-2, -1))
+                filters = (filters.reshape(((-1,) + filters.shape[-2:])))
+                img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
+                                        "layer1_kernels", self.model_name, layer.name)
+                os.makedirs(img_path, exist_ok=True)
+                f = self.threadpool.submit(self._plot_kernels, *(filters, img_path, round(time.time() * 10E6)))
+                self.futures.append(f)
 
     def on_train_end(self, logs=None):
         self.threadpool.shutdown()

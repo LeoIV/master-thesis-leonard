@@ -4,26 +4,30 @@ import os
 import time
 from asyncio import Future
 from concurrent.futures.thread import ThreadPoolExecutor
-from typing import Union, Sequence
+from typing import Union, Sequence, Callable, Any
 
 import numpy as np
 from PIL import Image
 from keras import Model
 from keras.callbacks import Callback
+from keras.layers import Conv2D
 from matplotlib import pyplot as plt
 
 from utils.future_handling import check_finished_futures_and_return_unfinished
 
 
 class FeatureMapVisualizationCallback(Callback):
-    def __init__(self, log_dir: str, model_wrapper: Union['VariationalAutoencoder', 'AlexNet'],
-                 print_every_n_batches: int,
-                 layer_idxs: Sequence[int], x_train: np.ndarray, num_samples: int = 5):
+    def __init__(self, log_dir: str, model: Model, model_name: str,
+                 print_every_n_batches: int, x_train: np.ndarray, num_samples: int = 5,
+                 x_train_transform: Callable[[np.ndarray, Any], np.ndarray] = None,
+                 transform_params: Sequence[Any] = None):
         super().__init__()
+        self.model_name = model_name
+        self.transform_params = transform_params
+        self.x_train_transform = x_train_transform
+        self.model = model
         self.log_dir = log_dir
-        self.model_wrapper = model_wrapper
         self.print_every_n_batches = print_every_n_batches
-        self.layer_idxs = layer_idxs
         self.seen = 0
         self.x_train = x_train
         self.fmas = {}
@@ -33,12 +37,15 @@ class FeatureMapVisualizationCallback(Callback):
         self.futures: Sequence[Future] = []
         self.num_samples = num_samples
         assert self.num_samples > 0
-        idxs = np.random.randint(0, len(self.x_train), self.num_samples)
-        self.samples = [np.copy(self.x_train[idx]) for idx in idxs]
+        self.sample_idxs = np.random.randint(0, len(self.x_train), self.num_samples)
+
+        self._output_layers = [l for l in self.model.layers if
+                               isinstance(l, Conv2D)]
+        self._multi_output_model = Model(model.inputs, [l.output for l in self._output_layers])
 
     @staticmethod
     def _save_feature_maps(img_path_layer, fms, fig_num):
-        feature_maps = np.copy(fms).squeeze()
+        feature_maps = np.copy(fms[0])
         feature_maps = np.moveaxis(feature_maps, -1, 0)
 
         min_value = fms.min()
@@ -75,73 +82,58 @@ class FeatureMapVisualizationCallback(Callback):
         if logs is None:
             logs = {}
         self.futures = check_finished_futures_and_return_unfinished(self.futures)
-        if batch % self.print_every_n_batches == 0 and len(self.layer_idxs) > 0:
-            plt.rcParams["figure.figsize"] = (7 * self.num_samples, 10 + 10 * (len(self.layer_idxs)))
+        if batch % self.print_every_n_batches == 0 and len(self._output_layers) > 0:
+            samples = np.copy(self.x_train[self.sample_idxs])
+            x_train = samples if self.x_train_transform is None else self.x_train_transform(samples,
+                                                                                            *self.transform_params)
+
+            plt.rcParams["figure.figsize"] = (7 * self.num_samples, 10 + 10 * (len(self._output_layers)))
             self.seen += 1
             self.batch_nrs.append(batch)
-            fig, ax = plt.subplots(1 + len(self.layer_idxs), len(self.samples), num=round(time.time() * 10E6))
-            for sample_nr, sample in enumerate(self.samples):
+            fig, ax = plt.subplots(1 + len(self._output_layers), len(samples), num=round(time.time() * 10E6))
+            for sample_nr, sample in enumerate(
+                    x_train if self.x_train_transform is None else np.array(x_train).swapaxes(1, 0)):
 
                 # draw sample from data
-                sample_as_uint8 = np.copy(sample)
+                sample_as_uint8 = np.copy(samples[sample_nr])
 
                 if not sample_as_uint8.dtype == np.uint8:
                     sample_as_uint8 *= 255.0
                     sample_as_uint8 = sample_as_uint8.astype(np.uint8)
                 sample_as_uint8 = sample_as_uint8.squeeze()
                 img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
-                                        "feature_map",
+                                        "feature_map", self.model_name,
                                         "sample_{}".format(sample_nr))
                 os.makedirs(img_path, exist_ok=True)
-                ax[0, sample_nr].imshow(sample.squeeze(), cmap='gray') if len(self.samples) > 1 else ax[0].imshow(
+                ax[0, sample_nr].imshow(sample.squeeze(), cmap='gray') if len(samples) > 1 else ax[0].imshow(
                     sample.squeeze(), cmap='gray')
                 Image.fromarray(sample_as_uint8).save(
                     os.path.join(img_path, "original.jpg"))
-                for i, layer_idx in enumerate(self.layer_idxs):
-                    logging.info("Visualizing feature maps for layer {}".format(layer_idx))
-                    print("Visualizing feature maps for layer {}".format(layer_idx))
 
-                    # we cannot use instanceof as we aren't allowed to import the model_wrapper class directly since
-                    # this would lead to cyclic references
-                    if type(self.model_wrapper).__name__ in ['VariationalAutoencoder', 'AlexNetVAE',
-                                                             'FrozenAlexNetVAE', 'AlexAlexNetVAE', 'VLAE', 'HVAE']:
-                        if layer_idx < len(self.model_wrapper.encoder.layers) - 1:
-                            output_layer = self.model_wrapper.encoder.layers[layer_idx]
-                            model = Model(inputs=self.model_wrapper.encoder.inputs, outputs=output_layer.output)
-                        else:
-                            output_layer = self.model_wrapper.decoder.layers[
-                                layer_idx - len(self.model_wrapper.encoder.layers) - 1]
-                            model = Model(inputs=self.model_wrapper.encoder.inputs,
-                                          outputs=Model(self.model_wrapper.decoder.inputs, output_layer.output)(
-                                              self.model_wrapper.encoder.outputs))
-                    elif type(self.model_wrapper).__name__ in ['AlexNet', 'SimpleClassifier']:
-                        output_layer = self.model_wrapper.model.layers[layer_idx]
-                        model = Model(inputs=self.model_wrapper.model.inputs, outputs=output_layer.output)
-                    else:
-                        raise RuntimeError(
-                            "model_wrapper has to be either of type VariationalAutoencoder, AlexNetVAE, "
-                            "FrozenAlexNetVAE or AlexNet")
+                outputs = self._multi_output_model.predict(
+                    np.expand_dims(sample, 0) if self.x_train_transform is None else [np.expand_dims(s, 0) for s in
+                                                                                      sample])
 
-                    img_path_layer = os.path.join(img_path, "{}".format(output_layer.name))
+                for i, output in enumerate(outputs):
+                    img_path_layer = os.path.join(img_path, "{}".format(self._output_layers[i].name))
 
-                    feature_maps = model.predict(sample[np.newaxis, :], batch_size=1, verbose=1)
                     # as the printing a very long time, we do this in threads
-                    f = self.threadpool.submit(self._save_feature_maps, *(img_path_layer, feature_maps,
+                    f = self.threadpool.submit(self._save_feature_maps, *(img_path_layer, output,
                                                                           round(time.time() * 10E6)))
                     self.futures.append(f)
-                    fmas = np.sum(np.abs(feature_maps), axis=tuple(range(len(feature_maps.shape)))[:-1])
+                    fmas = np.sum(np.abs(output), axis=tuple(range(len(output.shape)))[:-1])
                     fmas = fmas
                     self.fmas.setdefault(sample_nr, {})
-                    self.fmas[sample_nr].setdefault(layer_idx, [])
-                    self.fmas[sample_nr][layer_idx].append(fmas)
-                    fmas_stacked = np.copy(np.stack(self.fmas[sample_nr][layer_idx]))
+                    self.fmas[sample_nr].setdefault(self._output_layers[i].name, [])
+                    self.fmas[sample_nr][self._output_layers[i].name].append(fmas)
+                    fmas_stacked = np.copy(np.stack(self.fmas[sample_nr][self._output_layers[i].name]))
                     fmas_stacked /= np.max(fmas_stacked)
-                    axx = ax[i + 1, sample_nr] if len(self.samples) > 1 else ax[i + 1]
-                    axx.set_title('Normalized activations - Layer {}'.format(output_layer.name))
+                    axx = ax[i + 1, sample_nr] if len(samples) > 1 else ax[i + 1]
+                    axx.set_title('Normalized activations - Layer {}'.format(self._output_layers[i].name))
                     axx.imshow(fmas_stacked, origin='lower', interpolation="none")
                     axx.set(xlabel="#feature map", ylabel="# batch")
                     axx.set_yticks(np.arange(len(self.batch_nrs), step=2), self.batch_nrs[0::2])
-            fig.colorbar(ax[1, 0].get_images()[0]) if len(self.samples) > 1 else fig.colorbar(ax[1].get_images()[0])
+            fig.colorbar(ax[1, 0].get_images()[0]) if len(samples) > 1 else fig.colorbar(ax[1].get_images()[0])
             fig.savefig(
                 os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen), "feature_map",
                              'activations.png'))
