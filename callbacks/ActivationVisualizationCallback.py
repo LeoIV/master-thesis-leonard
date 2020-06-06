@@ -62,6 +62,11 @@ class ActivationVisualizationCallback(Callback):
 
             fig, axs = plt.subplots(rows, cols, figsize=(cols * 10, rows * 10), num=round(time.time() * 10E6))
 
+            if cols == 1:
+                axs = [axs]
+            if rows == 1:
+                axs = [axs]
+
             for row in range(rows):
                 for col in range(cols):
                     fig_idx = row * cols + col

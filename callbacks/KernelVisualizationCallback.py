@@ -1,7 +1,7 @@
 import logging
+import math
 import os
 import time
-from concurrent import futures
 from concurrent.futures.thread import ThreadPoolExecutor
 
 import numpy as np
@@ -9,7 +9,6 @@ from keras import Model
 from keras.callbacks import Callback
 from keras.layers import Conv2D
 from matplotlib import pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from utils.future_handling import check_finished_futures_and_return_unfinished
 
@@ -29,16 +28,32 @@ class KernelVisualizationCallback(Callback):
         self.futures = []
 
     @staticmethod
-    def _plot_kernels(filters, img_path, fig_num):
-        fig = plt.figure(fig_num, figsize=((8.0, 6.0)))
-        for map_nr, f_map in enumerate(filters):
-            ax = fig.gca()
-            img = ax.imshow(f_map.squeeze())
-            divider = make_axes_locatable(ax)
-            cax = divider.append_axes("right", size="5%", pad=0.05)
-            fig.colorbar(img, cax=cax)
-            fig.savefig(os.path.join(img_path, "map_{}.png".format(map_nr)))
-            fig.clear()
+    def _plot_kernels(filters, img_path, layer_name, fig_num):
+
+        rows = int(math.floor(math.sqrt(len(filters))))
+        cols = int(math.ceil(len(filters) / rows))
+
+        fig, axs = plt.subplots(rows, cols, figsize=(cols * 3, rows * 3), num=fig_num)
+
+        if cols == 1:
+            axs = [axs]
+        if rows == 1:
+            axs = [axs]
+
+        min, max = np.min(filters), np.max(filters)
+        for row in range(rows):
+            for col in range(cols):
+                fig_idx = row * cols + col
+                axs[row][col].set_xticks([])
+                axs[row][col].set_yticks([])
+                if fig_idx >= len(filters):
+                    break
+                im = axs[row][col].imshow(filters[fig_idx].squeeze(), vmin=min, vmax=max)
+        fig.subplots_adjust(right=0.8)
+        cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+        fig.colorbar(im, cax=cbar_ax)
+        fig.savefig(os.path.join(img_path, "{}.png".format(layer_name)))
+        fig.clear()
         plt.close(fig)
 
     def on_epoch_end(self, epoch, logs=None):
@@ -60,9 +75,10 @@ class KernelVisualizationCallback(Callback):
                 filters = np.moveaxis(filters, (0, 1), (-2, -1))
                 filters = (filters.reshape(((-1,) + filters.shape[-2:])))
                 img_path = os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen),
-                                        "layer1_kernels", self.model_name, layer.name)
+                                        "kernels", self.model_name)
                 os.makedirs(img_path, exist_ok=True)
-                f = self.threadpool.submit(self._plot_kernels, *(filters, img_path, round(time.time() * 10E6)))
+                f = self.threadpool.submit(self._plot_kernels,
+                                           *(filters, img_path, layer.name, round(time.time() * 10E6)))
                 self.futures.append(f)
 
     def on_train_end(self, logs=None):

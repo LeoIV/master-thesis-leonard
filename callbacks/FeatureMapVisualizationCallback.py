@@ -1,10 +1,9 @@
-import logging
 import math
 import os
 import time
 from asyncio import Future
 from concurrent.futures.thread import ThreadPoolExecutor
-from typing import Union, Sequence, Callable, Any
+from typing import Sequence, Callable, Any
 
 import numpy as np
 from PIL import Image
@@ -51,26 +50,27 @@ class FeatureMapVisualizationCallback(Callback):
         min_value = fms.min()
         max_value = fms.max()
 
-        columns = 10
-        rows = math.ceil((len(feature_maps) + 1) / columns)
+        rows = int(math.floor(math.sqrt(len(feature_maps))))
+        cols = int(math.ceil(len(feature_maps) / rows))
 
-        fig, axs = plt.subplots(rows, columns, figsize=(columns * 2, rows * 2), num=fig_num)
+        fig, axs = plt.subplots(rows, cols, figsize=(cols * 2, rows * 2), num=fig_num)
+        if cols == 1:
+            axs = [axs]
+        if rows == 1:
+            axs = [axs]
 
-        for xax in axs:
-            if rows > 1:
-                for yax in xax:
-                    yax.set_xticks([])
-                    yax.set_yticks([])
-            else:
-                xax.set_xticks([])
-                xax.set_yticks([])
-
-        for i, f_map in enumerate(feature_maps):
-            row = i // columns
-            column = i % columns
-            (axs[row, column] if rows > 1 else axs[column]).imshow(f_map.squeeze(), vmin=min_value,
-                                                                   vmax=max_value)
-        fig.colorbar((axs[0, 0] if rows > 1 else axs[0]).get_images()[0], cax=axs[-1, -1] if rows > 1 else axs[-1])
+        for row in range(rows):
+            for col in range(cols):
+                fig_idx = row * cols + col
+                axs[row][col].set_xticks([])
+                axs[row][col].set_yticks([])
+                if fig_idx >= len(feature_maps):
+                    break
+                im = axs[row][col].imshow(feature_maps[fig_idx].squeeze(), vmin=min_value,
+                                          vmax=max_value)
+        fig.subplots_adjust(right=0.8)
+        cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+        fig.colorbar(im, cax=cbar_ax)
         fig.savefig("{}.png".format(img_path_layer))
         fig.clear()
         plt.close(fig)
@@ -136,7 +136,7 @@ class FeatureMapVisualizationCallback(Callback):
             fig.colorbar(ax[1, 0].get_images()[0]) if len(samples) > 1 else fig.colorbar(ax[1].get_images()[0])
             fig.savefig(
                 os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen), "feature_map",
-                             'activations.png'))
+                             'activations_{}.png'.format(self.model_name)))
             plt.close(fig)
             # set back to default
             plt.rcParams["figure.figsize"] = (8.0, 6.0)

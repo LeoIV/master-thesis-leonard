@@ -1,15 +1,14 @@
 import logging
 import os
 import time
-from collections import Iterable
 from concurrent.futures.thread import ThreadPoolExecutor
 from typing import Optional, Sequence, Dict, List
 
 import numpy as np
 from keras import Model
 from keras.callbacks import Callback
-from sklearn.manifold import TSNE
 from matplotlib import pyplot as plt
+from sklearn.manifold import TSNE
 
 from utils.future_handling import check_finished_futures_and_return_unfinished
 
