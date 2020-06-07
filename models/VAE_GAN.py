@@ -262,8 +262,8 @@ class VAEGAN(VAEWrapper):
                                                               model_name="encoder",
                                                               print_every_n_batches=print_every_n_batches,
                                                               x_train=x_train_subset)
-        fm_decoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
-                                                              model_name="encoder",
+        fm_decoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.decoder,
+                                                              model_name="decoder",
                                                               print_every_n_batches=print_every_n_batches,
                                                               x_train=x_train_subset,
                                                               x_train_transform=lambda x, m: m.predict(x),

@@ -309,13 +309,14 @@ class VLAEGAN(VAEWrapper):
         fm_encoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
                                                               model_name="encoder",
                                                               print_every_n_batches=print_every_n_batches,
-                                                              x_train=x_train_subset)
-        fm_decoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
-                                                              model_name="encoder",
-                                                              print_every_n_batches=print_every_n_batches,
                                                               x_train=x_train_subset,
                                                               x_train_transform=lambda x, m: m.predict(x),
                                                               transform_params=[self.encoder])
+        fm_decoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
+                                                              model_name="encoder",
+                                                              print_every_n_batches=print_every_n_batches,
+                                                              x_train=x_train_subset)
+
         rc_callback = ReconstructionImagesCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
                                                    initial_epoch=initial_epoch, vae=self, x_train=x_train_subset,
                                                    num_reconstructions=self.num_samples, num_inputs=len(self.z_dims))
