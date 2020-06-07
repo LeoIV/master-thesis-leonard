@@ -478,6 +478,7 @@ class VLAEGAN(VAEWrapper):
             for cb in callbacks_list:
                 cb.on_epoch_end(epoch, losses)
                 self.model.save(os.path.join(self.log_dir, 'weights.h5'))
+                self.model.save(os.path.join(self.log_dir, 'weights_epoch_{}.h5'.format(epoch)))
             epoch += 1
 
         for cb in callbacks_list:
