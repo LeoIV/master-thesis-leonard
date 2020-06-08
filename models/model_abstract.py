@@ -4,6 +4,7 @@ import os
 import sys
 import traceback
 from abc import ABC, abstractmethod
+from concurrent.futures.thread import ThreadPoolExecutor
 from typing import Tuple, Sequence, Optional, Union, Dict
 
 import numpy as np
@@ -281,16 +282,18 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
 
         lr_sched = step_decay_schedule(initial_lr=self.learning_rate, decay_factor=lr_decay, step_size=1)
 
+        executor = ThreadPoolExecutor(max_workers=2)
+
         checkpoint_filepath = os.path.join(weights_folder, "weights-{epoch:03d}-{loss:.2f}.h5")
         checkpoint1 = ModelCheckpoint(checkpoint_filepath, save_weights_only=True, verbose=1)
         checkpoint2 = ModelCheckpoint(os.path.join(weights_folder, 'weights.h5'), save_weights_only=True, verbose=1)
         tb_callback = TensorBoard(log_dir=self.log_dir, batch_size=batch_size, update_freq="batch")
         kv_encoder_callback = KernelVisualizationCallback(log_dir=self.log_dir,
                                                           print_every_n_batches=print_every_n_batches,
-                                                          model=self.encoder, model_name="encoder")
+                                                          model=self.encoder, model_name="encoder", executor=executor)
         kv_decoder_callback = KernelVisualizationCallback(log_dir=self.log_dir,
                                                           print_every_n_batches=print_every_n_batches,
-                                                          model=self.decoder, model_name="decoder")
+                                                          model=self.decoder, model_name="decoder", executor=executor)
         rc_callback = ReconstructionImagesCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
                                                    initial_epoch=initial_epoch, vae=self, x_train=x_train_subset,
                                                    num_reconstructions=self.num_samples, num_inputs=len(self.z_dims))
@@ -307,16 +310,17 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
         fma_encoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
                                                                model_name='encoder',
                                                                print_every_n_batches=print_every_n_batches,
-                                                               x_train=x_train_subset)
+                                                               x_train=x_train_subset, executor=executor)
         fma_decoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.decoder,
                                                                model_name='decoder',
                                                                print_every_n_batches=print_every_n_batches,
                                                                x_train=x_train_subset,
                                                                x_train_transform=lambda x, m: m.predict(x),
-                                                               transform_params=[self.encoder])
+                                                               transform_params=[self.encoder], executor=executor)
         hs_callback = HiddenSpaceCallback(log_dir=self.log_dir, vae=self, batch_size=batch_size,
                                           x_train=x_train_subset, y_train=y_embedding, max_samples=5000,
-                                          layer_names=self.mu_layer_names, plot_params=embedding_callback_params)
+                                          layer_names=self.mu_layer_names, plot_params=embedding_callback_params,
+                                          executor=executor)
         ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
         callbacks_list = [kv_encoder_callback, kv_decoder_callback, fma_encoder_callback, fma_decoder_callback,

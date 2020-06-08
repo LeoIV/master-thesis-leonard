@@ -19,7 +19,7 @@ class FeatureMapVisualizationCallback(Callback):
     def __init__(self, log_dir: str, model: Model, model_name: str,
                  print_every_n_batches: int, x_train: np.ndarray, num_samples: int = 5,
                  x_train_transform: Callable[[np.ndarray, Any], np.ndarray] = None,
-                 transform_params: Sequence[Any] = None):
+                 transform_params: Sequence[Any] = None, executor: ThreadPoolExecutor = None):
         super().__init__()
         self.model_name = model_name
         self.transform_params = transform_params
@@ -31,7 +31,7 @@ class FeatureMapVisualizationCallback(Callback):
         self.x_train = x_train
         self.fmas = {}
         self.batch_nrs = []
-        self.threadpool = ThreadPoolExecutor(max_workers=5)
+        self.threadpool = ThreadPoolExecutor(max_workers=2) if executor is None else executor
         self.epoch = 1
         self.futures: Sequence[Future] = []
         self.num_samples = num_samples
@@ -87,10 +87,8 @@ class FeatureMapVisualizationCallback(Callback):
             x_train = samples if self.x_train_transform is None else self.x_train_transform(samples,
                                                                                             *self.transform_params)
 
-            plt.rcParams["figure.figsize"] = (7 * self.num_samples, 10 + 10 * (len(self._output_layers)))
             self.seen += 1
             self.batch_nrs.append(batch)
-            fig, ax = plt.subplots(1 + len(self._output_layers), len(samples), num=round(time.time() * 10E6))
             for sample_nr, sample in enumerate(
                     x_train if self.x_train_transform is None else np.array(x_train).swapaxes(1, 0)):
 
@@ -105,8 +103,6 @@ class FeatureMapVisualizationCallback(Callback):
                                         "feature_map", self.model_name,
                                         "sample_{}".format(sample_nr))
                 os.makedirs(img_path, exist_ok=True)
-                ax[0, sample_nr].imshow(sample.squeeze(), cmap='gray') if len(samples) > 1 else ax[0].imshow(
-                    sample.squeeze(), cmap='gray')
                 Image.fromarray(sample_as_uint8).save(
                     os.path.join(img_path, "original.jpg"))
 
@@ -128,18 +124,6 @@ class FeatureMapVisualizationCallback(Callback):
                     self.fmas[sample_nr][self._output_layers[i].name].append(fmas)
                     fmas_stacked = np.copy(np.stack(self.fmas[sample_nr][self._output_layers[i].name]))
                     fmas_stacked /= np.max(fmas_stacked)
-                    axx = ax[i + 1, sample_nr] if len(samples) > 1 else ax[i + 1]
-                    axx.set_title('Normalized activations - Layer {}'.format(self._output_layers[i].name))
-                    axx.imshow(fmas_stacked, origin='lower', interpolation="none")
-                    axx.set(xlabel="#feature map", ylabel="# batch")
-                    axx.set_yticks(np.arange(len(self.batch_nrs), step=2), self.batch_nrs[0::2])
-            fig.colorbar(ax[1, 0].get_images()[0]) if len(samples) > 1 else fig.colorbar(ax[1].get_images()[0])
-            fig.savefig(
-                os.path.join(self.log_dir, "epoch_{}".format(self.epoch), "step_{}".format(self.seen), "feature_map",
-                             'activations_{}.png'.format(self.model_name)))
-            plt.close(fig)
-            # set back to default
-            plt.rcParams["figure.figsize"] = (8.0, 6.0)
 
     def on_train_end(self, logs=None):
         self.threadpool.shutdown()

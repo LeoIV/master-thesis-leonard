@@ -1,6 +1,7 @@
 import logging
 import math
 import os
+from concurrent.futures.thread import ThreadPoolExecutor
 from typing import Tuple, Sequence, List, Union, Optional
 
 import numpy as np
@@ -300,22 +301,24 @@ class VLAEGAN(VAEWrapper):
             y_embedding = y_train[:5000] if y_train is not None else None
 
         # checkpoint2 = ModelCheckpoint(os.path.join(weights_folder, 'weights.h5'), save_weights_only=True, verbose=1)
+        executor = ThreadPoolExecutor(max_workers=2)
+
         kv_encoder_callback = KernelVisualizationCallback(log_dir=self.log_dir,
                                                           print_every_n_batches=print_every_n_batches,
-                                                          model=self.encoder, model_name="encoder")
+                                                          model=self.encoder, model_name="encoder", executor=executor)
         kv_decoder_callback = KernelVisualizationCallback(log_dir=self.log_dir,
                                                           print_every_n_batches=print_every_n_batches,
-                                                          model=self.encoder, model_name="decoder")
+                                                          model=self.encoder, model_name="decoder", executor=executor)
         fm_encoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
                                                               model_name="encoder",
                                                               print_every_n_batches=print_every_n_batches,
-                                                              x_train=x_train_subset)
+                                                              x_train=x_train_subset, executor=executor)
         fm_decoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.decoder,
                                                               model_name="decoder",
                                                               print_every_n_batches=print_every_n_batches,
                                                               x_train=x_train_subset,
                                                               x_train_transform=lambda x, m: m.predict(x),
-                                                              transform_params=[self.encoder])
+                                                              transform_params=[self.encoder], executor=executor)
 
         rc_callback = ReconstructionImagesCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
                                                    initial_epoch=initial_epoch, vae=self, x_train=x_train_subset,
@@ -332,7 +335,8 @@ class VLAEGAN(VAEWrapper):
                                                               transform_params=[self.encoder])
         hs_callback = HiddenSpaceCallback(log_dir=self.log_dir, vae=self, batch_size=batch_size,
                                           x_train=x_train_subset, y_train=y_embedding, max_samples=5000,
-                                          layer_names=self.mu_layer_names, plot_params=embedding_callback_params)
+                                          layer_names=self.mu_layer_names, plot_params=embedding_callback_params,
+                                          executor=executor)
         ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
         callbacks_list = [kv_encoder_callback, kv_decoder_callback, av_encoder_callback, av_decoder_callback,

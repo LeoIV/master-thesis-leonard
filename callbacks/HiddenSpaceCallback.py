@@ -16,7 +16,7 @@ from utils.future_handling import check_finished_futures_and_return_unfinished
 class HiddenSpaceCallback(Callback):
     def __init__(self, log_dir: str, vae: 'VAEWrapper', batch_size: int, x_train: np.ndarray,
                  layer_names: Sequence[str], y_train: Optional[np.ndarray] = None, max_samples: int = 1000,
-                 plot_params: List[Dict[str, any]] = None):
+                 plot_params: List[Dict[str, any]] = None, executor: ThreadPoolExecutor = None):
         """
         Visualize the embedding space using T-SNE
         :param log_dir:
@@ -36,7 +36,7 @@ class HiddenSpaceCallback(Callback):
         self.vae = vae
         self.futures = []
         self.log_dir = log_dir
-        self.threadpool = ThreadPoolExecutor(max_workers=2)
+        self.threadpool = ThreadPoolExecutor(max_workers=2) if executor is None else executor
         if len(self.x_train) > self.max_samples:
             idxs = np.random.randint(0, len(self.x_train), self.max_samples)
             self.x_train = np.array([np.copy(self.x_train[idx]) for idx in idxs])
