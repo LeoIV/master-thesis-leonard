@@ -260,7 +260,7 @@ class VAEGAN(VAEWrapper):
                                                           model=self.encoder, model_name="encoder", executor=executor)
         kv_decoder_callback = KernelVisualizationCallback(log_dir=self.log_dir,
                                                           print_every_n_batches=print_every_n_batches,
-                                                          model=self.encoder, model_name="decoder", executor=executor)
+                                                          model=self.decoder, model_name="decoder", executor=executor)
         fm_encoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
                                                               model_name="encoder",
                                                               print_every_n_batches=print_every_n_batches,
@@ -274,11 +274,6 @@ class VAEGAN(VAEWrapper):
         rc_callback = ReconstructionImagesCallback(log_dir=self.log_dir, print_every_n_batches=print_every_n_batches,
                                                    initial_epoch=initial_epoch, vae=self, x_train=x_train_subset,
                                                    num_reconstructions=self.num_samples, num_inputs=len(self.z_dims))
-        fm_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model_wrapper=self,
-                                                      print_every_n_batches=print_every_n_batches,
-                                                      layer_idxs=self.feature_map_layers,
-                                                      x_train=x_train_subset, num_samples=self.num_samples,
-                                                      executor=executor)
         av_encoder_callback = ActivationVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
                                                               model_name='encoder',
                                                               x_train=x_train_subset,
@@ -296,7 +291,7 @@ class VAEGAN(VAEWrapper):
         ll_callback = LossLoggingCallback(logdir=self.log_dir)
         # tb_callback has to be first as we use its filewriter subsequently but it is initialized by keras in this given order
         callbacks_list = [kv_encoder_callback, kv_decoder_callback, fm_encoder_callback, fm_decoder_callback,
-                          hs_callback, av_encoder_callback, av_decoder_callback, fm_callback, rc_callback, ll_callback]
+                          hs_callback, av_encoder_callback, av_decoder_callback, rc_callback, ll_callback]
 
         logging.info("Training for {} epochs".format(epochs))
 

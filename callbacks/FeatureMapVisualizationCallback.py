@@ -68,8 +68,10 @@ class FeatureMapVisualizationCallback(Callback):
 
             self.seen += 1
             self.batch_nrs.append(batch)
+
             for sample_nr, sample in enumerate(
-                    x_train if self.x_train_transform is None else np.array(x_train).swapaxes(1, 0)):
+                    x_train if self.x_train_transform is None or not isinstance(x_train, list) else np.array(
+                        x_train).swapaxes(1, 0)):
 
                 # draw sample from data
                 sample_as_uint8 = np.copy(samples[sample_nr])
@@ -86,8 +88,8 @@ class FeatureMapVisualizationCallback(Callback):
                     os.path.join(img_path, "original.jpg"))
 
                 outputs = self._multi_output_model.predict(
-                    np.expand_dims(sample, 0) if self.x_train_transform is None else [np.expand_dims(s, 0) for s in
-                                                                                      sample])
+                    np.expand_dims(sample, 0) if self.x_train_transform is None or len(sample.shape) == 1 else [
+                        np.expand_dims(s, 0) for s in sample])
 
                 for i, output in enumerate(outputs):
                     img_path_layer = os.path.join(img_path, "{}".format(self._output_layers[i].name))
