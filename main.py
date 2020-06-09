@@ -81,7 +81,7 @@ def main(args: List[str]):
     parser.add_argument('--use_batch_norm', type=str2bool, default=False)
     parser.add_argument('--use_dropout', type=str2bool, default=False)
     parser.add_argument('--dropout_rate', type=float, default=0.5)
-    parser.add_argument('--num_samples', type=int, default=5)
+    parser.add_argument('--num_samples', type=int, default=3)
     parser.add_argument('--steps_per_epoch', type=int, required=False)
     parser.add_argument('--weights_path', type=str, required=False,
                         help="The path to restore the model from. Is only considered if --mode=load You usually might "

@@ -13,6 +13,7 @@ from keras.layers import Conv2D
 from matplotlib import pyplot as plt
 
 from utils.future_handling import check_finished_futures_and_return_unfinished
+from utils.img_ops import filters_to_figure
 
 
 class FeatureMapVisualizationCallback(Callback):
@@ -47,30 +48,8 @@ class FeatureMapVisualizationCallback(Callback):
         feature_maps = np.copy(fms[0])
         feature_maps = np.moveaxis(feature_maps, -1, 0)
 
-        min_value = fms.min()
-        max_value = fms.max()
+        fig = filters_to_figure(filters=feature_maps, fig_num=fig_num)
 
-        rows = int(math.floor(math.sqrt(len(feature_maps))))
-        cols = int(math.ceil(len(feature_maps) / rows))
-
-        fig, axs = plt.subplots(rows, cols, figsize=(cols * 2, rows * 2), num=fig_num)
-        if cols == 1:
-            axs = [axs]
-        if rows == 1:
-            axs = [axs]
-
-        for row in range(rows):
-            for col in range(cols):
-                fig_idx = row * cols + col
-                axs[row][col].set_xticks([])
-                axs[row][col].set_yticks([])
-                if fig_idx >= len(feature_maps):
-                    break
-                im = axs[row][col].imshow(feature_maps[fig_idx].squeeze(), vmin=min_value,
-                                          vmax=max_value)
-        fig.subplots_adjust(right=0.8)
-        cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
-        fig.colorbar(im, cax=cbar_ax)
         fig.savefig("{}.png".format(img_path_layer))
         fig.clear()
         plt.close(fig)

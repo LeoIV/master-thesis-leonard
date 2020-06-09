@@ -11,6 +11,7 @@ from keras.layers import Conv2D
 from matplotlib import pyplot as plt
 
 from utils.future_handling import check_finished_futures_and_return_unfinished
+from utils.img_ops import filters_to_figure
 
 
 class KernelVisualizationCallback(Callback):
@@ -30,31 +31,8 @@ class KernelVisualizationCallback(Callback):
 
     @staticmethod
     def _plot_kernels(filters, img_path, layer_name, fig_num):
-
-        rows = int(math.floor(math.sqrt(len(filters))))
-        cols = int(math.ceil(len(filters) / rows))
-
-        fig, axs = plt.subplots(rows, cols, figsize=(cols * 3, rows * 3), num=fig_num)
-
-        if cols == 1:
-            axs = [axs]
-        if rows == 1:
-            axs = [axs]
-
-        min, max = np.min(filters), np.max(filters)
-        for row in range(rows):
-            for col in range(cols):
-                fig_idx = row * cols + col
-                axs[row][col].set_xticks([])
-                axs[row][col].set_yticks([])
-                if fig_idx >= len(filters):
-                    break
-                im = axs[row][col].imshow(filters[fig_idx].squeeze(), vmin=min, vmax=max)
-        fig.subplots_adjust(right=0.8)
-        cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
-        fig.colorbar(im, cax=cbar_ax)
+        fig = filters_to_figure(filters, fig_num=fig_num)
         fig.savefig(os.path.join(img_path, "{}.png".format(layer_name)))
-        fig.clear()
         plt.close(fig)
 
     def on_epoch_end(self, epoch, logs=None):

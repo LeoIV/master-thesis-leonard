@@ -254,7 +254,7 @@ class VAEGAN(VAEWrapper):
 
         # checkpoint2 = ModelCheckpoint(os.path.join(weights_folder, 'weights.h5'), save_weights_only=True, verbose=1)
 
-        executor = ThreadPoolExecutor(max_workers=2)
+        executor = ThreadPoolExecutor(max_workers=5)
         kv_encoder_callback = KernelVisualizationCallback(log_dir=self.log_dir,
                                                           print_every_n_batches=print_every_n_batches,
                                                           model=self.encoder, model_name="encoder", executor=executor)
