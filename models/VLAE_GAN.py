@@ -83,22 +83,21 @@ class VLAEGAN(VAEWrapper):
         def _discriminator(input_shape: Tuple[int, int, int]):
             x = inpt = Input(shape=input_shape, name="discriminator_input")
             for i in range(2):
-                x = x_feat = Conv2D(batch_input_shape=input_shape, filters=128, kernel_size=5, padding='same',
+                x = x_feat = Conv2D(batch_input_shape=input_shape, filters=128, kernel_size=5, strides=2,
+                                    padding='same',
                                     name="discriminator_conv2d_{}".format(i))(x)
-                x = AveragePooling2D()(x)
                 x = BatchNormalization(name="discriminator_batch_norm_{}".format(i))(x)
                 x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(i))(x)
             if self.input_dim[0] >= 100:
                 for i in range(2):
-                    x = x_feat = Conv2D(batch_input_shape=input_shape, filters=192, kernel_size=5, padding='same',
+                    x = x_feat = Conv2D(batch_input_shape=input_shape, filters=192, kernel_size=5, strides=2,
+                                        padding='same',
                                         name="discriminator_conv2d_{}".format(i + 2))(x)
-                    x = AveragePooling2D()(x)
                     x = BatchNormalization(name="discriminator_batch_norm_{}".format(i + 2))(x)
                     x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(i + 2))(x)
                 for i in range(3):
-                    x = Conv2D(batch_input_shape=input_shape, filters=256, kernel_size=5, padding='same',
+                    x = Conv2D(batch_input_shape=input_shape, filters=256, kernel_size=5, strides=2, padding='same',
                                name="discriminator_conv2d_{}".format(i + 4))(x)
-                    x = AveragePooling2D()(x)
                     x = BatchNormalization(name="discriminator_batch_norm_{}".format(i + 4))(x)
                     x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(i + 4))(x)
             x = Flatten(name="discriminator_flatten_0")(x)
@@ -265,7 +264,7 @@ class VLAEGAN(VAEWrapper):
         kl_loss = vae_kl_loss()
 
         self.encoder_train = Model(self.inputs, self.dis_x_feat_tilde)
-        self.encoder_train.add_loss(kl_loss)
+        self.encoder_train.add_loss(10 * kl_loss)
         self.encoder_train.add_loss(dis_nl_loss)
 
         self.decoder_train = Model([self.inputs, *self.decoder.inputs], [self.dis_x_tilde, self.dis_x_p])

@@ -91,7 +91,7 @@ def filters_to_figure(filters: Union[np.array, Iterable[np.array]], filter_spaci
 
     # create figure with one subplot
     fig, ax = plt.subplots(num=round(time.time() * 10E6) if fig_num is None else fig_num,
-                           figsize=(13, 15))
+                           figsize=(15, 13))
 
     if not isinstance(filters, np.ndarray):
         filters = np.ndarray(filters)
