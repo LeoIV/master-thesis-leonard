@@ -319,7 +319,7 @@ class VLAEGAN(VAEWrapper):
                                                           model=self.encoder, model_name="encoder", executor=executor)
         kv_decoder_callback = KernelVisualizationCallback(log_dir=self.log_dir,
                                                           print_every_n_batches=print_every_n_batches,
-                                                          model=self.encoder, model_name="decoder", executor=executor)
+                                                          model=self.decoder, model_name="decoder", executor=executor)
         fm_encoder_callback = FeatureMapVisualizationCallback(log_dir=self.log_dir, model=self.encoder,
                                                               model_name="encoder",
                                                               print_every_n_batches=print_every_n_batches,

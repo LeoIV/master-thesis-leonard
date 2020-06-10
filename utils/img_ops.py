@@ -96,6 +96,7 @@ def filters_to_figure(filters: Union[np.array, Iterable[np.array]], filter_spaci
 
     if not isinstance(filters, np.ndarray):
         filters = np.ndarray(filters)
+    filters = filters.astype(np.float64)
 
     min, max = np.min(filters), np.max(filters)
 
