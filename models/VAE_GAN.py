@@ -162,7 +162,7 @@ class VAEGAN(VAEWrapper):
             if i < self.n_layers_decoder - 1:
                 if self.use_batch_norm:
                     x = BatchNormalization()(x)
-                x = LeakyReLU()(x)
+                x = LeakyReLU()(x) if self.inner_activation == "LeakyReLU" else ReLU()(x)
                 if self.use_dropout:
                     x = Dropout(rate=0.25)(x)
             else:
@@ -204,7 +204,7 @@ class VAEGAN(VAEWrapper):
         self.encoder_train.add_loss(dis_nl_loss)
 
         self.decoder_train = Model([self.inputs, *self.decoder.inputs], [self.dis_x_tilde, self.dis_x_p])
-        self.decoder_train.add_loss(0.5 * dis_nl_loss)
+        self.decoder_train.add_loss(0.25 * dis_nl_loss)
 
         self.discriminator_train = Model([self.inputs, *self.decoder.inputs],
                                          [self.dis_x, self.dis_x_tilde, self.dis_x_p])
