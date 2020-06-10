@@ -115,7 +115,7 @@ def filters_to_figure(filters: Union[np.array, Iterable[np.array]], filter_spaci
             # fill array at the position with the feature map
             array[arr_row_idx:arr_row_idx + filter_size, arr_col_idx:arr_col_idx + filter_size] = filters[filter_idx]
     # initialize normalizer with minimum and maximum obtained above
-    norm = Normalize(vmin=min - 1E-5, vmax=max + 1E-5)
+    norm = Normalize(vmin=min - 1E-3, vmax=max + 1E-3)
     # remove ticks and border around subplot
     ax.axis('off')
     # imshow with normalizer and custom colormap
