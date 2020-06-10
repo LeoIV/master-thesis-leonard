@@ -200,11 +200,11 @@ class VAEGAN(VAEWrapper):
         kl_loss = vae_kl_loss()
 
         self.encoder_train = Model(self.inputs, self.dis_x_feat_tilde)
-        self.encoder_train.add_loss(10 * kl_loss)
+        self.encoder_train.add_loss(kl_loss)
         self.encoder_train.add_loss(dis_nl_loss)
 
         self.decoder_train = Model([self.inputs, *self.decoder.inputs], [self.dis_x_tilde, self.dis_x_p])
-        self.decoder_train.add_loss(0.25 * dis_nl_loss)
+        self.decoder_train.add_loss(0.75 * dis_nl_loss)
 
         self.discriminator_train = Model([self.inputs, *self.decoder.inputs],
                                          [self.dis_x, self.dis_x_tilde, self.dis_x_p])
@@ -295,7 +295,7 @@ class VAEGAN(VAEWrapper):
 
         logging.info("Training for {} epochs".format(epochs))
 
-        optimizer = Adam(lr=0.00005, beta_1=0.5, decay=self.decay_rate)
+        optimizer = Adam(lr=self.learning_rate, beta_1=0.5, decay=self.decay_rate)
 
         def set_trainable(model: Model, trainable: bool):
             """
@@ -368,7 +368,7 @@ class VAEGAN(VAEWrapper):
                                     y_train[batch_index * batch_size:batch_index * batch_size + batch_size])
                         if model == self.discriminator_train:
                             x = [x, *[np.random.normal(size=(batch_size, z)) for z in self.z_dims]]
-                            y_real = np.ones((batch_size,), dtype='float32')
+                            y_real = np.full((batch_size,), fill_value=0.9, dtype='float32')
                             y_fake = np.zeros((batch_size,), dtype='float32')
                             y = [y_real, y_fake, y_fake]
                             outs = model.train_on_batch(x, y)
