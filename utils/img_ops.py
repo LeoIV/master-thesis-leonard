@@ -7,6 +7,8 @@ from PIL import Image
 from keras import Model
 from keras.layers import Conv2D, Dense
 from matplotlib import pyplot as plt, cm
+from matplotlib.axis import Axis
+from matplotlib.colorbar import Colorbar
 from matplotlib.colors import Normalize
 from matplotlib.figure import Figure
 
@@ -80,9 +82,8 @@ def filters_to_figure(filters: Union[np.array, Iterable[np.array]], filter_spaci
 
     c_map = cm.get_cmap(c_map)
     # We want the space between the filters to be transparent as fig.save_fig also adds transparent space everywhere
-    # else. We achieve this by setting the array values to a value lower than the minimum of the feature maps
-    # and by then letting the feature map everything below the minimum of the feature maps to a transparent RGBA
-    # value
+    # else. We achieve this by setting the array values to -1 and by letting the feature map map everything below the
+    # minimum of the feature maps to a transparent RGBA value
     c_map.set_under('w', alpha=1.0)
 
     # make figure approximately square
@@ -98,11 +99,15 @@ def filters_to_figure(filters: Union[np.array, Iterable[np.array]], filter_spaci
 
     min, max = np.min(filters), np.max(filters)
 
+    # normalize filters to [0, 1], we will adjust the colorbar accordingly later
+    filters -= min
+    filters /= np.max(filters)
+
     array_cols = filter_size * cols + (cols - 1) * filter_spacing
     array_rows = filter_size * rows + (rows - 1) * filter_spacing
 
-    # create array with default value minimum of the feature maps - 1
-    array = np.full(shape=(array_rows, array_cols), fill_value=min - 1, dtype=np.float32)
+    # create array with default value minimum of -1
+    array = np.full(shape=(array_rows, array_cols), fill_value=-1.0, dtype=np.float32)
 
     for row in range(rows):
         for col in range(cols):
@@ -114,8 +119,8 @@ def filters_to_figure(filters: Union[np.array, Iterable[np.array]], filter_spaci
             arr_col_idx = col * (filter_size + filter_spacing)
             # fill array at the position with the feature map
             array[arr_row_idx:arr_row_idx + filter_size, arr_col_idx:arr_col_idx + filter_size] = filters[filter_idx]
-    # initialize normalizer with minimum and maximum obtained above
-    norm = Normalize(vmin=min - 1E-3, vmax=max + 1E-3)
+    # initialize normalizer with -1 and 1.0, otherwise the normalizer would also incorporate the -1 values
+    norm = Normalize(vmin=.0, vmax=1.0)
     # remove ticks and border around subplot
     ax.axis('off')
     # imshow with normalizer and custom colormap
@@ -123,5 +128,8 @@ def filters_to_figure(filters: Union[np.array, Iterable[np.array]], filter_spaci
     # add colorbar
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
-    fig.colorbar(im, cax=cbar_ax)
+    # create colorbar with true min and max
+    m = plt.cm.ScalarMappable(cmap=c_map)
+    m.set_clim(vmin=min, vmax=max)
+    fig.colorbar(m, cax=cbar_ax)
     return fig
