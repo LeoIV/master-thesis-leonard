@@ -82,44 +82,22 @@ class VLAEGAN(VAEWrapper):
 
         def _discriminator(input_shape: Tuple[int, int, int]):
             x = inpt = Input(shape=input_shape, name="discriminator_input")
-            for i in range(2):
-                x_conv_stride = Conv2D(batch_input_shape=input_shape, filters=64, kernel_size=5, strides=2,
-                                       padding='same', name="discriminator_conv2d_stride_{}".format(i))(x)
-                x_conv_avg_pool = Conv2D(batch_input_shape=input_shape, filters=64, kernel_size=5,
-                                         padding='same', name="discriminator_conv2d_avg_pool_{}".format(i))(x)
-                x_conv_avg_pool = AveragePooling2D(name="discriminator_avg_pool_{}".format(i))(x_conv_avg_pool)
-                x = x_feat = Concatenate(name="discriminator_concatenate_{}".format(i))(
-                    [x_conv_stride, x_conv_avg_pool])
-                x = BatchNormalization(name="discriminator_batch_norm_{}".format(i))(x)
-                x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(i))(x)
+            x = Conv2D(batch_input_shape=input_shape, filters=64, kernel_size=4, strides=2, padding='same')(x)
+            x = LeakyReLU(alpha=0.2)(x)
+            x = x_feat = Conv2D(batch_input_shape=input_shape, filters=128, kernel_size=4, strides=2, padding='same')(x)
+            x = BatchNormalization()(x)
             if self.input_dim[0] >= 100:
-                for i in range(2):
-                    x_conv_stride = Conv2D(batch_input_shape=input_shape, filters=96, kernel_size=5, strides=2,
-                                           padding='same',
-                                           name="discriminator_conv2d_stride_{}".format(i + 2))(x)
-                    x_conv_avg_pool = Conv2D(batch_input_shape=input_shape, filters=96, kernel_size=5,
-                                             padding='same', name="discriminator_conv2d_avg_pool_{}".format(i + 2))(x)
-                    x_conv_avg_pool = AveragePooling2D(name="discriminator_avg_pool_{}".format(i + 2))(x_conv_avg_pool)
-                    x = x_feat = Concatenate(name="discriminator_concatenate_{}".format(i + 2))(
-                        [x_conv_stride, x_conv_avg_pool])
-                    x = BatchNormalization(name="discriminator_batch_norm_{}".format(i + 2))(x)
-                    x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(i + 2))(x)
-                for i in range(3):
-                    x_conv_stride = Conv2D(batch_input_shape=input_shape, filters=128, kernel_size=5, strides=2,
-                                           padding='same',
-                                           name="discriminator_conv2d_stride_{}".format(i + 4))(x)
-                    x_conv_avg_pool = Conv2D(batch_input_shape=input_shape, filters=128, kernel_size=5, padding='same',
-                                             name="discriminator_conv2d_avg_pool_{}".format(i + 4))(x)
-                    x_conv_avg_pool = AveragePooling2D(name="discriminator_avg_pool_{}".format(i + 4))(x_conv_avg_pool)
-                    x = Concatenate(name="discriminator_concatenate_{}".format(i + 4))([x_conv_stride, x_conv_avg_pool])
-                    x = BatchNormalization(name="discriminator_batch_norm_{}".format(i + 4))(x)
-                    x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(i + 4))(x)
-            x = Flatten(name="discriminator_flatten_0")(x)
-            x = Dense(512, name="discriminator_dense_0")(x)
-            x = BatchNormalization(name="discriminator_batch_norm_{}".format(7 if self.input_dim[0] >= 100 else 2))(x)
-            x = LeakyReLU(alpha=0.2, name="discriminator_leaky_relu_{}".format(7 if self.input_dim[0] >= 100 else 2))(x)
-            x = Dense(1, activation='sigmoid', name="discriminator_dense_1")(x)
-
+                x = x_feat = Conv2D(batch_input_shape=input_shape, filters=256, kernel_size=4, strides=2,
+                                    padding='same')(x)
+                x = BatchNormalization()(x)
+                x = LeakyReLU(alpha=0.2)(x)
+                x = Conv2D(batch_input_shape=input_shape, filters=512, kernel_size=4, strides=2, padding='same')(x)
+                x = BatchNormalization()(x)
+                x = LeakyReLU(alpha=0.2)(x)
+            x = Conv2D(batch_input_shape=input_shape, filters=1, kernel_size=1, strides=4, padding='same')(x)
+            x = Flatten()(x)
+            x = Dense(1)(x)
+            x = Activation(activation='sigmoid')(x)
             return Model(inpt, [x_feat, x], name="vlae_gan_discriminator")
 
         self.discriminator = _discriminator(self.input_dim)
@@ -233,7 +211,7 @@ class VLAEGAN(VAEWrapper):
         g0 = Reshape(shape_before_flattening, name="generative_0_reshape_0")(g0)
         for i, (kernelsize, stride, feature_maps) in enumerate(self.gen0_kernels_strides_featuremaps):
             g0 = Conv2DTranspose(filters=math.ceil(feature_maps / self.feature_map_reduction_factor),
-                                 kernel_size=kernelsize, strides=stride, padding='same',
+                                 kernel_size=kernelsize, strides=stride, padding='same', use_bias=False,
                                  name="generative_0_conv2d_transpose_{}".format(i))(g0)
             g0 = Dropout(self.dropout_rate, name="generative_0_dropout_{}".format(i + 1))(
                 g0) if self.use_dropout else g0
