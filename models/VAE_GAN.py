@@ -153,7 +153,7 @@ class VAEGAN(VAEWrapper):
         for i in range(self.n_layers_decoder):
             conv_t_layer = Conv2DTranspose(
                 filters=math.ceil(self.decoder_conv_t_filters[i] / self.feature_map_reduction_factor),
-                kernel_size=self.decoder_conv_t_kernel_size[i],
+                kernel_size=self.decoder_conv_t_kernel_size[i], use_bias=False,
                 strides=self.decoder_conv_t_strides[i], padding='same', name='decoder_conv_t_' + str(i)
             )
 
