@@ -83,17 +83,37 @@ M.Sc. Zahra Fayyaz
 \pagenumbering{Roman}
 \tableofcontents
 \newpage
-    \setcounter{savepage}{\arabic{page}}
-    \pagenumbering{arabic}
+\setcounter{savepage}{\arabic{page}}
+\pagenumbering{arabic}
 
 
-    \section{Introduction}\label{sec:introduction}
+\section{Introduction}\label{sec:introduction}
 
-    \textbf{tbd}
+Research in artificial neural networks has risen in recent years due to their success in a large variety of different tasks.
+This increase in research has led to progressively better network architectures, achieving better and better results.
+The improvement of network architectures, however, is mainly driven by the question whether a new improvement will lead to better results \citep{lindsay2020convolutional}.
 
+Biological plausibility, an important consideration in the field of computational neuroscience, often is of no interest to researchers aiming at solving a complex problem.
+Even though progress in neural network research has become more and more disconnected from the biological example, they are inspired by biology.
+Modern neural networks operating on images (mainly \acp{CNN}) indeed share many features with the visual system.
 
-    \section{Theoretical Background}\label{sec:theoretical-background}
-    \input{background}
+Even though neural networks are trained in a manner largely detached from the way the brain learns and builds memories, it has been shown that image classification networks are related to the visual system, not only areas where this relatedness has been built into the model.
+
+Both, the biological foundation of \acp{CNN} and the more recent insights on their more indirect relatedness to the visual system qualify them as a potentially good model of the visual system.
+
+Unfortunately, the neural networks where this kind of relatedness has been discovered so far are trained in a supervised manner, requiring lots of labeled data.
+This kind of learning is disconnected from human perception where often one single example is sufficient when it comes to grouping objects into classes.
+
+The \ac{VAE} is one important representative of a class of models \textit{generative models}.
+This class of models allows a different training procedure, still requiring many samples but no labels.
+Furthermore, \acp{VAE} build generalizable latent representations of inputs which might be similar to the abstract representation of the brain when perceiving the world.
+
+\acp{VAE}, therefore, could be an important step towards a more realistic model of the visual system.
+
+This thesis aims at answering the question whether \acp{VAE} prove to be a successful model of the visual system.
+
+\section{Theoretical Background}\label{sec:theoretical-background}
+\input{background}
 
 
 \section{Methods}\label{sec:methods}
@@ -177,7 +197,10 @@ Another consideration is training stability.
 Due to the adversarial loss, training \acp{GAN} has many difficulties (mode collapse, error oscillation\textbf{REF}), often resulting in failure modes.
 Training regular \acp{VAE}, in contrast, is far more stable.
 
-The previous considerations should be regarded when choosing a loss function.
+The choice of the loss function also might play an important role when studying a model’s representation with human \ac{IT} representations.
+Compared to the pixel-wise loss, the generative loss allows for a more holistic image assessment.
+This might play an important role in the emergence of a models’s latent representation, i.e. might lead to a more realistic latent representation in terms of human IT activations.
+This aspect should be investigated in future work.
 
 \subsection{Failure on ImageNet}
 
@@ -298,16 +321,17 @@ _________________________________________________________________
 \acro{LeakyReLU}{Leaky Rectified Linear Unit}
 \acro{ILSVRC2017}{Large Scale Visual Recognition Challenge 2017}
 \acro{MSE}{Mean Squared Error}
+\acro{RDM}{Representational Dissimilarity Matrix}
 \acro{KL-divergence}{Kullback-Leibler divergence}
 \acro{ELBO}{Evidence Lower Bound}
 \acro{PDF}{Probability Density Function}
-        \acro{GAN}{Generative Adversarial Network}
-        \acro{VLAE}{Variational Ladder Autoencoder}
-        \acro{LVAE}{Ladder Variational Autoencoder}
-        \acro{CNS}{Central Nervous System}
-        \acro{V1}{Primary Visual Cortex}
-        \acro{LGN}{Lateral Geniculate Nucleus}
-        \acro{TEO}{Temporo-Occipital Area}
+\acro{GAN}{Generative Adversarial Network}
+\acro{VLAE}{Variational Ladder Autoencoder}
+\acro{LVAE}{Ladder Variational Autoencoder}
+\acro{CNS}{Central Nervous System}
+\acro{V1}{Primary Visual Cortex}
+\acro{LGN}{Lateral Geniculate Nucleus}
+\acro{TEO}{Temporo-Occipital Area}
 \end{acronym}
 \newpage
 \listoffigures

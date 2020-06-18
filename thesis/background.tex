@@ -1,3 +1,5 @@
+The following section presents important theoretical concepts that used in this thesis as well as related work.
+
 \subsection{Human Cognition}\label{subsec:human-brain-structure}
 
 \subsubsection{Cells}
@@ -78,7 +80,111 @@ Importantly, Figure~\ref{fig:ventral_dorsal_pathway} does not show the complete 
 From V4, the Ventral pathways has feedback and feedforward connections from and to \ac{TEO}, and from \ac{TEO} it has feedback and feedforward connections from and to \ac{IT}, which, in turn, has feedback connections to \ac{V1} \citep[p. 563]{mack2013principles}.
 
 According to the two-stream hypothesis~\citep{goodale1992separate}, the two pathways are assumed to encode the \textit{what} (dorsal) and \textit{where} (ventral) in a visual scene~\citep[p. 520]{mack2013principles}.
-Even though the two pathways can exchange information \citep[p. 564]{mack2013principles}, they encode two different qualities of a stimulus: the identity and the location.
+Even though the two pathways can exchange information~\citep[p. 564]{mack2013principles}, they encode two different qualities of a stimulus: the identity and the location.
+
+\subsection{Models of the Visual System}
+
+\subsubsection{Simple and Complex Cells in \ac{V1}}\label{subsubseq:simple_complex_cells}
+
+\citet{hubel1962receptive} distinguish two main types of cells in the primary visual cortex: simple and complex cells.
+Both cell types are orientation sensitive, i.e. different cells are tuned towards different orientations of stripes in a stimulus.
+Other than simple cells, complex cells are more invariant towards the stripe's location (but not it's orientation) in the receptive field.
+Complex cells are assumed to receive input from simple cells~\citep{hubel1962receptive}.
+
+Based on this assumption, complex cells can be modelled by receiving input from many simple cells, tuned towards a specific orientation but not translation.
+If any of the afferent simple cells fire, the complex cells fires as well, leading to an translation invariant behavior~\citep{hubel1962receptive}.
+
+It can be shown that a two-dimensional Gabor wavelet is a very good stimulus for a simple cell in \ac{V1} in terms of neuron excitation~\citep{jones1987evaluation}.
+
+\subsubsection{Neocognitron}
+
+The Neocognitron~\citep{fukushima1980neocognitron} is a model of object perception.
+It aims at modelling the ventral stream based on the findings of \citet{hubel1962receptive}.
+It is a neural network, consisting of models of simple (\say{S-cells}) and complex (\say{C-cells}) cells, arranged alternating in multiple layers.
+It can be trained in an unsupervised manner by reinforcing connections leading to high cells activations in the next layer and has shown to be effective in pattern recognition.
+
+\subsubsection{\acp{CNN}}
+\acp{CNN}~\citep{lecun1989backpropagation} can be understood as a successor of the Neocognitron~\citep{lindsay2020convolutional} and is a network type commonly used on image data~\citep[p. 326]{Goodfellow-et-al-2016}.
+The constituent of \acp{CNN} giving it it's name are the convolutional layers that act as a pattern detector, similar to the S-cells in the Neocognitron~\citep{lindsay2020convolutional}.
+In addition, after an activation layer, many neural networks subsequently perform an operation called (max-)pooling~\citep[pp. 326, 339]{Goodfellow-et-al-2016}.
+The pooling operation introduces invariance to the network, similar to C-cells~\citep{lindsay2020convolutional}.
+
+\paragraph{Convolution}
+
+Assume $I$ is a two-dimensional grayscale image and $K$ is a xconvolutional kernel.
+Then, the convolution operation can be written as~\citep[p. 327]{Goodfellow-et-al-2016}:
+\begin{align}
+    S(i, j)=(I * K)(i, j)=\sum_{m=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} I(m, n) K(i-m, j-n) \label{eq:conv}
+\end{align}
+
+The result of the convolution is $S$, a \textit{feature map}.
+
+The kernel usually is implemented as a two-dimensional array~\citep[p. 327]{Goodfellow-et-al-2016}.
+Values outside of this array, as they are assumed in the summation in Equation~\ref{eq:conv}, are assumed to be zero.
+These values then do not contribute to the sum and the convolution effectively only has to use a finite number of summations.
+In case of a $3\times 3$ kernel, Equation~\ref{eq:conv} boils down to:
+\begin{align}
+    S(i, j)=(I * K)(i, j)=\sum_{m=i-1}^{i+1} \sum_{n=j-1}^{j+1} I(m, n) K(i-m, j-n) \label{eq:conv_boiled_down}
+\end{align}
+assuming that indexing starts at zero for the image and at minus one for the kernel.
+
+The output of a convolution is maximum in image areas where the image contains a flipped version of the kernel.
+This is because the sums in Equation~\ref{eq:conv_boiled_down} go from low to high indices for the image but from high to low indices for the kernel.
+
+Other than the cross-correlation\footnote{The cross-correlation is defined as $S(i, j)=(K * I)(i, j)=\sum_{m=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} I(i+m, j+n) K(m, n)$~\citep[p. 329]{Goodfellow-et-al-2016}.}, the convolution is commutative.
+However, this property is not important in practice and \say{many neural network libraries implement [...] the cross-correlation [instead]}~\citep[p. 329]{Goodfellow-et-al-2016}.
+
+\subparagraph{Padding}
+The convolution operations applies the kernel at all image locations.
+At border pixels, however, this leads to a problem because the sum in Equation~\ref{eq:conv_boiled_down} also considers image pixels with an index smaller than $i$ or $j$.
+There are multiple options to deal with this problem.
+
+One option is to not pad the image at all and to start and end the convolution at indices such that the sum in Equation~\ref{eq:conv_boiled_down} never \say{touches} invalid image \textbf{indices}~\citep[p. 350]{Goodfellow-et-al-2016}.
+This, however, leads to smaller resulting feature maps as the border pixels are not considered.
+This can be problematic in cases where the network has to be very deep as this happens on all convolutional layers.
+Also, the network is not as able to make sense of border pixels as for inner pixels.
+
+Another option is \textit{zero-padding}~\citep[p. 350]{Goodfellow-et-al-2016}, i.e. to assume values outside the image to be zero.
+Here, the feature map is of the same size (assuming no strided convolution) as the input.
+However, the network still handles border pixels differently than inner pixels as the feature map values for border pixels tend to be smaller due to the multiplication with zero in Equation~\ref{eq:conv_boiled_down}.
+
+Other padding techniques mirror the image at the borders or assume that all pixel values outside the image are the same as at the borders~\footnote{\href{https://www.tensorflow.org/api\_docs/python/tf/pad}{https://www.tensorflow.org/api\_docs/python/tf/pad}, last access: 2020/06/18}.
+
+\paragraph{Max-Pooling}
+Similar to the convolution, pooling operations use a sliding window over the feature maps, often with an offset (\textit{stride}) such that the sliding window sees every pixel only once.
+A strided max-pooling has multiple effects.
+
+First, it leads to a downsampling of the image.
+This is a useful property as it allows to use more convolutional kernels in higher layers without exceeding a system's memory\footnote{Of course, the convolutional kernels itself are almost certainly unproblematic as they are very small. Each convolution, however, produces another memory-consuming feature map.}.
+
+Not less importantly, max-pooling introduces invariance to small translations to the network~\citep[p. 342]{Goodfellow-et-al-2016}.
+
+In cases where this translation invariance is not desired\footnote{This is often the case for generative models.} but the image should be down-sampled, the max-pooling layer can be omitted and a strided convolution can be used instead~\citep[p. 337]{Goodfellow-et-al-2016}.
+
+\paragraph{\acp{CNN} as a Model of the Visual System}
+As discussed earlier, \acp{CNN} by design share some features with the visual system, namely the convolution as a model of S-cells and max-pooling as a model of C-cells.
+Surprisingly, some \acp{CNN} are also related in ways not explicitly built into this model.
+
+AlexNet~\citep{krizhevsky2012imagenet} is a deep \ac{CNN} trained on image classification.
+\citet{krizhevsky2012imagenet} have shown that this network learns Gabor wavelets in the kernels of the first layer.
+Importantly, a Gabor-like kernel is most excited by a Gabor wavelet itself, which is the optimal stimulus for cells in \ac{V1} (see Section~\ref{subsubseq:simple_complex_cells} and \citet{jones1987evaluation}).
+
+Furthermore, \citet{khaligh2014deep} have shown that \acp{CNN} trained in a supervised manner show similar \acp{RDM} as the human \ac{IT}.
+A \ac{RDM} is a matrix encoding the correlation of activity patterns for a given model.
+Rows and columns refer to different input stimuli.
+A cell in a \ac{RDM} then contains the correlation of the activity patterns for the given input stimuli and the given model.
+\acp{RDM}, therefore, are symmetric.
+
+The similarity of the \acp{RDM} is evidence of that supervised \acp{CNN} and the human \ac{IT} have a similar high-level encoding of information.
+
+\citet{khaligh2014deep} also show that this is not true for a variety of unsupervised models.
+The unsupervised models under investigation, however, are only losely related to \acp{VAE}.
+The question whether \acp{VAE} show similar \acp{RDM} as the human \ac{IT}, therefore, remains.
+
+It has been shown that \acp{VAE}, trained in a self-supervised manner, partially learn Gabor wavelets when trained to predict the next image in a sequence of images~\citep{palm2012prediction}.
+
+\textbf{DRAFT!}
+\citet{eickenberg2017seeing} and \citet{wen2018neural} compare response of certain brain areas with layers in CNNs (also many more, a good list is in \citet{wen2018neural})
 
 \subsection{Visual Object Perception}\label{subsec:visual-object-perception}
 
@@ -167,7 +273,7 @@ The agent, in turn, aims at maximizing its reward. \textbf{REFERENCES FOR THIS P
 
 \subsection{Generative Methods}\label{subsec:generative-methods}
 
-Section~\label{subsec:types-of-learning} used the example of a \say{cat-and-dog-classifier} to introduce supervised learning.
+Section~\ref{subsec:types-of-learning} used the example of a \say{cat-and-dog-classifier} to introduce supervised learning.
 Such as classifier also is an example of a \textit{discriminative model} because it \say{model[s] the posterior probabilities directly}~\citep[p. 43]{bishop2006pattern}.
 Therefore, a discriminative model, for example, does not allow to predict the probability density of a data point in the feature space~\citep[pp. 43,44]{bishop2006pattern}.
 
@@ -693,14 +799,6 @@ This mitigates the problem of the pixelwise loss in \acp{VAE} that is assumed to
     \item \citet{tschannen2018recent} give an overview over \say{recent advances in autoencoder-based representation learning}
     \item Discuss VAEs on sequences of images.
     \item Check \citet{pidhorskyi2020adversarial} for more related work.
-\end{itemize}
-
-\subsection{Visual Features in Neural Networks}\label{subsec:visual_features_in_neural_networks}
-\textbf{DRAFT!}
-\begin{itemize}
-    \item~\citet{krizhevsky2012imagenet} report Gabor wavelets in \acp{CNN} trained on image classification
-    \item~\citet{palm2012prediction} found Gabor wavelets in vanilla autoencoders, trained on predicting the next image in a sequence, \citet{walker2016uncertain} did something similar for VAEs
-    \item~\citet{eickenberg2017seeing} and \citet{wen2018neural} compare response of certain brain areas with layers in CNNs (also many more, a good list is in \citet{wen2018neural})
 \end{itemize}
 
 \subsection{Feature Disentanglement}
