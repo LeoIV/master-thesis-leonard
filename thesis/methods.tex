@@ -131,7 +131,3 @@ To cross-check the results of the AlexNet-VAE, only the encoder part was trained
 
 As it turned out that also in the AlexNet-VAE no Gabor wavelets emerged (see Section~\ref{subsec:results_visual_features_in_variational_autoencoders}), the image classification AlexNet-like network was used as an encoder with frozen weights and only the decoder part was trained to see if using a network trained on image classification has certain disadvantages when being used as a decoder in a \ac{VAE} compared to a decoder trained from scratch.
 
-\subsection{Sparsness in Generative Models}\label{subsec:effective-network-capacity}
-One hyperparameter to choose in the different models is the number of feature maps of one layer.
-During the implementation it could be observed that some feature maps show little activity compared to others, posing the question by how much the number of feature maps can be reduced without increasing the network loss.
-\textbf{CONTINUE, also image of inactive fms}

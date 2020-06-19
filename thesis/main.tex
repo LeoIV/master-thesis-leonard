@@ -21,15 +21,21 @@
 \usepackage{bm}
 \usepackage{amssymb}
 \usepackage{tikz}
+\usepackage{lscape}
 \usetikzlibrary{shapes,positioning,decorations.pathreplacing}
 \addbibresource{literature.bib}
 \renewcommand{\baselinestretch}{1.5}
+\let\oldsection\section
+\renewcommand
+
+
+\section{\clearpage\oldsection}
 \newcounter{savepage}
 
-\lstset{lineskip=-0.7ex,frame=single}
+\lstset{lineskip=-0.7ex,frame=single,breaklines=true}
 
 \DeclarePairedDelimiterX{\infdivx}[2]{(}{)}{%
-    #1\;\delimsize\|\;#2%
+#1\;\delimsize\|\;#2%
 }
 \newcommand{\kldiv}{D_{KL}\infdivx}
 \DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
@@ -40,22 +46,22 @@
 \makeatletter
 \newenvironment{breakablealgorithm}
 {% \begin{breakablealgorithm}
-    \begin{center}
-        \refstepcounter{algorithm}% New algorithm
-        \vspace{1em}
-        \hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
-        \renewcommand{\caption}[2][\relax]{% Make a new \caption
-            {\raggedright\textbf{\ALG@name~\thealgorithm} ##2\par}%
-            \ifx\relax##1\relax % #1 is \relax
-            \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
-            \else % #1 is not \relax
-            \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
-            \fi
-            \kern2pt\hrule\kern4pt
-        }
-}{% \end{breakablealgorithm}
-    \kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+\begin{center}
+\refstepcounter{algorithm}% New algorithm
     \vspace{1em}
+    \hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+    \renewcommand{\caption}[2][\relax]{% Make a new \caption
+    {\raggedright\textbf{\ALG@name~\thealgorithm} ##2\par}%
+    \ifx\relax##1\relax % #1 is \relax
+    \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
+    \else % #1 is not \relax
+    \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
+    \fi
+    \kern2pt\hrule\kern4pt
+    }
+}{% \end{breakablealgorithm}
+\kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+\vspace{1em}
 \end{center}
 }
 \makeatother
@@ -120,10 +126,10 @@ This thesis aims at answering the question whether \acp{VAE} prove to be a succe
 \input{methods}
 
 
-\section{Results}\label{sec:results}
+\section{Results and Discussion}\label{sec:results}
 \input{results}
 
-\section{Discussion}\label{sec:discussion}
+\section{Discussion and Future Work}\label{sec:discussion}
 
 \subsection{Possible applications of VLAE-GAN model}
 \citet{vanrullen2019reconstructing} learn a mapping between test subject's fMRI responses when shown images from the CelebA dataset and the latent space of a \ac{VAE}.
@@ -269,6 +275,22 @@ Future research could aim at investigating if and by how far semantic representa
 \label{fig:vlae_morpho_z\i}
 \end{figure}
 }
+\pagebreak
+\begin{landscape}
+\section{\ac{VLAE} Networks used in Experiments on Sparsity (Section~\label{subsec:effective-network-capacity})}\label{sec:listings_sparsity_networks}
+\input{listings/results_sparsity/fm1-encoder.tex}
+\pagebreak
+\input{listings/results_sparsity/fm1-decoder.tex}
+\pagebreak
+\input{listings/results_sparsity/fm2-encoder.tex}
+\pagebreak
+\input{listings/results_sparsity/fm2-decoder.tex}
+\pagebreak
+\input{listings/results_sparsity/fm3-encoder.tex}
+\pagebreak
+\input{listings/results_sparsity/fm3-decoder.tex}
+\end{landscape}
+
 \pagebreak
 
 \section{Discriminator Network used in Section \ref{subsec:vae-generated-samples-vs-true-samples}}\label{sec:listing_discriminator_network}

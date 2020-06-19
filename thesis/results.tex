@@ -22,6 +22,106 @@ As the accuracy was not of primary concern, the training was stopped during the 
 Figure~\ref{fig:classification_layer1_kernels} shows all 256 convolutional kernels of the image classification network.
 It is easy to see that in many kernels, Gabor wavelet-like filters emerge.
 
+\subsection{Sparseness in Generative Models}\label{subsec:effective-network-capacity}
+One hyperparameter to choose in the different models is the number of feature maps of one layer.
+During the implementation it could be observed that some feature maps show little activity compared to others, posing the question by how much the number of feature maps can be reduced without increasing the network loss.
+
+Furthermore, the questions arises whether sparseness in \acp{VAE} is related to sparseness in the primary visual cortex (see Section~\ref{subsubsec:sparse_representations}).
+The brain uses sparseness to represent information - maybe \acp{VAE} use a similar mechanism.
+This would be evidence for relatedness of \acp{VAE} to the biological example.
+
+To answer this question, the feature map activity of a \ac{VLAE} on \textsc{Mnist} with input size $28\times 28$ and different numbers of feature maps and nodes in fully connected layers was measured.
+By gradually decreasing the network capacity, it was tested whether sparseness arises due to an initial over-capacity of the network or if it arises because the network employs sparseness under all conditions.
+Because it re-scales the feature map activity, batch normalization was disabled for this experiment.
+To compensate for the potentially longer training convergence, the model was trained for 200 instead of 100 epochs.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.7\textwidth}
+        \centering
+        % include first image
+        \includegraphics[width=\textwidth]{images/sparseness/encoder_fm1_fms.png}
+        \caption{Feature map activities - large model}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.7\textwidth}
+        \centering
+        % include second image
+        \includegraphics[width=\textwidth]{images/sparseness/encoder_fm2_fms.png}
+        \caption{Feature map activities - medium model}
+    \end{subfigure}
+\end{figure}
+\begin{figure}
+    \ContinuedFloat
+    \centering
+    \begin{subfigure}{.7\textwidth}
+        \centering
+        % include second image
+        \includegraphics[width=\textwidth]{images/sparseness/encoder_fm3_fms.png}
+        \caption{Feature map activities - small model}
+    \end{subfigure}
+    \caption{Feature map activities for the different models}
+    \label{fig:fm_activities_sparseness}
+\end{figure}
+
+Listing~\ref{lst:sparsity-vlae-encoder-28-fm1} shows the output of the \ac{VLAE} encoder used for the experiments on sparsity.
+Importantly, this is the initial encoder.
+Three models were trained in total with a gradually decreased number of feature maps (by the factor of two and three).
+All network configurations can be found in Appendix~\ref{sec:listings_sparsity_networks}.
+The models were trained with the Adam optimizer with an initial learning rate of 0.0005 for the model with the original number of feature maps\footnote{An initial learning rate of 0.001 for the \say{large} model led to an \textbf{overflow}} and a learning rate of 0.001 for the models of decreased number of feature maps.
+All models use a reconstruction loss factor of 10,000 and three two-dimensional latent spaces.
+The inner activation function is ReLU in all cases.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        % include first image
+        \includegraphics[width=\textwidth]{images/sparseness/sparseness_train_loss.png}
+        \caption{Training loss}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        % include second image
+        \includegraphics[width=\textwidth]{images/sparseness/sparseness_validation_loss.png}
+        \caption{Validation loss}
+    \end{subfigure}
+    \caption{Loss curves of models with different number of feature maps (see Appendix~\ref{sec:listings_sparsity_networks}). $fm$ is the reduction factor of the feature maps; $fm-1$, therefore, is the original model, $fm=2$ the model with half the number of feature maps, and $fm=3$ the model with one third of the feature maps.}
+    \label{fig:learning_curves_sparseness}
+\end{figure}
+
+Figure~\ref{fig:learning_curves_sparseness} shows training and validation losses of the different models.
+Firstly, increasing the number of feature maps increases convergence speed.
+Even though the large model (the model with the original number of feature maps) is trained with a slightly smaller learning rate, it covnerges faster compared to the smaller models.
+It, however, does not only converge faster in terms of training loss, it also achieves the lowest validation loss amongst the three models.
+The minimum validation loss is achieved faster than the minimum validation loss of the other models.
+After achieving the minimum validation loss, however, all models overfit.
+The large model overfits stronger than the smaller models, leading to the highest validation loss after 200 epochs.
+The validation loss is minimal after 26 epochs for the large, 39 epochs for the medium, and 52 epochs for the smallest model.
+
+Figure~\ref{fig:fm_activities_sparseness} shows the activities of feature maps in the different models.
+Each line in a subplot is a boxplot.
+Each subfigure is the output of either a convolutional, an activation, or a fully connected layers.
+Most prominently, the activations are sparse after convolutions.
+The activations usually decrease the level of sparsity.
+Nonetheless, sparsity is apparent in almost all figures - in the larger as well as in the smaller models.
+
+\paragraph{Sparsity in \acp{VLAE} vs. Sparse Representations}
+The sparseness in \acp{VLAE}, however, does not seem to be related to sparse representations in the brain.
+
+Even though there are only some feature maps showing high activity, they are mostly the same regardless of the input.
+This is different from the brain where the overlap of active neurons is small and different neurons are active for different stimuli (see Section~\ref{subsubsec:sparse_representations} and \citet{yoshida2020natural}).
+
+The reason why the \ac{VLAE} uses sparseness, mostly regardless of the model capacity, seems to be more related to the Lottery Ticket Hypothesis~\citep{frankle2018lottery}.
+In all cases, there seems to be a subnetwork.
+Pruning the original network such that only the subnetwork persists should lead to a comparable performance.
+Assume that the small \ac{VLAE}-network approximately is a pruned version of the large \ac{VLAE}-network, having only as many feature maps as are active in the large network.
+Then, the small network is not the successful subnetwork in the large network~\citep{frankle2018lottery}.
+Instead, the small network itself has a successful subnetwork.
+
+The Lottery Ticket Hypothesis states that it is in general not possible to train the pruned network from scratch without knowing the weight initializations obtained from training the unpruned network.
+
 \subsection{V(L)AE Generated Samples vs. True Samples}\label{subsec:vae-generated-samples-vs-true-samples}
 \acp{GAN} (see Section~\ref{subsubsec:representation_learning}) are trained by simulatenously training a \textit{generator} to create new samples and a \textit{discriminator} to discriminate between true and generated samples.
 \acp{VAE} are another generative model that is not forced in the same way to create indistinguishable samples.
@@ -262,12 +362,6 @@ Not considering the dark-purple points, $\bm{z}_1$ still shows a less prominent 
 In contrast, digit identity does not seem to be encoded strongly by $\bm{z}_1$ (see Figure~\ref{fig:vlae_embeddings_mu1_identity}).
 
 \textbf{continue}
-
-\subsection{Sparse Activations}
-\textbf{DRAFT!}
-Present results on feature map activities: most inactive, only a few active.
-\citet{yoshida2020natural} show that natural images are sparsely encoded in mice V1, however in contrast to our results, the overlap for different images is quite small.
-Discuss the implications on the model suitability.
 
 \subsection{Feature Map Stripes}\label{subsec:feature-map-stripes}
 
