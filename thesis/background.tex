@@ -453,15 +453,26 @@ The usage of neural networks poses a challenge for computing the first term in e
 Usually, one would draw a sufficient number of samples from $q_\phi(\bm{z}|\bm{x})$ to approximate the expectation.
 However, sampling is not possible if one wants to compute the gradient to train the model by backpropagation.
 
-\textbf{TODO: Posterior Collapse (Dai et al. 2019), Spurious global optima (van den Oord et al. 2018), prior/posterior mismatch (Tolshkin et al. 2018, Dai et al. 2019)}
-
 \paragraph{Disadvantages}
-Another disadvantage of \acp{VAE} is that they \say{use only a small subset of the dimensions of $\bm{z}$}~\citep[p. 694]{Goodfellow-et-al-2016}.
+
+One problem arising when training \acp{VAE} is \say{\textit{posterior collapse}, in which the variational distribution collapses towards the prior}~(\citep{lucas2019understanding} and \citep[p. 694]{Goodfellow-et-al-2016}).
+Verbalized, this means that one or more of the latent dimensions resemble the prior, i.e.~\citep{lucas2019understanding}:
+\begin{align}
+    \exists i: \forall \mathbf{x} q_{\phi}\left(z_{i} | \mathbf{x}\right) \approx p\left(z_{i}\right)
+\end{align}
+In the most extreme case this happens for \textit{all} latent dimensions.
+Then, the generator can make no use of $\bm{x}$ at all - generated images are unrelated to the input image.
+Most probably, the KL-term is the reason for posterior collapse as it is the term forcing the posterior to match the prior distribution~\citep{lucas2019understanding}.
+One technique to avoid posterior collapse is to adjust (more specifically lower) the weight of the KL-term compared to the reconstruction term~\citep{lucas2019understanding}.
+
+Another disadvantage of \acp{VAE} are \say{blurry} and \say{fuzzy} reconstructions~\citep{zhao2017towards}.
+According to \citet{zhao2017towards}, these reconstructions occur for $\bm{z}$'s that are encodings of a variety of different $\bm{x}$'s.
+Importantly, \citet{zhao2017towards} propose that blurry reconstructions are caused by the pixel-wise loss and a too simple prior (standard Gaussian distribution).
 
 \subsubsection{Representation Learning}\label{subsubsec:representation_learning}
 
 Representation learning can be understood as \say{learning representations of the data that make it easier to extract useful information when building classifiers or other predictors}~\citep{bengio2013representation}.
-While this is a rather broad definition, this thesis focuses on \textit{hierarchical representations}, since this is what can be observed in the visual cortex (\textbf{QUELLE}).
+While this is a rather broad definition, this thesis focuses on \textit{hierarchical representations}, since this is what can be observed in the visual cortex~\citep{rodriguez2015hierarchical}.
 
 The following paragraphs introduce different (hierarchical) representation learning approaches relevant to the techniques used in the course of this thesis.
 
@@ -632,10 +643,11 @@ Apparently, the first row shows a sequence of alphabetic characters (\say{GERBEN
 However, the \say{R} and the \say{B} in the first row are the exact same symbols as the \say{12} and the \say{13} in the second one.
 A pure feed-forward systems would be unable to discriminate between the low-level features \textit{R} and \textit{13}.
 Incorporating high-level features like \textit{alphabetic string} helps to improve the posterior low-level feature representation.
-Furthermore, the additional top-down pass is more biologically plausible compared to a pure feedforward network (\textbf{REFERENCE}).
+Furthermore, the additional top-down pass is more biologically plausible compared to a pure feedforward network~\citep{rodriguez2015hierarchical}.
+\citet{rodriguez2015hierarchical} explicitly discuss \say{the need for top-down priming or attention}.
 
 Unlike hierarchical \acp{VAE}, \acp{LVAE} do not use the output of lower stochastic embedding layers as input for higher layers.
-Instead, they use a deterministic multi-layer network in the encoder (see Figure~\ref{fig:vlae}) and pass information from intermediate layers to the stochastic embedding layers.
+Instead, they use a deterministic multi-layer network in the encoder (see Figure~\ref{fig:lvae}) and pass information from intermediate layers to the stochastic embedding layers.
 \begin{align}
     \bm{d}_i &= \text{NN}(\bm{d}_{i-1})\\
     \hat{\bm{\mu}}_{q,i}&=\text{NN}(\bm{d}_i)\\
@@ -822,7 +834,25 @@ This mitigates the problem of the pixelwise loss in \acp{VAE} that is assumed to
 \end{itemize}
 
 \subsection{Semantic Representations}\label{subsec:semantic-representations}
-\textbf{DRAFT!}
+For the term \textit{Semantic Representations}, a universally accepted definition yet has to be found.
+\textit{Semantics} is defined\footnote{\href{https://www.lexico.com/en/definition/semantics}{https://www.lexico.com/en/definition/semantics}, last access: 21/06/2020} as
+\begin{displayquote}
+    The branch of linguistics and logic concerned with meaning. There are a number of branches and subbranches of semantics, including formal semantics, which studies the logical aspects of meaning, such as sense, reference, implication, and logical form, lexical semantics, which studies word meanings and word relations, and conceptual semantics, which studies the cognitive structure of meaning.
+\end{displayquote}
+This thesis is less concerned with linguistics but with \textit{meanings} and \textit{relations}, not of language but of \textbf{images}.
+A general definition of \textit{Semantic Representations}, however, should not be restricted to words or images.
+It should incorporate all kinds of concepts a human can form of a perception.
+
+In the course of this thesis, \textit{Semantic Representations} are somewhat related to \textit{Word Embeddings} in \ac{NLP}.
+Word embeddings~\citep{mikolov2013efficient} are a vectorized representation of words in a vector space.
+The training procedure learns a mapping from word into the latent space such that the word's position itself has meaning.
+One prominent example is that the vector space allows \say{simple algebraic operations[...]. [I]t was shown for example that \textit{vector}(\say{King}) - \textit{vector}(\say{Man}) + \textit{vector}(\say{Woman}) results in a vector that is closest to the vector representation of the word \textit{Queen} [...]}~\citep{mikolov2013efficient}.
+
+Just like the brain maps similar visual stimuli to neurons close to one another, a semantic representation should be an encoding of the concept where encodings of similar concepts are close to one another according to some distance metric.
+
+Moreover, a model leading to semantic representations should behave like the biological example.
+
+The idea of semantic representations is more deeply discussed in the following subsections.
 
 \subsubsection{Supervised Models}
 \begin{itemize}
