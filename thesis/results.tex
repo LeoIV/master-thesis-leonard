@@ -129,7 +129,7 @@ The Lottery Ticket Hypothesis states that it is in general not possible to train
 
 \paragraph{Latent Space Traversals}
 
-\subparagraph{Mnist}
+\subparagraph{\textsc{Mnist}}
 
 A latent space traversal is one way to see if and how a model learns a general representation of the dataset.
 Figure~\ref{fig:mnist_latent_space_traversal} shows the latent space traversal of \ac{VAE}, \ac{VAE}-\ac{GAN}, \ac{VLAE}, and \ac{VLAE}-\ac{GAN}.
@@ -177,7 +177,8 @@ Unrepresentative generations in such areas, therefore, is no model failure.
     \label{fig:mnist_latent_space_traversal}
 \end{figure}
 
-\subsection{V(L)AE Generated Samples vs. True Samples}\label{subsec:vae-generated-samples-vs-true-samples}
+\paragraph{Pixel-wise Image Statistics}
+
 \acp{GAN} (see Section~\ref{subsubsec:representation_learning}) are trained by simulatenously training a \textit{generator} to create new samples and a \textit{discriminator} to discriminate between true and generated samples.
 \acp{VAE} are another generative model that is not forced in the same way to create indistinguishable samples.
 Instead, a reconstruction loss is used to force the reconstruction to be close to the true sample in terms of difference in the pixel values.
@@ -185,68 +186,71 @@ At the same time, the \ac{KL}-loss and the reparametrization trick force the mod
 Drawing from the Gaussian embedding space therefore should allow to generate new samples similar to true samples.
 However, the question remains how indistinguishable these generates samples are from true samples.
 
-To address this question, different statistical analyses were performed revealing that in fact VAE generated samples can be perfectly distinguished from true samples.
-\textbf{Talk about the blurriness in VAE generated samples that are another strong reason why this is possible.}
+To address this question, different statistical analyses were performed revealing that in fact generated samples can be perfectly distinguished from true samples.
+
+\subparagraph{\textsc{Mnist}}
 
 \begin{figure}
     \centering
-    \begin{subfigure}{0.4\textwidth}
+    \begin{subfigure}{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/vlae_generated_vs_true/mnist_vs_vlae_mean.png}
-        \caption{Mean}
-        \label{subfig:vlae_mean_generated_vs_true}
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_mean.png}
+        \caption{Histogram of mean pixel intensities for different models}
+        \label{subfig:mean_generated_vs_true}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.4\textwidth}
+    \begin{subfigure}{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/vlae_generated_vs_true/mnist_vs_vlae_sd.png}
-        \caption{Standard Deviation}
-        \label{subfig:vae_sd_generated_vs_true}
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_sd.png}
+        \caption{Histogram of pixel intensity standard deviations for different models}
+        \label{subfig:sd_generated_vs_true}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.4\textwidth}
+    \begin{subfigure}{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/vlae_generated_vs_true/mnist_vs_vlae_skew.png}
-        \caption{Skewness}
-        \label{subfig:vae_skew_generated_vs_true}
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_skew.png}
+        \caption{Histogram of pixel intensity skewness for different models}
+        \label{subfig:skew_generated_vs_true}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.4\textwidth}
+    \begin{subfigure}{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/vlae_generated_vs_true/mnist_vs_vlae_kurt.png}
-        \caption{Kurtosis}
-        \label{subfig:vae_kurt_generated_vs_true}
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_kurt.png}
+        \caption{Histogram of pixel intensity kurtosis for different models}
+        \label{subfig:kurt_generated_vs_true}
     \end{subfigure}
-    \caption{Comparison of image statistics of \ac{VAE} and \ac{VLAE} compared to \textsc{MNIST} test images. }
+    \caption{Reconstructions of the VLAE model when systematically exploring one latent space and randomly choosing the other two latent spaces. The space explored systematically is sampled from -3 SD to 3 SD in both dimensions, the other values are chosen by drawing from an uniform distribution over $[-1; 1]$. Created analogously to \citet[Figure 5]{zhao2017learning}.}
     \label{fig:mean_generated_vs_true}
 \end{figure}
 
-
-The MNIST test set of 10,000 images was compared to a 10.000 generated samples from the Vanilla \ac{VAE} and the \ac{VLAE}.
+The MNIST test set of 10,000 images was compared to a 10,000 generated samples from \ac{VAE}, \ac{VLAE}, \ac{VAE}-\ac{GAN} and \ac{VLAE}-\ac{GAN}.
 The samples were generated by drawing from a standard two-dimensional Gaussian distribution $\mathcal{N}^2(\bm{0},\bm{I})$.
 First, the mean pixel values, i.e.~the mean over all $28\times 28$ pixel values, were compared (see Figure~\ref{subfig:vlae_mean_generated_vs_true}).
-The plot overlays the histograms of mean pixel values for the three conditions: \textsc{MNIST}, \ac{VAE}, and \ac{VLAE}.
+The plot overlays the histograms of mean pixel values for the five conditions: \textsc{Mnist}, \ac{VAE}, and \ac{VLAE}.
 The other plots in Figure~\ref{fig:mean_generated_vs_true} were created accordingly but for higher moments of the pixel value distributions.
 
-Analyzing Figure~\ref{fig:mean_generated_vs_true} leads to the assumption that, except for Figure~\ref{subfig:vae_sd_generated_vs_true}, the \ac{VLAE} captures the statistics better than the \ac{VAE}.
+Analyzing Figure~\ref{fig:mean_generated_vs_true} leads to the assumption that all models learn the pixel distributions to some extent.
+The overlap of the histograms is high for all models.
 \begin{table}
     \begin{tabular}{lrrrr}
         \toprule
-        Model & $p$-value (mean) & $p$-value (sd) & $p$-value (skewness) & $p$-value (kurtosis)\\
+        Model              & $p$-value (mean)    & $p$-value (sd)       & $p$-value (skewness) & $p$-value (kurtosis) \\
         \midrule
-        \ac{VAE} & 0.0 & 0.0 & 0.0 & 0.0 \\
-        \ac{VLAE} & $1.8\cdot 10^{-147}$ & 0.0 & $7.9\cdot 10^{-11}$ & 0.309\\
+        \ac{VAE}           & $8.6\cdot 10^{-13}$ & 0.0                  & 0.0                  & $2.3\cdot 10^{-165}$ \\
+        \ac{VLAE}          & $1.8\cdot 10^{-16}$ & $1.6\cdot 10^{-265}$ & 0.047                & 0.423                \\
+        \ac{VAE}-\ac{GAN}  & 0.0                 & 0.0                  & $3.4\cdot 10^{-303}$ & $4.4\cdot 10^{-290}$ \\
+        \ac{VLAE}-\ac{GAN} & $3.8\cdot 10^{-25}$ & $6.6\cdot 10^{-32}$  & 0.040                & 0.132                \\
         \bottomrule
     \end{tabular}
     \caption{$p$-values of a Wilcoxon signed-rank test. Each cell tests the hypothesis that the respective moments for the respective model are equal to the values for the \textsc{MNIST} test images. For each cell, the sample size was $2\cdot 10,000$.}
     \label{tab:vae-vlae-mnist}
 \end{table}
 Table~\ref{tab:vae-vlae-mnist} shows the results of a Wilcoxon signed-rank test for the samples of moments of the pixel distributions.
-The results lead to two conclusions: 1) The \ac{VLAE} in fact captures the statistics of the pixel distribution better compared to the \ac{VAE}.
-2) Both models do not capture the true pixel distribution.
+The results lead to two conclusions: 1) The \ac{VLAE}-models capture the statistics of the pixel distribution better compared to the \ac{VAE}-models.
+2) All models do not capture the true pixel distribution.
 
-Similar to the \ac{GAN} approach, a discriminator network was trained to distinguish generated samples from true \textsc{MNIST} test images\footnote{The configuration of the discriminator network can be found in Appendix \ref{sec:listing_discriminator_network}.}.
-The discriminator network shows an accuracy of 1.0 for distinguishing both, \ac{VAE} generated from \textsc{MNIST} test images as well as  \ac{VLAE} from \textsc{MNIST} test images.
+To verify that none of the models generates indistinguishable samples, a discriminator network was trained to distinguish generated samples from true \textsc{MNIST} test images\footnote{The configuration of the discriminator network can be found in Appendix~\ref{sec:listing_discriminator_network}. The network was trained using binary cross entropy for one epoch using the Adam optimizer.}.
+The discriminator network shows an accuracy of 1.0 for distinguishing for all models, i.e.~it is perfectly able to predict generated from true samples for all models.
 
 \subsection{Independence of VLAE Embeddings}\label{subsec:independence-of-vlae-embeddings}
 
@@ -518,4 +522,68 @@ This explains why the network can be sensitive towards these black-black contras
 Noteworthy, if the bias term in the convolutions is removed, the black-black contrast sensitivity vanishes because the network is not able anymore to add a constant to the black pixel values on the bottom-right or top-left of the image.
 For this purpose, the batch normalization has to be removed too since it uses a bias term as well.
 This, however, does not qualitatively change the networks behavior on real images.
+
+\subsection{Pixelwise vs. Adversarial Loss}\label{subsec:pixelwise-vs.-adversarial-loss}
+This thesis employed two different methods to train the decoder towards generating natural looking images, namely the pixel-wise or the generative loss.
+The encoder of the generative models furthermore was trained such that the hidden-layer activity of the discriminator is similar for generated and real images (in addition to the KL-term).
+
+Advantages, disadvantages, and use-cases for both loss functions are discussed in the following.
+
+First of all, both loss functions do not seem to be biologically plausible as they are not founded in Hebbian learning.
+For the encoder loss, it could be argued that it is trained such that it elicits a \say{neural response} in the discriminator, similar to the one for real images.
+This \say{activity matching} seems to be at least somewhat related to Hebbian learning as it explicitly considers the amount of activity on the level on single neurons.
+However, discriminator and encoder itself are trained using backpropagation.
+
+\citet{larsen2015autoencoding} state that the pixel-wise loss can lead to very high values even for small translation (see Section~\ref{subsubsec:representation_learning}).
+Intuitively seeming like a disadvantage, this is only true for images with a high frequency and a large variance of pixel values.
+A black-and-white image consisting of alternating black and white rows and the same image shifted by one pixel in $y$-direction in fact would result in a maximum pixel-wise loss as the two images are orthogonal to one another.
+Natural images, however, usually are less susceptible to a large pixel-wise loss for small translation because there are less regions of high contrast.
+In the context of natural images, the pixel-wise loss function for example enables the model to detect if an object is placed in another corner of the image as the loss would incrase for such high translations.
+If, however, the aim is to generate more realistic images, the generative loss should be used since the pixel-wise loss leads to blurry reconstructions.
+Also, \acp{GAN} empirically are not agnostic of an objects position (\textbf{REF: GAN-VLAE on dsprites}).
+
+Another consideration is training stability.
+Due to the adversarial loss, training \acp{GAN} has many difficulties (mode collapse, error oscillation\textbf{REF}), often resulting in failure modes.
+Training regular \acp{VAE}, in contrast, is far more stable.
+
+The choice of the loss function also might play an important role when studying a model's representation with human \ac{IT} representations.
+Compared to the pixel-wise loss, the generative loss allows for a more holistic image assessment.
+This might play an important role in the emergence of a models's latent representation, i.e. might lead to a more realistic latent representation in terms of human IT activations.
+This aspect should be investigated in future work.
+
+\subsection{Model Limitations}\label{subsec:model-limitations}
+All networks investigated in the course of this thesis are \acp{CNN}.
+A network design has to be chosen for each network type (see Section~\ref{subsec:models}).
+Some of these hyperparameters are context dependent.
+A network operating on \textsc{Mnist}, for example, receives inputs of size $28\times 28$ pixels.
+Such a networks must not be as deep as a network operating on ImageNet, as fewer layers are sufficient for the network to capture the image in it's entirety.
+Other hyperparameters are chosen based on previous research.
+Some configurations are known to be better for a certain task than others (see Section~\ref{subsec:models}).
+
+Another consideration in the context of computational neuroscience is the biological plausibility.
+This thesis aims at anwering in how far \acp{VAE} are reasonable models of the human visual cortex.
+In order to do this, the model structure must allow comparisons with empirical data for the parts under investigation.
+
+Specifically, lower model layers are compared with earlier, higher model layers with later regions in the visual cortex.
+Furthermore, the models are chosen such that similar inputs translate to similar encodings.
+The biological plausibility of the encoding should be further investigated in future research (\textbf{REF TO RELATED SECTION}).
+
+However, due to practial reasons such as the availability of training data or computational resoureces, the model disregards actualities of the human body, a more refined model should incorporate.
+
+Other than in the models used in this thesis, the human eye receives a stream of visual stimuli.
+Perceiving movements of animate objects could play an important role in distinguishing between animate and inanimate objects.
+The dissimilarity between semantic representations of animate and inanimate objects has been shown in \textbf{REF}.
+Recurrent models such as LSTMs could allow to extend the models developed in the course of this thesis to sequences of images.
+
+This thesis only considered image data to form semantic representations even though the human mind perceives the world through more senses.
+Future research could aim at investigating if and by how far semantic representations can be improved by using additional sources of information, for example sound.
+
+\subsection{Feedback Connections of the \acl{LGN}}\label{subsec:feedback-connections-of-the-lateral-geniculate-nucleus}
+\textbf{DRAFT!}
+As discussed in Section~\ref{subsubsec:visual-cortex}, the \ac{LGN} receives strong feedback connections from the \ac{V1}.
+Consider the \ac{LVAE}-model in Section~\ref{subsubsec:representation_learning} and the discussion concerning the top-down pass.
+It is stated that, compared to the Vanilla VAE, the \ac{LVAE} model is more biologically plausible because top-down connections resemble the feedback connections in the ventral and primary visual pathway.
+\citet{sonderby2016ladder} claim that the top-down pass helps improving the low-level feature representation because it enables the model to incorporate the higher-level context.
+
+Maybe the feedback connections fulfil this very function, i.e.\ allowing visual regions operating on a lower semantic level to incorporate the high-level context to disambiguate the lower-level representations.
 

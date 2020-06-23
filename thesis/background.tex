@@ -77,7 +77,18 @@ From \ac{V1}, information is propagated to other brain regions via the \textit{v
 The dorsal pathway is responsible for the pass of information regarding the direction of movements whereas the ventral pathway is more concerned with object recognition~\citep[p. 564]{mack2013principles}.
 Figure~\ref{fig:ventral_dorsal_pathway} shows the two pathways and the flow of information.
 Importantly, Figure~\ref{fig:ventral_dorsal_pathway} does not show the complete pathways.
-From V4, the Ventral pathways has feedback and feedforward connections from and to \ac{TEO}, and from \ac{TEO} it has feedback and feedforward connections from and to \ac{IT}, which, in turn, has feedback connections to \ac{V1} \citep[p. 563]{mack2013principles}.
+From V4, the Ventral pathways has feedback and feedforward connections from and to \ac{TEO}, and from \ac{TEO} it has feedback and feedforward connections from and to \ac{IT}, which, in turn, has feedback connections to \ac{V1}~\citep[p. 563]{mack2013principles}.
+
+The visual cortex is mainly structured in a feed-forward manner.
+It is the common view that lower regions in the visual cortex detect lower level features, whereas higher regions detect higher level features~\citep{eickenberg2017seeing}.
+The primary visual cortex (\ac{V1}) detects edges~\citep{hubel1962receptive, eickenberg2017seeing}.
+The seconday visual cortex (\ac{V2}) does not respond to such easily interpretable shapes~\citep{freeman2013functional}.
+Instead, it responds to naturalistic textures that can be expressed in terms of features \ac{V1} is sensitive to~\citep{freeman2013functional}.
+The function of V4 is manifold - it \say{respond[s] to more complex geometric shapes, color, and a large number of other
+stimulus characteristics}~\citep{eickenberg2017seeing} and it is assumed to perform foreground and background segmentation~\citep{roe2012toward}.
+Furthermore, \ac{V4} is assumed to play a role in \say{visual attention}~\citep{roe2012toward}, i.e. to \say{enhance neuronal firing to relevant stimuli in V4 and [to] suppress responses to distractor stimuli}~\citep{roe2012toward}.
+It is assumed that this behavior emerges from the top-down connections into \ac{V4}~\citep{roe2012toward}.
+\ac{IT}, finally, responds to high level features such as faces and complex objects~\citep{logothetis1995shape, eickenberg2017seeing}.
 
 According to the two-stream hypothesis~\citep{goodale1992separate}, the two pathways are assumed to encode the \textit{what} (dorsal) and \textit{where} (ventral) in a visual scene~\citep[p. 520]{mack2013principles}.
 Even though the two pathways can exchange information~\citep[p. 564]{mack2013principles}, they encode two different qualities of a stimulus: the identity and the location.
@@ -169,7 +180,7 @@ assuming that indexing starts at zero for the image and at minus one for the ker
 The output of a convolution is maximum in image areas where the image contains a flipped version of the kernel.
 This is because the sums in Equation~\ref{eq:conv_boiled_down} go from low to high indices for the image but from high to low indices for the kernel.
 
-Other than the cross-correlation\footnote{The cross-correlation is defined as $S(i, j)=(K * I)(i, j)=\sum_{m=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} I(i+m, j+n) K(m, n)$~\citep[p. 329]{Goodfellow-et-al-2016}.}, the convolution is commutative.
+Other than the cross-correlation\footnote{The cross-correlation is defined as $S(i, j)=(I * K)(i, j)=\sum_{m=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} I(i+m, j+n) K(m, n)$~\citep[p. 329]{Goodfellow-et-al-2016}.}, the convolution is commutative.
 However, this property is not important in practice and \say{many neural network libraries implement [...] the cross-correlation [instead]}~\citep[p. 329]{Goodfellow-et-al-2016}.
 
 \subparagraph{Padding}
@@ -199,7 +210,7 @@ Not less importantly, max-pooling introduces invariance to small translations to
 
 In cases where this translation invariance is not desired\footnote{This is often the case for generative models.} but the image should be down-sampled, the max-pooling layer can be omitted and a strided convolution can be used instead~\citep[p. 337]{Goodfellow-et-al-2016}.
 
-\paragraph{\acp{CNN} as a Model of the Visual System}
+\paragraph{\acp{CNN} as Models of the Visual System}
 As discussed earlier, \acp{CNN} by design share some features with the visual system, namely the convolution as a model of S-cells and max-pooling as a model of C-cells.
 Surprisingly, some \acp{CNN} are also related in ways not explicitly built into this model.
 
@@ -213,6 +224,10 @@ Rows and columns refer to different input stimuli.
 A cell in a \ac{RDM} then contains the correlation of the activity patterns for the given input stimuli and the given model.
 \acp{RDM}, therefore, are symmetric.
 
+\citet{eickenberg2017seeing} explicitly discuss \acp{CNN} as models of the visual system.
+Their findings show that \say{early visual areas are better described by lower level convolutional net layers and later visual areas by higher level net layers, exhibiting a progression across ventral and dorsal streams}~\citep{eickenberg2017seeing, wen2018neural}.
+
+
 The similarity of the \acp{RDM} is evidence of that supervised \acp{CNN} and the human \ac{IT} have a similar high-level encoding of information.
 
 \citet{khaligh2014deep} also show that this is not true for a variety of unsupervised models.
@@ -220,11 +235,6 @@ The unsupervised models under investigation, however, are only losely related to
 The question whether \acp{VAE} show similar \acp{RDM} as the human \ac{IT}, therefore, remains.
 
 It has been shown that \acp{VAE}, trained in a self-supervised manner, partially learn Gabor wavelets when trained to predict the next image in a sequence of images~\citep{palm2012prediction}.
-
-\textbf{DRAFT!}
-\citet{eickenberg2017seeing} and \citet{wen2018neural} compare response of certain brain areas with layers in CNNs (also many more, a good list is in \citet{wen2018neural})
-
-
 
 \subsection{Types of Learning}\label{subsec:types-of-learning}
 
@@ -245,7 +255,7 @@ Hyperparameter optimization aims at finding the best combination of these parame
 For a classifier, the performance can be expressed as the accuracy, i.e. the fraction of correct predictions.
 In this context, one datapoint is a specific hyperparameter combination and the corresponding label is the accuracy of the classifier trained with these hyperparameters.
 Since the space of possible datapoints is large, possibly infinitely large for continuous values such as the learning rate, and one function evaluation is computationally expensive, it is usually not possibly to simply visit all datapoints.
-Bayesian Optimization \textbf{REF} is one technique adressing this problem.
+Besides others, Bayesian Optimization~\citep{mockus1978application} is one technique to approach this problem.
 
 In the introductory example of this paragraph, the dataset was present beforehand.
 In such settings, the learning algorithm learns the mapping function and does not update it once the learning is finished.
