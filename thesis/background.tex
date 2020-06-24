@@ -435,11 +435,6 @@ Equation~\ref{eq:elbo_lower_bound} justifies the name \textit{\acl{ELBO}}.
 If the \ac{KL-divergence} goes to zero, it approaches the likelihood of the data~\citep[p. 18]{kingma2019introduction}.
 In particular, we cannot even compute $p_\theta(\bm{z}|\bm{x})$ with our \ac{VAE} setup.
 
-\textbf{I am happy with the VAE part above but the following needs some polishing.
-In particular, I want to work on the difference between propabilities and neural networks.
-The part with the MSE needs clarification and I also have to check the notation.
-Also, I should add more references.}
-
 Equation~\ref{eq:elbo_error_term}, however, is more useful for implementing the error function of an \ac{VAE}.
 Consider the term inside the expectation of the first term.
 $p_\theta(\bm{x}|\bm{z})$ usually is chosen to be a normal distribution with \ac{PDF}
@@ -525,12 +520,12 @@ where $V(D, G)$ is the training objective defined in Equation~\ref{eq:gan_object
 \say{To disentagle digit shape styles on MNIST}, \citet{chen2016infogan} choose $\bm{c}$ as three-element set $\bm{c} = (\bm{c}_1, \bm{c}_2, \bm{c}_3)$ with $\bm{c}_1$ drawn from a categorical distribution with ten categories (equal to the number of classes in MNIST) and event probability $p_i=0.1 \, \forall i \in [0, 10]$.
 $\bm{c}_2$ and $\bm{c}_3$ are drawn from a uniform distribution over $[-1, 1]$.
 
-Figure~\ref{fig:infogan} shows the representation disentaglement by varying the $\bm{c}_i$-values.
+Figure~\ref{fig:infogan} shows the latent space separability by varying the $\bm{c}_i$-values.
 Noteworthy, InfoGAN seems to generalize as $\bm{c}_2$ and $\bm{c}_3$ varied between $[-2, 2]$ whereas these values took values in $[-1, 1]$ at training time.
 
 \paragraph{StyleGAN}
-StyleGAN~\citep{karras2019style} is a type of \ac{GAN} explicitly addressing \textit{feature disentanglement}.
-The term \textit{style} refers to feature disentanglement, i.e.~the model is capable of learning a disentanglement of images into different styles.
+StyleGAN~\citep{karras2019style} is a type of \ac{GAN} explicitly addressing \textit{latent space separability} (see Section~\ref{subsec:feature-separability}).
+The term \textit{style} refers to latent space separability, i.e.~the model is capable of learning a disentanglement of images into different styles.
 The styles of an image are learned at different levels.
 Importantly, styles are learned in a self-supervised manner.
 Therefore it is not possible to explicitly force the model to learn certain aspects of an image.
@@ -561,7 +556,7 @@ Then, the image is upsampled to double size.
 This process is repeated until the image has the desired output size.
 \citet{karras2019style} use nine of these blocks, resulting in an output size of $1024\times 1024$.
 
-Feature disentanglement is achieved by a technique called \textit{mixing regularization}.
+Latent space separability is achieved by a technique called \textit{mixing regularization}.
 Here, for a subset of the training images, two input vectors $\bm{z}_1$ and $\bm{z}_2$ are drawn.
 During the training, a point (or layer) of $g$ is chosen by random up to which layer $\bm{z}_1$ controls the style.
 After this point, the style information from $\bm{z}_2$ is fed to the network.
@@ -834,14 +829,60 @@ This mitigates the problem of the pixelwise loss in \acp{VAE} that is assumed to
     \item Check \citet{pidhorskyi2020adversarial} for more related work.
 \end{itemize}
 
-\subsection{Feature Disentanglement}
-\textbf{DRAFT!}
-\begin{itemize}
-    \item \citet{karras2019style} describe two means to measure feature entanglement: \textit{Perceptual Path Length} and \textit{Linear Separability}
-    \item \citet{kim2018disentangling} give an overview of feature disentanglement for \acp{VAE}. They propose a new metric to measure feature disentanglement and a new VAE model tackling this problem.
-    \item \citet{Shu2020Weakly} discuss that unsupervised feature disentanglement has no guarantees to work. They show, however, that it empirically works quite well and discuss that this is because of the inductive biases of learning algorithms.
-    \item The $\beta$-\ac{VAE} paper (see Section~\ref{subsubsec:representation_learning}) discusses that a larger $\beta$ in the VAE loss function leads to better disentanglement but to worse reconstructions.
-\end{itemize}
+\subsection{Latent Space Disentanglement}\label{subsec:feature-disentanglement}
+\textit{Latent Space Disentanglement} is a concept not to be confused with \textit{Latent Space Separability} (see Section~\ref{subsec:feature-separability}).
+These two concepts are explained in the following.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_disentanglement_a.png}
+        \caption{\say{Distribution of features in the training set}~\citep{karras2019style}}
+        \label{fig:feature_space_disentanglement_a}
+    \end{subfigure}%
+    \hfill
+    \begin{subfigure}{.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_disentanglement_b.png}
+        \caption{Mapping from latent space to feature space}
+        \label{fig:feature_space_disentanglement_b}
+    \end{subfigure}
+    \caption{The problem of latent space entanglement (taken from \citet{karras2019style})}
+    \label{fig:feature_space_disentanglement}
+\end{figure}
+
+Consider Figure~\ref{fig:feature_space_disentanglement_a} and assume a dataset of males containing only two factors of variation, e.g. age ($x$-axis from older to younger) and voice level ($y$-axis, bottom-up from lower to higher).
+The missing square in the upper left is the combination \say{old and high voice level} that is missing in the dataset.
+Now, consider Figure~\ref{fig:feature_space_disentanglement_b} showing a mapping from a latent space to the feature space.
+The upper left square in Figure~\ref{fig:feature_space_disentanglement_a} is not present in this latent space.
+This leads to \textit{Latent Space Entanglement}: when interpolating in the latent space, there are paths along which the factors of variation change faster than for other paths.
+
+Different methods have been proposed to measure the degree of latent space entanglement.
+One approach is to measure the degree by which a generated image changes as the latent space is entangled (\textit{Perceptual Path Length})~\citep{karras2019style}.
+If the latent space is entangled, this value on average should be higher compared to a disentangled space.
+
+Another approach is \textit{Linear Separability}~\citep{karras2019style}, measuring how well sets of points can be separated by a linear hyperplane.
+
+\citet{kim2018disentangling} propose to generate data by fixing one factor of variation (for example one dimension in the latent space) and randomly sampling from others.
+If the latent space is disentangled, there should be one or multiple almost invariant dimensions in the generated data that attribute to the fixed factor of variation.
+
+\subsection{Latent Space Separability}\label{subsec:feature-separability}
+
+\textit{Latent Space Separability} is related to Latent Space Disentanglement but it is used in a stricter sense in the course of this thesis.
+Whereas Latent Space Disentanglement was mainly motivated by the disentanglement of one latent space, Latent Space Separability is concerned with splitting up the latent space representation of features into multiple levels of latent spaces.
+If successful, Latent Space Separability allows to directly control the factors of variation without the need to find the subspace in one latent space controlling this factor.
+
+For example, \textit{InfoGAN} (see Section~\ref{subsubsec:representation_learning}) is based on this principle.
+Another example is \ac{VLAE}.
+
+Importantly, Latent Space Separability is supposed to have two properties: \textit{Consistency} and \textit{Restrictiveness} as defined in \citet{Shu2020Weakly}.
+Consistency means that if only one factor of variation is varied (e.g. the factor that attributes to an object's size) and the others are fixed, generated items only change with respect to this very factor but not to other factors (i.e. only the object's size is changing but not it's shape).
+Restrictiveness means that if, again, only one factor $i$ of variation is varied, the choice of the other factors should not affect the models measurement of the $i$-th factor.
+For example, if factor $i$ again encodes an objects size, the same value of factor $i$ should always encode the same size, irrespective of the choice if the other factors~\citep{Shu2020Weakly}.
+
+Strictly unsupervised approaches are not guaranteed to have both of the properties.
+Suprisingly, however, most unsupervised approaches for Latent Space Separability empirically show to have these properties to a high degree~\citep{Shu2020Weakly}.
 
 \subsection{Semantic Representations}\label{subsec:semantic-representations}
 For the term \textit{Semantic Representations}, a universally accepted definition yet has to be found.
@@ -860,19 +901,13 @@ One prominent example is that the vector space allows \say{simple algebraic oper
 
 Just like the brain maps similar visual stimuli to neurons close to one another, a semantic representation should be an encoding of the concept where encodings of similar concepts are close to one another according to some distance metric.
 
-Moreover, a model leading to semantic representations should behave like the biological example.
+Unfortunately, a dense vector (as in word embeddings) as a semantic representation is rather unrelated to a subpopulation of active neurons.
+The question of how to obtain good semantic representations remains.
+One requirement could be that a model leading to semantic representations should behave like the biological example.
 
-The idea of semantic representations is more deeply discussed in the following subsections.
+It has been reported that the activations of hidden layers in supervised \acp{CNN} explain \ac{IT} cortical representation~\citep{khaligh2014deep,cadieu2014deep}.
 
-\subsubsection{Supervised Models}
-\begin{itemize}
-    \item \citet{khaligh2014deep} found evidence for that supervised models may explain \ac{IT} cortical representation
-    \item \citet{cadieu2014deep} report more or less the same
-\end{itemize}
+Additionally, there is some evidence that unsupervised models do not explain \ac{IT} cortical representation (or by far worse than supervised models)~\citep{khaligh2014deep}.
+Finally, it remains unclear if Gabor wavelets emerge in unsupervised \acp{CNN}~\citep{han2019variational}.
+There are, however, unsupervised models that learn Gabor wavelets~\citep{berkes2005slow}.
 
-\subsubsection{Unsupervised Models}
-\textbf{DRAFT!}
-\begin{itemize}
-    \item \citet{han2019variational} found no evidence for or against Gabor wavelets in \acp{VAE} due to too small kernel size, however they were able to predict fmri activity from the latent representation in a VAE
-    \item \citet{khaligh2014deep} found evidence against the assumption that unsupervised models might explain \ac{IT} cortical representation, however not explicitly for \acp{VAE}
-\end{itemize}
