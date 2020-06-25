@@ -567,15 +567,9 @@ During inference time, the crossover point can be chosen arbitrarily, i.e.~it ca
 
 Now, $\bm{y}_i$ that are fed into the network at a low resolution (i.e. $i$ is small) control the coarse styles referred to in the beginning of the section, whereas $\bm{y}_i$ at higher layers control finer styles.
 
-Finally, \citet{karras2019style} analyze how disentangled generations from $\mathcal{W}$-space are compared to $\mathcal{Z}$-space by means of \textit{perceptual path length}.
-The perceptual path length is a measure of how much reconstructions change for small variation in the latent space.
-It is calculated by moving by a small value $\epsilon$ on a path, obtained by interpolating between two random $\bm{z}_1$, $\bm{z}_2$ (or $\bm{w}_1$, $\bm{w}_2$)\footnote{Interpolation is spherical for $\bm{z}$ and interpolation for $\bm{w}$.} and taking the perceptual loss~\citep{johnson2016perceptual} between the image before moving by $\epsilon$ and after.
-Finally, the mean of this value is obtained by applying the procedure for sufficiently many samples.
-
-Using the previously described procedure, \citet{karras2019style} show that the perceptual path length is lower for interpolating in $\mathcal{W}$ compared to interpolating in $\mathcal{Z}$.
+Finally, \citet{karras2019style} analyze how disentangled generations from $\mathcal{W}$-space are compared to $\mathcal{Z}$-space by means of \textit{perceptual path length} (see Section~\ref{subsec:feature-disentanglement}).
+\citet{karras2019style} show that the perceptual path length is lower for interpolating in $\mathcal{W}$ compared to interpolating in $\mathcal{Z}$.
 Therefore, they assumed that $\mathcal{Z}$ is more entangled than $\mathcal{W}$.
-
-\footnote{Part on linear separability still missing}
 
 \paragraph{\acl{LVAE}}
 
@@ -860,6 +854,9 @@ This leads to \textit{Latent Space Entanglement}: when interpolating in the late
 
 Different methods have been proposed to measure the degree of latent space entanglement.
 One approach is to measure the degree by which a generated image changes as the latent space is entangled (\textit{Perceptual Path Length})~\citep{karras2019style}.
+The perceptual path length is a measure of how much reconstructions change for small variation in the latent space.
+It is calculated by moving by a small value $\epsilon$ on a path, obtained by interpolating between two random $\bm{z}_1$, $\bm{z}_2$ (or $\bm{w}_1$, $\bm{w}_2$)\footnote{Interpolation is spherical for $\bm{z}$ and linear for $\bm{w}$.} and taking the perceptual loss~\citep{johnson2016perceptual} between the image before moving by $\epsilon$ and after.
+Finally, the mean of this value is obtained by applying the procedure for sufficiently many samples.
 If the latent space is entangled, this value on average should be higher compared to a disentangled space.
 
 Another approach is \textit{Linear Separability}~\citep{karras2019style}, measuring how well sets of points can be separated by a linear hyperplane.
