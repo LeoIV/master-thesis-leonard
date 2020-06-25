@@ -145,10 +145,10 @@ def main(args: List[str]):
         from models.VAE import VAE
         input_dim = infer_input_dim((28, 28), args)
         if 'gan' not in args.configuration:
-            model = VAE(input_dim=input_dim, encoder_conv_filters=[32, 64, 64, 64],
+            model = VAE(input_dim=input_dim, encoder_conv_filters=[32, 64, 128, 256],
                         encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[2, 2, 1, 1],
-                        decoder_conv_t_filters=[64, 64, 32, 3 if args.rgb else 1],
-                        decoder_conv_t_kernel_size=[3, 3, 3, 3],
+                        decoder_conv_t_filters=[256, 128, 64, 3 if args.rgb else 1],
+                        decoder_conv_t_kernel_size=[4, 4, 4, 4],
                         decoder_conv_t_strides=[1, 1, 2, 2], log_dir=args.logdir, z_dims=args.z_dims,
                         kernel_visualization_layer=args.kernel_visualization_layer,
                         feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,
@@ -156,10 +156,10 @@ def main(args: List[str]):
                         feature_map_reduction_factor=args.feature_map_reduction_factor,
                         inner_activation=args.inner_activation, dropout_rate=args.dropout_rate)
         else:
-            model = VAEGAN(input_dim=input_dim, encoder_conv_filters=[32, 64, 64, 64],
+            model = VAEGAN(input_dim=input_dim, encoder_conv_filters=[32, 64, 128, 256],
                            encoder_conv_kernel_size=[3, 3, 3, 3], encoder_conv_strides=[2, 2, 1, 1],
-                           decoder_conv_t_filters=[64, 64, 32, 3 if args.rgb else 1],
-                           decoder_conv_t_kernel_size=[3, 3, 3, 3],
+                           decoder_conv_t_filters=[256, 128, 64, 3 if args.rgb else 1],
+                           decoder_conv_t_kernel_size=[4, 4, 4, 4],
                            decoder_conv_t_strides=[1, 1, 2, 2], log_dir=args.logdir, z_dims=args.z_dims,
                            kernel_visualization_layer=args.kernel_visualization_layer,
                            feature_map_layers=args.feature_map_layers, use_batch_norm=args.use_batch_norm,

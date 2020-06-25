@@ -87,6 +87,11 @@ M.Sc. Zahra Fayyaz
 
 \end{titlepage}
 \pagenumbering{Roman}
+
+\section*{\centering Abstract}
+
+bla bla bla
+
 \tableofcontents
 \newpage
 \setcounter{savepage}{\arabic{page}}
@@ -129,56 +134,6 @@ This thesis aims at answering the question whether \acp{VAE} prove to be a succe
 \section{Results and Discussion}\label{sec:results}
 \input{results}
 
-\section{Discussion and Future Work}\label{sec:discussion}
-
-\subsection{Possible applications of VLAE-GAN model}
-\citet{vanrullen2019reconstructing} learn a mapping between test subject's fMRI responses when shown images from the CelebA dataset and the latent space of a \ac{VAE}.
-They discuss which brain regions have most influence in the mapping, showing that the occipital lobe contributes most and the temporal and frontoparietal Cortex less.
-
-The \ac{VLAE}(-\ac{GAN}) used in the course of this thesis uses three latent spaces compared to one latent space for a regular \ac{VAE}(-\ac{GAN}).
-Furthermore it is designed such that the latent spaces encode features of different granularities.
-
-\textbf{DRAFT FROM HERE:}
-This model allows to learn three mappings from different lobes to different latent spaces of the VLAE-GAN decoder.
-Maybe this is a better model and allows deeper analyses compared to the normal VAE decoder.
-
-
-\subsection{Disentangled Representations of VLAE}
-\textbf{Discuss the result from section \ref{subsec:morpho-mnist-on-vlae}. For example, digit identity is encoded in} $\bm{z}_2$ and $\bm{z}_3$ \textbf{. That is another indicator to why VLAE does not learn fully independent representation (Ref \ref{subsec:independence-of-vlae-embeddings})}
-
-
-
-\subsection{Criticism on \citet{zhao2017learning}}\label{subseq:criticism_vlae}
-\textbf{DRAFT!}
-\citet{zhao2017learning} compared their model to a HVAE and showed the difference on a plot.
-However, the plots are not really comparable.
-
-
-\subsection{Visual Features in Variational Autoencoders}\label{subsec:discussion_visual_features_in_variational_autoencoders}
-\textbf{DRAFT!}
-\begin{itemize}
-\item Reconstructions of AlexNet-VAE don't look natural at all, this might be because ImageNet, unlike CelebA, is not properly aligned and contains images from a large variety of classes.
-This might be another hint towards the assumption that \acp{VAE} are no suitable model for semantic representations
-\item How does it come that supervised models seem to be a good representation of \ac{IT} cortical representation~\citep{khaligh2014deep}? Maybe the brain learns in a \say{supervised} manner in the sense that if you have never seen a horse, you need someone to tell you that that is a horse in order to make sense out of it.
-However, you might, at least, be able to recognize that it is an animal.
-Also, if someone tells you \say{This is a horse.}, you'll be able to recognize horses from different orientations and in different body positions without further training.
-This is quite different from how \acp{CNN} capture animals and is a strong hint to that supervised \acp{CNN} alone a no sufficient model for cortical IT representations.
-\end{itemize}
-
-\subsection{MNIST vs. VAE and VLAE Embeddings}
-\textbf{DRAFT!}
-\textbf{Discuss in how far the models are comparable because they have different architectures.}
-
-\subsection{Comparison to \ac{IT}}
-\textbf{DRAFT!}
-Talk about how to compare network activites to IT activities.
-
-
-
-\subsection{Failure on ImageNet}
-
-
-
 \section{Conclusion}\label{sec:conclusion}
 
 This thesis discussed if \acfp{VAE} are candidate models of the visual cortex, potentially allowing to obtain semantic representations of the input.
@@ -202,38 +157,40 @@ But also, this thesis discussed ways to extend these models to better model the 
 \printbibliography
 
 \newpage
+\pagenumbering{Roman}
+\setcounter{page}{\thesavepage}
 \appendix
 \section{Additional Plots for Section~\ref{subsec:independence-of-vlae-embeddings}}\label{sec:additional-plots-for-section_independence}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{images/appendix_plots/notprop_1_3.png}
-\caption{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_3=\varphi$. Created accordingly to Figure~\ref{fig:notprop}.}
-\label{fig:notprop_1_3}
+\includegraphics[width=\textwidth]{images/notprop/mnist/vlae/ccs_0_2_vlae.png}
+\caption{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_3=\varphi$ for \ac{VLAE} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{images/appendix_plots/notprop_2_3.png}
-\caption{Proportionality of pixel intensities when fixing $\bm{z}_2 = \bm{z}_3=\varphi$. Created accordingly to Figure~\ref{fig:notprop}.}
-\label{fig:notprop_2_3}
+\includegraphics[width=\textwidth]{images/notprop/mnist/vlae/ccs_1_2_vlae.png}
+\caption{Proportionality of pixel intensities when fixing $\bm{z}_2 = \bm{z}_3=\varphi$ for \ac{VLAE} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
 \end{figure}
 
-\section{Additional Plots for Section~\ref{subsec:morpho-mnist-on-vlae}}\label{sec:additional-plots-for-section_morpho_mnist}
-\foreach \i in {1,...,3}{
 \begin{figure}[H]
 \centering
-\foreach \j in {0,...,6}{
-\begin{subfigure}{0.3\textwidth}
-\centering
-\includegraphics[width=\textwidth]{images/vlae_embeddings/embeddings_mu_\i_\j.png}
-\label{subfig:vlae_morpho_z\i_\j}
-\end{subfigure}
-\hfill
-}
-\caption{Embeddings on VLAE layer $\bm{z}_{\i}$ colored by means of MorphoMNIST}
-\label{fig:vlae_morpho_z\i}
+\includegraphics[width=\textwidth]{images/notprop/mnist/vlae_gan/ccs_0_1_vlae_gan.png}
+\caption{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_2=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
 \end{figure}
-}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/notprop/mnist/vlae_gan/ccs_0_2_vlae_gan.png}
+\caption{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_3=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/notprop/mnist/vlae_gan/ccs_1_2_vlae_gan.png}
+\caption{Proportionality of pixel intensities when fixing $\bm{z}_2 = \bm{z}_3=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
+\end{figure}
+
 \pagebreak
 \begin{landscape}
 \section{\ac{VLAE} Networks used in Experiments on Sparsity (Section~\label{subsec:effective-network-capacity})}\label{sec:listings_sparsity_networks}
@@ -289,8 +246,6 @@ _________________________________________________________________
 
 
 \newpage
-\pagenumbering{Roman}
-\setcounter{page}{\thesavepage}
 \section*{Acronyms}
 \begin{acronym}[TDMA]
 \acro{AdaIN}{Adaptive Instance Normalization}
