@@ -127,7 +127,7 @@ The Lottery Ticket Hypothesis states that it is in general not possible to train
 
 \subsection{Model Generated Samples}\label{subsec:model-generated-samples}
 
-\paragraph{Latent Space Traversals}
+\subsubsection{Latent Space Traversals}
 
 \subparagraph{\textsc{Mnist}}
 
@@ -166,12 +166,14 @@ Unrepresentative generations in such areas, therefore, is no model failure.
         % include second image
         \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_mnist.png}
         \caption{\ac{VLAE} latent space traversal from $z_i=-3$ to $z_i=-3$ in both dimensions for the respective $z$-dimension. The other $z$ dimensions are sampled uniformly over $[-3; 3]$}
+        \label{subfig:vlae_mnist_latent_space_traversal}
     \end{subfigure}
     \begin{subfigure}{\textwidth}
         \centering
         % include second image
         \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_mnist.png}
         \caption{\ac{VLAE}-\ac{GAN} latent space traversal from $z_i=-3$ to $z_i=3$ in both dimensions for the respective $z$-dimension. The other $z$ dimensions are sampled uniformly over $[-3; 3]$}
+        \label{subfig:vlae_gan_mnist_latent_space_traversal}
     \end{subfigure}
     \caption{Latent space traversal for different models on \textsc{Mnist}. The original images have been inverted for the purpose of this figure.}
     \label{fig:mnist_latent_space_traversal}
@@ -185,7 +187,239 @@ Unrepresentative generations in such areas, therefore, is no model failure.
 
 \textbf{TODO: Plots and Discussion}
 
-\paragraph{Pixel-wise Image Statistics}
+\subsubsection{Latent Space Embedding}
+
+\paragraph{\textsc{Mnist}}
+
+Figures~\ref{fig:vae_latent_space_mnist} and \ref{fig:vlae_latent_space_mnist} show the latent spaces of \ac{VAE} and \ac{VLAE} trained on the \textsc{Mnist} dataset.
+For \ac{VAE}, there is only one latent space while there are three for \ac{VLAE}.
+The embeddings are colored by different means, employing information from Morpho-\textsc{Mnist} (see Section~\ref{subsubsec:morphomnist}) and the digit identity information provided by \textsc{Mnist} itself.
+
+As discussed in Section~\ref{subsubsec:representation_learning}, the \acl{VLAE} aims at learning \say{hierarchical disentangled representation}~\citep{zhao2017learning}.
+The lower embedding layers of such a model trained on MNIST (see Section~\ref{subsubsec:mnist}) encode features such as stroke width, digit width, and digit tilt whereas the highest layer mainly learns digit identity~\citep{zhao2017learning}.
+
+Incorporating the additional labels provided by Morpho-\textsc{MNIST} (see Section~\ref{subsubsec:morphomnist}) helps to analyze to what extent the lower layers learn which morphological features of \textsc{MNIST}.
+The morphological attributes, however, are not equally distributed for all digits.
+The mean stroke length and the digith width, for example, have a very low mean value for the digit \say{1} (see Figure~\ref{fig:morpho_mnist_distribution}).
+Therefore, it should be possible to almost uniquely identify the identity of the digit \say{1} by just considering the stroke length or the digit width.
+Other attributes such as stroke thickness, digit slant, and digit height are more evenly distributed (see Figure~\ref{fig:morpho_mnist_distribution}).
+
+Consider Figure~\ref{subfig:vlae_mnist_latent_space_z_1_slant} showing the embedding layer $\bm{z}_1$ colored by digit slant.
+Figure~\ref{fig:morpho_mnist_distribution} shows that the mean of the attribute \textit{Slant} is quite evenly distributed.
+The color gradient in Figure~\ref{subfig:vlae_mnist_latent_space_z_1_slant} therefore indicates that the VLAE actually learns the morphological attribute instead of just showing the class identity, encoded by means of another morphological attribute that correlates with class identity.
+
+For Figure~\ref{subfig:vlae_mnist_latent_space_z_1_width}, the situation is different.
+The noticeable dark-purple cluster in the top left correlates with dark-purple points in Figure~\ref{subfig:vlae_mnist_latent_space_z_1_identity} that encode image with label \say{1}.
+For digit width, however, \say{1} is an outlier (see Figure~\ref{fig:morpho_mnist_distribution}) and a small digit width therefore is a strong indicator for a digit identity of \say{1}.
+Nonetheless, overall digit identity does not seem to be encoded strongly by $\bm{z}_1$ (see Figure~\ref{subfig:vlae_mnist_latent_space_z_1_identity}).
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.32\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae/embeddings_mu_0.png}
+        \caption{Latent space colored by digit slant}
+        \label{subfig:vae_mnist_latent_space_slant}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.32\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae/embeddings_mu_1.png}
+        \caption{Latent space colored by digit thickness}
+        \label{subfig:vae_mnist_latent_space_thickness}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.32\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae/embeddings_mu_2.png}
+        \caption{Latent space colored by digit area}
+        \label{subfig:vae_mnist_latent_space_area}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.24\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae/embeddings_mu_3.png}
+        \caption{Latent space colored by digit length}
+        \label{subfig:vae_mnist_latent_space_length}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.24\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae/embeddings_mu_4.png}
+        \caption{Latent space colored by digit width}
+        \label{subfig:vae_mnist_latent_space_width}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.24\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae/embeddings_mu_5.png}
+        \caption{Latent space colored by digit height}
+        \label{subfig:vae_mnist_latent_space_height}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.24\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae/embeddings_mu_6.png}
+        \caption{Latent space colored by digit identity}
+        \label{subfig:vae_mnist_latent_space_identity}
+    \end{subfigure}
+    \caption{Latent space colored by different means of \ac{VAE} with $dim_z=2$ trained on \textsc{Mnist} dataset}
+    \label{fig:vae_latent_space_mnist}
+\end{figure}
+
+\begin{landscape}
+    \begin{figure}
+        \centering
+        \foreach \i in {1,2,3}{
+        \begin{subfigure}{.16\textwidth}
+            \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae/embeddings_mu_\i_0.png}
+            \caption{$z_{\i}$: digit slant}
+            \label{subfig:vlae_mnist_latent_space_z_\i_slant}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{.16\textwidth}
+            \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae/embeddings_mu_\i_1.png}
+            \caption{$z_{\i}$: digit thickness}
+            \label{subfig:vlae_mnist_latent_space_z_\i_thickness}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{.16\textwidth}
+            \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae/embeddings_mu_\i_2.png}
+            \caption{$z_{\i}$: digit area}
+            \label{subfig:vlae_mnist_latent_space_z_\i_area}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{.16\textwidth}
+            \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae/embeddings_mu_\i_3.png}
+            \caption{$z_{\i}$: digit length}
+            \label{subfig:vlae_mnist_latent_space_z_\i_length}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{.16\textwidth}
+            \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae/embeddings_mu_\i_4.png}
+            \caption{$z_{\i}$: digit width}
+            \label{subfig:vlae_mnist_latent_space_z_\i_width}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{.16\textwidth}
+            \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae/embeddings_mu_\i_5.png}
+            \caption{$z_{\i}$: digit height}
+            \label{subfig:vlae_mnist_latent_space_z_\i_height}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{.16\textwidth}
+            \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae/embeddings_mu_\i_6.png}
+            \caption{$z_{\i}$: digit identity}
+            \label{subfig:vlae_mnist_latent_space_z_\i_identity}
+        \end{subfigure}}
+        \caption{Latent space colored by different means of \ac{VAE} with $dim_z=2$ trained on \textsc{Mnist} dataset}
+        \label{fig:vlae_latent_space_mnist}
+    \end{figure}
+\end{landscape}
+
+Noticeable, digit identity seems to be learned in $z_2$ as well as $z_3$ (see Figures~\ref{subfig:vlae_mnist_latent_space_z_2_identity} and \ref{subfig:vlae_mnist_latent_space_z_3_identity}).
+This, however, would be a contradiction to Figure~\ref{subfig:vlae_mnist_latent_space_traversal} and even more Figure~\ref{subfig:vlae_gan_mnist_latent_space_traversal}, showing that digit identity mainly is learned in the last embedding layer.
+Albeit $z_2$ has some influence on digit identity, this effect is not nearly as prominent as for $z_3$ even though the clustering in Figure~\ref{subfig:vlae_mnist_latent_space_z_2_identity} seems to be almost as good as in Figure~\ref{subfig:vlae_mnist_latent_space_z_3_identity}.
+It seems as if the digit identity learned in $z_2$ only supports the model generation but has a far less strong influence than $z_3$.
+
+All in all, \ac{VLAE} does not seem to learn fully separable representations.
+However, the less powerful network below $z_1$ indeed seems to learn lower-level representations that also are employed when generating new images (see Figures~\ref{subfig:vlae_mnist_latent_space_traversal} and \ref{subfig:vlae_gan_mnist_latent_space_traversal}).
+
+For \ac{VAE}, digit identity defines the shape of the latent space (Figure~\ref{subfig:vae_mnist_latent_space_identity}), leading to bigger \say{main clusters}.
+As \ac{VAE} only has one latent space, it employs subspaces to learn the lower-level factors of variation such as slant within the main clusters (Figure~\ref{subfig:vae_mnist_latent_space_slant}).
+
+The \ac{VAE} seems to learn an efficient encoding of most of the factors of variation as revealed by this kind of visualization even though it has narrower information bottleneck with a two-dimensional latent space compared to the three two-dimensional latent spaces of \ac{VLAE}.
+
+\paragraph{CelebA}
+\textbf{TODO}
+
+\paragraph{dsprites}
+
+The latent space embeddings for the dsprites dataset allow a more profound comparison of \ac{VAE} and \ac{VLAE}.
+Here, the \ac{VAE} model was given a six-dimensional embedding space whereas the \ac{VLAE} model has three two-dimensional embedding spaces.
+The dimensionality of the \ac{VAE} model was increased as the dsprites dataset was assumed to be more diverse compared to \textsc{Mnist}, requiring more model capacity to encode the information.
+Importantly, \ac{VAE} and \ac{VLAE} approximately have the same model capacity under the assumption that \ac{VLAE} uses lower embedding layers to only learn lower-level features and higher embedding layers to only learn higher-level features and that the dataset can be splitted in this way.
+
+As the \ac{VAE} model employs a higher dimensional latent space, the embeddings were visualized using t-SNE embeddings (see Figure~\ref{fig:vae_latent_space_dsprites}).
+
+One advantage of dsprites over \textsc{Mnist} is that all factors of variation by design are independent and represented equally often, allowing a more straight-forward analysis.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae/embeddings_mu_0.png}
+        \caption{Latent space colored by object shape}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae/embeddings_mu_1.png}
+        \caption{Latent space colored by object scale}
+        \label{subfig:vae_embedding_dsprites_scale}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae/embeddings_mu_2.png}
+        \caption{Latent space colored by object orientation}
+        \label{subfig:vae_embedding_dsprites_orientation}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae/embeddings_mu_3.png}
+        \caption{Latent space colored by object $x$-position}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae/embeddings_mu_4.png}
+        \caption{Latent space colored by object $y$-position}
+    \end{subfigure}
+    \caption{t-SNE latent space embeddings colored by different means of \ac{VAE} with $dim_z=6$ trained on dsprites dataset}
+    \label{fig:vae_latent_space_dsprites}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \foreach \i in {1,2,3}{
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae/embeddings_mu_\i_0.png}
+        \caption{Latent space $z_{\i}$ colored by object shape}
+        \label{subfig:vlae_embedding_z\i_dsprites_shape}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae/embeddings_mu_\i_1.png}
+        \caption{Latent space $z_{\i}$ colored by object scale}
+        \label{subfig:vlae_embedding_z\i_dsprites_scale}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae/embeddings_mu_\i_2.png}
+        \caption{Latent space $z_{\i}$ colored by object orientation}
+        \label{subfig:vlae_embedding_z\i_dsprites_orientation}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae/embeddings_mu_\i_3.png}
+        \caption{Latent space $z_{\i}$ colored by object $x$-position}
+        \label{subfig:vlae_embedding_z\i_dsprites_x_pos}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae/embeddings_mu_\i_4.png}
+        \caption{Latent space $z_{\i}$ colored by object $y$-position}
+        \label{subfig:vlae_embedding_z\i_dsprites_y_pos}
+    \end{subfigure}
+    }
+    \caption{Latent space colored by different means of \ac{VLAE} with $dim_{z_i}=2$ trained on dsprites dataset}
+    \label{fig:vlae_latent_space_dsprites}
+\end{figure}
+
+Again, the \ac{VAE} builds main clusters and seems to embed lower-level feature into main clusters.
+Especially the object scale seems to be a lower-level feature (see Figure~\ref{subfig:vae_embedding_dsprites_scale}).
+Only object orientation does not seem to be learned at all (see Figure~\ref{subfig:vae_embedding_dsprites_orientation}).
+
+\ac{VLAE} performance on dsprites (see Figure~\ref{fig:vlae_latent_space_dsprites}) is worse compared to \ac{VAE}.
+The model, again, learns main clusters, especially for object position (see Figures~\ref{subfig:vlae_embedding_z3_dsprites_x_pos} and \ref{subfig:vlae_embedding_z3_dsprites_y_pos}).
+Furthermore, the model learns object scale (see Figure~\ref{subfig:vlae_embedding_z3_dsprites_scale} and \ref{subfig:vlae_embedding_z2_dsprites_scale}).
+Otherwise, the model does not seem to learn other factors of variation.
+Furthermore, the representations are not particularly disentangled.
+Object position and scale is learned in all layers, but best in $z_3$.
+
+All in all, using a \ac{VAE} with a higher-dimensional space seems to be superior compared to the \ac{VLAE} in terms of encoding effiency.
+
+\subsubsection{Pixel-wise Image Statistics}
 
 \acp{GAN} (see Section~\ref{subsubsec:representation_learning}) are trained by simulatenously training a \textit{generator} to create new samples and a \textit{discriminator} to discriminate between true and generated samples.
 \acp{VAE} are another generative model that is not forced in the same way to create indistinguishable samples.
@@ -196,7 +430,7 @@ However, the question remains how indistinguishable these generates samples are 
 
 To address this question, different statistical analyses were performed revealing that in fact generated samples can be perfectly distinguished from true samples.
 
-\subparagraph{\textsc{Mnist}}
+\paragraph{\textsc{Mnist}}
 
 \begin{figure}
     \centering
@@ -260,13 +494,13 @@ The results lead to two conclusions: 1) The \ac{VLAE}-models capture the statist
 To verify that none of the models generates indistinguishable samples, a discriminator network was trained to distinguish generated samples from true \textsc{MNIST} test images\footnote{The configuration of the discriminator network can be found in Appendix~\ref{sec:listing_discriminator_network}. The network was trained using binary cross entropy for one epoch using the Adam optimizer.}.
 The discriminator network shows an accuracy of 1.0 for distinguishing for all models, i.e.~it is perfectly able to predict generated from true samples for all models.
 
-\subparagraph{CelebA}
+\paragraph{CelebA}
 \textbf{TODO: Plots and Discussion}
 
-\subparagraph{dsprites}
+\paragraph{dsprites}
 \textbf{TODO: Plots and Discussion}
 
-\paragraph{Distribution of Generated Samples}
+\subsubsection{Distribution of Generated Samples}
 
 Do the \ac{VAE} and \ac{VLAE} models generate each number with the same probability as a number's probability in the training set?
 To answer this question, the following procedure was applied.
@@ -278,7 +512,7 @@ This procedure was applied to \textsc{Mnist} only as it was the only labeled dat
 
 \textbf{TODO: Plots and Discussion}
 
-\subsection{Independence of VLAE Embeddings}\label{subsec:independence-of-vlae-embeddings}
+\subsubsection{Independence of VLAE Embeddings}\label{subsec:independence-of-vlae-embeddings}
 
 \begin{figure}[t]
     \centering
@@ -393,60 +627,6 @@ This, however, is a violation of equation~\ref{eq:notprop}.
 Importantly, the correlation only persists for certain pixels.
 
 \textbf{Investigate, if possible, this in terms of Perceptual Path Length and Linear Separability (see \citet{karras2019style}).}
-
-\subsection{Morpho-MNIST on VLAE}\label{subsec:morpho-mnist-on-vlae}
-
-As discussed in Section~\ref{subsubsec:representation_learning}, the \acl{VLAE} aims at learning \say{hierarchical disentangled representation}~\citep{zhao2017learning}.
-The lower embedding layers of such a model trained on MNIST (see Section~\ref{subsubsec:mnist}) encode features such as stroke width, digit width, and digit tilt whereas the highest layer mainly learns digit identity~\citep{zhao2017learning}.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{images/morpho_mnist_distribution.png}
-    \caption{Distribution of the \textsc{Morpho-MNIST} attributes for the different digits. Taken from \citep{castro2019morpho}.}
-    \label{fig:morpho_mnist_distribution}
-\end{figure}
-
-Incorporating the additional labels provided by Morpho-\textsc{MNIST} (see Section~\ref{subsubsec:morphomnist}) helps to analyze to what extent the lower layers learn which morphological features of \textsc{MNIST}.
-The morphological attributes, however, are not equally distributed for all digits.
-The mean stroke length and the digith width, for example, have a very low mean value for the digit \say{1} (see Figure~\ref{fig:morpho_mnist_distribution}).
-Therefore, it should be possible to almost uniquely identify the identity of the digit \say{1} by just considering the stroke length or the digit width.
-Other attributes such as stroke thickness, digit slant, and digit height are more evenly distributed (see Figure~\ref{fig:morpho_mnist_distribution}).
-
-\begin{figure}
-    \centering
-    \begin{subfigure}{.33\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/vlae_embeddings/embeddings_mu_1_0.png}
-        \caption{}
-        \label{fig:vlae_embeddings_mu1_slant}
-    \end{subfigure}%
-    \begin{subfigure}{.33\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/vlae_embeddings/embeddings_mu_1_4.png}
-        \caption{}
-        \label{fig:vlae_embeddings_mu1_width}
-    \end{subfigure}
-    \begin{subfigure}{.33\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/vlae_embeddings/embeddings_mu_1_6.png}
-        \caption{}
-        \label{fig:vlae_embeddings_mu1_identity}
-    \end{subfigure}
-    \caption{5000 random training points plotted in the first embedding layer $\bm{z}_1$ for the VLAE model. The position of the dots does not change in the diffent subplot. Different color dots by different means (shown in the respective legend). The morphological attributes are evenly assigned to ten bins. Dark colors indicate a low value of the respective whereas bright colors indicate a high value.}
-    \label{fig:vlae_embeddings_mu1}
-\end{figure}
-
-Consider Figure~\ref{fig:vlae_embeddings_mu1_slant} showing the embedding layer $\bm{z}_1$ colored by digit slant\footnote{A complete plot of all morphological attributes for all layers can be found in Appendix~\ref{sec:additional-plots-for-section_morpho_mnist}.}.
-Figure~\ref{fig:morpho_mnist_distribution} shows that the mean of the attribute \textit{Slant} is quite evenly distributed.
-The color gradient in Figure~\ref{fig:vlae_embeddings_mu1_slant} therefore indicates that the VLAE actually learns the morphological attribute instead of just showing the class identity, encoded by means of another morphological attribute that correlates with class identity.
-
-For Figure~\ref{fig:vlae_embeddings_mu1_width}, the situation is different.
-The noticeable dark-purple cluster in the top left correlates with dark-purple points in Figure~\ref{fig:vlae_embeddings_mu1_identity} that encode image with label \say{1}.
-For digit width, however, \say{1} is an outlier (see Figure~\ref{fig:morpho_mnist_distribution}) and a small digit width therefore is a strong indicator for a digit identity of \say{1}.
-Not considering the dark-purple points, $\bm{z}_1$ still shows a less prominent color gradient from the bottom right to the top left.
-In contrast, digit identity does not seem to be encoded strongly by $\bm{z}_1$ (see Figure~\ref{fig:vlae_embeddings_mu1_identity}).
-
-\textbf{continue}
 
 \subsection{Feature Map Stripes}\label{subsec:feature-map-stripes}
 

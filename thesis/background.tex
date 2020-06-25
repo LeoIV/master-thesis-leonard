@@ -693,7 +693,7 @@ Using all these techniques on the \ac{LVAE} model allows meaningful representati
     \label{fig:vlae_structure}
 \end{figure}
 
-Unlike the \ac{LVAE}, the \ac{VLAE} is a pure feedforward network.
+Unlike the \ac{LVAE}, the \ac{VLAE}~\citep{zhao2017learning} is a pure feedforward network.
 It's design is driven by the idea that \say{[i]f $\bm{z}_i$ is more abstract than $\bm{z}_j$, then the inference mapping $q(\bm{z}_i|\bm{x})$ and generative mapping when other layers are fixed $p(\bm{x}|\bm{z}_i, \bm{z}_{\neg i}=z^0_{\neg i})$ requires a more expressive network to capture}~\citep{zhao2017learning}.
 Figure~\ref{fig:vlae_structure} shows an exemplary network structure of a \ac{VLAE}.
 Early embedding layers like $\bm{z}_1$ are equipped with a less expressive network that, according to \citet{zhao2017learning}, should not allow to learn abstract features\footnote{In case of \textsc{Mnist}, more abstract features are for example the digit identity.}.

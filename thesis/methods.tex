@@ -49,13 +49,22 @@ The samples are grayscale images of size $28\times 28$pixels.
 
 \subsubsection{Morpho-MNIST}\label{subsubsec:morphomnist}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/morpho_mnist_distribution.png}
+    \caption{Distribution of the \textsc{Morpho-MNIST} attributes for the different digits. Taken from~\citep{castro2019morpho}.}
+    \label{fig:morpho_mnist_distribution}
+\end{figure}
+
 Morpho-MNIST~\citep{castro2019morpho} is an extension of the MNIST dataset that addresses the question: \say{[T]o what extent has my model learned to represent specific factors of
 variation in the data?} ~\citep{castro2019morpho}.
 To address this questions, Morpho-MNIST provides the following (continuous) labels of morphological attributes of the MNIST samples: stroke length, stroke thickness, slant, width, and height.
 
-Besides providing additional labels of low-level MNIST attributes, Morpho-MNIST provides a toolbox to measure (i.e. calculate the morphological labels) and perturb MNIST images.
+Besides providing additional labels of low-level MNIST attributes, Morpho-MNIST provides a toolbox to measure (i.e~ calculate the morphological labels) and perturb MNIST images.
 The perturbation toolbox allows it to thin, thicken, swell, and to add fractures to an image.
 Morpho-MNIST also provides pre-computed datasets that were built using the perturbation toolbox.
+
+Importantly, the distribution of the morphological attributes partly is highly skewed (for example Thickness and Height, see Figure~\ref{fig:morpho_mnist_distribution}).
 
 \subsubsection{dSprites}
 dSprites\footnote{\href{https://github.com/deepmind/dsprites-dataset/}{https://github.com/deepmind/dsprites-dataset/}, last access: 5/28/2020}~\citep{dsprites17} is a dataset designed \say{to assess the disentanglement properties of unsupervised learning methods.}
