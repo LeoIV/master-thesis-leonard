@@ -77,10 +77,11 @@ class VAEGAN(VAEWrapper):
             x = LeakyReLU(alpha=0.2)(x)
             x = x_feat = Conv2D(batch_input_shape=input_shape, filters=128, kernel_size=4, strides=2, padding='same')(x)
             x = BatchNormalization()(x)
-            if self.input_dim[0] >= 100:
+            if self.input_dim[0] >= 60:
                 x = x_feat = Conv2D(batch_input_shape=input_shape, filters=256, kernel_size=4, strides=2,
                                     padding='same')(x)
                 x = BatchNormalization()(x)
+            if self.input_dim[0] >= 100:
                 x = LeakyReLU(alpha=0.2)(x)
                 x = Conv2D(batch_input_shape=input_shape, filters=512, kernel_size=4, strides=2, padding='same')(x)
                 x = BatchNormalization()(x)

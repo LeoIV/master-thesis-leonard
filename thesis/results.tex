@@ -187,7 +187,7 @@ Unrepresentative generations in such areas, therefore, is no model failure.
 
 \textbf{TODO: Plots and Discussion}
 
-\subsubsection{Latent Space Embedding}
+\subsubsection{Latent Space Embeddings}\label{subsubsec:latent_space_embeddings}
 
 \paragraph{\textsc{Mnist}}
 
@@ -305,7 +305,7 @@ Nonetheless, overall digit identity does not seem to be encoded strongly by $\bm
             \caption{$z_{\i}$: digit identity}
             \label{subfig:vlae_mnist_latent_space_z_\i_identity}
         \end{subfigure}}
-        \caption{Latent space colored by different means of \ac{VAE} with $dim_z=2$ trained on \textsc{Mnist} dataset}
+        \caption{Latent space colored by different means of \ac{VLAE} with $dim_z=2$ trained on \textsc{Mnist} dataset}
         \label{fig:vlae_latent_space_mnist}
     \end{figure}
 \end{landscape}
@@ -514,49 +514,26 @@ This procedure was applied to \textsc{Mnist} only as it was the only labeled dat
 
 \subsubsection{Independence of VLAE Embeddings}\label{subsec:independence-of-vlae-embeddings}
 
-\begin{figure}[t]
-    \centering
-    \begin{subfigure}{0.3\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/vlae_plots1.png}
-        \caption{Exploring $z_1$}
-        \label{subfig:vlae_plots1}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.3\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/vlae_plots2.png}
-        \caption{Exploring $z_{2}$}
-        \label{subfig:vlae_plots2}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.3\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/vlae_plots3.png}
-        \caption{Exploring $z_3$}
-        \label{subfig:vlae_plots3}
-    \end{subfigure}
-    \caption{Reconstructions of the VLAE model when systematically exploring one latent space and randomly choosing the other two latent spaces. The space explored systematically is sampled from -3 SD to 3 SD in both dimensions, the other values are chosen by drawing from an uniform distribution over $[-1; 1]$. Created analogously to \citet[Figure 5]{zhao2017learning}.}
-    \label{fig:vlae_plots}
-\end{figure}
+
 The VLAE learns embeddings on different levels.
 For MNIST, \citet{zhao2017learning} used three two-dimensional layers to learn image semantics of different granularity.
 They claim that their model is able to learn disentangled hierarchical features.
-Figure~\ref{fig:vlae_plots} shows reconstructions of this model when systematically exploring one dimensions and randomly choosing the others.
+Figure~\ref{subfig:vlae_mnist_latent_space_traversal} shows reconstructions of this model when systematically exploring one dimensions and randomly choosing the others.
 Apparently, the model is able to learn disentangled representations to some extent.
 
-For example, $z_1$ seems to mainly encode the digit orientation, $z_2$ seems to primarily encode digit width, whereas $z_3$ seems to encode digit identity.
-However, it is not obvious how disentangled the representations actually are.
+For example, $z_1$ seems to mainly encode the digit thickness whereas $z_3$ seems to encode digit identity.
+For $z_2$, however, seems to also have influence on the digit identity.
+Therefore, it is not obvious how disentangled the representations actually are.
 \begin{breakablealgorithm}
     \caption{Generating Layer Representative Samples by Averaging Out Other Embedding Layers}\label{alg:layer_representative_samples}
     \begin{algorithmic}[1]
         \Function{LayerRepresentativeSamples}{numSamples,numApproximations}
-        \State $j \gets 0$
-        \State $\mathcal{L}\gets \varnothing$
-        \While{$i < \text{numSamples}$}
-        \State $\bm{v} \gets \bm{v} \sim \mathcal{N}(\bm{0}, \bm{I})$\label{line:fixing_v}
-        \ForAll{$j \in \{1,2,3\}$}
-        \State $\bm{s}_j \gets$ \Call{LayerRepresentativeSample}{$\bm{v}$, numApproximations, $j$}
+            \State $j \gets 0$
+            \State $\mathcal{L}\gets \varnothing$
+            \While{$i < \text{numSamples}$}
+                \State $\bm{v} \gets \bm{v} \sim \mathcal{N}(\bm{0}, \bm{I})$\label{line:fixing_v}
+                \ForAll{$j \in \{1,2,3\}$}
+                    \State $\bm{s}_j \gets$ \Call{LayerRepresentativeSample}{$\bm{v}$, numApproximations, $j$}
         \EndFor
         \State $\mathcal{L} \gets \mathcal{L} \cup \{\{\bm{s}_1, \bm{s}_2, \bm{s}_3\}\}$
 

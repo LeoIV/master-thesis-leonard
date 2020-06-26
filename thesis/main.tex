@@ -25,11 +25,10 @@
 \usetikzlibrary{shapes,positioning,decorations.pathreplacing}
 \addbibresource{literature.bib}
 \renewcommand{\baselinestretch}{1.5}
+% @formatter:off
 \let\oldsection\section
-\renewcommand
-
-
-\section{\clearpage\oldsection}
+\renewcommand\section{\clearpage\oldsection}
+% @formatter:on
 \newcounter{savepage}
 
 \lstset{lineskip=-0.7ex,frame=single,breaklines=true}
@@ -190,6 +189,145 @@ But also, this thesis discussed ways to extend these models to better model the 
 \includegraphics[width=\textwidth]{images/notprop/mnist/vlae_gan/ccs_1_2_vlae_gan.png}
 \caption{Proportionality of pixel intensities when fixing $\bm{z}_2 = \bm{z}_3=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
 \end{figure}
+
+
+\pagebreak
+\section{Additional Latent Space Embeddings (Section~\ref{subsubsec:latent_space_embeddings})}
+
+\subsection{\textsc{Mnist}}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae_gan/embeddings_mu_0.png}
+\caption{Latent space colored by digit slant}
+\label{subfig:vae_mnist_latent_space_slant}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae_gan/embeddings_mu_1.png}
+\caption{Latent space colored by digit thickness}
+\label{subfig:vae_mnist_latent_space_thickness}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.32\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae_gan/embeddings_mu_2.png}
+\caption{Latent space colored by digit area}
+\label{subfig:vae_mnist_latent_space_area}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.24\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae_gan/embeddings_mu_3.png}
+\caption{Latent space colored by digit length}
+\label{subfig:vae_mnist_latent_space_length}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.24\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae_gan/embeddings_mu_4.png}
+\caption{Latent space colored by digit width}
+\label{subfig:vae_mnist_latent_space_width}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.24\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae_gan/embeddings_mu_5.png}
+\caption{Latent space colored by digit height}
+\label{subfig:vae_mnist_latent_space_height}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.24\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae_gan/embeddings_mu_6.png}
+\caption{Latent space colored by digit identity}
+\label{subfig:vae_mnist_latent_space_identity}
+\end{subfigure}
+\caption{Latent space colored by different means of \ac{VAE}-\ac{GAN} with $dim_z=2$ trained on \textsc{Mnist} dataset}
+\label{fig:vae_latent_space_mnist}
+\end{figure}
+
+\begin{landscape}
+\begin{figure}[H]
+\centering
+\foreach \i in {1,2,3}{
+\begin{subfigure}{.16\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_0.png}
+\caption{$z_{\i}$: digit slant}
+\label{subfig:vlae_mnist_latent_space_z_\i_slant}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.16\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_1.png}
+\caption{$z_{\i}$: digit thickness}
+\label{subfig:vlae_mnist_latent_space_z_\i_thickness}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.16\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_2.png}
+\caption{$z_{\i}$: digit area}
+\label{subfig:vlae_mnist_latent_space_z_\i_area}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.16\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_3.png}
+\caption{$z_{\i}$: digit length}
+\label{subfig:vlae_mnist_latent_space_z_\i_length}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.16\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_4.png}
+\caption{$z_{\i}$: digit width}
+\label{subfig:vlae_mnist_latent_space_z_\i_width}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.16\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_5.png}
+\caption{$z_{\i}$: digit height}
+\label{subfig:vlae_mnist_latent_space_z_\i_height}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.16\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_6.png}
+\caption{$z_{\i}$: digit identity}
+\label{subfig:vlae_mnist_latent_space_z_\i_identity}
+\end{subfigure}}
+\caption{Latent space colored by different means of \ac{VLAE}-\ac{GAN} with $dim_z=2$ trained on \textsc{Mnist} dataset}
+\label{fig:vlae_latent_space_mnist}
+\end{figure}
+\end{landscape}
+
+\subsection{dsprites}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.19\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae_gan/embeddings_mu_0.png}
+\caption{Latent space colored by object shape}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.19\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae_gan/embeddings_mu_1.png}
+\caption{Latent space colored by object scale}
+\label{subfig:vae_embedding_dsprites_scale}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.19\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae_gan/embeddings_mu_2.png}
+\caption{Latent space colored by object orientation}
+\label{subfig:vae_embedding_dsprites_orientation}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.19\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae_gan/embeddings_mu_3.png}
+\caption{Latent space colored by object $x$-position}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.19\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae_gan/embeddings_mu_4.png}
+\caption{Latent space colored by object $y$-position}
+\end{subfigure}
+\caption{t-SNE latent space embeddings colored by different means of \ac{VAE}-\ac{GAN} with $dim_z=6$ trained on dsprites dataset}
+\label{fig:vae_gan_latent_space_dsprites}
+\end{figure}
+
+\textbf{TODO: VLAE-GAN}
+
 
 \pagebreak
 \begin{landscape}
