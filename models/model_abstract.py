@@ -227,7 +227,7 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
 
         def vae_r_loss(y_true, y_pred):
             r_loss = K.mean(K.square(y_true - y_pred), axis=[1, 2, 3])
-            return r_loss
+            return r_loss_factor * r_loss
 
         def vae_kl_loss(y_true, y_pred):
             kl_loss = 0.0
@@ -238,8 +238,7 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
         def vae_loss(y_true, y_pred):
             r_loss = vae_r_loss(y_true, y_pred)
             kl_loss = vae_kl_loss(y_true, y_pred)
-            print("loss factor")
-            return r_loss_factor * r_loss + kl_loss
+            return r_loss + kl_loss
 
         optimizer = Adam(lr=learning_rate, decay=self.decay_rate)
         self.model.compile(optimizer=optimizer, loss=vae_loss, metrics=[vae_r_loss, vae_kl_loss])
