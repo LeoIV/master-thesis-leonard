@@ -612,6 +612,183 @@ All plots can be found in Appendix~\ref{sec:additional-plots-for-section_indepen
 
 \textbf{TODO}
 
+\subsection{Latent Space Entanglement and Categorical Factors of Variation}\label{subsec:latent-space-entanglement-and-categorical-factors-of-variation}
+
+As discussed in Section~\ref{subsec:feature-disentanglement} and Section~\ref{subsubsec:representation_learning} ($\beta$-\ac{VAE}), there is a trade-off between reconstruction quality and prior-posterior matching.
+Increasing the weight of the reconstruction term in the \ac{VAE} training objective (smaller $\beta$ in Equation~\ref{eq:beta-vae}) leads to better reconstructions.
+The posterior distribution, however, will match the prior distribution less exactly.
+Increasing $\beta$ in Equation~\ref{eq:beta-vae}, in contrast, leads to a posterior closer to the prior distribution at the expense of reconstruction quality.
+
+Specifically, \citet{higgins2017beta} claim that increasing $\beta$ leads to a better latent space disentanglement.
+
+As discussed in Section~\ref{subsec:feature-disentanglement}, the quality of feature space disentanglement can be assessed by measuring how fast reconstructions change as the latent space is traversed.
+A well disentangled feature space, however, should lead to problems for datasets with categorical factors of variation such as dsprites.
+Even though CelebA has binary labels as well (for example \say{brown hair}), there still is enough variation within hair colors to allow a smooth translation between hair colors~\citep{higgins2017beta}.
+For dsprites, there are only three distinct shapes (\say{square}, \say{ellipse}, and \say{heart}).
+To achieve a good reconstruction quality on these shapes, the model would have to place them in separate areas of the latent space, violating both, feature space disentanglement and a Gaussian posterior.
+
+To validate this empirically, a \ac{VAE} with input size $64\times 64$ (the size of dsprites images) and a ten-dimensional latent space was trained on dsprites with different reconstruction term weights: 10,000, 7,500, and 5,000.
+For the remainder of this section, these models are referred to as \say{10,000-\ac{VAE}}, \say{7,500-\ac{VAE}}, and \say{\say{5,000-\ac{VAE}}}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist.png}
+    \caption{Histogram of 73,728 dsprites images from the validation set in 100 bins for \ac{VAE} with reconstruction term weight 10,000}
+    \label{fig:10000_vae_latent_space_distribution}
+\end{figure}
+
+Figure~\ref{fig:10000_vae_latent_space_distribution} shows the distribution of dsprites validation images.
+Noticeable, the ninth dimension is far less Gaussian than the other nine dimensions.
+As \say{object shape} is the only categorical factor of variation, one could assume that the ninth dimension encodes \say{object shape}.
+However, this raises the question why there are more than three peaks for the ninth dimension.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_shape_1.png}
+        \caption{Latent space distribution of images with shape \textit{Square}}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_shape_2.png}
+        \caption{Latent space distribution of images with shape \textit{Ellipse}}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_shape_3.png}
+        \caption{Latent space distribution of images with shape \textit{Heart}}
+    \end{subfigure}
+    \caption{Histogram of dsprites images with a certain shape from the validation set in 100 bins}
+    \label{fig:10000_vae_latent_space_distribution_shapes}
+\end{figure}
+
+Figure~\ref{fig:10000_vae_latent_space_distribution_shapes} shows the distribution of images with a certain shape.
+Even though there is some difference between the plots, the $\mu$-values in the ninth dimension still are assigned to different and distinct areas within the ninth dimension.
+\textit{Shape} alone does not explain the strong peaks in the ninth dimension.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_scale_0_5.png}
+        \caption{Latent space distribution of images with scale = 0.5}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_scale_0_6.png}
+        \caption{Latent space distribution of images with scale = 0.6}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_scale_0_7.png}
+        \caption{Latent space distribution of images with scale = 0.7}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_scale_0_8.png}
+        \caption{Latent space distribution of images with scale = 0.8}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_scale_0_9.png}
+        \caption{Latent space distribution of images with shape scale = 0.9}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_scale_1_0.png}
+        \caption{Latent space distribution of images with shape scale = 1.0}
+    \end{subfigure}
+    \caption{Histogram of dsprites images with a certain scale from the validation set in 100 bins}
+    \label{fig:10000_vae_latent_space_distribution_scales}
+\end{figure}
+
+Consider Figure~\ref{fig:10000_vae_latent_space_distribution_scales} showing distributions of images of differenct \textit{scales}.
+The scale values in the dsprites dataset are six distinct values in the range from 0.5 to 1.0.
+Apparently, a \ac{VAE} model with a too strong reconstruction term does not learn to interpolate between these values but assigns them to distinct areas of the latent space.
+
+Plotting only the images with a certain scale \textit{and} a certain shape, finally, explains the distinct peaks in the ninth dimension (see Figure~\ref{fig:10000_vae_latent_space_distribution_scales_and_shapes}).
+The model produces two peaks for each scale.
+One of the peaks attributes to the shape \textit{Heart}, the other one for the shapes \textit{Ellipse} and \textit{Square}.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_shape_1_scale_0_5.png}
+        \caption{Latent space distribution of images with scale = 0.5 and shape \textit{Square}}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_shape_2_scale_0_5.png}
+        \caption{Latent space distribution of images with scale = 0.5 and shape \textit{Ellipse}}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_shape_3_scale_0_5.png}
+        \caption{Latent space distribution of images with scale = 0.5 and shape \textit{Heart}}
+    \end{subfigure}
+    \caption{Histogram of dsprites images with scale = 0.5 and different shapes from the validation set in 100 bins}
+    \label{fig:10000_vae_latent_space_distribution_scales_and_shapes}
+\end{figure}
+
+Noteworthy, the model learns a hierarchical clustering in the ninth dimension.
+\textit{Shape} is a subcluster of \textit{Scale}.
+Certainly, this subclustering leads to highly entangled latent space and a highly un-Gaussian distribution.
+It allows, however, to violate the \textit{KL}-term in favor of the reconstruction term in just one instead of two dimensions.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_10000_traverse_square_ellipse.png}
+        \caption{Latent space traversal from \textit{Square} $\rightarrow$ \textit{Ellipse}}
+        \label{subfig:10000_vae_latent_space_traversal_square_to_ellipse}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_10000_traverse_ellipse_heart.png}
+        \caption{Latent space traversal from \textit{Ellipse} $\rightarrow$ \textit{Heart}}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_10000_traverse_heart_square.png}
+        \caption{Latent space traversal from \textit{Heart} $\rightarrow$ \textit{Square}}
+        \label{subfig:10000_vae_latent_space_traversal_heart_to_square}
+    \end{subfigure}
+    \caption{Latent space traversal between latent space representations of images with certain shapes for 10,000-\ac{VAE}. Color-values were inverted for this plot.}
+    \label{fig:10000_vae_latent_space_traversal_shape_to_shape}
+\end{figure}
+
+Figure~\ref{fig:10000_vae_latent_space_traversal_shape_to_shape} shows the latent space traversal between different shapes\footnote{The corresponding plots for the other model can be found in Appendix~\ref{sec:additional_plots_latent_space_entanglement}.}.
+For the purpose of the plot, the latent representations $\bm{z}_1, \bm{z}_2$ of two $\bm{x}_i$ with a certain shape and the same configuration of the other parameters was obtained and interpolated between linearly.
+Figure~\ref{fig:10000_vae_latent_space_traversal_shape_to_shape} shows the reconstructions of 21 evenly spaced points on the line segment between $\bm{z}_1$ and $\bm{z}_2$.
+It shows the high degree of latent space entanglement: sudden position changes (Figure~\ref{subfig:10000_vae_latent_space_traversal_square_to_ellipse}) or sudden emergence of new objects (Figure~\ref{fig:10000_vae_latent_space_traversal_shape_to_shape}).
+
+Importantly, obtaining $\bm{z}$ by fixing only the shape and the scale\footnote{Based on the cluster analysis, not fixing the scale would easily lead to regions with low probability density.} for an $\bm{x}_i$ and averaging over all other configurations was not successful.
+It lead to empty images as it probably lead to $\bm{z}_i$'s in regions of the latent space with low probability density.
+Furthermore, for the latent space traversal shown in Figure~\ref{fig:10000_vae_latent_space_traversal_shape_to_shape}, it was possible to always find parameter combinations where the traversal lead to empty images in the middle of the line segment.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_7500_dist.png}
+        \caption{Reconstruction term weight 7,500}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_5000_dist.png}
+        \caption{Reconstruction term weight 5,000}
+    \end{subfigure}
+    \caption{Histogram of 73,728 dsprites images from the validation set in 100 bins for \ac{VAE} with different reconstruction term weights}
+    \label{fig:7500_5000_vae_latent_space_distribution_scales_and_shapes}
+\end{figure}
+
+Figure~\ref{fig:7500_5000_vae_latent_space_distribution_scales_and_shapes} shows the latent space distribution of \acp{VAE} with a reduced reconstruction term weight, i.e. an increase \ac{KL-divergence} term weight.
+The histograms look more Gaussian and in fact the \ac{KL-divergence} on the validation set decreased from 22.744 (reconstruction loss weight: 10,000) to 22.271 (reconstruction loss weight: 7,500) or, respectively, 18.172 (reconstruction loss weight: 5,000).
+Surprisingly, the difference between 10,000-\ac{VAE} and 7,500-\ac{VAE} is small on the validation data.
+
 \subsection{Feature Map Stripes}\label{subsec:feature-map-stripes}
 
 \begin{figure}

@@ -7,8 +7,6 @@ from PIL import Image
 from keras import Model
 from keras.layers import Conv2D, Dense
 from matplotlib import pyplot as plt, cm
-from matplotlib.axis import Axis
-from matplotlib.colorbar import Colorbar
 from matplotlib.colors import Normalize
 from matplotlib.figure import Figure
 

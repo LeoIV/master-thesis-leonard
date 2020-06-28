@@ -701,7 +701,7 @@ Consider Equation~\ref{eq:elbo_error_term} describing the loss function in a \ac
 \citet{higgins2017beta} discovered that weighting both terms, the KL-divergence and the reconstruction loss, equally leads to suboptimal results in terms of \textit{feature disentanglement}.
 They therefore formulated the $\beta$-VAE learning objective that adds an additional hyperparameter $\beta$ to the loss function, controlling the relative weights of the two terms:
 \begin{align}
-    \mathbb{E}_{q_{\phi}(\bm{z} | \bm{x})}\left[\log p_{\theta}(\bm{x} | \bm{z})\right]-\beta \kldiv{q_{\phi}(\bm{z} | \bm{x})}{p(\bm{z})}
+    \mathbb{E}_{q_{\phi}(\bm{z} | \bm{x})}\left[\log p_{\theta}(\bm{x} | \bm{z})\right]-\beta \kldiv{q_{\phi}(\bm{z} | \bm{x})}{p(\bm{z})} \label{eq:beta-vae}
 \end{align}
 
 A value $\beta > 1$ puts more emphasis on the KL-term compared to the original \ac{VAE} loss function ($\beta = 1$).
@@ -710,7 +710,10 @@ This requires that some factors of the data are conditionally independent, \cite
 
 Setting $\beta > 1$ also lowers the influence of the reconstruction error in the \ac{VAE} training objective.
 This leads to worse reconstructions.
-The right parameter choice, therefore, is context dependent.
+Hence, the right parameter choice is context dependent.
+
+\textbf{TODO:}
+Add paragraph on \citet{burgess2018understanding}
 
 \paragraph{\ac{VAE}-\ac{GAN}}
 \ac{VAE}-\acp{GAN}~\citep{larsen2015autoencoding} are a variation of \acp{VAE} specifically designed to replace the pixel-wise reconstruction loss.
