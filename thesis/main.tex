@@ -101,26 +101,26 @@ bla bla bla
 
 Research in artificial neural networks has risen in recent years due to their success in a large variety of different tasks.
 This increase in research has led to progressively better network architectures, achieving better and better results.
-The improvement of network architectures, however, is mainly driven by the question whether a new improvement will lead to better results \citep{lindsay2020convolutional}.
+However, the improvement of network architectures is mainly driven by the question of whether a new improvement will lead to better results \citep{lindsay2020convolutional}.
 
-Biological plausibility, an important consideration in the field of computational neuroscience, often is of no interest to researchers aiming at solving a complex problem.
-Even though progress in neural network research has become more and more disconnected from the biological example, they are inspired by biology.
+Biological plausibility, an essential consideration in computational neuroscience, is often of no interest to researchers aiming at solving a complex problem.
+Even though progress in neural network research has become more disconnected from the biological example, they are inspired by biology.
 Modern neural networks operating on images (mainly \acp{CNN}) indeed share many features with the visual system.
 
-Even though neural networks are trained in a manner largely detached from the way the brain learns and builds memories, it has been shown that image classification networks are related to the visual system, not only areas where this relatedness has been built into the model.
+Even though neural networks are trained in a manner different from the way the brain learns and builds memories, it has been shown that image classification networks are related to the visual system, not only areas where this relatedness has been built into the model.
 
-Both, the biological foundation of \acp{CNN} and the more recent insights on their more indirect relatedness to the visual system qualify them as a potentially good model of the visual system.
+Both the biological foundation of \acp{CNN} and the more recent insights on their more indirect relatedness to the visual system qualify them as a potentially useful visual system model.
 
-Unfortunately, the neural networks where this kind of relatedness has been discovered so far are trained in a supervised manner, requiring lots of labeled data.
-This kind of learning is disconnected from human perception where often one single example is sufficient when it comes to grouping objects into classes.
+Unfortunately, the neural networks where this kind of relatedness has been discovered are trained in a supervised manner, requiring lots of labeled data.
+This kind of learning is disconnected from human perception, where often one single example is sufficient when it comes to grouping objects into classes.
 
 The \ac{VAE} is one important representative of a class of models \textit{generative models}.
 This class of models allows a different training procedure, still requiring many samples but no labels.
-Furthermore, \acp{VAE} build generalizable latent representations of inputs which might be similar to the abstract representation of the brain when perceiving the world.
+FFurthermore, \acp{VAE} build generalizable latent representations of inputs, which might be similar to the abstract representation of the brain when perceiving the world.
 
 \acp{VAE}, therefore, could be an important step towards a more realistic model of the visual system.
 
-This thesis aims at answering the question whether \acp{VAE} prove to be a successful model of the visual system.
+This thesis aims to answer whether \acp{VAE} prove to be a successful model of the visual system.
 
 \section{Theoretical Background}\label{sec:theoretical-background}
 \input{background}
@@ -393,6 +393,52 @@ But also, this thesis discussed ways to extend these models to better model the 
 \end{landscape}
 
 \pagebreak
+\section{Feature Extraction Network in Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation}}\label{sec:appendix_feature_extraction_network_ppl_dsprites}
+\begin{lstlisting}[caption={Feature extraction network for \ac{PPL} computation.},captionpos=b]
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+discriminator_input (InputLa (None, 64, 64, 1)         0
+_________________________________________________________________
+conv2d_91 (Conv2D)           (None, 32, 32, 64)        1664
+_________________________________________________________________
+batch_normalization_114 (Bat (None, 32, 32, 64)        256
+_________________________________________________________________
+leaky_re_lu_55 (LeakyReLU)   (None, 32, 32, 64)        0
+_________________________________________________________________
+conv2d_92 (Conv2D)           (None, 16, 16, 128)       204928
+_________________________________________________________________
+batch_normalization_115 (Bat (None, 16, 16, 128)       512
+_________________________________________________________________
+leaky_re_lu_56 (LeakyReLU)   (None, 16, 16, 128)       0
+_________________________________________________________________
+conv2d_93 (Conv2D)           (None, 8, 8, 256)         295168
+_________________________________________________________________
+batch_normalization_116 (Bat (None, 8, 8, 256)         1024
+_________________________________________________________________
+leaky_re_lu_57 (LeakyReLU)   (None, 8, 8, 256)         0
+_________________________________________________________________
+conv2d_94 (Conv2D)           (None, 8, 8, 512)         1180160
+_________________________________________________________________
+batch_normalization_117 (Bat (None, 8, 8, 512)         2048
+_________________________________________________________________
+leaky_re_lu_58 (LeakyReLU)   (None, 8, 8, 512)         0
+_________________________________________________________________
+conv2d_95 (Conv2D)           (None, 3, 3, 3)           1539
+_________________________________________________________________
+flatten_31 (Flatten)         (None, 27)                0
+_________________________________________________________________
+dense_31 (Dense)             (None, 3)                 84
+_________________________________________________________________
+activation_31 (Activation)   (None, 3)                 0
+=================================================================
+Total params: 1,687,383
+Trainable params: 1,685,463
+Non-trainable params: 1,920
+_________________________________________________________________
+\end{lstlisting}
+
+\pagebreak
 
 \section{Discriminator Network used in Section \ref{subsec:vae-generated-samples-vs-true-samples}}\label{sec:listing_discriminator_network}
 \begin{lstlisting}[caption={The discriminator network used to distinguish generated \ac{VAE}/\ac{VLAE} samples from true \textsc{MNIST} images.},captionpos=b]
@@ -457,6 +503,7 @@ _________________________________________________________________
 \acro{V4}{Quaternary Visual Cortex}
 \acro{LGN}{Lateral Geniculate Nucleus}
 \acro{TEO}{Temporo-Occipital Area}
+\acro{PPL}{Perceptual Path Length}
 \end{acronym}
 \newpage
 \listoffigures

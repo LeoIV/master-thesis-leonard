@@ -227,7 +227,6 @@ A cell in a \ac{RDM} then contains the correlation of the activity patterns for 
 \citet{eickenberg2017seeing} explicitly discuss \acp{CNN} as models of the visual system.
 Their findings show that \say{early visual areas are better described by lower level convolutional net layers and later visual areas by higher level net layers, exhibiting a progression across ventral and dorsal streams}~\citep{eickenberg2017seeing, wen2018neural}.
 
-
 The similarity of the \acp{RDM} is evidence of that supervised \acp{CNN} and the human \ac{IT} have a similar high-level encoding of information.
 
 \citet{khaligh2014deep} also show that this is not true for a variety of unsupervised models.
@@ -235,6 +234,7 @@ The unsupervised models under investigation, however, are only losely related to
 The question whether \acp{VAE} show similar \acp{RDM} as the human \ac{IT}, therefore, remains.
 
 It has been shown that \acp{VAE}, trained in a self-supervised manner, partially learn Gabor wavelets when trained to predict the next image in a sequence of images~\citep{palm2012prediction}.
+Also, there are unsupervised models that learn Gabor wavelets~\citep{berkes2005slow}.
 
 \subsection{Types of Learning}\label{subsec:types-of-learning}
 
@@ -338,8 +338,10 @@ Reproducing the data distribution is what is desired in generative methods (see 
 
 Recent improvements on \acp{GAN} have led to synthesis of highly natural images as shown in Figure~\ref{fig:gan_samples}.
 
-\paragraph{Problems with \acp{GAN}}
-\textbf{DRAFT}
+The main disadvantage of \acp{GAN} is training stability.
+When training \acp{GAN}, one commonly encounters \textit{mode collapse} or \textit{loss oscillation}.
+For mode collapse, the generator produces only few or even just one sample~\citep{che2016mode}.
+Loss oscillation occurs when generator and discriminator alternatingly become stronger and weaker~\citep{ham2020unbalanced}.
 
 \subsubsection{Variational Autoencoders}\label{subsec:variational-autoencoders}
 
@@ -480,11 +482,6 @@ Representation learning can be understood as \say{learning representations of th
 While this is a rather broad definition, this thesis focuses on \textit{hierarchical representations}, since this is what can be observed in the visual cortex~\citep{rodriguez2015hierarchical}.
 
 The following paragraphs introduce different (hierarchical) representation learning approaches relevant to the techniques used in the course of this thesis.
-
-\paragraph{The Latent Space}
-\textbf{DRAFT!}
-\citet{shao2018riemannian,arvanitidis2017latent} discuss if the latent space is a Riemann space.
-Elaborate on this and the consequences of this assumption in terms of latent space traversal and smoothness of the latent / semantic space.
 
 \paragraph{InfoGAN}
 InfoGANs~\cite{chen2016infogan} address feature learning in \acp{GAN} by \say{decomposing the input noise vector into two parts}~\citep{chen2016infogan}.
@@ -712,8 +709,12 @@ Setting $\beta > 1$ also lowers the influence of the reconstruction error in the
 This leads to worse reconstructions.
 Hence, the right parameter choice is context dependent.
 
-\textbf{TODO:}
-Add paragraph on \citet{burgess2018understanding}
+\citet{burgess2018understanding} show that disentangled representations and a good reconstruction quality can be achieved by giving the model \say{control of the encoding capacity}.
+This is done by introducing a parameter $C$ to Equation~\ref{eq:beta-vae}~\citep{burgess2018understanding}:
+\begin{align}
+    \mathbb{E}_{q_{\phi}(\mathbf{z} \mid \bm{x})}\left[\log p_{\theta}(\bm{x} \mid \bm{z})\right]-\gamma\left|D_{K L}\left(q_{\phi}(\bm{z} \mid \bm{x}) \| p(\bm{z})\right)-C\right|
+\end{align}
+During training, $C$ is gradually increased from zero to a higher value (25 in case of dsprites with $\gamma=1000$ \citep{burgess2018understanding}).
 
 \paragraph{\ac{VAE}-\ac{GAN}}
 \ac{VAE}-\acp{GAN}~\citep{larsen2015autoencoding} are a variation of \acp{VAE} specifically designed to replace the pixel-wise reconstruction loss.
@@ -819,13 +820,7 @@ Compared to the \ac{VAE} that uses a pixelwise loss on the reconstructions, \ac{
 Except for this loss, \ac{ALAE} by no means forces the input to be similar to the reconstruction.
 This mitigates the problem of the pixelwise loss in \acp{VAE} that is assumed to be the reason for blurry reconstructions.
 
-\paragraph{Other stuff}
-\textbf{DRAFT!}
-\begin{itemize}
-    \item \citet{tschannen2018recent} give an overview over \say{recent advances in autoencoder-based representation learning}
-    \item Discuss VAEs on sequences of images.
-    \item Check \citet{pidhorskyi2020adversarial} for more related work.
-\end{itemize}
+\citet{tschannen2018recent} further discuss \say{recent advances in autoencoder-based representation learning}.
 
 \subsection{Latent Space Disentanglement}\label{subsec:feature-disentanglement}
 \textit{Latent Space Disentanglement} is a concept not to be confused with \textit{Latent Space Separability} (see Section~\ref{subsec:feature-separability}).
@@ -899,16 +894,22 @@ In the course of this thesis, \textit{Semantic Representations} are somewhat rel
 Word embeddings~\citep{mikolov2013efficient} are a vectorized representation of words in a vector space.
 The training procedure learns a mapping from word into the latent space such that the word's position itself has meaning.
 One prominent example is that the vector space allows \say{simple algebraic operations[...]. [I]t was shown for example that \textit{vector}(\say{King}) - \textit{vector}(\say{Man}) + \textit{vector}(\say{Woman}) results in a vector that is closest to the vector representation of the word \textit{Queen} [...]}~\citep{mikolov2013efficient}.
+For word representations, it has been shown that they correlate with brain activity fMRI data\citep{ruan2016exploring, anderson2013words}.
 
 Just like the brain maps similar visual stimuli to neurons close to one another, a semantic representation should be an encoding of the concept where encodings of similar concepts are close to one another according to some distance metric.
 
 Unfortunately, a dense vector (as in word embeddings) as a semantic representation is rather unrelated to a subpopulation of active neurons.
-The question of how to obtain good semantic representations remains.
-One requirement could be that a model leading to semantic representations should behave like the biological example.
+Another consideration is the \textit{mode} of perception.
+Different brain areas may be activated by different modes of presentation (e.g. \textit{visual} vs. \textit{auditory}) but only the brain regions that are active regardless of the mode of presentation are candidate regions for amodal representations~\citep{fairhall2013brain}.
+\citet{fairhall2013brain} attempt to find these brain regions by analyzing which brain regions are active for textual and visual stimuli (both presented visually).
 
-It has been reported that the activations of hidden layers in supervised \acp{CNN} explain \ac{IT} cortical representation~\citep{khaligh2014deep,cadieu2014deep}.
+All in all, the question of how to obtain and assess good semantic representations remains.
+One minimum requirement, albeit, is that (amodal) semantic representations should behave like the biological example.
 
-Additionally, there is some evidence that unsupervised models do not explain \ac{IT} cortical representation (or by far worse than supervised models)~\citep{khaligh2014deep}.
-Finally, it remains unclear if Gabor wavelets emerge in unsupervised \acp{CNN}~\citep{han2019variational}.
-There are, however, unsupervised models that learn Gabor wavelets~\citep{berkes2005slow}.
+This thesis focuses on visual-modal semantic representations.
+
+For visual input, it has been shown that higher-layer activations of supervised \acp{CNN} explain \ac{IT} cortical representation~\citep{khaligh2014deep,cadieu2014deep}.
+For unsupervised models operating on image data, in contrast, there is some evidence that these models do not explain \ac{IT} cortical representation (or by far worse than supervised models)~\citep{khaligh2014deep} - even though not explicitly for \acp{CNN}.
+
+\acp{CNN}, therefore, seem to be a promising candidate for visual-modal semantic representations.
 

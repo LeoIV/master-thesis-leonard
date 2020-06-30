@@ -789,6 +789,54 @@ Figure~\ref{fig:7500_5000_vae_latent_space_distribution_scales_and_shapes} shows
 The histograms look more Gaussian and in fact the \ac{KL-divergence} on the validation set decreased from 22.744 (reconstruction loss weight: 10,000) to 22.271 (reconstruction loss weight: 7,500) or, respectively, 18.172 (reconstruction loss weight: 5,000).
 Surprisingly, the difference between 10,000-\ac{VAE} and 7,500-\ac{VAE} is small on the validation data.
 
+To account for latent space disentanglement, the \ac{PPL} for the latent spaces of the different models is computed.
+The perceptual loss is obtained by a \ac{CNN} trained to predict dsprites object categories\footnote{The model architecture can be found in Appendix~\ref{sec:appendix_feature_extraction_network_ppl_dsprites}, the features are extracted in \say{conv2d\_94}. The model was trained for one epoch using categorical crossentropy with the Adam optimizer with an initial learning rate of 0.1. The model achieved a top-1 accuracy of 0.8 on the validation set.}.
+The \ac{PPL} was computed for 50 different random seeds.
+Each of these \ac{PPL}-computations interpolated at random 100 steps (dependent on the random seed).
+
+\begin{table}
+    \centering
+    \begin{tabular}{lrr}
+        \toprule
+        Model           & mean \ac{PPL} & standard deviation \\
+        \midrule
+        10,000-\ac{VAE} & 0.0067        & 0.0042             \\
+        7,500-\ac{VAE}  & 0.0409        & 0.0062             \\
+        5,000-\ac{VAE}  & 0.0022        & 0.0005             \\
+        \bottomrule
+    \end{tabular}
+    \caption{\acfp{PPL} for the different models latent spaces}
+    \label{tab:ppl-dsprites}
+\end{table}
+
+\begin{table}
+    \centering
+    \begin{tabular}{lrr}
+        \toprule
+        Model Comparison & $p$-value \\
+        \midrule
+        10,000-\ac{VAE} vs. 7,500-\ac{VAE} & 0.0067 & 0.0042 \\
+        7,500-\ac{VAE} vs. 5,000-\ac{VAE}  & 0.0409 & 0.0062 \\
+        10,000-\ac{VAE} vs. 5,000-\ac{VAE} & 0.0022 & 0.0005 \\
+        \bottomrule
+    \end{tabular}
+    \caption{$p$-values of a two-sided Wilcoxon signed-rank test}
+    \label{tab:ppl-dsprites-p-values}
+\end{table}
+
+Table~\ref{tab:ppl-dsprites} shows mean \ac{PPL} values and the standard deviations, Table~\ref{tab:ppl-dsprites-p-values} gives the $p$-values of the model comparisons.
+Surprisingly, 10,000-\ac{VAE} has a lower \ac{PPL} than 7,500-\ac{VAE}.
+
+This can be explained by the high non-Gaussianity of the latent space of 10,000-\ac{VAE}.
+Many reconstructions lead to black images.
+The perceptual loss between two similar images, however, is low - leading to a low perceptual path length.
+
+As the latent space Gaussianity improves for 7,500-\ac{VAE}, the \ac{PPL} first increases and then decreases again as the latent space is truly disentangled.
+It, therefore, can be argued that latent space Gaussianity is one necessary condition to compare models by \ac{PPL}.
+Only if the sampling does not lead to $z$-space regions of low probability density, \ac{PPL} gives interpretable results.
+
+In fact, 5,000-\ac{VAE} by far has the lowest \ac{PPL} value of the models with a Gaussian latent space (7,500-\ac{VAE} and 5,000-\ac{VAE}).
+
 \subsection{Feature Map Stripes}\label{subsec:feature-map-stripes}
 
 \begin{figure}
