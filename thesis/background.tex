@@ -3,8 +3,14 @@ The following section presents important theoretical concepts that used in this 
 \subsection{Human Cognition}\label{subsec:human-brain-structure}
 
 \subsubsection{Cells}
+The human nervous systems has two types of cells, \textit{neurons} and \textit{glial cells} or \textit{glia}~\citep[p. 71]{mack2013principles}.
+Even though glia occur two to ten times more often in the nervous system than neurons~\citep[p. 24]{mack2013principles}, they - unlike neurons - \say{are not directly involved in electrical signaling}~\citep[p. 26]{mack2013principles} and therefore not further described in the course of this work.
 
-\begin{wrapfigure}[18]{R}{0.3\textwidth}
+Neurons in different brain regions can take different forms.
+However, regardless of their specific configuration, they have four defined regions: \say{(1) the cell body, (2) dendrites, (3) axon, and (4) presynaptic terminals}~\citep[p. 22]{mack2013principles} (see Figure~\ref{fig:neuron_structure}).
+The dendrites receive input from other neurons while axons convey electrical signals to other neuron's dendrites.
+
+\begin{wrapfigure}[34]{R}{0.3\textwidth}
     \begin{center}
         \includegraphics[width=0.28\textwidth]{images/neuron.jpeg}
     \end{center}
@@ -12,12 +18,6 @@ The following section presents important theoretical concepts that used in this 
     \label{fig:neuron_structure}
 \end{wrapfigure}
 
-The human nervous systems has two types of cells, \textit{neurons} and \textit{glial cells} or \textit{glia}~\citep[p. 71]{mack2013principles}.
-Even though glia occur two to ten times more often in the nervous system than neurons~\citep[p. 24]{mack2013principles}, they - unlike neurons - \say{are not directly involved in electrical signaling}~\citep[p. 26]{mack2013principles} and therefore not further described in the course of this work.
-
-Neurons in different brain regions can take different forms.
-However, regardless of their specific configuration, they have four defined regions: \say{(1) the cell body, (2) dendrites, (3) axon, and (4) presynaptic terminals}~\citep[p. 22]{mack2013principles} (see Figure~\ref{fig:neuron_structure}).
-The dendrites receive input from other neurons while axons convey electrical signals to other neuron's dendrites.
 \textbf{Hier könnte noch deutlich mehr kommen.}
 
 \subsubsection{Human Brain Structure}
@@ -95,7 +95,7 @@ Even though the two pathways can exchange information~\citep[p. 564]{mack2013pri
 
 \subsubsection{Visual Object Perception}\label{subsec:visual-object-perception}
 
-\begin{wrapfigure}[12]{R}{0.3\textwidth}
+\begin{wrapfigure}[16]{R}{0.3\textwidth}
     \begin{center}
         \includegraphics[width=0.28\textwidth]{images/rubens_sketches.jpg}
     \end{center}
@@ -271,7 +271,7 @@ Self-supervised learning can also be seen as a subtype of unsupervised learning,
 Another example for self-supervised learning are word embeddings \textbf{REF}.
 
 \paragraph{Unsupervised Learning}
-\begin{wrapfigure}[11]{R}{0.5\textwidth}
+\begin{wrapfigure}[18]{R}{0.5\textwidth}
     \centering
     \includegraphics[width=.48\textwidth]{images/latent_spaces/mnist/vae/embeddings_mu_6.png}
     \caption[Clusters of data points]{Data points colored by their corresponding class building clusters.}
@@ -881,7 +881,13 @@ Strictly unsupervised approaches are not guaranteed to have both of the properti
 Suprisingly, however, most unsupervised approaches for Latent Space Separability empirically show to have these properties to a high degree~\citep{Shu2020Weakly}.
 
 \subsection{Semantic Representations}\label{subsec:semantic-representations}
-For the term \textit{Semantic Representations}, a universally accepted definition yet has to be found.
+
+Section~\ref{subsec:visual-object-perception} described the case of a subject who was able to copy drawings of objects but not to capture their \textit{meaning}.
+\citet[pp. 1069, 1070]{squire2012fundamental} hypothesize that the subject's \ac{IT} was impaired, leading to an \say{inability to generate a high-level representation of the object}.
+
+The term \textit{Semantic Representation} refers to these high-level representations that allow to capture the \textit{meaning} of a stimulus.
+
+Albeit, a universally accepted definition for this term yet has to be found.
 \textit{Semantics} is defined\footnote{\href{https://www.lexico.com/en/definition/semantics}{https://www.lexico.com/en/definition/semantics}, last access: 21/06/2020} as
 \begin{displayquote}
     The branch of linguistics and logic concerned with meaning. There are a number of branches and subbranches of semantics, including formal semantics, which studies the logical aspects of meaning, such as sense, reference, implication, and logical form, lexical semantics, which studies word meanings and word relations, and conceptual semantics, which studies the cognitive structure of meaning.
@@ -897,9 +903,10 @@ One prominent example is that the vector space allows \say{simple algebraic oper
 For word representations, it has been shown that they correlate with brain activity fMRI data\citep{ruan2016exploring, anderson2013words}.
 
 Just like the brain maps similar visual stimuli to neurons close to one another, a semantic representation should be an encoding of the concept where encodings of similar concepts are close to one another according to some distance metric.
-
 Unfortunately, a dense vector (as in word embeddings) as a semantic representation is rather unrelated to a subpopulation of active neurons.
+
 Another consideration is the \textit{mode} of perception.
+Section~\ref{subsec:visual-object-perception} discusses that the \ac{IT} seems to play a crucial role in building and accessing semantic representations for visual input.
 Different brain areas may be activated by different modes of presentation (e.g. \textit{visual} vs. \textit{auditory}) but only the brain regions that are active regardless of the mode of presentation are candidate regions for amodal representations~\citep{fairhall2013brain}.
 \citet{fairhall2013brain} attempt to find these brain regions by analyzing which brain regions are active for textual and visual stimuli (both presented visually).
 

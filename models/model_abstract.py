@@ -68,6 +68,8 @@ class ModelWrapper(ABC):
             models_to_plot["encoder"] = self.encoder
         if hasattr(self, 'decoder'):
             models_to_plot["decoder"] = self.decoder
+        if hasattr(self, 'discriminator'):
+            models_to_plot["discriminator"] = self.discriminator
 
         for k, v in models_to_plot.items():
             try:

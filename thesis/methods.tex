@@ -1,5 +1,11 @@
 The following Sections describe the methods used in the course of this thesis.
 
+\subsection{Implementation Details}\label{subsec:implementation-details}
+
+All models were implemented with Keras\footnote{\href{https://keras.io/}{https://keras.io/}, last access: 07/01/2020} in Version 2.2.4 using the TensorFlow\footnote{\href{https://www.tensorflow.org/}{https://www.tensorflow.org/}, last access: 07/01/2020} backend in Version 1.15..
+The models were trained on Tesla V100-DGXS GPUs with 16GB of RAM.
+The model code can be found under \href{https://github.com/LeoIV/master-thesis-leonard}{https://github.com/LeoIV/master-thesis-leonard}.
+
 \subsection{Datasets}\label{subsec:datasets}
 
 Five different datasets were used to train the models.
@@ -79,11 +85,47 @@ The dataset also contains the factor labels for each image.
 
 \subsection{Models}\label{subsec:models}
 
-Four different base models were evaluated in the course of this thesis.
+Four different base \ac{VAE} models were evaluated in the course of this thesis.
+Furthermore, two \say{AlexNet} models were used for some additional experiments.
+
+The models are described in the following.
+Importantly, the models were varied based on the input dimensionality, are more detailed description can be found in Appendix~\textbf{REF}.
 
 \subsubsection{VAE Model}
 
+\begin{figure}
+    \centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth,height=.85\textheight,keepaspectratio]{images/vae/encoder.png}
+        \caption{Encoder}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth,height=.85\textheight,keepaspectratio]{images/vae/decoder.png}
+        \caption{Decoder}
+    \end{subfigure}
+    \caption{\ac{VAE} model structure}
+    \label{fig:vae_model_structure}
+\end{figure}
+
 \subsubsection{VLAE Model}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth,height=.85\textheight,keepaspectratio]{images/vlae/encoder.png}
+        \caption{Encoder}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth,height=.85\textheight,keepaspectratio]{images/vlae/decoder.png}
+        \caption{Decoder}
+    \end{subfigure}
+    \caption{\ac{VLAE} model structure}
+    \label{fig:vlae_model_structure}
+\end{figure}
 
 \subsubsection{VAE-GAN Model}
 
@@ -92,6 +134,8 @@ Four different base models were evaluated in the course of this thesis.
 \subsubsection{AlexNet Classifier}
 
 \subsubsection{AlexNet VAE}
+
+
 
 \subsection{Visual Features Variational Autoencoders}\label{subsec:visual-features-variational-autoencoders}
 Different questions were asked investigate whether \acp{VAE} are a biologically plausible model of the Visual Cortex.
@@ -107,12 +151,12 @@ Since still no Gabor wavelets emerged (see Section~\ref{subsec:results_visual_fe
     \centering
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=\textwidth,height=.9\textheight,keepaspectratio]{alexnet-vae/encoder.png}
+        \includegraphics[width=\textwidth,height=.9\textheight,keepaspectratio]{images/alexnet-vae/encoder.png}
         \caption{Encoder}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=\textwidth,height=.9\textheight,keepaspectratio]{alexnet-vae/decoder.png}
+        \includegraphics[width=\textwidth,height=.9\textheight,keepaspectratio]{images/alexnet-vae/decoder.png}
         \caption{Decoder}
     \end{subfigure}
     \caption{AlexNet-VAE Network}
@@ -130,7 +174,7 @@ The encoder is was followed by the reparametrization layer and, subsequently, th
 \begin{figure}
     \centering
     \begin{center}
-        \includegraphics[height=0.9\textheight]{alexnet/model.png}
+        \includegraphics[height=0.9\textheight]{images/alexnet/model.png}
     \end{center}
     \caption[AlexNet Network]{AlexNet-inspired Image Classification Network}
     \label{fig:alexnet}

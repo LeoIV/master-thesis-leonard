@@ -1,7 +1,7 @@
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
-\usepackage{geometry}
+\usepackage[margin=1.0in]{geometry}
 \usepackage{parskip}
 \usepackage{subcaption}
 \usepackage{wrapfig}
@@ -21,10 +21,11 @@
 \usepackage{bm}
 \usepackage{amssymb}
 \usepackage{tikz}
+\usepackage{soul}
 \usepackage{lscape}
 \usetikzlibrary{shapes,positioning,decorations.pathreplacing}
 \addbibresource{literature.bib}
-\renewcommand{\baselinestretch}{1.5}
+\renewcommand{\baselinestretch}{1.0}
 % @formatter:off
 \let\oldsection\section
 \renewcommand\section{\clearpage\oldsection}
@@ -393,6 +394,27 @@ But also, this thesis discussed ways to extend these models to better model the 
 \end{landscape}
 
 \pagebreak
+\section{Additional Plots for Section~\ref{subsubsec:pixel_wise_statistics}}\label{sec:appendix_pixel_wise_statistics}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/vlae_kde.png}
+\caption{Histogram of mean $z$-values for different layers and dimensions of \ac{VLAE} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/vae_kde.png}
+\caption{Histogram of mean $z$-values for different layers and dimensions of \ac{VAE} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/vae_gan_kde.png}
+\caption{Histogram of mean $z$-values for different layers and dimensions of \ac{VAE}-\ac{GAN} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\end{figure}
+
+\pagebreak
 \section{Feature Extraction Network in Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation}}\label{sec:appendix_feature_extraction_network_ppl_dsprites}
 \begin{lstlisting}[caption={Feature extraction network for \ac{PPL} computation.},captionpos=b]
 _________________________________________________________________
@@ -504,6 +526,8 @@ _________________________________________________________________
 \acro{LGN}{Lateral Geniculate Nucleus}
 \acro{TEO}{Temporo-Occipital Area}
 \acro{PPL}{Perceptual Path Length}
+\acro{PDF}{Probability Density Function}
+\acro{KDE}{Kernel Density Estimation}
 \end{acronym}
 \newpage
 \listoffigures
