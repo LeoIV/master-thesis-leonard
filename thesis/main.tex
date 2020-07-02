@@ -94,6 +94,10 @@ bla bla bla
 
 \tableofcontents
 \newpage
+\listoffigures
+\newpage
+\listoftables
+\newpage
 \setcounter{savepage}{\arabic{page}}
 \pagenumbering{arabic}
 
@@ -396,11 +400,7 @@ But also, this thesis discussed ways to extend these models to better model the 
 \pagebreak
 \section{Additional Plots for Section~\ref{subsubsec:pixel_wise_statistics}}\label{sec:appendix_pixel_wise_statistics}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=.8\textwidth]{images/generated_vs_true/vlae_kde.png}
-\caption{Histogram of mean $z$-values for different layers and dimensions of \ac{VLAE} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
-\end{figure}
+
 
 \begin{figure}[H]
 \centering
@@ -410,8 +410,14 @@ But also, this thesis discussed ways to extend these models to better model the 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=.8\textwidth]{images/generated_vs_true/vae_gan_kde.png}
-\caption{Histogram of mean $z$-values for different layers and dimensions of \ac{VAE}-\ac{GAN} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/vlae_kde.png}
+\caption{Histogram of mean $z$-values for different layers and dimensions of \ac{VLAE} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/vlae_gan_kde.png}
+\caption{Histogram of mean $z$-values for different layers and dimensions of \ac{VLAE}-\ac{GAN} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
 \end{figure}
 
 \pagebreak
@@ -529,10 +535,6 @@ _________________________________________________________________
 \acro{PDF}{Probability Density Function}
 \acro{KDE}{Kernel Density Estimation}
 \end{acronym}
-\newpage
-\listoffigures
-\newpage
-\listoftables
 \newpage
 \input{erklaerung}
 

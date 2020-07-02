@@ -10,7 +10,7 @@ Neurons in different brain regions can take different forms.
 However, regardless of their specific configuration, they have four defined regions: \say{(1) the cell body, (2) dendrites, (3) axon, and (4) presynaptic terminals}~\citep[p. 22]{mack2013principles} (see Figure~\ref{fig:neuron_structure}).
 The dendrites receive input from other neurons while axons convey electrical signals to other neuron's dendrites.
 
-\begin{wrapfigure}[34]{R}{0.3\textwidth}
+\begin{wrapfigure}[28]{R}{0.3\textwidth}
     \begin{center}
         \includegraphics[width=0.28\textwidth]{images/neuron.jpeg}
     \end{center}
@@ -24,13 +24,6 @@ The dendrites receive input from other neurons while axons convey electrical sig
 
 The human brain is subdivided into six regions of different forms and functions: the medulla, pons, midbrain, cerebellum, diencephalon, and the cerebral hemispheres~\citep[p. 340]{mack2013principles} (see Figure~\ref{fig:human_brain_divisions}).
 Together with the spinal cord, it constitutes the \ac{CNS}~\citep[p. 340]{mack2013principles}.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=.4\textwidth]{images/brain_regions.jpeg}
-    \caption[Divisions of the human brain]{Five divisions of the human brain, the cerebral cortex as part of the cerebral hemispheres, and the spinal cord. Taken from \citet[p. 340]{mack2013principles}.}
-    \label{fig:human_brain_divisions}
-\end{figure}
 
 Medulla, pons, and midbrain constitute the \textit{brain stem}.
 The brain stem recieves input from \say{several specialized senses, such as hearing, balance and taste} and \say{mediates sensation and motor control of head, neck, and face}~\citep[p. 341]{mack2013principles}.
@@ -55,6 +48,13 @@ Neurons within the different layers show different kinds of connectivity.
 For example, Layer I mainly contains dendrites of cells in deeper layers where as Layers II and III contain \textit{pyramidal neurons} whose axons project onto other neuros~\citep[p. 346]{mack2013principles}.
 
 Furthermore, the neocortex is structured \textit{topographically}, i.e.~neurons within a sensory area (e.g. the skin or retina) are mapped onto the neocortex such that neighboring neurons in the sensory area ultimately map onto neighboring regions in the neocortex~\citep[p. 343]{mack2013principles}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.4\textwidth]{images/brain_regions.jpeg}
+    \caption[Divisions of the human brain]{Five divisions of the human brain, the cerebral cortex as part of the cerebral hemispheres, and the spinal cord. Taken from \citet[p. 340]{mack2013principles}.}
+    \label{fig:human_brain_divisions}
+\end{figure}
 
 \subsubsection{Visual Cortex}\label{subsubsec:visual-cortex}
 
@@ -271,7 +271,7 @@ Self-supervised learning can also be seen as a subtype of unsupervised learning,
 Another example for self-supervised learning are word embeddings \textbf{REF}.
 
 \paragraph{Unsupervised Learning}
-\begin{wrapfigure}[18]{R}{0.5\textwidth}
+\begin{wrapfigure}[16]{R}{0.5\textwidth}
     \centering
     \includegraphics[width=.48\textwidth]{images/latent_spaces/mnist/vae/embeddings_mu_6.png}
     \caption[Clusters of data points]{Data points colored by their corresponding class building clusters.}
@@ -822,6 +822,13 @@ This mitigates the problem of the pixelwise loss in \acp{VAE} that is assumed to
 
 \citet{tschannen2018recent} further discuss \say{recent advances in autoencoder-based representation learning}.
 
+\paragraph{Feature Consistency}
+
+One important property of the \ac{VAE} latent space is that it captures image semantics up to a certain degree.
+For a model trained on CelebA\footnote{See Section~\ref{celeba_dataset}.}, for example, it is possible to add sunglasses to a randomly generated face by adding the mean latent vector of images containing sunglasses~\citep{hou2017deep}.
+\citet{hou2017deep} train a model particularly tailored to have this property by using the \textit{perceptual loss} (the between hidden layer activations of a feature extraction network).
+\textbf{More could come here}
+
 \subsection{Latent Space Disentanglement}\label{subsec:feature-disentanglement}
 \textit{Latent Space Disentanglement} is a concept not to be confused with \textit{Latent Space Separability} (see Section~\ref{subsec:feature-separability}).
 These two concepts are explained in the following.
@@ -841,7 +848,7 @@ These two concepts are explained in the following.
         \caption{Mapping from latent space to feature space}
         \label{fig:feature_space_disentanglement_b}
     \end{subfigure}
-    \caption{The problem of latent space entanglement (taken from \citet{karras2019style})}
+    \caption[Latent Space Entanglement]{The problem of latent space entanglement (taken from \citet{karras2019style})}
     \label{fig:feature_space_disentanglement}
 \end{figure}
 

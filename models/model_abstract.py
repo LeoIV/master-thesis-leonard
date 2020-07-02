@@ -237,13 +237,27 @@ class VAEWrapper(DeepCNNModelWrapper, ABC):
                 kl_loss += -0.5 * K.sum(1 + lv.output - K.square(m.output) - K.exp(lv.output), axis=1)
             return kl_loss
 
+        def mean_lv(yt, yp):
+            lvs = 0
+            i = 0
+            for lv in self.logvar_layers:
+                lvs += lv.output
+                i += 1
+            return lvs / i
+
+        def min_lv(yt, yp):
+            lvs = []
+            for lv in self.logvar_layers:
+                lvs.append(K.min(lv.output))
+            return K.min(lvs)
+
         def vae_loss(y_true, y_pred):
             r_loss = vae_r_loss(y_true, y_pred)
             kl_loss = vae_kl_loss(y_true, y_pred)
             return r_loss + kl_loss
 
         optimizer = Adam(lr=learning_rate, decay=self.decay_rate)
-        self.model.compile(optimizer=optimizer, loss=vae_loss, metrics=[vae_r_loss, vae_kl_loss])
+        self.model.compile(optimizer=optimizer, loss=vae_loss, metrics=[vae_r_loss, vae_kl_loss, mean_lv, min_lv])
 
     def save(self):
         if not hasattr(self, 'encoder') and not hasattr(self, 'decoder'):

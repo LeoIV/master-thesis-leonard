@@ -12,9 +12,9 @@ Five different datasets were used to train the models.
 Four of the datasets contain images of different sizes, the fifth dataset provides additional labels for \textsc{Mnist}.
 The images were resized to match the model's excepted input sizes using Lanczos interpolation~\citep[pp. 223, ff]{burger2009principles}.
 
-\subsubsection{CelebA}
+\subsubsection{CelebA}\label{subsubsec:celeba_dataset}
 
-\begin{wrapfigure}[11]{R}{0.3\textwidth}
+\begin{wrapfigure}[14]{R}{0.3\textwidth}
     \begin{center}
         \includegraphics[width=0.28\textwidth]{images/celeba_sample_63.jpg}
     \end{center}
@@ -40,7 +40,7 @@ This curated version is commonly used as a baseline (\textbf{refs}).
 
 \subsubsection{MNIST}\label{subsubsec:mnist}
 
-\begin{wrapfigure}[10]{R}{0.2\textwidth}
+\begin{wrapfigure}[9]{R}{0.2\textwidth}
     \begin{center}
         \includegraphics[width=0.18\textwidth]{images/mnist_sample.png}
     \end{center}
@@ -58,11 +58,11 @@ The samples are grayscale images of size $28\times 28$pixels.
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/morpho_mnist_distribution.png}
-    \caption{Distribution of the \textsc{Morpho-MNIST} attributes for the different digits. Taken from~\citep{castro2019morpho}.}
+    \caption[Morpho-\textsc{Mnist} distribution]{Distribution of the Morpho-\textsc{Mnist} attributes for the different digits. Taken from~\citep{castro2019morpho}.}
     \label{fig:morpho_mnist_distribution}
 \end{figure}
 
-Morpho-MNIST~\citep{castro2019morpho} is an extension of the MNIST dataset that addresses the question: \say{[T]o what extent has my model learned to represent specific factors of
+Morpho-\textsc{Mnist}~\citep{castro2019morpho} is an extension of the \textsc{Mnist} dataset that addresses the question: \say{[T]o what extent has my model learned to represent specific factors of
 variation in the data?} ~\citep{castro2019morpho}.
 To address this questions, Morpho-MNIST provides the following (continuous) labels of morphological attributes of the MNIST samples: stroke length, stroke thickness, slant, width, and height.
 
