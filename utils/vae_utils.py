@@ -1,6 +1,50 @@
-from keras import backend as K
+import numpy as np
+from keras import backend as K, Model
 from keras.engine import Layer
 from keras.layers import Dense, Lambda
+
+
+def distance_measure(y1, y2, perc_loss: Model):
+    feat_1 = perc_loss.predict(y1)
+    feat_2 = perc_loss.predict(y2)
+    squared_difference = np.square(feat_1 - feat_2)
+    return np.mean(squared_difference, axis=(1, 2, 3))
+
+
+def normalize(v):
+    im = np.sqrt(np.sum(np.square(v), axis=-1, keepdims=True))
+    return v / im
+
+
+def slerp(a, b, t):
+    a = normalize(a)
+    b = normalize(b)
+    d = np.sum(a * b, axis=-1, keepdims=True)
+    p = t * np.arccos(d)
+    c = normalize(b - d * a)
+    d = a * np.cos(p) + c * np.sin(p)
+    return normalize(d)
+
+
+def perceptual_path_length(decoder, perc_loss: Model, num_samples=100, minibatch=32, sampling='full', epsilon=1e-4,
+                           seed=None):
+    distance_expr = []
+    for begin in range(0, num_samples, minibatch):
+        if seed is not None:
+            np.random.seed(begin * seed)
+        lat_t01 = np.random.standard_normal([minibatch * 2] + decoder.inputs[0].shape[1:])
+        lerp_t = np.random.uniform(size=[minibatch], low=0.0, high=1.0 if sampling == 'full' else 0.0)
+        lat_t0, lat_t1 = lat_t01[0::2], lat_t01[1::2]
+        lat_e0 = slerp(lat_t0, lat_t1, lerp_t[:, np.newaxis])
+        lat_e1 = slerp(lat_t0, lat_t1, lerp_t[:, np.newaxis] + epsilon)
+        dlat_e01 = np.reshape(np.stack([lat_e0, lat_e1], axis=1), lat_t01.shape)
+        images = decoder.predict(dlat_e01)
+
+        img_e0, img_e1 = images[0::2], images[1::2]
+
+        distance_expr.append(distance_measure(img_e0, img_e1, perc_loss) * (1 / epsilon ** 2))
+    all_distances = np.concatenate(distance_expr, axis=0)
+    return np.mean(all_distances), all_distances
 
 
 def sampling(args):

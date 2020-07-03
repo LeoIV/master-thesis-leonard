@@ -102,6 +102,7 @@ bla bla bla
 \pagenumbering{arabic}
 
 
+\acresetall
 \section{Introduction}\label{sec:introduction}
 
 Research in artificial neural networks has risen in recent years due to their success in a large variety of different tasks.
@@ -127,17 +128,19 @@ FFurthermore, \acp{VAE} build generalizable latent representations of inputs, wh
 
 This thesis aims to answer whether \acp{VAE} prove to be a successful model of the visual system.
 
+\acresetall
 \section{Theoretical Background}\label{sec:theoretical-background}
 \input{background}
 
-
+\acresetall
 \section{Methods}\label{sec:methods}
 \input{methods}
 
-
+\acresetall
 \section{Results and Discussion}\label{sec:results}
 \input{results}
 
+\acresetall
 \section{Conclusion}\label{sec:conclusion}
 
 This thesis discussed if \acfp{VAE} are candidate models of the visual cortex, potentially allowing to obtain semantic representations of the input.
@@ -168,31 +171,31 @@ But also, this thesis discussed ways to extend these models to better model the 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{images/notprop/mnist/vlae/ccs_0_2_vlae.png}
-\caption{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_3=\varphi$ for \ac{VLAE} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
+\caption[VLAE Pixel Proportionality - $\bm{z}_1$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_3=\varphi$ for \ac{VLAE} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{images/notprop/mnist/vlae/ccs_1_2_vlae.png}
-\caption{Proportionality of pixel intensities when fixing $\bm{z}_2 = \bm{z}_3=\varphi$ for \ac{VLAE} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
+\caption[VLAE Pixel Proportionality - $\bm{z}_2$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_2 = \bm{z}_3=\varphi$ for \ac{VLAE} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{images/notprop/mnist/vlae_gan/ccs_0_1_vlae_gan.png}
-\caption{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_2=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
+\caption[VLAE-GAN Pixel Proportionality - $\bm{z}_1$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_2=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{images/notprop/mnist/vlae_gan/ccs_0_2_vlae_gan.png}
-\caption{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_3=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
+\caption[VLAE-GAN Pixel Proportionality - $\bm{z}_1$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_3=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{images/notprop/mnist/vlae_gan/ccs_1_2_vlae_gan.png}
-\caption{Proportionality of pixel intensities when fixing $\bm{z}_2 = \bm{z}_3=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
+\caption[VLAE-GAN Pixel Proportionality - $\bm{z}_2$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_2 = \bm{z}_3=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
 \end{figure}
 
 
@@ -216,7 +219,7 @@ But also, this thesis discussed ways to extend these models to better model the 
 \caption{Latent space traversal from \textit{Heart} $\rightarrow$ \textit{Square}}
 \label{subfig:10000_vae_latent_space_traversal_heart_to_square}
 \end{subfigure}
-\caption{Latent space traversal between latent space representations of images with certain shapes for 7,500-\ac{VAE}. Color-values were inverted for this plot.}
+\caption[7,500-\ac{VAE} - Latent Space Traversal]{Latent space traversal between latent space representations of images with certain shapes for 7,500-\ac{VAE}. Color-values were inverted for this plot.}
 \label{fig:7500_vae_latent_space_traversal_shape_to_shape}
 \end{figure}
 
@@ -238,7 +241,7 @@ But also, this thesis discussed ways to extend these models to better model the 
 \caption{Latent space traversal from \textit{Heart} $\rightarrow$ \textit{Square}}
 \label{subfig:10000_vae_latent_space_traversal_heart_to_square}
 \end{subfigure}
-\caption{Latent space traversal between latent space representations of images with certain shapes for 5,000-\ac{VAE}. Color-values were inverted for this plot.}
+\caption[5,000-\ac{VAE} - Latent Space Traversal]{Latent space traversal between latent space representations of images with certain shapes for 5,000-\ac{VAE}. Color-values were inverted for this plot.}
 \label{fig:5000_vae_latent_space_traversal_shape_to_shape}
 \end{figure}
 
@@ -291,7 +294,7 @@ But also, this thesis discussed ways to extend these models to better model the 
 \caption{Latent space colored by digit identity}
 \label{subfig:vae_mnist_latent_space_identity}
 \end{subfigure}
-\caption{Latent space colored by different means of \ac{VAE}-\ac{GAN} with $dim_z=2$ trained on \textsc{Mnist} dataset}
+\caption[\ac{VAE}-\ac{GAN} Latent Space - \textsc{Mnist}]{Latent space colored by different means of \ac{VAE}-\ac{GAN} with $dim_z=2$ trained on \textsc{Mnist} dataset}
 \label{fig:vae_latent_space_mnist}
 \end{figure}
 
@@ -340,7 +343,7 @@ But also, this thesis discussed ways to extend these models to better model the 
 \caption{$z_{\i}$: digit identity}
 \label{subfig:vlae_mnist_latent_space_z_\i_identity}
 \end{subfigure}}
-\caption{Latent space colored by different means of \ac{VLAE}-\ac{GAN} with $dim_z=2$ trained on \textsc{Mnist} dataset}
+\caption[\ac{VLAE}-\ac{GAN} Latent Space - \textsc{Mnist}]{Latent space colored by different means of \ac{VLAE}-\ac{GAN} with $dim_z=2$ trained on \textsc{Mnist} dataset}
 \label{fig:vlae_latent_space_mnist}
 \end{figure}
 \end{landscape}
@@ -374,7 +377,7 @@ But also, this thesis discussed ways to extend these models to better model the 
 \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae_gan/embeddings_mu_4.png}
 \caption{Latent space colored by object $y$-position}
 \end{subfigure}
-\caption{t-SNE latent space embeddings colored by different means of \ac{VAE}-\ac{GAN} with $dim_z=6$ trained on dsprites dataset}
+\caption[\ac{VAE}-\ac{GAN} Latent Space - dsprites]{t-SNE latent space embeddings colored by different means of \ac{VAE}-\ac{GAN} with $dim_z=6$ trained on dsprites dataset}
 \label{fig:vae_gan_latent_space_dsprites}
 \end{figure}
 
@@ -400,24 +403,22 @@ But also, this thesis discussed ways to extend these models to better model the 
 \pagebreak
 \section{Additional Plots for Section~\ref{subsubsec:pixel_wise_statistics}}\label{sec:appendix_pixel_wise_statistics}
 
-
-
 \begin{figure}[H]
 \centering
 \includegraphics[width=.8\textwidth]{images/generated_vs_true/vae_kde.png}
-\caption{Histogram of mean $z$-values for different layers and dimensions of \ac{VAE} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\caption[\ac{VAE} Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VAE} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=.8\textwidth]{images/generated_vs_true/vlae_kde.png}
-\caption{Histogram of mean $z$-values for different layers and dimensions of \ac{VLAE} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\caption[\ac{VLAE} Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VLAE} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=.8\textwidth]{images/generated_vs_true/vlae_gan_kde.png}
-\caption{Histogram of mean $z$-values for different layers and dimensions of \ac{VLAE}-\ac{GAN} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\caption[\ac{VLAE}-\ac{GAN} Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VLAE}-\ac{GAN} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
 \end{figure}
 
 \pagebreak
@@ -509,31 +510,31 @@ _________________________________________________________________
 \begin{acronym}[TDMA]
 \acro{AdaIN}{Adaptive Instance Normalization}
 \acro{ALAE}{Adversarial Latent Autoencoder}
-\acro{VAE}{Variational Autoencoder}
 \acro{CNN}{Convolutional Neural Network}
+\acro{CNS}{Central Nervous System}
+\acro{ELBO}{Evidence Lower Bound}
+\acro{GAN}{Generative Adversarial Network}
 \acro{IT}{Inferior Temporal Cortex}
-\acro{ReLU}{Rectified Linear Unit}
-\acro{LeakyReLU}{Leaky Rectified Linear Unit}
 \acro{ILSVRC2017}{Large Scale Visual Recognition Challenge 2017}
-\acro{MSE}{Mean Squared Error}
-\acro{RDM}{Representational Dissimilarity Matrix}
+\acro{LeakyReLU}{Leaky Rectified Linear Unit}
+\acro{LGN}{Lateral Geniculate Nucleus}
+\acro{KDE}{Kernel Density Estimation}
 \acro{KL-divergence}{Kullback-Leibler divergence}
 \acro{KL}{Kullback-Leibler}
-\acro{ELBO}{Evidence Lower Bound}
-\acro{PDF}{Probability Density Function}
+\acro{MSE}{Mean Squared Error}
 \acro{NLP}{Natural Language Processing}
-\acro{GAN}{Generative Adversarial Network}
+\acro{PDF}{Probability Density Function}
+\acro{PPL}{Perceptual Path Length}
+\acro{ReLU}{Rectified Linear Unit}
+\acro{RDM}{Representational Dissimilarity Matrix}
+\acrodefplural{RDM}{Representational Dissimilarity Matrices}
+\acro{TEO}{Temporo-Occipital Area}
+\acro{VAE}{Variational Autoencoder}
 \acro{VLAE}{Variational Ladder Autoencoder}
 \acro{LVAE}{Ladder Variational Autoencoder}
-\acro{CNS}{Central Nervous System}
 \acro{V1}{Primary Visual Cortex}
 \acro{V2}{Secondary Visual Cortex}
 \acro{V4}{Quaternary Visual Cortex}
-\acro{LGN}{Lateral Geniculate Nucleus}
-\acro{TEO}{Temporo-Occipital Area}
-\acro{PPL}{Perceptual Path Length}
-\acro{PDF}{Probability Density Function}
-\acro{KDE}{Kernel Density Estimation}
 \end{acronym}
 \newpage
 \input{erklaerung}

@@ -1,16 +1,10 @@
 \subsection{Visual Features in Variational Autoencoders}\label{subsec:results_visual_features_in_variational_autoencoders}
 The following sections describe the results of the experiments on visual features in variational autoencoders.
 
-\begin{itemize}
-    \item Results non-AlexNet-like-VAE on CelebA: especially layer 1 kernels
-    \item Results AlexNet-like-VAE on ImageNet: especially layer 1 kernels
-    \item Results AlexNet-like image classification CNN on ImageNet: especially layer 1 kernels
-    \item Results AlexNet-like-VAE with frozen decoder from classification network
-\end{itemize}
-
-\subsubsection{AlexNet Image Classification}
-To make sure that the network structure of the \ac{VAE} is apt to generate Gabor wavelets, image classification was performed on ImageNet (see Figure~\ref{fig:alexnet} and Section~\ref{subsec:visual-features-variational-autoencoders} for the used network, see Section~\ref{ssec:imagenet} for ImageNet).
-As the accuracy was not of primary concern, the training was stopped during the tenth epoch (\textbf{If time: train all 100 epochs}), the top-1 training accuracy at this time was at 0.85.
+\paragraph{AlexNet Image Classification}
+It is known that AlexNet learns Gabor-like features in the first layer~\citep{krizhevsky2012imagenet}.
+To verify that the AlexNet-like \ac{VAE} by it's architecture is able to learn Gabor wavelets, the corresponding AlexNet classification network was trained on ImageNet similarly to \citet{krizhevsky2012imagenet} (class prediction).
+The network was trained for ten epochs, the top-1 training accuracy at this time was at 0.85.
 
 \begin{figure}
     \centering
@@ -19,8 +13,28 @@ As the accuracy was not of primary concern, the training was stopped during the 
     \label{fig:classification_layer1_kernels}
 \end{figure}
 
-Figure~\ref{fig:classification_layer1_kernels} shows all 256 convolutional kernels of the image classification network.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/alexnet_vae_l1_kernels.png}
+    \caption[\ac{VAE} - Layer 1 Kernels]{Convolutional Kernels in the first layer of the AlexNet \ac{VAE} network. The filters are shown in their original size (11x11).}
+    \label{fig:vae_layer1_kernels}
+\end{figure}
+
+Figure~\ref{fig:classification_layer1_kernels} shows all 288 ($96 \cdot 3$) convolutional kernels of the image classification network.
 It is easy to see that in many kernels, Gabor wavelet-like filters emerge.
+
+This, however, is not true for the AlexNet-\ac{VAE} model.
+Figure~\ref{fig:vae_layer1_kernels} shows the layer 1 kernels of the AlexNet \ac{VAE} network.
+The network has a $z_{dim}$ of 2,000 and a very similar architecture as the AlexNet image classification network
+
+
+
+\begin{itemize}
+    \item Results non-AlexNet-like-VAE on CelebA: especially layer 1 kernels
+    \item Results AlexNet-like-VAE on ImageNet: especially layer 1 kernels
+    \item Results AlexNet-like image classification CNN on ImageNet: especially layer 1 kernels
+    \item Results AlexNet-like-VAE with frozen decoder from classification network
+\end{itemize}
 
 \subsection{Sparseness in Generative Models}\label{subsec:effective-network-capacity}
 One hyperparameter to choose in the different models is the number of feature maps of one layer.
@@ -728,7 +742,7 @@ For the remainder of this section, these models are referred to as \say{10,000-\
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist.png}
-    \caption{Histogram of 73,728 dsprites images from the validation set in 100 bins for \ac{VAE} with reconstruction term weight 10,000}
+    \caption[VAE Latent Space Distribution - dsprites]{Posterior distribution of \ac{VAE} with reconstruction term weight 10,000 on 73,728 dsprites images from the validation set in 100 bins}
     \label{fig:10000_vae_latent_space_distribution}
 \end{figure}
 
@@ -754,7 +768,7 @@ However, this raises the question why there are more than three peaks for the ni
         \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_shape_3.png}
         \caption{Latent space distribution of images with shape \textit{Heart}}
     \end{subfigure}
-    \caption{Histogram of dsprites images with a certain shape from the validation set in 100 bins}
+    \caption[VAE Latent Space Distribution - dsprites Shapes]{Histogram of dsprites images with a certain shape from the validation set in 100 bins}
     \label{fig:10000_vae_latent_space_distribution_shapes}
 \end{figure}
 
@@ -794,7 +808,7 @@ Even though there is some difference between the plots, the $\mu$-values in the 
         \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_scale_1_0.png}
         \caption{Latent space distribution of images with shape scale = 1.0}
     \end{subfigure}
-    \caption{Histogram of dsprites images with a certain scale from the validation set in 100 bins}
+    \caption[VAE Latent Space Distribution - dsprites Scales]{Posterior distribution for dsprites images with a certain scale from the validation set in 100 bins}
     \label{fig:10000_vae_latent_space_distribution_scales}
 \end{figure}
 
@@ -823,7 +837,7 @@ One of the peaks attributes to the shape \textit{Heart}, the other one for the s
         \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_10000_dist_shape_3_scale_0_5.png}
         \caption{Latent space distribution of images with scale = 0.5 and shape \textit{Heart}}
     \end{subfigure}
-    \caption{Histogram of dsprites images with scale = 0.5 and different shapes from the validation set in 100 bins}
+    \caption[VAE Latent Space Distribution - dsprites Scale and Shapes]{Posterior distribution for dsprites images with scale = 0.5 and different shapes from the validation set in 100 bins}
     \label{fig:10000_vae_latent_space_distribution_scales_and_shapes}
 \end{figure}
 
@@ -851,7 +865,7 @@ It allows, however, to violate the \textit{KL}-term in favor of the reconstructi
         \caption{Latent space traversal from \textit{Heart} $\rightarrow$ \textit{Square}}
         \label{subfig:10000_vae_latent_space_traversal_heart_to_square}
     \end{subfigure}
-    \caption{Latent space traversal between latent space representations of images with certain shapes for 10,000-\ac{VAE}. Color-values were inverted for this plot.}
+    \caption[VAE Latent Space Traversal - dsprites]{Latent space traversal between latent space representations of images with certain shapes for 10,000-\ac{VAE}. Color-values were inverted for this plot.}
     \label{fig:10000_vae_latent_space_traversal_shape_to_shape}
 \end{figure}
 
@@ -876,7 +890,7 @@ Furthermore, for the latent space traversal shown in Figure~\ref{fig:10000_vae_l
         \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_5000_dist.png}
         \caption{Reconstruction term weight 5,000}
     \end{subfigure}
-    \caption{Histogram of 73,728 dsprites images from the validation set in 100 bins for \ac{VAE} with different reconstruction term weights}
+    \caption[VAE Latent Space Distribution - Different Reconstruction Term Weights]{Posterior distribution of VAE with different reconstruction terms weights for 73,728 dsprites images from the validation set in 100 bins}
     \label{fig:7500_5000_vae_latent_space_distribution_scales_and_shapes}
 \end{figure}
 
@@ -956,17 +970,24 @@ In fact, 5,000-\ac{VAE} by far has the lowest \ac{PPL} value of the models with 
         \caption{The feature maps after max pooling of LeakyReLU 5}
         \label{subfig:maxpool}
     \end{subfigure}
-    \caption{The original image and the feature maps after passing the image through the network until after the specified layer. The stripe artifacts can be observed in many feature maps in Subfigure~\ref{subfig:lakyrelu5}. They vanish after max-pooling (Subfigure~\ref{subfig:maxpool}).}
+    \caption[Feature map stripes]{The original image and the feature maps after passing the image through the network until after the specified layer. The stripe artifacts can be observed in many feature maps in Subfigure~\ref{subfig:lakyrelu5}. They vanish after max-pooling (Subfigure~\ref{subfig:maxpool}).}
     \label{fig:stripes}
 \end{figure}
 
 
 One observation being made during the analysis of the networks was the emergence of striped artifacts in the networks feature maps (Figure~\ref{fig:stripes}).
-These stripes were observed in the Vanilla VAE, AlexNetVAE, as well as the AlexNet Classifier and might be also present in other networks (\textbf{CHECK THIS}).
+These stripes were observed in the AlexNetVAE and the AlexNet Classifier.
 Apparently, the stripes are either always horizontal or vertical for one network type.
 If they are vertical, they can appear on the left or the right side of the same network.
 If they are horizontal, they appear either on the top or on the bottom of the same network.
 The exact reason why the networks show this behavior was not found, however some insights were won.
+
+\paragraph{Kernel Size}
+The stripes were only observed for large kernel sizes.
+AlexNet and AlexNet \ac{VAE} use $11\times 11$ kernels in the first layer.
+Using such large kernels with zero-padding (see next paragraph) causes the convolution operation to incorporate many zero-terms.
+For feature map pixels at borders and especially in corners, there are only few non-zero values contributing to the result of the convolution.
+This results in overall low feature map values for these pixels.
 
 \paragraph{Padding}
 The stripes occur due to the zero-padding in the network and the resulting contrast observed by the convolutional filters.
@@ -982,14 +1003,14 @@ However, for this network, the stripes seem to occur for a sharp shift of black 
 \begin{figure}
     \centering
     \foreach \n in {0,...,11}{
-        \begin{subfigure}{0.05\textwidth}
-            \frame{\includegraphics[width=\textwidth]{images/stripes/test_images/original\n.jpg}}
-            \caption{}
-            \label{subfig:test_images_stripes\n}
-        \end{subfigure}
-        \hfill
+    \begin{subfigure}{0.05\textwidth}
+        \frame{\includegraphics[width=\textwidth]{images/stripes/test_images/original\n.jpg}}
+        \caption{}
+        \label{subfig:test_images_stripes\n}
+    \end{subfigure}
+    \hfill
     }
-    \caption{The test images used to analyze the networks behavior.}
+    \caption[Feature Map Stripes - Test Images]{The test images used to analyze the networks behavior.}
     \label{fig:test_images_stripes}
 \end{figure}
 
@@ -1011,7 +1032,7 @@ All different feature maps with respect to each image can be found in the append
         \caption{The feature maps after LeakyReLU 5}
         \label{subfig:stripes_test_img_maxpool3}
     \end{subfigure}
-    \caption{The feature maps with respect to test image~\ref{subfig:test_images_stripes8}.}
+    \caption[Feature Map Stripes on Test Images]{The feature maps with respect to test image~\ref{subfig:test_images_stripes8}.}
     \label{fig:stripes_test_img}
 \end{figure}
 
@@ -1033,6 +1054,16 @@ Noteworthy, if the bias term in the convolutions is removed, the black-black con
 For this purpose, the batch normalization has to be removed too since it uses a bias term as well.
 This, however, does not qualitatively change the networks behavior on real images.
 
+\paragraph{Network Depth}
+The network depth is assumed to play a role in the emergence of feature map stripes.
+As explained above, the emergence of feature maps is an amplifying process.
+Low-developed feature map stripes in lower layers lead to high developed feature map stripes in higher layers.
+
+This effect was, to the best of the author's belief, not reported previously.
+It seems to have no significant influence on the network performance.
+However, it could, depending on the implementation, lead to a loss of precision as feature maps contain very different float values.
+Floating point representations then need a larger exponent and have less storage for the mantissa.
+
 \subsection{Pixelwise vs. Adversarial Loss}\label{subsec:pixelwise-vs.-adversarial-loss}
 This thesis employed two different methods to train the decoder towards generating natural looking images, namely the pixel-wise or the generative loss.
 The encoder of the generative models furthermore was trained such that the hidden-layer activity of the discriminator is similar for generated and real images (in addition to the KL-term).
@@ -1050,10 +1081,9 @@ A black-and-white image consisting of alternating black and white rows and the s
 Natural images, however, usually are less susceptible to a large pixel-wise loss for small translation because there are less regions of high contrast.
 In the context of natural images, the pixel-wise loss function for example enables the model to detect if an object is placed in another corner of the image as the loss would incrase for such high translations.
 If, however, the aim is to generate more realistic images, the generative loss should be used since the pixel-wise loss leads to blurry reconstructions.
-Also, \acp{GAN} empirically are not agnostic of an objects position (\textbf{REF: GAN-VLAE on dsprites}).
 
 Another consideration is training stability.
-Due to the adversarial loss, training \acp{GAN} has many difficulties (mode collapse, error oscillation\textbf{REF}), often resulting in failure modes.
+Due to the adversarial loss, training \acp{GAN} has many difficulties (mode collapse, error oscillation, see Section~\ref{subsubsec:gans}), often resulting in failure modes.
 Training regular \acp{VAE}, in contrast, is far more stable.
 
 The choice of the loss function also might play an important role when studying a model's representation with human \ac{IT} representations.
@@ -1076,13 +1106,13 @@ In order to do this, the model structure must allow comparisons with empirical d
 
 Specifically, lower model layers are compared with earlier, higher model layers with later regions in the visual cortex.
 Furthermore, the models are chosen such that similar inputs translate to similar encodings.
-The biological plausibility of the encoding should be further investigated in future research (\textbf{REF TO RELATED SECTION}).
+The biological plausibility of the encoding should be further investigated in future research.
 
 However, due to practial reasons such as the availability of training data or computational resoureces, the model disregards actualities of the human body, a more refined model should incorporate.
 
 Other than in the models used in this thesis, the human eye receives a stream of visual stimuli.
 Perceiving movements of animate objects could play an important role in distinguishing between animate and inanimate objects.
-The dissimilarity between semantic representations of animate and inanimate objects has been shown in \textbf{REF}.
+The dissimilarity between semantic representations of animate and inanimate objects has been shown in \citet{khaligh2014deep}.
 Recurrent models such as LSTMs could allow to extend the models developed in the course of this thesis to sequences of images.
 
 This thesis only considered image data to form semantic representations even though the human mind perceives the world through more senses.
