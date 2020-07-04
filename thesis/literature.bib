@@ -247,27 +247,33 @@ In this thesis I implement and evaluate state-of-the-art deep learning models an
     url = {http://www.nari.ee.ethz.ch/pubs/p/autoenc2018}
 }
 
-% CONTINUE HERE
-
 @article{eickenberg2017seeing,
-    title = {Seeing it all: Convolutional network layers map the function of the human visual system},
-    author = {Eickenberg, Michael and Gramfort, Alexandre and Varoquaux, Ga {\"e} l and Thirion, Bertrand},
-    journal = {NeuroImage},
-    volume = {152},
-    pages = {184--194},
-    year = {2017},
-    publisher = {Elsevier}
+    title = "Seeing it all: Convolutional network layers map the function of the human visual system",
+    journal = "NeuroImage",
+    volume = "152",
+    pages = "184 - 194",
+    year = "2017",
+    issn = "1053-8119",
+    doi = "https://doi.org/10.1016/j.neuroimage.2016.10.001",
+    url = "http://www.sciencedirect.com/science/article/pii/S1053811916305481",
+    author = "Michael Eickenberg and Alexandre Gramfort and Gaël Varoquaux and Bertrand Thirion",
+    abstract = "Convolutional networks used for computer vision represent candidate models for the computations performed in mammalian visual systems. We use them as a detailed model of human brain activity during the viewing of natural images by constructing predictive models based on their different layers and BOLD fMRI activations. Analyzing the predictive performance across layers yields characteristic fingerprints for each visual brain region: early visual areas are better described by lower level convolutional net layers and later visual areas by higher level net layers, exhibiting a progression across ventral and dorsal streams. Our predictive model generalizes beyond brain responses to natural images. We illustrate this on two experiments, namely retinotopy and face-place oppositions, by synthesizing brain activity and performing classical brain mapping upon it. The synthesis recovers the activations observed in the corresponding fMRI studies, showing that this deep encoding model captures representations of brain function that are universal across experimental paradigms."
 }
 
 @article{wen2018neural,
-    title = {Neural encoding and decoding with deep learning for dynamic natural vision},
     author = {Wen, Haiguang and Shi, Junxing and Zhang, Yizhen and Lu, Kun-Han and Cao, Jiayue and Liu, Zhongming},
+    title = "{Neural Encoding and Decoding with Deep Learning for Dynamic Natural Vision}",
     journal = {Cerebral Cortex},
     volume = {28},
     number = {12},
-    pages = {4136--4160},
-    year = {2018},
-    publisher = {Oxford University Press}
+    pages = {4136-4160},
+    year = {2017},
+    month = {10},
+    abstract = "{Convolutional neural network (CNN) driven by image recognition has been shown to be able to explain cortical responses to static pictures at ventral-stream areas. Here, we further showed that such CNN could reliably predict and decode functional magnetic resonance imaging data from humans watching natural movies, despite its lack of any mechanism to account for temporal dynamics or feedback processing. Using separate data, encoding and decoding models were developed and evaluated for describing the bi-directional relationships between the CNN and the brain. Through the encoding models, the CNN-predicted areas covered not only the ventral stream, but also the dorsal stream, albeit to a lesser degree; single-voxel response was visualized as the specific pixel pattern that drove the response, revealing the distinct representation of individual cortical location; cortical activation was synthesized from natural images with high-throughput to map category representation, contrast, and selectivity. Through the decoding models, fMRI signals were directly decoded to estimate the feature representations in both visual and semantic spaces, for direct visual reconstruction and semantic categorization, respectively. These results corroborate, generalize, and extend previous findings, and highlight the value of using deep learning, as an all-in-one model of the visual cortex, to understand and decode natural vision.}",
+    issn = {1047-3211},
+    doi = {10.1093/cercor/bhx268},
+    url = {https://doi.org/10.1093/cercor/bhx268},
+    eprint = {https://academic.oup.com/cercor/article-pdf/28/12/4136/26338870/bhx268.pdf},
 }
 
 @article{mockus1978application,
@@ -291,20 +297,26 @@ In this thesis I implement and evaluate state-of-the-art deep learning models an
     url = {http://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf}
 }
 
-@article{brock2018large,
-    title = {Large scale gan training for high fidelity natural image synthesis},
-    author = {Brock, Andrew and Donahue, Jeff and Simonyan, Karen},
-    journal = {arXiv preprint arXiv:1809.11096},
-    year = {2018}
+
+@inproceedings{brock2018large,
+    title = {Large Scale {GAN} Training for High Fidelity Natural Image Synthesis},
+    author = {Andrew Brock and Jeff Donahue and Karen Simonyan},
+    booktitle = {International Conference on Learning Representations},
+    year = {2019},
+    url = {https://openreview.net/forum?id=B1xsqj09Fm},
 }
 
-@inproceedings{chen2016infogan,
-    title = {Infogan: Interpretable representation learning by information maximizing generative adversarial nets},
+@incollection{chen2016infogan,
+    title = {InfoGAN: Interpretable Representation Learning by Information Maximizing Generative Adversarial Nets},
     author = {Chen, Xi and Duan, Yan and Houthooft, Rein and Schulman, John and Sutskever, Ilya and Abbeel, Pieter},
-    booktitle = {Advances in neural information processing systems},
+    booktitle = {Advances in Neural Information Processing Systems 29},
+    editor = {D. D. Lee and M. Sugiyama and U. V. Luxburg and I. Guyon and R. Garnett},
     pages = {2172--2180},
-    year = {2016}
+    year = {2016},
+    publisher = {Curran Associates, Inc.},
+    url = {http://papers.nips.cc/paper/6399-infogan-interpretable-representation-learning-by-information-maximizing-generative-adversarial-nets.pdf}
 }
+
 
 @article{bengio2013representation,
     title = {Representation learning: A review and new perspectives},
@@ -317,24 +329,39 @@ In this thesis I implement and evaluate state-of-the-art deep learning models an
     publisher = {IEEE}
 }
 
+
 % @formatter:off
-@inproceedings{sonderby2016ladder,
-    title = {Ladder variational autoencoders},
-    author = {Sønderby, Casper Kaae and Raiko, Tapani and Maaløe, Lars and Sønderby, Søren Kaae and Winther, Ole},
-    booktitle = {Advances in neural information processing systems},
+@incollection{sonderby2016ladder,
+    title = {Ladder Variational Autoencoders},
+    author = {Sønderby, Casper Kaae and Raiko, Tapani and Maaløe, Lars and S\o nderby, Søren Kaae and Winther, Ole},
+    booktitle = {Advances in Neural Information Processing Systems 29},
+    editor = {D. D. Lee and M. Sugiyama and U. V. Luxburg and I. Guyon and R. Garnett},
     pages = {3738--3746},
-    year = {2016}
+    year = {2016},
+    publisher = {Curran Associates, Inc.},
+    url = {http://papers.nips.cc/paper/6275-ladder-variational-autoencoders.pdf}
 }
+
 % @formatter:on
 
-@inproceedings{zhao2017learning,
-    title = {Learning hierarchical features from deep generative models},
-    author = {Zhao, Shengjia and Song, Jiaming and Ermon, Stefano},
-    booktitle = {Proceedings of the 34th International Conference on Machine Learning-Volume 70},
+
+@InProceedings{zhao2017learning,
+    title = {Learning Hierarchical Features from Deep Generative Models},
+    author = {Shengjia Zhao and Jiaming Song and Stefano Ermon},
+    booktitle = {Proceedings of the 34th International Conference on Machine Learning},
     pages = {4091--4099},
     year = {2017},
-    organization = {JMLR. org}
+    editor = {Doina Precup and Yee Whye Teh},
+    volume = {70},
+    series = {Proceedings of Machine Learning Research},
+    address = {International Convention Centre, Sydney, Australia},
+    month = {06--11 Aug},
+    publisher = {PMLR},
+    pdf = {http://proceedings.mlr.press/v70/zhao17c/zhao17c.pdf},
+    url = {http://proceedings.mlr.press/v70/zhao17c.html},
+    abstract = {Deep neural networks have been shown to be very successful at learning feature hierarchies in supervised learning tasks. Generative models, on the other hand, have benefited less from hierarchical models with multiple layers of latent variables. In this paper, we prove that hierarchical latent variable models do not take advantage of the hierarchical structure when trained with existing variational methods, and provide some limitations on the kind of features existing models can learn. Finally we propose an alternative architecture that do not suffer from these limitations. Our model is able to learn highly interpretable and disentangled hierarchical features on several natural image datasets with no task specific regularization or prior knowledge.}
 }
+
 
 @phdthesis{van2016auto,
     title = {What auto-encoders could learn from brains},
@@ -346,7 +373,12 @@ In this thesis I implement and evaluate state-of-the-art deep learning models an
 @article{goodale1992separate,
     title = {Separate visual pathways for perception and action},
     author = {Goodale, Melvyn A and Milner, A David and others},
-    year = {1992}
+    journal = {Trends in neurosciences},
+    volume = {15},
+    number = {1},
+    pages = {20--25},
+    year = {1992},
+    publisher = {Elsevier}
 }
 
 @book{mack2013principles,
@@ -368,21 +400,20 @@ In this thesis I implement and evaluate state-of-the-art deep learning models an
     year = {2019}
 }
 
-@article{lecun1998gradient,
-    title = {Gradient-based learning applied to document recognition},
-    author = {LeCun, Yann and Bottou, L {\'e} on and Bengio, Yoshua and Haffner, Patrick},
+@ARTICLE{lecun1998gradient,
+    author = {Y. {Lecun} and L. {Bottou} and Y. {Bengio} and P. {Haffner}},
     journal = {Proceedings of the IEEE},
+    title = {Gradient-based learning applied to document recognition},
+    year = {1998},
     volume = {86},
     number = {11},
-    pages = {2278--2324},
-    year = {1998},
-    publisher = {Ieee}
-}
+    pages = {2278-2324}, }
 
-@article{pidhorskyi2020adversarial,
+@InProceedings{pidhorskyi2020adversarial,
+    author = {Pidhorskyi, Stanislav and Adjeroh, Donald A. and Doretto, Gianfranco},
     title = {Adversarial Latent Autoencoders},
-    author = {Pidhorskyi, Stanislav and Adjeroh, Donald and Doretto, Gianfranco},
-    journal = {arXiv preprint arXiv:2004.04467},
+    booktitle = {The IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month = {June},
     year = {2020}
 }
 
@@ -394,52 +425,95 @@ In this thesis I implement and evaluate state-of-the-art deep learning models an
     year = {2019}
 }
 
-@inproceedings{johnson2016perceptual,
-    title = {Perceptual losses for real-time style transfer and super-resolution},
-    author = {Johnson, Justin and Alahi, Alexandre and Fei-Fei, Li},
-    booktitle = {European conference on computer vision},
-    pages = {694--711},
-    year = {2016},
-    organization = {Springer}
+@InProceedings{johnson2016perceptual,
+    author = "Johnson, Justin and Alahi, Alexandre and Fei-Fei, Li",
+    editor = "Leibe, Bastian and Matas, Jiri and Sebe, Nicu and Welling, Max",
+    title = "Perceptual Losses for Real-Time Style Transfer and Super-Resolution",
+    booktitle = "Computer Vision -- ECCV 2016",
+    year = "2016",
+    publisher = "Springer International Publishing",
+    address = "Cham",
+    pages = "694--711",
+    abstract = "We consider image transformation problems, where an input image is transformed into an output image. Recent methods for such problems typically train feed-forward convolutional neural networks using a per-pixel loss between the output and ground-truth images. Parallel work has shown that high-quality images can be generated by defining and optimizing perceptual loss functions based on high-level features extracted from pretrained networks. We combine the benefits of both approaches, and propose the use of perceptual loss functions for training feed-forward networks for image transformation tasks. We show results on image style transfer, where a feed-forward network is trained to solve the optimization problem proposed by Gatys et al. in real-time. Compared to the optimization-based method, our network gives similar qualitative results but is three orders of magnitude faster. We also experiment with single-image super-resolution, where replacing a per-pixel loss with a perceptual loss gives visually pleasing results.",
+    isbn = "978-3-319-46475-6"
 }
 
-@article{kim2018disentangling,
-    title = {Disentangling by factorising},
+
+
+@InProceedings{kim2018disentangling,
+    title = {Disentangling by Factorising},
     author = {Kim, Hyunjik and Mnih, Andriy},
-    journal = {arXiv preprint arXiv:1802.05983},
-    year = {2018}
+    booktitle = {Proceedings of the 35th International Conference on Machine Learning},
+    pages = {2649--2658},
+    year = {2018},
+    editor = {Dy, Jennifer and Krause, Andreas},
+    volume = {80},
+    series = {Proceedings of Machine Learning Research},
+    address = {Stockholmsmässan, Stockholm Sweden},
+    month = {10--15 Jul},
+    publisher = {PMLR},
+    pdf = {http://proceedings.mlr.press/v80/kim18b/kim18b.pdf},
+    url = {http://proceedings.mlr.press/v80/kim18b.html},
+    abstract = {We define and address the problem of unsupervised learning of disentangled representations on data generated from independent factors of variation. We propose FactorVAE, a method that disentangles by encouraging the distribution of representations to be factorial and hence independent across the dimensions. We show that it improves upon beta-VAE by providing a better trade-off between disentanglement and reconstruction quality and being more robust to the number of training iterations. Moreover, we highlight the problems of a commonly used disentanglement metric and introduce a new metric that does not suffer from them.}
 }
+
 
 @article{higgins2017beta,
     title = {beta-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework.},
     author = {Higgins, Irina and Matthey, Loic and Pal, Arka and Burgess, Christopher and Glorot, Xavier and Botvinick, Matthew and Mohamed, Shakir and Lerchner, Alexander},
-    journal = {Iclr},
+    journal = {Proceedings of the 5th International Conference on Learning Representations (ICLR)},
     volume = {2},
     number = {5},
     pages = {6},
     year = {2017}
 }
 
-@article{larsen2015autoencoding,
+@InProceedings{larsen2015autoencoding,
     title = {Autoencoding beyond pixels using a learned similarity metric},
-    author = {Larsen, Anders Boesen Lindbo and S {\o} nderby, S {\o} ren Kaae and Larochelle, Hugo and Winther, Ole},
-    journal = {arXiv preprint arXiv:1512.09300},
-    year = {2015}
+    author = {Anders Boesen Lindbo Larsen and Søren Kaae Sønderby and Hugo Larochelle and Ole Winther},
+    booktitle = {Proceedings of The 33rd International Conference on Machine Learning},
+    pages = {1558--1566},
+    year = {2016},
+    editor = {Maria Florina Balcan and Kilian Q. Weinberger},
+    volume = {48},
+    series = {Proceedings of Machine Learning Research},
+    address = {New York, New York, USA},
+    month = {20--22 Jun},
+    publisher = {PMLR},
+    pdf = {http://proceedings.mlr.press/v48/larsen16.pdf},
+    url = {http://proceedings.mlr.press/v48/larsen16.html},
+    abstract = {We present an autoencoder that leverages learned representations to better measure similarities in data space. By combining a variational autoencoder (VAE) with a generative adversarial network (GAN) we can use learned feature representations in the GAN discriminator as basis for the VAE reconstruction objective. Thereby, we replace element-wise errors with feature-wise errors to better capture the data distribution while offering invariance towards e.g. translation. We apply our method to images of faces and show that it outperforms VAEs with element-wise similarity measures in terms of visual fidelity. Moreover, we show that the method learns an embedding in which high-level abstract visual features (e.g. wearing glasses) can be modified using simple arithmetic.}
 }
+
 
 @inproceedings{shao2018riemannian,
-    title = {The riemannian geometry of deep generative models},
-    author = {Shao, Hang and Kumar, Abhishek and Thomas Fletcher, P},
-    booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition Workshops},
-    pages = {315--323},
-    year = {2018}
+    author = {H. Shao and A. Kumar and P. Fletcher},
+    booktitle = {2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW)},
+    title = {The Riemannian Geometry of Deep Generative Models},
+    year = {2018},
+    volume = {},
+    issn = {},
+    pages = {428-4288},
+    keywords = {manifolds;jacobian matrices;computational modeling;measurement;geometry;generators;data models},
+    doi = {10.1109/CVPRW.2018.00071},
+    url = {https://doi.ieeecomputersociety.org/10.1109/CVPRW.2018.00071},
+    publisher = {IEEE Computer Society},
+    address = {Los Alamitos, CA, USA},
+    month = {jun}
 }
 
-@article{arvanitidis2017latent,
-    title = {Latent space oddity: on the curvature of deep generative models},
-    author = {Arvanitidis, Georgios and Hansen, Lars Kai and Hauberg, S {\o} ren},
-    journal = {arXiv preprint arXiv:1710.11379},
-    year = {2017}
+
+
+@inproceedings{arvanitidis2017latent,
+    title = "Latent space oddity: On the curvature of deep generative models",
+    abstract = "Deep generative models provide a systematic way to learn nonlinear data distributions through a set of latent variables and a nonlinear “generator” function that maps latent points into the input space. The nonlinearity of the generator implies that the latent space gives a distorted view of the input space. Under mild conditions, we show that this distortion can be characterized by a stochastic Riemannian metric, and we demonstrate that distances and interpolants are significantly improved under this metric. This in turn improves probability distributions, sampling algorithms and clustering in the latent space. Our geometric analysis further reveals that current generators provide poor variance estimates and we propose a new generator architecture with vastly improved variance estimates. Results are demonstrated on convolutional and fully connected variational autoencoders, but the formalism easily generalizes to other deep generative models.",
+    author = "Georgios Arvanitidis and Hansen, {Lars Kai} and S{\o}ren Hauberg",
+    year = "2018",
+    month = "jan",
+    day = "1",
+    language = "English",
+    booktitle = "Proceedings of International Conference on Learning Representations",
+    note = "6th International Conference on Learning Representations, ICLR 2018 ; Conference date: 30-04-2018 Through 03-05-2018",
 }
 
 @book{bishop2006pattern,
@@ -470,71 +544,115 @@ Shu2020Weakly,
 @misc{dsprites17,
     author = {Loic Matthey and Irina Higgins and Demis Hassabis and Alexander Lerchner},
     title = {dSprites: Disentanglement testing Sprites dataset},
-    howpublished = {https://github.com/deepmind/dsprites-dataset/},
+    url = {https://github.com/deepmind/dsprites-dataset/},
     year = "2017",
 }
 
-@article{vanrullen2019reconstructing,
-    title = {Reconstructing faces from fMRI patterns using deep generative neural networks},
+@misc{lexico,
+    title = "Lexico",
+    publisher = "Oxford University Press",
+    url = "www.lexico.com",
+    year = {2020},
+    month = {Jul},
+    day = {4} }
+
+
+@Article{vanrullen2019reconstructing,
     author = {VanRullen, Rufin and Reddy, Leila},
-    journal = {Communications biology},
+    title = {Reconstructing faces from fMRI patterns using deep generative neural networks},
+    journal = {Communications Biology},
+    year = {2019},
+    month = {May},
+    day = {21},
     volume = {2},
     number = {1},
-    pages = {1--10},
-    year = {2019},
-    publisher = {Nature Publishing Group}
+    pages = {193},
+    abstract = {Although distinct categories are reliably decoded from fMRI brain responses, it has proved more difficult to distinguish visually similar inputs, such as different faces. Here, we apply a recently developed deep learning system to reconstruct face images from human fMRI. We trained a variational auto-encoder (VAE) neural network using a GAN (Generative Adversarial Network) unsupervised procedure over a large data set of celebrity faces. The auto-encoder latent space provides a meaningful, topologically organized 1024-dimensional description of each image. We then presented several thousand faces to human subjects, and learned a simple linear mapping between the multi-voxel fMRI activation patterns and the 1024 latent dimensions. Finally, we applied this mapping to novel test images, translating fMRI patterns into VAE latent codes, and codes into face reconstructions. The system not only performed robust pairwise decoding (>95 {\%} correct), but also accurate gender classification, and even decoded which face was imagined, rather than seen.},
+    issn = {2399-3642},
+    doi = {10.1038/s42003-019-0438-y},
+    url = {https://doi.org/10.1038/s42003-019-0438-y}
 }
-@article{yoshida2020natural,
-    title = {Natural images are reliably represented by sparse and variable populations of neurons in visual cortex},
+
+
+@Article{yoshida2020natural,
     author = {Yoshida, Takashi and Ohki, Kenichi},
-    journal = {Nature communications},
+    title = {Natural images are reliably represented by sparse and variable populations of neurons in visual cortex},
+    journal = {Nature Communications},
+    year = {2020},
+    month = {Feb},
+    day = {13},
     volume = {11},
     number = {1},
-    pages = {1--19},
-    year = {2020},
-    publisher = {Nature Publishing Group}
+    pages = {872},
+    abstract = {Natural scenes sparsely activate neurons in the primary visual cortex (V1). However, how sparsely active neurons reliably represent complex natural images and how the information is optimally decoded from these representations have not been revealed. Using two-photon calcium imaging, we recorded visual responses to natural images from several hundred V1 neurons and reconstructed the images from neural activity in anesthetized and awake mice. A single natural image is linearly decodable from a surprisingly small number of highly responsive neurons, and the remaining neurons even degrade the decoding. Furthermore, these neurons reliably represent the image across trials, regardless of trial-to-trial response variability. Based on our results, diverse, partially overlapping receptive fields ensure sparse and reliable representation. We suggest that information is reliably represented while the corresponding neuronal patterns change across trials and collecting only the activity of highly responsive neurons is an optimal decoding strategy for the downstream neurons.},
+    issn = {2041-1723},
+    doi = {10.1038/s41467-020-14645-x},
+    url = {https://doi.org/10.1038/s41467-020-14645-x}
 }
 
 @article{jones1987evaluation,
+    author = {Jones, J. P. and Palmer, L. A.},
     title = {An evaluation of the two-dimensional Gabor filter model of simple receptive fields in cat striate cortex},
-    author = {Jones, Judson P and Palmer, Larry A},
-    journal = {Journal of neurophysiology},
+    journal = {Journal of Neurophysiology},
     volume = {58},
     number = {6},
-    pages = {1233--1258},
-    year = {1987}
+    pages = {1233-1258},
+    year = {1987},
+    doi = {10.1152/jn.1987.58.6.1233},
+    note = {PMID: 3437332},
+    URL = {https://doi.org/10.1152/jn.1987.58.6.1233},
+    eprint = {https://doi.org/10.1152/jn.1987.58.6.1233},
+    abstract = { 1. Using the two-dimensional (2D) spatial and spectral response profiles described in the previous two reports, we test Daugman's generalization of Marcelja's hypothesis that simple receptive fields belong to a class of linear spatial filters analogous to those described by Gabor and referred to here as 2D Gabor filters. 2. In the space domain, we found 2D Gabor filters that fit the 2D spatial response profile of each simple cell in the least-squared error sense (with a simplex algorithm), and we show that the residual error is devoid of spatial structure and statistically indistinguishable from random error. 3. Although a rigorous statistical approach was not possible with our spectral data, we also found a Gabor function that fit the 2D spectral response profile of each simple cell and observed that the residual errors are everywhere small and unstructured. 4. As an assay of spatial linearity in two dimensions, on which the applicability of Gabor theory is dependent, we compare the filter parameters estimated from the independent 2D spatial and spectral measurements described above. Estimates of most parameters from the two domains are highly correlated, indicating that assumptions about spatial linearity are valid. 5. Finally, we show that the functional form of the 2D Gabor filter provides a concise mathematical expression, which incorporates the important spatial characteristics of simple receptive fields demonstrated in the previous two reports. Prominent here are 1) Cartesian separable spatial response profiles, 2) spatial receptive fields with staggered subregion placement, 3) Cartesian separable spectral response profiles, 4) spectral response profiles with axes of symmetry not including the origin, and 5) the uniform distribution of spatial phase angles. 6. We conclude that the Gabor function provides a useful and reasonably accurate description of most spatial aspects of simple receptive fields. Thus it seems that an optimal strategy has evolved for sampling images simultaneously in the 2D spatial and spatial frequency domains. }
 }
 
-@article{hubel1962receptive,
+@Article{hubel1962receptive,
+    author = {HUBEL, D. H. and WIESEL, T. N.},
     title = {Receptive fields, binocular interaction and functional architecture in the cat's visual cortex},
-    author = {Hubel, David H and Wiesel, Torsten N},
     journal = {The Journal of physiology},
+    year = {1962},
+    month = {Jan},
     volume = {160},
     number = {1},
-    pages = {106--154},
-    year = {1962},
-    publisher = {Wiley Online Library}
+    pages = {106-154},
+    keywords = {*CEREBRAL CORTEX/physiology; Animals; Cats; Cerebral Cortex/*physiology; *Visual Cortex},
+    note = {14449617[pmid]},
+    note = {PMC1359523[pmcid]},
+    issn = {0022-3751},
+    doi = {10.1113/jphysiol.1962.sp006837},
+    url = {https://pubmed.ncbi.nlm.nih.gov/14449617},
+    url = {https://doi.org/10.1113/jphysiol.1962.sp006837},
+    language = {eng}
 }
 
 @article{lindsay2020convolutional,
-    title = {Convolutional neural networks as a model of the visual system: past, present, and future},
     author = {Lindsay, Grace},
+    title = {Convolutional Neural Networks as a Model of the Visual System: Past, Present, and Future},
     journal = {Journal of Cognitive Neuroscience},
-    pages = {1--15},
-    year = {2020},
-    publisher = {MIT Press}
+    volume = {0},
+    number = {0},
+    pages = {1-15},
+    year = {0},
+    doi = {10.1162/jocn\_a\_01544},
+    note = {PMID: 32027584},
+    URL = {https://doi.org/10.1162/jocn_a_01544},
+    eprint = {https://doi.org/10.1162/jocn_a_01544},
+    abstract = { Convolutional neural networks (CNNs) were inspired by early findings in the study of biological vision. They have since become successful tools in computer vision and state-of-the-art models of both neural activity and behavior on visual tasks. This review highlights what, in the context of CNNs, it means to be a good model in computational neuroscience and the various ways models can provide insight. Specifically, it covers the origins of CNNs and the methods by which we validate them as models of biological vision. It then goes on to elaborate on what we can learn about biological vision by understanding and experimenting on CNNs and discusses emerging opportunities for the use of CNNs in vision research beyond basic object recognition. }
+}
+s
+@InProceedings{fukushima1980neocognitron,
+    author = "Fukushima, Kunihiko and Miyake, Sei",
+    editor = "Amari, Shun-ichi and Arbib, Michael A.",
+    title = "Neocognitron: A Self-Organizing Neural Network Model for a Mechanism of Visual Pattern Recognition",
+    booktitle = "Competition and Cooperation in Neural Nets",
+    year = "1982",
+    publisher = "Springer Berlin Heidelberg",
+    address = "Berlin, Heidelberg",
+    pages = "267--285",
+    abstract = "A neural network model, called a ``neocognitron'', is proposed for a mechanism of visual pattern recognition. It is demonstrated by computer simulation that the neocognitron has characteristics similar to those of visual systems of vertebrates.",
+    isbn = "978-3-642-46466-9"
 }
 
-@article{fukushima1980neocognitron,
-    title = {Neocognitron: A self-organizing neural network model for a mechanism of pattern recognition unaffected by shift in position},
-    author = {Fukushima, Kunihiko},
-    journal = {Biological cybernetics},
-    volume = {36},
-    number = {4},
-    pages = {193--202},
-    year = {1980},
-    publisher = {Springer}
-}
+
 
 @inproceedings{liu2015hmax,
     title = {HMAX model: A survey},
@@ -545,38 +663,48 @@ Shu2020Weakly,
     organization = {IEEE}
 }
 
-@article{riesenhuber1999hierarchical,
-    title = {Hierarchical models of object recognition in cortex},
+@Article{riesenhuber1999hierarchical,
     author = {Riesenhuber, Maximilian and Poggio, Tomaso},
-    journal = {Nature neuroscience},
+    title = {Hierarchical models of object recognition in cortex},
+    journal = {Nature Neuroscience},
+    year = {1999},
+    month = {Nov},
+    day = {01},
     volume = {2},
     number = {11},
-    pages = {1019--1025},
-    year = {1999},
-    publisher = {Nature Publishing Group}
+    pages = {1019-1025},
+    abstract = {Visual processing in cortex is classically modeled as a hierarchy of increasingly sophisticated representations, naturally extending the model of simple to complex cells of Hubel and Wiesel. Surprisingly, little quantitative modeling has been done to explore the biological feasibility of this class of models to explain aspects of higher-level visual processing such as object recognition. We describe a new hierarchical model consistent with physiological data from inferotemporal cortex that accounts for this complex visual task and makes testable predictions. The model is based on a MAX-like operation applied to inputs to certain cortical neurons that may have a general role in cortical function.},
+    issn = {1546-1726},
+    doi = {10.1038/14819},
+    url = {https://doi.org/10.1038/14819}
 }
 
 @article{lecun1989backpropagation,
-    title = {Backpropagation applied to handwritten zip code recognition},
-    author = {LeCun, Yann and Boser, Bernhard and Denker, John S and Henderson, Donnie and Howard, Richard E and Hubbard, Wayne and Jackel, Lawrence D},
-    journal = {Neural computation},
+    author = {LeCun, Y. and Boser, B. and Denker, J. S. and Henderson, D. and Howard, R. E. and Hubbard, W. and Jackel, L. D.},
+    title = {Backpropagation Applied to Handwritten Zip Code Recognition},
+    journal = {Neural Computation},
     volume = {1},
     number = {4},
-    pages = {541--551},
+    pages = {541-551},
     year = {1989},
-    publisher = {MIT Press}
+    doi = {10.1162/neco.1989.1.4.541},
+    URL = {https://doi.org/10.1162/neco.1989.1.4.541},
+    eprint = {https://doi.org/10.1162/neco.1989.1.4.541},
+    abstract = { The ability of learning networks to generalize can be greatly enhanced by providing constraints from the task domain. This paper demonstrates how such constraints can be integrated into a backpropagation network through the architecture of the network. This approach has been successfully applied to the recognition of handwritten zip code digits provided by the U.S. Postal Service. A single network learns the entire recognition operation, going from the normalized image of the character to the final classification. }
 }
 
-@article{frankle2018lottery,
-    title = {The lottery ticket hypothesis: Finding sparse, trainable neural networks},
-    author = {Frankle, Jonathan and Carbin, Michael},
-    journal = {arXiv preprint arXiv:1803.03635},
-    year = {2018}
+@inproceedings{frankle2018lottery,
+    title = {The Lottery Ticket Hypothesis: Finding Sparse, Trainable Neural Networks},
+    author = {Jonathan Frankle and Michael Carbin},
+    booktitle = {International Conference on Learning Representations},
+    year = {2019},
+    url = {https://openreview.net/forum?id=rJl-b3RcF7},
 }
 
 @article{lucas2019understanding,
     title = {Understanding posterior collapse in generative latent variable models},
     author = {Lucas, James and Tucker, George and Grosse, Roger and Norouzi, Mohammad},
+    journal = {International Conference on Learning Representations, Workshop Paper},
     year = {2019}
 }
 
@@ -588,74 +716,102 @@ Shu2020Weakly,
 }
 
 % @formatter:off
-@article{rodriguez2015hierarchical,
-    title = {Hierarchical object representations in the visual cortex and computer vision},
-    author = {Rodr{\'\i}guez-S{\'a}nchez, Antonio J and Fallah, Mazyar and Leonardis, Ale {\v {s}}},
-    journal = {Frontiers in computational neuroscience},
-    volume = {9},
-    pages = {142},
-    year = {2015},
-    publisher = {Frontiers}
+@ARTICLE{rodriguez2015hierarchical,
+    AUTHOR={Rodríguez-Sánchez, Antonio J. and Fallah, Mazyar and Leonardis, Aleš},
+    TITLE={Editorial: Hierarchical Object Representations in the Visual Cortex and Computer Vision},
+    JOURNAL={Frontiers in Computational Neuroscience},
+    VOLUME={9},
+    PAGES={142},
+    YEAR={2015},
+    URL={https://www.frontiersin.org/article/10.3389/fncom.2015.00142},
+    DOI={10.3389/fncom.2015.00142},
+    ISSN={1662-5188}
 }
 % @formatter:on
 
-@article{mikolov2013efficient,
-    title = {Efficient estimation of word representations in vector space},
-    author = {Mikolov, Tomas and Chen, Kai and Corrado, Greg and Dean, Jeffrey},
-    journal = {arXiv preprint arXiv:1301.3781},
-    year = {2013}
+@inproceedings{mikolov2013efficient,
+    author = {Tomas Mikolov and Kai Chen and Greg Corrado and Jeffrey Dean},
+    editor = {Yoshua Bengio and Yann LeCun},
+    title = {Efficient Estimation of Word Representations in Vector Space},
+    booktitle = {1st International Conference on Learning Representations, {ICLR} 2013, Scottsdale, Arizona, USA, May 2-4, 2013, Workshop Track Proceedings},
+    year = {2013},
+    url = {http://arxiv.org/abs/1301.3781},
+    timestamp = {Thu, 25 Jul 2019 14:25:36 +0200},
+    biburl = {https://dblp.org/rec/journals/corr/abs-1301-3781.bib},
+    bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
 @article{berkes2005slow,
-    title = {Slow feature analysis yields a rich repertoire of complex cell properties},
     author = {Berkes, Pietro and Wiskott, Laurenz},
-    journal = {Journal of vision},
+    title = "{Slow feature analysis yields a rich repertoire of complex cell properties}",
+    journal = {Journal of Vision},
     volume = {5},
     number = {6},
-    pages = {9--9},
+    pages = {9-9},
     year = {2005},
-    publisher = {The Association for Research in Vision and Ophthalmology}
+    month = {07},
+    abstract = "{ In this study we investigate temporal slowness as a learning principle for receptive fields using slow feature analysis, a new algorithm to determine functions that extract slowly varying signals from the input data. We find a good qualitative and quantitative match between the set of learned functions trained on image sequences and the population of complex cells in the primary visual cortex (V1). The functions show many properties found also experimentally in complex cells, such as direction selectivity, non-orthogonal inhibition, end-inhibition, and side-inhibition. Our results demonstrate that a single unsupervised learning principle can account for such a rich repertoire of receptive field properties.}",
+    issn = {1534-7362},
+    doi = {10.1167/5.6.9},
+    url = {https://doi.org/10.1167/5.6.9},
+    eprint = {https://arvojournals.org/arvo/content\_public/journal/jov/933512/jov-5-6-9.pdf},
 }
+
 
 @article{burgess2018understanding,
     title = {Understanding disentangling in $\beta$-VAE},
     author = {Burgess, Christopher P and Higgins, Irina and Pal, Arka and Matthey, Loic and Watters, Nick and Desjardins, Guillaume and Lerchner, Alexander},
-    journal = {arXiv preprint arXiv:1804.03599},
-    year = {2018}
+    journal = {Learning Disentangled Representations: From Perception to Control Workshop},
+    year = {2017}
 }
 
 @inproceedings{ruan2016exploring,
-    title = {Exploring semantic representation in brain activity using word embeddings},
-    author = {Ruan, Yu-Ping and Ling, Zhen-Hua and Hu, Yu},
-    booktitle = {Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing},
-    pages = {669--679},
-    year = {2016}
+    title = "Exploring Semantic Representation in Brain Activity Using Word Embeddings",
+    author = "Ruan, Yu-Ping  and Ling, Zhen-Hua  and Hu, Yu",
+    booktitle = "Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2016",
+    address = "Austin, Texas",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/D16-1064",
+    doi = "10.18653/v1/D16-1064",
+    pages = "669--679",
 }
 
 @inproceedings{anderson2013words,
-    title = {Of words, eyes and brains: Correlating image-based distributional semantic models with neural representations of concepts},
-    author = {Anderson, Andrew J and Bruni, Elia and Bordignon, Ulisse and Poesio, Massimo and Baroni, Marco},
-    booktitle = {Proceedings of the 2013 Conference on Empirical Methods in Natural Language Processing},
-    pages = {1960--1970},
-    year = {2013}
+    title = "Of Words, Eyes and Brains: Correlating Image-Based Distributional Semantic Models with Neural Representations of Concepts",
+    author = "Anderson, Andrew J.  and Bruni, Elia  and Bordignon, Ulisse  and Poesio, Massimo  and Baroni, Marco",
+    booktitle = "Proceedings of the 2013 Conference on Empirical Methods in Natural Language Processing",
+    month = oct,
+    year = "2013",
+    address = "Seattle, Washington, USA",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/D13-1202",
+    pages = "1960--1970",
 }
 
 @article{fairhall2013brain,
-    title = {Brain regions that represent amodal conceptual knowledge},
-    author = {Fairhall, Scott L and Caramazza, Alfonso},
-    journal = {Journal of Neuroscience},
+    author = {Fairhall, Scott L. and Caramazza, Alfonso},
+    title = {Brain Regions That Represent Amodal Conceptual Knowledge},
     volume = {33},
     number = {25},
     pages = {10552--10558},
     year = {2013},
-    publisher = {Soc Neuroscience}
+    doi = {10.1523/JNEUROSCI.0051-13.2013},
+    publisher = {Society for Neuroscience},
+    abstract = {To what extent do the brain regions implicated in semantic processing contribute to the representation of amodal conceptual content rather than modality-specific mechanisms or mechanisms of semantic access and manipulation? Here, we propose that a brain region can be considered to represent amodal conceptual object knowledge if it is supramodal and plays a role in distinguishing among the conceptual representations of different objects. In an fMRI study, human participants made category typicality judgments about pictured objects or their names drawn from five different categories. Crossmodal multivariate pattern analysis revealed a network of six left-lateralized regions largely outside of category-selective visual cortex that showed a supramodal representation of object categories. These were located in the posterior middle/inferior temporal gyrus (pMTG/ITG), angular gyrus, ventral temporal cortex, posterior cingulate/precuneus (PC), and lateral and dorsomedial prefrontal cortex. Representational similarity analysis within these regions determined that the similarity between category-specific patterns of neural activity in the pMTG/ITG and the PC was consistent with the semantic similarity between these categories. This finding supports the PC and pMTG/ITG as candidate regions for the amodal representation of the conceptual properties of objects.},
+    issn = {0270-6474},
+    URL = {https://www.jneurosci.org/content/33/25/10552},
+    eprint = {https://www.jneurosci.org/content/33/25/10552.full.pdf},
+    journal = {Journal of Neuroscience}
 }
+
 
 @article{che2016mode,
     title = {Mode regularized generative adversarial networks},
     author = {Che, Tong and Li, Yanran and Jacob, Athul Paul and Bengio, Yoshua and Li, Wenjie},
-    journal = {arXiv preprint arXiv:1612.02136},
-    year = {2016}
+    journal = {Proceedings of the International Conference on Learning Representations (ICLR)},
+    year = {2017}
 }
 
 @article{ham2020unbalanced,

@@ -1,14 +1,26 @@
-The following section presents important theoretical concepts that used in this thesis as well as related work.
+This thesis discusses whether \acp{VAE} are a good model of the visual system.
+The following sections, therefore, first introduce the human visual system and, subsequently, work related to \acp{VAE} as a model of this.
 
-\subsection{Human Cognition}\label{subsec:human-brain-structure}
+\subsection{Visual Cognition}\label{subsec:human-brain-structure}
+
+The visual system enables humans and other high developed mammals to make sense of visual stimuli.
+The following sections describe how the hierarchical structure of the visual system enables perception of gradually increasing complex visual features.
 
 \subsubsection{Cells}
-The human nervous systems has two types of cells, \textit{neurons} and \textit{glial cells} or \textit{glia}~\citep[p. 71]{mack2013principles}.
-Even though glia occur two to ten times more often in the nervous system than neurons~\citep[p. 24]{mack2013principles}, they - unlike neurons - \say{are not directly involved in electrical signaling}~\citep[p. 26]{mack2013principles} and therefore not further described in the course of this work.
+
+The brain, together with the spinal cord constitutes the \ac{CNS}~\citep[p. 340]{mack2013principles}.
+The \ac{CNS} comprises two types of cells, \textit{neurons} and \textit{glial cells} or \textit{glia}~\citep[p. 71]{mack2013principles}.
+
+Even though glia occur two to ten times more often in the nervous system, neurons are the basic units allowing signal exchange in the nervous system~\citep[p. 24]{mack2013principles}.
+Glia, in contrast, surround neurons and play a supportive role but are not directly involved in this signal exchange~\citep[p. 26]{mack2013principles}.
 
 Neurons in different brain regions can take different forms.
-However, regardless of their specific configuration, they have four defined regions: \say{(1) the cell body, (2) dendrites, (3) axon, and (4) presynaptic terminals}~\citep[p. 22]{mack2013principles} (see Figure~\ref{fig:neuron_structure}).
-The dendrites receive input from other neurons while axons convey electrical signals to other neuron's dendrites.
+However, regardless of their specific configuration, they have four defined regions~\citep[p. 22]{mack2013principles}.
+
+The (1) cell body (\textit{soma}) performs metabolism and contains the genetic cell information.
+(2) \textit{Dendrites} are attached to the cell body.
+By branching out, they receive signals from other neurons.
+Through their (3) \textit{presynaptic terminals}, (4) \textit{axons} transmit signals to other cells.
 
 \begin{wrapfigure}[28]{R}{0.3\textwidth}
     \begin{center}
@@ -18,19 +30,16 @@ The dendrites receive input from other neurons while axons convey electrical sig
     \label{fig:neuron_structure}
 \end{wrapfigure}
 
-\textbf{Hier könnte noch deutlich mehr kommen.}
-
 \subsubsection{Human Brain Structure}
 
 The human brain is subdivided into six regions of different forms and functions: the medulla, pons, midbrain, cerebellum, diencephalon, and the cerebral hemispheres~\citep[p. 340]{mack2013principles} (see Figure~\ref{fig:human_brain_divisions}).
-Together with the spinal cord, it constitutes the \ac{CNS}~\citep[p. 340]{mack2013principles}.
 
 Medulla, pons, and midbrain constitute the \textit{brain stem}.
-The brain stem recieves input from \say{several specialized senses, such as hearing, balance and taste} and \say{mediates sensation and motor control of head, neck, and face}~\citep[p. 341]{mack2013principles}.
+The brain stem receives input from some senses (but not vision) and plays a role in motor control~\citep[p. 341]{mack2013principles}.
 Furthermore, it \say{contains [\ldots] pathways that carry [\ldots] information to other divisions of the \ac{CNS}}~\citep[p. 341]{mack2013principles}.
 
-The \textit{cerebellum} is mostly responsible for motor skills but is also involved in \say{language and other cognitive function}~\citep[p. 341]{mack2013principles}.
-Even though containing more neurons than other divisions of the brain, it \say{is well understood because relatively few types of neurons are involved}~\citep[p. 341]{mack2013principles}.
+The \textit{cerebellum} is mostly responsible for motor skills but is also involved in cognition~\citep[p. 341]{mack2013principles}.
+It contains more neurons than other divisions of the brain but only few different types and, therefore, is well explored~\citep[p. 341]{mack2013principles}.
 
 The \textit{diencephalon} contains the \textit{thalamus} and \textit{hypothalamus}.
 The thalamus acts as a filter, deciding which information is forwarded to the neocortex~\citep[p. 341]{mack2013principles}.
@@ -39,11 +48,11 @@ The hypothalamus plays an important role in controlling body functions such as e
 The \textit{cerebral hemispheres}~\citep[p. 341]{mack2013principles}, finally, is the brain region most relevant for this thesis.
 It can be further subdivided into \textit{cerebral cortex}, \textit{white matter}, \textit{basal ganglia}, \textit{amygdala}, and \textit{hippocampus}~\citep[p. 341]{mack2013principles}.
 The latter three are \say{concerned with the expression of emotion [amygdala], [\ldots] memory formation [hippocampus], and [\ldots] control of movement and aspects of motor learning [basal ganglia]}~\citep[p. 342]{mack2013principles}.
-The \textit{cerebral cortex}, underlayed by the \textit{white matter}, is the structure of the brain closest to the surface~\citet[p. 341]{mack2013principles}.
+The \textit{neocortex}, underlayed by the \textit{white matter}, is the region of the brain enabling cognition~\citep[pp. 341, 392]{mack2013principles}.
+It is the region of the cerebral cortex closest to the surface of the brain~\citep[p. 345]{mack2013principles}.
 
-The \textit{neocortex} is \say{the region of cerebral cortex nearest the surface of the brain} \citet[p. 345]{mack2013principles}.
-It is structured into six layers and columns~\citep[p. 345]{mack2013principles}.
-Neurons within a column are assumed to from a \say{local processing network} and are understood as \say{the fundamental computational modules of the neocortex}~\citep[p. 348]{mack2013principles}.
+The neocortex is structured into six layers and columns~\citep[p. 345]{mack2013principles}.
+Neurons within a column are assumed to from a \textit{local processing network} and are understood as \say{the fundamental computational modules of the neocortex}~\citep[p. 348]{mack2013principles}.
 Neurons within the different layers show different kinds of connectivity.
 For example, Layer I mainly contains dendrites of cells in deeper layers where as Layers II and III contain \textit{pyramidal neurons} whose axons project onto other neuros~\citep[p. 346]{mack2013principles}.
 
@@ -52,13 +61,13 @@ Furthermore, the neocortex is structured \textit{topographically}, i.e.~neurons 
 \begin{figure}
     \centering
     \includegraphics[width=.4\textwidth]{images/brain_regions.jpeg}
-    \caption[Divisions of the human brain]{Five divisions of the human brain, the cerebral cortex as part of the cerebral hemispheres, and the spinal cord. Taken from \citet[p. 340]{mack2013principles}.}
+    \caption[Divisions of the human brain]{Five divisions of the human brain in the \ac{CNS}, the cerebral cortex as part of the cerebral hemispheres, and the spinal cord. Taken from \citet[p. 340]{mack2013principles}.}
     \label{fig:human_brain_divisions}
 \end{figure}
 
 \subsubsection{Visual Cortex}\label{subsubsec:visual-cortex}
 
-The first cortical region receiving retinal signals is the \acf{V1}~\citep[p. 559]{mack2013principles}.
+The first cortical region receiving signals from the retina is the \acf{V1}~\citep[p. 559]{mack2013principles}.
 The \ac{V1} does not receive input directly from the retina, but the signal travels through the \textit{primary visual pathway} that includes the \ac{LGN}~\citep[p. 559]{mack2013principles}.
 Two other pathways transport signals from the retina to other brain regions but are not concerned with object recognition but controlling movements and pupillary reflexes~\citep[p. 559]{mack2013principles}.
 
@@ -895,7 +904,7 @@ Section~\ref{subsec:visual-object-perception} described the case of a subject wh
 The term \textit{Semantic Representation} refers to these high-level representations that allow to capture the \textit{meaning} of a stimulus.
 
 Albeit, a universally accepted definition for this term yet has to be found.
-\textit{Semantics} is defined\footnote{\href{https://www.lexico.com/en/definition/semantics}{https://www.lexico.com/en/definition/semantics}, last access: 21/06/2020} as
+\textit{Semantics} is defined as \citep{lexico}
 \begin{displayquote}
     The branch of linguistics and logic concerned with meaning. There are a number of branches and subbranches of semantics, including formal semantics, which studies the logical aspects of meaning, such as sense, reference, implication, and logical form, lexical semantics, which studies word meanings and word relations, and conceptual semantics, which studies the cognitive structure of meaning.
 \end{displayquote}
