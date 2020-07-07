@@ -20,7 +20,8 @@ However, regardless of their specific configuration, they have four defined regi
 The (1) cell body (\textit{soma}) performs metabolism and contains genetic cell information.
 (2) \textit{Dendrites} are attached to the cell body.
 By branching out, they receive signals from other neurons.
-Through their (3) \textit{presynaptic terminals}, (4) \textit{axons} transmit signals to other cells.
+Through their (3) \textit{presynaptic terminals}, (4) \textit{axons} transmit signals, the \textit{action potentials}, to other cells~\citep[pp. 22, 23]{mack2013principles}.
+
 
 \begin{wrapfigure}[28]{R}{0.3\textwidth}
     \begin{center}
@@ -71,10 +72,9 @@ Furthermore, the neocortex is structured \textit{topographically}, i.e., cells w
 
 Through the retina, signals of visual stimuli travel through the \textit{primary visual pathway} that includes the \ac{LGN}~\citep[p. 559]{mack2013principles}~(see Figure~\ref{fig:ventral_dorsal_pathway}).
 The primary visual pathway transports the signals to \acf{V1}, the first region of the visual cortex~\citep[p. 559]{mack2013principles}.
-% TODO: Two other pathways transport signals from the retina to other brain regions but are not concerned with object recognition but controlling movements and pupillary reflexes~\citep[p. 559]{mack2013principles}.
-% TODO: Introduce receptive field
 
-The \ac{LGN} contains \textit{on-center} and \textit{off-center} cells that respond strongly to stimuli having either a bright center and a dark surrounding or a dark center and a bright surrounding~\citep[pp. 564-566]{mack2013principles}.
+The \ac{LGN} contains \textit{on-center} and \textit{off-center} cells that respond strongly to stimuli having either a bright center and a dark surrounding or a dark center and a bright surrounding in their receptive field~\citep[pp. 564-566]{mack2013principles}.
+In the context of vision, the receptive field of a cell is the area of the visual field,\ the neuron is responsive to~\citep[p. 564]{mack2013principles}.
 Although signals travel primarily from \ac{LGN} to \ac{V1}, the \ac{LGN} receives strong feedback from \ac{V1}.
 However, the function of these feedback connections, outnumbering the number of feedforward neurons from the \ac{LGN} by factor ten, is mostly unknown~\citep[p. 573]{mack2013principles}.
 
@@ -92,20 +92,20 @@ From V4, the ventral pathway has feedback and feed-forward connections from and 
 
 The visual cortex is mainly structured in a feed-forward manner.
 Lower regions in the visual cortex detect lower level features.
-In contrast, higher regions detect higher-level features~\citep{eickenberg2017seeing}:
+In contrast, higher regions detect higher-level features~\citep{eickenberg2017seeing,desimone1995neural}:
 The primary visual cortex (\ac{V1}) detects edges~\citep{hubel1962receptive, eickenberg2017seeing}, while the \ac{V2} does not respond to such basic shapes~\citep{freeman2013functional}.
 Instead, it responds to naturalistic textures that are combinations of features \ac{V1} is sensitive to~\citep{freeman2013functional}.
 The function of V4 is manifold - it \say{respond[s] to more complex geometric shapes, color, and a large number of other
 stimulus characteristics}~\citep{eickenberg2017seeing} and it is assumed to perform foreground and background segmentation~\citep{roe2012toward}.
-% TODO: gucken ob visual attention ein feststehender Begriff ist
-% TODO: Zitat umschreiben
-Furthermore, the \ac{V4} is assumed to play a role in \say{visual attention}~\citep{roe2012toward}, i.e.,~to \say{enhance neuronal firing to relevant stimuli in V4 and [to] suppress responses to distractor stimuli}~\citep{roe2012toward}.
-This behavior is assumed to emerge from the top-down connections into \ac{V4}~\citep{roe2012toward}.
+
+Furthermore, the \ac{V4} is assumed to play a role in \textit{visual attention}.
+Attentional mechanisms are assumed to be enabled by top-down connections.
+They allow the suppression of irrelevant stimuli and focus on relevant ones in the current context~\citep{desimone1995neural,roe2012toward}.
+\ac{V4} receives input from top-down connections and is assumed to enable attentional mechanisms~\citep{roe2012toward}.
 The \ac{IT}, finally, responds to high-level features such as faces and complex objects~\citep{logothetis1995shape, eickenberg2017seeing}.
 
 The two-stream hypothesis~\citep{goodale1992separate} states that the two pathways are concerned with the \textit{where} (dorsal stream) and \textit{what} (ventral stream) in a visual scene~\citep[p. 520]{mack2013principles}.
 However, \citet[p. 564]{mack2013principles} note that the two pathways can exchange information.
-% TODO Gucken ob ich das zitieren muss
 Nevertheless, they still encode two different qualities of a stimulus: the identity and the location.
 
 \subsubsection{Visual Object Perception}\label{subsec:visual-object-perception}
@@ -186,17 +186,17 @@ Another example of self-supervised learning is word embeddings \textbf{REF}.
     \caption[Clusters of data points]{Data points colored by their corresponding class building clusters.}
     \label{fig:clustering_example}
 \end{wrapfigure}
-Just like in self-supervised learning, unsupervised learning works with unlabeled data, i.e.~the dataset only consists of samples $\bm{x}_i$.
-A typical example for unsupervised learning is clustering, an approach that can be used if the datapoints can be compared in terms of a distance measure.
+Like in self-supervised learning, unsupervised learning works with unlabeled data, i.e.,~the dataset only consists of samples $\bm{x}_i$.
+A typical example of unsupervised learning is clustering, an approach that can be used if the data points can be compared in terms of a distance measure.
 Consider Figure~\ref{fig:clustering_example}.
 Each data point belongs to one class, visualized by the color of the point.
 
-Cluster algorithms often are employed in cases where the class identity of data points is unknown, i.e.~they aim at finding the labeling function by identifying clusters of data points.
+Cluster algorithms are often employed in cases where the class identity of data points is unknown, i.e., they aim to find the labeling function by identifying clusters of data points.
 Figure~\ref{fig:clustering_example} shows an example where this can be feasible because adjacent data points tend to have the same class.
 
 \paragraph{Reinforcement Learning}
 Reinforcement learning is a very different paradigm compared to supervised and unsupervised learning.
-Here, the aim to is toz train an \textit{agent} to show some meaningful behavior, e.g.~to play a computer game.
+Here, the aim is to train an \textit{agent} to show some meaningful behavior, e.g.,~to play a computer game.
 Reinforcement learning algorithms achieve this by letting the agent explore the action space\footnote{In the case of a computer game, this would mean to carry out different moves.}.
 If the outcome of an action is good, the agent is getting rewarded.
 The agent, in turn, aims at maximizing its reward. \textbf{REFERENCES FOR THIS PARAGRAPH}
@@ -208,14 +208,14 @@ The agent, in turn, aims at maximizing its reward. \textbf{REFERENCES FOR THIS P
 \subsubsection{Simple and Complex Cells in \acl{V1}}\label{subsubseq:simple_complex_cells}
 
 \citet{hubel1962receptive} distinguish two main types of cells in the \ac{V1}: simple and complex cells.
-Both cell types are orientation sensitive, i.e.~different cells are tuned towards different orientations of stripes in a stimulus.
+Both cell types are orientation sensitive, i.e.,~different cells are tuned towards different orientations of stripes in a stimulus.
 Other than simple cells, complex cells are more invariant towards the stripe's location (but not its orientation) in the receptive field.
 Complex cells are assumed to receive input from simple cells~\citep{hubel1962receptive}.
-Based on this assumption, complex cells can be modelled by receiving input from many simple cells, tuned towards a specific orientation but not location.
-If any of the afferent simple cells fire, the complex cells fires as well, leading to an translation invariant behavior~\citep{hubel1962receptive}.
+Based on this assumption, complex cells can be modeled by receiving input from many simple cells, tuned towards a specific orientation but not location.
+If any of the afferent simple cells fire, the complex cells fires, leading to a translation-invariant behavior~\citep{hubel1962receptive}.
 
-% TODO: Was ist Gabor wavelet und Neuron Excitation?
-It can be shown that a two-dimensional Gabor wavelet is a very good stimulus for a simple cell in \ac{V1} in terms of neuron excitation~\citep{jones1987evaluation}.
+% TODO: Was ist Gabor wavelet
+It can be shown that a two-dimensional Gabor wavelet is an excellent stimulus for a simple cell in \ac{V1} in terms of the neuronal action potential~\citep{jones1987evaluation}.
 
 \subsubsection{Neocognitron}
 
@@ -226,12 +226,12 @@ It can be trained in an unsupervised manner by reinforcing connections leading t
 \subsubsection{\aclp{CNN}}\label{subsubsec:cnn_model_visual_system}
 \acp{CNN}~\citep{lecun1989backpropagation} can be understood as a successor of the Neocognitron~\citep{lindsay2020convolutional} and is a network type commonly used on image data~\citep[p. 326]{Goodfellow-et-al-2016}.
 The convolutional layers of a \ac{CNN} act as a pattern detector, similar to the S-cells in the Neocognitron~\citep{lindsay2020convolutional}.
-In addition, after an activation layer, \acp{CNN} usually perform an operation called (max-)pooling~\citep[pp. 326, 339]{Goodfellow-et-al-2016}.
+After an activation layer, \acp{CNN} usually perform an operation called (max-)pooling~\citep[pp. 326, 339]{Goodfellow-et-al-2016}.
 The pooling operation introduces invariance to the network, similar to C-cells~\citep{lindsay2020convolutional}.
 
 \paragraph{Convolution}
 
-Assume $I$ is a two-dimensional grayscale image and $K$ is a convolutional kernel.
+Assume $I$ is a two-dimensional grayscale image, and $K$ is a convolutional kernel.
 The convolution operation then is~\citep[p. 327]{Goodfellow-et-al-2016}:
 \begin{align}
     S(i, j)=(I * K)(i, j)=\sum_{m=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} I(m, n) K(i-m, j-n) \label{eq:conv}
@@ -242,56 +242,57 @@ The result of the convolution is $S$, a \textit{feature map}.
 The kernel is usually implemented as a two-dimensional array~\citep[p. 327]{Goodfellow-et-al-2016}.
 % TODO: Den folgenden Satz verständlicher, auch mit weniger assumes drin
 Values outside of this array, as they are assumed in the summation in Equation~\ref{eq:conv}, are assumed to be zero.
-These values then do not contribute to the sum and the convolution effectively only has to use a finite number of summations.
+These values then do not contribute to the sum, and the convolution effectively only has to use a finite number of summations.
 In case of a $3\times 3$ kernel, Equation~\ref{eq:conv} simplifies to:
 \begin{align}
     S(i, j)=(I * K)(i, j)=\sum_{m=i-1}^{i+1} \sum_{n=j-1}^{j+1} I(m, n) K(i-m, j-n) \label{eq:conv_boiled_down}
 \end{align}
-Equation~\ref{eq:conv} holds under the assumption that indexing starts at zero for the image and at minus one for the kernel.
+Equation~\ref{eq:conv} holds if indexing starts at zero for the image and at minus one for the kernel.
 
-The output of a convolution is at its maximum in image areas where the image contains a flipped version of the kernel.
+The output of a convolution is maximum in image areas where the image contains a flipped version of the kernel.
 % The sums in Equation~\ref{eq:conv_boiled_down} go from low to high indices for the image but from high to low indices for the kernel.
 Other than the cross-correlation\footnote{The cross-correlation is defined as $S(i, j)=(I * K)(i, j)=\sum_{m=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} I(i+m, j+n) K(m, n)$~\citep[p. 329]{Goodfellow-et-al-2016}.}, the convolution is commutative.
-However, this property is not important in practice and \say{many neural network libraries implement [...] the cross-correlation [instead]}~\citep[p. 329]{Goodfellow-et-al-2016}.
+However, this property is not relevant in practice, and \say{many neural network libraries implement [...] the cross-correlation [instead]}~\citep[p. 329]{Goodfellow-et-al-2016}.
 % TODO: Umschreiben, den Satz vorher
 
 \subparagraph{Padding}
-The convolution operations applies the kernel at all image locations.
+The convolution operation applies the kernel at all image locations.
 At border pixels, however, this operation is problematic because the sum in Equation~\ref{eq:conv_boiled_down} also considers image pixels with an index smaller than $i$ or $j$.
 There are multiple options to deal with this problem.
 
-One option is to not pad the image at all and to start and end the convolution at indices such that the sum in Equation~\ref{eq:conv_boiled_down} is never applied to invalid image indices~\citep[p. 350]{Goodfellow-et-al-2016}.
-This, however, leads to feature maps smaller than the input image because the border pixels are not considered.
+One option is not to pad the image at all and to start and end the convolution at indices such that the sum in Equation~\ref{eq:conv_boiled_down} is never applied to invalid image indices~\citep[p. 350]{Goodfellow-et-al-2016}.
+However, this leads to feature maps smaller than the input image because the border pixels are not considered.
 This can be problematic for deep networks as this happens on all convolutional layers.
 Also, the network does not consider border pixels equally often compared to non-border pixels.
 
-Another option is \textit{zero-padding}~\citep[p. 350]{Goodfellow-et-al-2016}, i.e.~assuming values outside the image to be zero.
+Another option is \textit{zero-padding}~\citep[p. 350]{Goodfellow-et-al-2016}, i.e.,~assuming values outside the image to be zero.
 Here, the feature map is of the same size as the input.
-However, the network still handles border pixels differently than inner pixels as the feature map values for border pixels tend to be smaller due to the multiplication with zero in Equation~\ref{eq:conv_boiled_down}.
+However, the network still handles border pixels differently from inner pixels.
+The feature maps values for border pixels tend to be smaller due to the multiplication with zero in Equation~\ref{eq:conv_boiled_down}.
 
 Other padding techniques mirror the image at the borders or assume that all pixel values outside the image are the same as at the borders~\footnote{\href{https://www.tensorflow.org/api\_docs/python/tf/pad}{https://www.tensorflow.org/api\_docs/python/tf/pad}, last access: 2020/06/18}.
 
 \paragraph{Max-Pooling}
-Similar to the convolution, pooling operations use a sliding window over the feature maps, often with an offset (\textit{stride}) such that the sliding window sees every pixel only once.
-A strided max-pooling has multiple effects.
-First, it leads to a downsampling of the image.
-This is a useful property as it allows to use more convolutional kernels in higher layers without exceeding a system's memory\footnote{Of course, the convolutional kernels itself are almost certainly unproblematic as they are very small. Each convolution, however, produces another memory-consuming feature map.}.
+Like the convolution, pooling operations use a sliding window over the feature maps, often with an offset (\textit{stride}) such that the sliding window sees every pixel only once.
+A stridden max-pooling has multiple effects.
+First, it leads to the downsampling of the image.
+Downsampling is a useful property as it allows us to use more convolutional kernels in higher layers without exceeding a system's memory\footnote{Of course, the convolutional kernels itself are almost certainly unproblematic as they are very small. Each convolution, however, produces another memory-consuming feature map.}.
 Not less importantly, max-pooling makes the network more invariant to small translations~\citep[p. 342]{Goodfellow-et-al-2016}.
-In cases where translation invariance is not desired\footnote{This is often the case for generative models.} but the image should be down-sampled, the max-pooling layer can be omitted and a strided convolution can be used instead~\citep[p. 337]{Goodfellow-et-al-2016}.
+In cases where translation invariance is not desired\footnote{This is often the case for generative models.}, but the image should be down-sampled, the max-pooling layer can be omitted, and a stridden convolution can be used instead~\citep[p. 337]{Goodfellow-et-al-2016}.
 
 \paragraph{\acfp{CNN} as Models of the Visual System}
-By design, \acp{CNN} share some features with the visual system, namely the convolution as a model of S-cells and max-pooling as a model of C-cells.
+By design, \acp{CNN} share some features with the visual system, namely the convolution as a model of S-cells and max-pooling as a C-cell model.
 However, \acp{CNN} show further unintentional parallels to the visual system:
 
 AlexNet~\citep{krizhevsky2012imagenet} is a deep \ac{CNN} trained on image classification.
-\citet{krizhevsky2012imagenet} have shown that this network learns Gabor wavelets in the kernels of the first layer.
+\citet{krizhevsky2012imagenet} have shown that this network learns Gabor wavelets in the first layer’s kernels.
 A Gabor wavelet is the optimal stimulus for a Gabor-like kernel (see Section~\ref{subsubsec:cnn_model_visual_system}), resulting in the strongest excitement.
-But also, it is the optimal stimulus for cells in \ac{V1} (see Section~\ref{subsubseq:simple_complex_cells}, and \citet{jones1987evaluation}).
+It is also the optimal stimulus for cells in \ac{V1} (see Section~\ref{subsubseq:simple_complex_cells}, and \citet{jones1987evaluation}).
 
-Furthermore, \citet{khaligh2014deep} have shown that \acp{CNN} trained in a supervised manner show similar \acp{RDM} as the human \ac{IT}.
+Furthermore, \citet{khaligh2014deep} have shown that \acp{CNN} trained in a supervised manner show similar \acp{RDM} like the human \ac{IT}.
 An \ac{RDM} is a matrix encoding the correlation of activity patterns for a given model.
 Rows and columns refer to different input stimuli.
-A cell in a \ac{RDM} then contains the correlation of the activity patterns for the given input stimuli and the given model.
+A cell in an \ac{RDM} then contains the correlation of the activity patterns for the given input stimuli and the given model.
 % \acp{RDM}, therefore, are symmetric.
 
 \citet{eickenberg2017seeing} explicitly discuss \acp{CNN} as models of the visual system.
@@ -301,25 +302,66 @@ The similarity of the \acp{RDM} is evidence that supervised \acp{CNN} and the hu
 
 % TODO: Der und der nächste Absatz nimmt VAEs vorweg, verschieben?
 \citet{khaligh2014deep} also show that this is not true for a variety of unsupervised models.
-The unsupervised models under investigation, however, are only losely related to \acfp{VAE}.
-The question whether \acp{VAE} show similar \acp{RDM} as the human \ac{IT}, therefore, remains.
+The unsupervised models under investigation, however, are only loosely related to \acfp{VAE}.
+The question of whether \acp{VAE} show similar \acp{RDM} as the human \ac{IT}, therefore, remains.
 
 It has been shown that \acp{VAE}, trained in a self-supervised manner, partially learn Gabor wavelets when trained to predict the next image in a sequence of images~\citep{palm2012prediction}.
-Also, there are unsupervised models that learn Gabor wavelets~\citep{berkes2005slow}.
+Also, some unsupervised models learn Gabor wavelets~\citep{berkes2005slow}.
+
+\subsection{Semantic Representations}\label{subsec:semantic-representations}
+
+Section~\ref{subsec:visual-object-perception} described a subject who was able to copy drawings of objects but not capture their \textit{meaning}.
+\citet[pp. 1069, 1070]{squire2012fundamental} hypothesize that the subject's \ac{IT} was impaired, leading to an \say{inability to generate a high-level representation of the object.}
+
+The term \textit{Semantic Representation} refers to these high-level representations that allow to capturing the \textit{meaning} of a stimulus.
+
+Albeit, a universally accepted definition for this term yet has to be found.
+\textit{Semantics} is defined as~\citep{lexico}
+\begin{displayquote}
+    The branch of linguistics and logic concerned with meaning. There are a number of branches and subbranches of semantics, including formal semantics, which studies the logical aspects of meaning, such as sense, reference, implication, and logical form, lexical semantics, which studies word meanings and word relations, and conceptual semantics, which studies the cognitive structure of meaning.
+\end{displayquote}
+This thesis is less concerned with linguistics but with \textit{meanings} and \textit{relations}, not of language but \textit{images}.
+A general definition of \textit{Semantic Representations}, however, should not be restricted to words or images.
+It should incorporate all kinds of concepts a human can form of perception.
+
+In this thesis, \textit{Semantic Representations} are somewhat related to \textit{Word Embeddings} in \ac{NLP}.
+Word embeddings~\citep{mikolov2013efficient} are a vectorized representation of words in a vector space.
+The training procedure learns a mapping from word into the latent space so that the word's position itself has meaning.
+One prominent example is that the vector space allows \say{simple algebraic operations[...]. [I]t was shown for example that \textit{vector}(\say{King}) - \textit{vector}(\say{Man}) + \textit{vector}(\say{Woman}) results in a vector that is closest to the vector representation of the word \textit{Queen} [...]}~\citep{mikolov2013efficient}.
+It has been shown that for word representations, they correlate with brain activity fMRI data~\citep{ruan2016exploring, anderson2013words}.
+
+Just like the brain maps similar visual stimuli to neurons close to one another, a semantic representation should encode concepts such that encodings of similar concepts are close to one another according to some distance metric.
+Unfortunately, a dense vector (as in word embeddings) as a semantic representation is somewhat unrelated to active neurons’ subpopulation.
+
+Another consideration is the \textit{mode} of perception.
+Section~\ref{subsec:visual-object-perception} discusses that the \ac{IT} seems to play a crucial role in building and accessing semantic representations for visual input.
+Different brain areas may be activated by different modes of presentation (e.g., \textit{visual} vs. \textit{auditory}).
+However, only the brain regions that are active regardless of the mode of presentation are candidate regions for amodal representations~\citep{fairhall2013brain}.
+\citet{fairhall2013brain} attempt to find these brain regions by analyzing which brain regions are active for textual and visual stimuli (both presented visually).
+
+All in all, the question of how to obtain and assess good semantic representations remains.
+One minimum requirement, albeit, is that those (amodal) semantic representations should behave like biological examples.
+
+This thesis focuses on visual-modal semantic representations.
+
+For visual input, it has been shown that higher-layer activations of supervised \acp{CNN} explain \ac{IT} cortical representation~\citep{khaligh2014deep,cadieu2014deep}.
+For unsupervised models operating on image data, in contrast, there is some evidence that these models do not explain \ac{IT} cortical representation (or by far worse than supervised models)~\citep{khaligh2014deep} - even though not explicitly for \acp{CNN}.
+
+\acp{CNN}, therefore, seem to be a promising candidate for visual-modal semantic representations.
 
 \subsection{Generative Methods}\label{subsec:generative-methods}
 
 Section~\ref{subsec:types-of-learning} used the example of a \say{cat-and-dog-classifier} to introduce supervised learning.
 Such a classifier is also an example of a \textit{discriminative model} because it \say{model[s] the posterior probabilities directly}~\citep[p. 43]{bishop2006pattern}.
 Therefore, a discriminative model, for example, does not allow to predict the probability density of a data point in the feature space~\citep[pp. 43,44]{bishop2006pattern}.
-\textit{Generative methods} model both, the input and the output probabilities.
-This allows to sample from the input space, for example to generate new data points~\citep[p. 43]{bishop2006pattern}.
-The following sections give an overview over existing generative methods.
+\textit{Generative methods} model both the input and the output probabilities.
+Access to the input probability allows sampling from the input space to generate new data points~\citep[p. 43]{bishop2006pattern}.
+The following sections give an overview of existing generative methods.
 
 \subsubsection{\aclp{GAN}}\label{subsubsec:gans}
 
 The idea behind \acp{GAN}~\citep{goodfellow2014gans} is to use two networks, one \textit{generator network} $G$ to approximate the data distribution, and another \textit{discriminator network} $D \mapsto [0, 1]$ to discriminate between true data points and data points generated by the generator network.
-This can be formalized as~\citep{goodfellow2014gans}:
+This interplay can be formalized as~\citep{goodfellow2014gans}:
 \begin{align}
     V(D, G)=\mathbb{E}_{\bm{x} \sim p_{\text{data}}(\bm{x})}[\log D(\bm{x})]+\mathbb{E}_{\bm{z} \sim p_{\bm{z}}(\bm{z})}[\log (1-D(G(\bm{z})))]
 \end{align}
@@ -334,11 +376,11 @@ It can be found by~\citep{goodfellow2014gans}:
 
 The discriminator $D$ in Equation~\ref{eq:gan_objective} is trained towards maximizing $V(D, G)$.
 A perfect discriminator achieves this by labeling all true samples $\bm{x} \sim p_{\text{data}}$ with 1 and all generated samples $G(\bm{z}), \bm{z}\sim p_{\bm{z}}$ with 0.
-This results in a value $V(D, G) = 0$, which is the maximum.
+The correct labeling of all samples results in a value $V(D, G) = 0$, which is the maximum.
 
 The generator $G$ is trained towards minimizing $V(D, G)$.
-As the discriminator output is the only variable term in $V(D, G)$, this can only be achieved by misleading the discriminator such that it makes a larger error.
-If the generator reproduces the data distribution $p_{\text{data}}$, the discriminator would no longer be able to distinguish the generated from the true samples as they come from the same distribution.
+As the discriminator output is the only variable term in $V(D, G)$, $G$ can only minimize $V(D, G)$ by misleading the discriminator to make a more significant error.
+If the generator reproduces the data distribution $p_{\text{data}}$, the discriminator would no longer distinguish the generated from the real samples as they come from the same distribution.
 Reproducing the data distribution is what is desired in generative methods.
 
 \begin{figure}
@@ -348,14 +390,13 @@ Reproducing the data distribution is what is desired in generative methods.
     \label{fig:gan_samples}
 \end{figure}
 
-Recent improvements on \acp{GAN} have led to syntheses of highly natural images as shown in Figure~\ref{fig:gan_samples}.
+Recent improvements on \acp{GAN} have led to syntheses of highly natural images, as shown in Figure~\ref{fig:gan_samples}.
 
 The main disadvantage of \acp{GAN} is training stability.
 When training \acp{GAN}, one commonly encounters \textit{mode collapse} or \textit{loss oscillation}.
-For mode collapse, the generator produces only few or even just one sample~\citep{che2016mode}.
-This indicates a failure to match the posterior distribution, which is the training objective of a \ac{GAN}.
-Loss oscillation occurs when the generator and the discriminator alternatingly become stronger and weaker~\citep{ham2020unbalanced}.
-% TODO: Warum ist das schlimm?
+For mode collapse, the generator produces only a few or even just one sample~\citep{che2016mode}.
+Mode collapse indicates a failure to match the posterior distribution, which is the \ac{GAN} training objective.
+Loss oscillation occurs when the generator and the discriminator alternatingly become stronger and weaker~\citep{ham2020unbalanced}, leading to a non-convergence of the model.
 
 \subsubsection{Variational Autoencoders}\label{subsec:variational-autoencoders}
 
@@ -365,10 +406,10 @@ Since \acfp{VAE} are a specialization of the autoencoder, the traditional autoen
 \paragraph{Autoencoders}
 
 Autoencoders are neural networks trained to reconstruct their input~\citep[p. 499]{Goodfellow-et-al-2016}.
-Autonencoders consist of an \textit{encoder} and a \textit{decoder}.
+Autoencoders consist of an \textit{encoder} and a \textit{decoder}.
 The encoder $f: \mathbb{R}^n \mapsto \mathbb{R}^m$ transforms an input $\bm{x}$ to a hidden representation $\bm{r} = f(\bm{x})$.
-Usually, the encoder transforms the input to a lower-dimensional representation ($m < n$).
-This can be used for dimensionality reduction or feature learning~\citep[p. 499]{Goodfellow-et-al-2016}.
+Usually, the encoder transforms the input into a lower-dimensional representation ($m < n$).
+This mapping can be used for dimensionality reduction or feature learning~\citep[p. 499]{Goodfellow-et-al-2016}.
 The decoder $g: \mathbb{R}^m \mapsto \mathbb{R}^n$ transforms the hidden representation back into the original feature space.
 Usually, one wants the reconstruction $\tilde{\bm{x}}$ to be close to the original feature $\bm{x}$ ($\tilde{\bm{x}} \approx \bm{x}$).
 In order to achieve this, the autoencoder is usually trained by minimizing the loss $\mathcal{L}(\bm{x}, g(f(\bm{x})))$ with
@@ -379,7 +420,7 @@ One common choice for $\mathcal{L}$ is the \ac{MSE} which is defined as~\citep[p
 \begin{align}
     \mathcal{L}(\bm{x}, \bm{y}) = \frac{1}{n}\sum (\bm{x}_i - \bm{y}_i)^2 \label{eq:mse}
 \end{align}
-Note that for linear activations in the autoencoder, the space spanned by the first $m$ principal components is the optimal solution for equation~\ref{eq:mse}~\citep{chicco2014deep}.
+Note that for linear activations in the autoencoder, the subspace spanned by the first $m$ principal components is the optimal solution for equation~\ref{eq:mse}~\citep{chicco2014deep}.
 
 \paragraph{Variational Autoencoders}
 
@@ -388,13 +429,13 @@ Autoencoders transform an input samples $\bm{x}$ to a \textit{hidden representat
 However, the distribution over $f(\bm{x})$ is generally unknown.
 Let $\bm{z} = f(\bm{x})$.
 Assume $\bm{\tilde{z}} = \bm{z} + \bm{\epsilon}$ is a slightly perturbed version of $\bm{z}$, created by adding a small amount of noise $\bm{\epsilon}$.
-Even though $\bm{\tilde{z}} \approx \bm{z}$, in terms of equation~\ref{eq:mse}, the result after decoding can be very different, i.e. $g(\bm{\tilde{z}}) \not\approx g(\bm{z})$.
-This is because the distribution $p(\bm{z})$ can take any arbitrary form.
+Even though $\bm{\tilde{z}} \approx \bm{z}$, in terms of equation~\ref{eq:mse}, the result after decoding can be very different, i.e., $g(\bm{\tilde{z}}) \not\approx g(\bm{z})$.
+This reconstruction-mismatch can occur because the distribution $p(\bm{z})$ can take any arbitrary form.
 Values of $\bm{z}$ that are close to another\footnote{For example in terms of Euclidean distance} can be likely for very different values of $\bm{x}$.
 
-To \textit{generate} new images it would be advantageous to enforce $p(\bm{z})$ to follow a certain distribution.
+To \textit{generate} new images, it would be advantageous to enforce $p(\bm{z})$ to follow a particular distribution.
 A common choice is an independent, multivariate normal distribution~\citep[pp. 24, 25]{kingma2019introduction}.
-\acp{VAE} enforce a certain (usually Gaussian) distribution over $\bm{z}$.
+\acp{VAE} enforce a specific (usually Gaussian) distribution over $\bm{z}$.
 
 \acp{VAE} are trained to generate samples that are likely to occur in the training set.
 Therefore, they aim to maximize $\log p(\bm{x})$\footnote{Note that $\max \log  p(\bm{x}) \equiv \max  p(\bm{x})$.}~\citep[p. 18]{kingma2019introduction}.
@@ -412,8 +453,8 @@ since computing $p(\bm{x}, \bm{z})$ is tractable~\citep[p. 14]{kingma2019introdu
 
 \acp{VAE} approximate the posterior by an \textit{inference model} $q_\phi(\bm{z}|\bm{x}) \approx p_\theta(\bm{z}|\bm{x})$, also called the \textit{encoder}~\citep[p. 15]{kingma2019introduction}.
 
-To minimize the difference between $q$ and $p$, usually the \ac{KL-divergence} plus the reconstruction error is minimized.
-The reason for this is explained in the following.
+To minimize the difference between $q$ and $p$, usually, the \ac{KL-divergence} plus the reconstruction error is minimized.
+The reason for this is as follows.
 The starting point is that we cannot compute the posterior $p_\theta(\bm{z}|\bm{x})$.
 Therefore, we approximate it by another distribution $q_\phi$.
 The \ac{KL-divergence} is used o minimize the difference between $p_{\theta}$ and $p_{\phi}$: $\kldiv{q_\phi(\bm{z}|\bm{x})}{p_\theta(\bm{z}|\bm{x})}$.
@@ -450,8 +491,8 @@ but also as
 
 Equations~\ref{eq:elbo_lower_bound} and~\ref{eq:elbo_error_term} allow two different interpretations of the \ac{ELBO}.
 Equation~\ref{eq:elbo_lower_bound} justifies the name \textit{\acl{ELBO}}.
-If the \ac{KL-divergence} goes to zero, it approaches the likelihood of the data~\citep[p. 18]{kingma2019introduction}.
-However, we cannot compute $p_\theta(\bm{z}|\bm{x})$ with our \ac{VAE} setup.
+If the \ac{KL-divergence} nears zero, it approaches the likelihood of the data~\citep[p. 18]{kingma2019introduction}.
+However, $p_\theta(\bm{z}|\bm{x})$ cannot be computed with a \ac{VAE}.
 
 Equation~\ref{eq:elbo_error_term}, however, is more useful for implementing the error function of a \ac{VAE}.
 Consider the term inside the expectation of the first term.
@@ -464,7 +505,7 @@ Then
     \log f_{\sigma,\mu}(x) &= \log \left( \frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{1}{2}\left( \frac{x-\mu}{\sigma} \right)^2} \right)\\
     &= - \log \sqrt{2\pi}\sigma -\frac{1}{2}\left( \frac{x-\mu}{\sigma} \right)^2 \label{eq:log_normal_distr}
 \end{align}
-Since $\mu$ in this case is a function of $\bm{z}$ (parametrized by $\theta$), we can consider this as the reconstruction $\hat{\bm{x}} = f_\theta(\bm{z})$.
+Since $\mu$, in this case, is a function of $\bm{z}$ (parametrized by $\theta$), we can consider this as the reconstruction $\hat{\bm{x}} = f_\theta(\bm{z})$.
 Then, except for subtracting a constant and scaling by a constant, equation~\ref{eq:log_normal_distr} is the \ac{MSE}.
 
 Since $p(\bm{x}|\bm{z})$ is a Gaussian, maximizing $\mathbb{E}_{q(z)} \left[ p(x|z) \right]$ is equivalent to minimizing the mean squared error between $x$ and the \textit{reconstruction} $\hat{x}$.
@@ -474,38 +515,43 @@ When implementing a \ac{VAE}, $q_\phi$ and $p_\theta$ are realized by neural net
 The encoder predicts the mean and variances for an independent, multivariate normal distribution, whereas the decoder reconstructs the input.
 The usage of neural networks poses a challenge for computing the first term in equation~\ref{eq:elbo_error_term}.
 Usually, one would draw a sufficient number of samples from $q_\phi(\bm{z}|\bm{x})$ to approximate the expectation.
-However, sampling is not possible if one wants to compute the gradient to train the model by backpropagation.
+However, sampling is impossible if one wants to compute the gradient to train the model by backpropagation.
 
 \paragraph{Disadvantages}
 
 % TODO: Zitat weg
 One problem arising when training \acp{VAE} is \say{\textit{posterior collapse}, in which the variational distribution collapses towards the prior}~(\citep{lucas2019understanding} and \citep[p. 694]{Goodfellow-et-al-2016}).
-This means that one or more of the latent dimensions resemble the prior, i.e.~\citep{lucas2019understanding}:
+Posterior collapse means that one or more of the latent dimensions resemble the prior, i.e.~\citep{lucas2019understanding}:
 \begin{align}
     \exists i: \forall \mathbf{x} q_{\phi}\left(z_{i} | \mathbf{x}\right) \approx p\left(z_{i}\right)
 \end{align}
 In the most extreme case, this happens for \textit{all} latent dimensions.
 In that case, the generator cannot make use of $\bm{x}$ at all, because generated images are unrelated to the input image.
-Most probably, the KL-term is the reason for posterior collapse as it is the term forcing the posterior to match the prior distribution~\citep{lucas2019understanding}.
+The KL-term is probably the reason for the posterior collapse as it is the term forcing the posterior to match the prior distribution~\citep{lucas2019understanding}.
 One technique to avoid posterior collapse is to lower the weight of the KL-term compared to the reconstruction term~\citep{lucas2019understanding}.
 
 Another disadvantage of \acp{VAE} are \say{blurry} and \say{fuzzy} reconstructions~\citep{zhao2017towards}.
 According to \citet{zhao2017towards}, these reconstructions occur for $\bm{z}$'s that are encodings of a variety of different $\bm{x}$'s.
-They propose that blurry reconstructions are caused by the pixel-wise loss and a too simple prior, e.g.~a standard multivariate normal distribution~\citep{zhao2017towards}.
+They propose that blurry reconstructions are caused by the pixel-wise loss and a too simple prior, e.g.,~a standard multivariate normal distribution~\citep{zhao2017towards}.
 
 \subsubsection{Representation Learning}\label{subsubsec:representation_learning}
-% TODO: Hier muss das Zitat unbedingt weg
-In the visual cortex, only hierarchical representations can be observed~\citep{rodriguez2015hierarchical}.
-% TODO: Brücke zum Representation learning, oder den Satz darüber weg
-Representation learning can be understood as \say{learning representations of the data that make it easier to extract useful information when building classifiers or other predictors}~\citep{bengio2013representation}.
+\textit{Representation learning} originally addresses the learning of representations of input data that makes models operating on this data more efficient~\citep{bengio2013representation}.
+In the context of \ac{NLP}, for example, sentences are often represented by \textit{Bag-of-Words} vectors.
+In a Bag-of-Words vector, each cell stands for one word in the vocabulary.
+The representation for one specific sentence is obtained by assigning each cell the number of occurrences of its word in the sentence.
 
-The following paragraphs introduce different (hierarchical) representation learning approaches used in the course of this thesis.
+However, representation learning can also be considered in semantic representations (see Section~\ref{subsec:semantic-representations}).
+As discussed earlier (see Section~\ref{subsubsec:visual-cortex}), different regions of the visual cortex learn representations of the input in different regions.
+Earlier regions learn representations of simple features, whereas later regions respond to sophisticated features of the input.
+RTherefore, representations of inputs are learned in a \textit{hierarchy} of simple to complex shapes~\citep{rodriguez2015hierarchical}.
+
+The following paragraphs introduce different hierarchical representation learning approaches.
 
 \paragraph{InfoGAN}
 InfoGANs~\cite{chen2016infogan} address feature learning in \acp{GAN} by \say{decomposing the input noise vector into two parts}~\citep{chen2016infogan}.
 Instead of only the noise $z$, the generator $G$ receives an additional input of \say{structure latent variables} $\bm{c} = (\bm{c_1}, \bm{c_2}, \dots, \bm{c_L})$.
 The additional variables are assumed to be independent of each other.
-To force $G$ to not simply ignore $c$,~\citet{chen2016infogan} modify the training objective such that \say{there should be high mutual information between latent codes $c$ and the generator distribution $G(z,c)$}~\citep{chen2016infogan}.
+To force $G$ not just to ignorce $c$,~\citet{chen2016infogan} modify the training objective such that \say{there should be high mutual information between latent codes $c$ and the generator distribution $G(z,c)$}~\citep{chen2016infogan}.
 The new loss function takes the form
 \begin{align}
     \min _{G} \max _{D} V_I(D, G)=V(D, G) - \lambda I(\bm{c}; G(\bm{z}, \bm{c}))
@@ -533,27 +579,33 @@ where $V(D, G)$ is the training objective defined in Equation~\ref{eq:gan_object
     \label{fig:infogan}
 \end{figure}
 
-\say{To disentagle digit shape styles on MNIST}, \citet{chen2016infogan} choose $\bm{c}$ as three-element set $\bm{c} = (\bm{c}_1, \bm{c}_2, \bm{c}_3)$ with $\bm{c}_1$ drawn from a categorical distribution with ten categories (equal to the number of classes in MNIST) and event probability $p_i=0.1 \, \forall i \in [0, 10]$.
+\say{To disentagle digit shape styles on MNIST,} \citet{chen2016infogan} choose $\bm{c}$ as three-element set $\bm{c} = (\bm{c}_1, \bm{c}_2, \bm{c}_3)$ with $\bm{c}_1$ drawn from a categorical distribution with ten categories (equal to the number of classes in MNIST) and event probability $p_i=0.1 \, \forall i \in [0, 10]$.
 $\bm{c}_2$ and $\bm{c}_3$ are drawn from a uniform distribution over $[-1, 1]$.
 
 Figure~\ref{fig:infogan} shows the latent space separability by varying the $\bm{c}_i$-values.
-In conclusion, InfoGAN seems to generalize as $\bm{c}_2$ and $\bm{c}_3$ vary between $[-2, 2]$, even though these values were in $[-1, 1]$ at training time.
-% TODO: Concluding remark
+In conclusion, InfoGAN seems to generalize as $\bm{c}_2$, and $\bm{c}_3$ vary between $[-2, 2]$, even though these values were in $[-1, 1]$ at training time.
+Generalization is a critical property for a model of the visual context.
+Also, InfoGAN addresses the problem of hierarchical learning.
+As discussed in Section~\ref{subsubsec:visual-cortex}, the different regions in the visual cortex learn increasingly complex representations.
+Therefore, InfoGAN, as a model employing hierarchical representations, addresses one more important property of models of the visual system.
 
 \paragraph{StyleGAN}
-StyleGAN~\citep{karras2019style} is a type of \ac{GAN} explicitly addressing \textit{latent space separability} (see Section~\ref{subsec:feature-separability}).
-The term \textit{style} refers to latent space separability, i.e.~the model is capable of learning a disentanglement of images into different styles.
-% TODO: Was ist ein Style?
+StyleGAN~\citep{karras2019style} is a type of \ac{GAN} that explicitly addresses \textit{latent space separability} (see Section~\ref{subsec:feature-separability}).
+The term \textit{style} refers to latent space separability, i.e.,~the model is can learn a disentanglement of images into different styles.
+Another term for style is factor of variation.
+For human faces, for example, one style or factor of variation is the hair color.
+
 The styles of an image are learned at different levels in a self-supervised manner.
-It is therefore not possible to explicitly force the model to learn pre-defined aspects of an image.
-A posterior analysis allows to identify which aspects were learned on which level.
-% TODO: Woher kommt das? Beschreibe den Anwendungsfall hier
-Coarse styles correspond to gender, age, or glasses.
+Therefore, it is not possible to explicitly force the model to learn pre-defined aspects of an image.
+A posterior analysis allows us to identify which aspects were learned on which level.
+
+\citet{karras2019style} train their model on a dataset of human faces.
+In this context, coarse styles correspond to gender, age, or glasses.
 Middle styles correspond to skin color, face form, or mouth open/closed.
 Fine styles correspond mainly to hair color and lightning.
 
-\acp{GAN} generate new images by using some random noise $\bm{z}\in \mathcal{Z}$ as input (see Section~\ref{subsubsec:gans}).
-In addition, StyleGAN uses a mapping network $f: \mathcal{Z}\mapsto \mathcal{W}$ to map the random noise to a vector $\bm{w}\in \mathcal{W}$.
+\acp{GAN} generate new images using random noise $\bm{z}\in \mathcal{Z}$ as input (see Section~\ref{subsubsec:gans}).
+Besides, StyleGAN uses a mapping network $f: \mathcal{Z}\mapsto \mathcal{W}$ to map the random noise to a vector $\bm{w}\in \mathcal{W}$.
 With an affine transformation, the vector $w$ is then mapped to a vector $\bm{y}_i = (\bm{y}_{s,i}, \bm{y}_{b,i})$.
 Different vectors $\bm{y}_i$ are fed into different layers $i$ of the generator network to control the style on this layer.
 
@@ -567,24 +619,24 @@ The \ac{AdaIN} operation of SyleGAN is defined as~\citep{karras2019style}:
 where $\mu(\cdot)$ gives the mean and $\sigma(\cdot)$ the (empirical) standard deviation.
 Importantly, this operation is applied separately for each feature map of $\bm{x}_i$.
 
-On each resolution, $g$ first applies noise addition, \ac{AdaIN}, $3\times 3$ convolution, noise addition, and one last \ac{AdaIN} operation.
+On each resolution, $g$ first applies noise addition, \ac{AdaIN}, a $3\times 3$ convolution, noise addition, and one last \ac{AdaIN} operation.
 Then, the image is upsampled to double size.
 This process is repeated until the image has the desired output size.
 \citet{karras2019style} use nine of these blocks, resulting in an output size of $1024\times 1024$.
 
 In StyleGAN, latent space separability is achieved by a technique called \textit{mixing regularization}.
 Here, for a subset of the training images, two input vectors $\bm{z}_1$ and $\bm{z}_2$ are drawn.
-During the training, a point (or layer) of $g$ is chosen by random up to which layer $\bm{z}_1$ controls the style.
+During the training, a point (or layer) of $g$ up to which layer $\bm{z}_1$ controls the style is chosen at random.
 After this point, the style information from $\bm{z}_2$ is fed into the network.
 Randomly choosing this point \say{prevents the network from assuming that adjacent styles are correlated}~\citep{karras2019style}.
 
 The training procedure allows for using two sources for the generation.
-During inference time, the crossover point can be chosen arbitrarily, i.e.~it can be controlled what styles are taken from the first and what styles are taken from the second source.
+During inference time, the crossover point can be chosen arbitrarily, i.e.,~it can be controlled what styles are taken from the first and what styles are taken from the second source.
 
-$\bm{y}_i$ that are fed into the network at a low resolution (i.e. $i$ is small) control the coarse styles, whereas $\bm{y}_i$ at higher layers control finer styles.
+$\bm{y}_i$s fed into the network at a low resolution (i.e., $i$ is small) control the coarse styles, whereas $\bm{y}_i$ at higher layers control finer styles.
 
-Finally, \citet{karras2019style} analyze how disentangled generations from $\mathcal{W}$-space are compared to $\mathcal{Z}$-space by means of \textit{perceptual path length} (see Section~\ref{subsec:feature-disentanglement}).
-They show that the perceptual path length is lower for interpolating in $\mathcal{W}$ compared to interpolating in $\mathcal{Z}$~\citep{karras2019style}.
+Finally, \citet{karras2019style} analyze how disentangled generations from $\mathcal{W}$-space are compared to $\mathcal{Z}$-space employing \textit{perceptual path length} (see Section~\ref{subsec:feature-disentanglement}).
+They show that the perceptual path length is lower for interpolating in $\mathcal{W}$ than for interpolation in $\mathcal{Z}$~\citep{karras2019style}.
 Therefore, they conclude that $\mathcal{Z}$ is more entangled than $\mathcal{W}$ in their setup.
 
 % TODO: Concluding dings
@@ -640,15 +692,16 @@ Therefore, they conclude that $\mathcal{Z}$ is more entangled than $\mathcal{W}$
     \caption[\ac{VLAE} structure]{\ac{LVAE} structure, adapted from \citet{sonderby2016ladder}. Solid arrows indicate feed-forward connections, dashed arrows indicate weight sharing. Diamonds indicate stochastic variables, circles deterministic variables.}
     \label{fig:lvae}
 \end{figure}
-% TODO: Beschreib top-down priming hier
-% TODO: Warum ist das ein Problem?
+
 \aclp{LVAE}~\citep{sonderby2016ladder} address the problem of hierarchical learning in \acp{VAE}.
-Hierarchical \acp{VAE} only use the first few layers to learn meaningful semantics of an input.
-In case of \citet{sonderby2016ladder}, the first two layers are sufficient.
+Classical \acp{VAE}, in contrast, learn one latent representation in one layer.
+
+Hierarchical \acp{VAE}, also, only use the first few layers to learn meaningful semantics of an input.
+In the case of \citet{sonderby2016ladder}, the first two layers are sufficient.
 \citet{zhao2017learning} state that, given a sufficiently large encoder network in the first layer, the first layer learns all the semantics.
 While this is not always true, they \say{demonstrate that this phenomen occurs in practice [\ldots]}.
 
-\acp{LVAE} is a model designed to, instead of using just the first few layers, use all embedding layers to learn a representation.
+\ac{LVAE} is a model designed to use all embedding layers to learn a representation instead of just the first few layers.
 They do this by passing information top-down in the inference network.
 \begin{figure}
     \centering
@@ -656,24 +709,24 @@ They do this by passing information top-down in the inference network.
     \caption[Context-Dependent Semantic Ambiguity]{Illustration of context-dependent semantic ambiguity. Taken from \citet[p. 61]{van2016auto}}
     \label{fig:gerben_ambiguity}
 \end{figure}
-Figure~\ref{fig:gerben_ambiguity} gives an intuition why passing information top-down can be advantegous.
+Figure~\ref{fig:gerben_ambiguity} gives an intuition of why passing information top-down can be advantageous.
 Here, the two rows show two different alphanumeric strings.
-% TODO: Verweis auf Perception von Menschen hier
-Apparently, the first row shows a sequence of alphabetic characters (\say{GERBEN}) whereas the second row shows a sequence of numeric characters (\say{10 11 12 13 14 15}).
-However, the \say{R} and the \say{B} in the first row are the exact same symbols as the \say{12} and the \say{13} in the second one.
-A pure feed-forward systems would be unable to discriminate between the low-level features \textit{R} and \textit{13}.
-Incorporating high-level features like \textit{alphabetic string} helps to improve the posterior low-level feature representation.
-Furthermore, the additional top-down pass is more biologically plausible compared to a pure feed-forward network~\citep{rodriguez2015hierarchical}.
-\citet{rodriguez2015hierarchical} explicitly discuss \say{the need for top-down priming or attention}.
 
-Unlike hierarchical \acp{VAE}, \acp{LVAE} do not use the output of lower stochastic embedding layers as input for higher layers.
+Apparently, the first row shows a sequence of alphabetic characters (\say{GERBEN}), whereas the second row shows a sequence of numeric characters (\say{10 11 12 13 14 15}).
+However, \say{R} and \say{B} in the first row are the same symbols as \say{12} and \say{13} in the second one.
+A simple feed-forward system would be unable to discriminate between the low-level features \textit{R} and \textit{13}.
+Incorporating high-level features like \textit{alphabetic string} helps to improve the posterior low-level feature representation.
+Furthermore, the top-down pass is more biologically plausible than a pure feed-forward network and enables the model to focus on relevant parts of the input (see Section~\ref{subsubsec:visual-cortex}).
+
+
+Unlike hierarchical \acp{VAE}, \acp{LVAE} do not use lower stochastic embedding layers as input for higher layers.
 Instead, they use a deterministic multi-layer network in the encoder (see Figure~\ref{fig:lvae}) and pass information from intermediate layers to the stochastic embedding layers.
 \begin{align}
     \bm{d}_i &= \text{NN}(\bm{d}_{i-1})\\
     \hat{\bm{\mu}}_{q,i}&=\text{NN}(\bm{d}_i)\\
     \hat{\bm{\sigma}}^2_{q,i}&=\text{NN}(\bm{d}_i)
 \end{align}
-Output from higher stochastic embedding layers is passed to lower layers via the decoder $p$:
+The output from higher stochastic embedding layers is passed to lower layers via the decoder $p$:
 \begin{align}
     \bm{\sigma}_{q,i}&=\frac{1}{\hat{\bm{\sigma}}^{-2}_{q,i}+\hat{\bm{\sigma}}^{-2}_{p,i}}\\
     \bm{\mu}_{q,i}&=\frac{\hat{\bm{\mu}}_{q,i}\hat{\bm{\sigma}}^{-2}_{q,i}+\hat{\bm{\mu}}_{p,i}\hat{\bm{\sigma}}^{-2}_{p,i}}{\hat{\bm{\sigma}}^{-2}_{q,i}+\hat{\bm{\sigma}}^{-2}_{p,i}}
@@ -683,12 +736,12 @@ The latent variables then are sampled conditionally:
     q(\bm{z}_i|\cdot)=\mathcal{N}(\bm{z}_i|\bm{\mu}_{q,i},\bm{\sigma}^2_{q,i})
 \end{align}
 
-\citet{sonderby2016ladder} show that gradually increasing the weight of the KL-term in the \ac{VAE} training criterion leads to a better usage of the latent spaces in terms of active units.
+\citet{sonderby2016ladder} show that gradually increasing the weight of the KL-term in the \ac{VAE} training criterion leads to better usage of the latent spaces in terms of active units.
 Without this \textit{warm-up} phase, \acp{VAE} show many inactive units.
-\citet{sonderby2016ladder} discuss that \acp{VAE} show this behavior because it allows them to minimize the KL-term in the \ac{VAE} loss function fast.
+\citet{sonderby2016ladder} discuss that \acp{VAE} show this behavior because it allows them to minimize the KL-term in the \ac{VAE} loss function quickly.
 
 Using batch-normalization and warm-up alone already leads to more meaningful representations in the higher layers of a hierarchical VAE~\citep{sonderby2016ladder}.
-Using all these techniques on the \ac{LVAE} model allows meaningful representations in even higher layers compared to a hierarchical VAE\footnote{In \citet{sonderby2016ladder}, a hierarchical \ac{VAE} with batch-normalization and warm-up learns meaningful representations up to the fourth layer where as 5-layer \ac{LVAE} also learns meaningful representations in the fifth layers. Deeper models were not investigated.}.
+Using all these techniques on the \ac{LVAE} model allows meaningful representations in even higher layers than a hierarchical VAE\footnote{In \citet{sonderby2016ladder}, a hierarchical \ac{VAE} with batch-normalization and warm-up learns meaningful representations up to the fourth layer where as 5-layer \ac{LVAE} also learns meaningful representations in the fifth layers. Deeper models were not investigated.}.
 
 \paragraph{\acl{VLAE}}
 
@@ -709,35 +762,35 @@ Using all these techniques on the \ac{LVAE} model allows meaningful representati
 \end{figure}
 
 Unlike the \ac{LVAE}, the \ac{VLAE}~\citep{zhao2017learning} is a pure feed-forward network.
-It's design is driven by the idea that \say{[i]f $\bm{z}_i$ is more abstract than $\bm{z}_j$, then the inference mapping $q(\bm{z}_i|\bm{x})$ and generative mapping when other layers are fixed $p(\bm{x}|\bm{z}_i, \bm{z}_{\neg i}=z^0_{\neg i})$ requires a more expressive network to capture}~\citep{zhao2017learning}.
+Its design is driven by the idea that \say{[i]f $\bm{z}_i$ is more abstract than $\bm{z}_j$, then the inference mapping $q(\bm{z}_i|\bm{x})$ and generative mapping when other layers are fixed $p(\bm{x}|\bm{z}_i, \bm{z}_{\neg i}=z^0_{\neg i})$ requires a more expressive network to capture}~\citep{zhao2017learning}.
 Figure~\ref{fig:vlae_structure} shows an exemplary network structure of a \ac{VLAE}.
-Early embedding layers like $\bm{z}_1$ are equipped with a less expressive network that, according to \citet{zhao2017learning}, should not allow to learn abstract features\footnote{In case of \textsc{Mnist}, more abstract features are for example the digit identity.}.
+Early embedding layers like $\bm{z}_1$ are equipped with a less powerful network that, according to \citet{zhao2017learning}, should not learn abstract features\footnote{In case of \textsc{Mnist}, more abstract features are for example the digit identity.}.
 
 These assumptions are discussed in Section~\ref{subseq:criticism_vlae}.
 
 \paragraph{$\beta$-VAE}
 
-Consider Equation~\ref{eq:elbo_error_term} describing the loss function in a \ac{VAE}.
+Consider Equation~\ref{eq:elbo_error_term}, describing the loss function in a \ac{VAE}.
 \citet{higgins2017beta} discovered that weighting both terms, the KL-divergence and the reconstruction loss, equally leads to suboptimal results in terms of \textit{feature disentanglement}.
-They therefore formulated the $\beta$-VAE learning objective that adds an additional hyperparameter $\beta$ to the loss function, controlling the relative weights of the two terms:
+They, therefore, formulated the $\beta$-VAE learning objective that adds a hyperparameter $\beta$ to the loss function, controlling the relative weights of the two terms:
 \begin{align}
     \mathbb{E}_{q_{\phi}(\bm{z} | \bm{x})}\left[\log p_{\theta}(\bm{x} | \bm{z})\right]-\beta \kldiv{q_{\phi}(\bm{z} | \bm{x})}{p(\bm{z})} \label{eq:beta-vae}
 \end{align}
 
-A value $\beta > 1$ puts more emphasis on the KL-term compared to the original \ac{VAE} loss function ($\beta = 1$).
+A value $\beta > 1$ puts more emphasis on the KL-term than the original \ac{VAE} loss function ($\beta = 1$).
 \citet{higgins2017beta} state that this could lead to better feature disentanglement because the KL-term \say{encourages conditional independence in $q_\phi(\bm{z}|\bm{x})$}~\citep{higgins2017beta}.
-This requires that some factors of the data are conditionally independent, \citet{higgins2017beta}, however, show empirically that this often is the case.
+A proper disentanglement requires that some factors of the data are conditionally independent, \citet{higgins2017beta}, however, show empirically that this often is the case.
 
 Setting $\beta > 1$ also lowers the influence of the reconstruction error in the \ac{VAE} training objective.
-This leads to worse reconstructions.
-Hence, the right parameter choice is context dependent.
+A larger $\beta$ leads to worse reconstructions.
+Hence, the right parameter choice is context-dependent.
 
-\citet{burgess2018understanding} show that disentangled representations and a good reconstruction quality can be achieved by giving the model \say{control of the encoding capacity}.
-This is done by introducing a parameter $C$ to Equation~\ref{eq:beta-vae}~\citep{burgess2018understanding}:
+\citet{burgess2018understanding} show that disentangled representations and a good reconstruction quality can be achieved by giving the model \say{control of the encoding capacity.}
+Controlling encoding capacity is done by introducing a parameter $C$ to Equation~\ref{eq:beta-vae}~\citep{burgess2018understanding}:
 \begin{align}
     \mathbb{E}_{q_{\phi}(\mathbf{z} \mid \bm{x})}\left[\log p_{\theta}(\bm{x} \mid \bm{z})\right]-\gamma\left|D_{K L}\left(q_{\phi}(\bm{z} \mid \bm{x}) \| p(\bm{z})\right)-C\right|
 \end{align}
-During training, $C$ is gradually increased from zero to a higher value (25 in case of dsprites with $\gamma=1000$ \citep{burgess2018understanding}).
+During training, $C$ gradually increases from zero to a higher value (25 for dsprites with $\gamma=1000$ \citep{burgess2018understanding}).
 
 \paragraph{\ac{VAE}-\ac{GAN}}
 \ac{VAE}-\acp{GAN}~\citep{larsen2015autoencoding} are a variation of \acp{VAE} specifically designed to replace the pixel-wise reconstruction loss.
@@ -745,15 +798,15 @@ Even on highly curated datasets such as \textsc{Mnist} (\textbf{REF}), \acp{VAE}
 The design of \ac{VAE}-\acp{GAN} is based on the assumption that the pixel-wise loss in the \ac{VAE} training objective (see Equation~\ref{eq:log_normal_distr}) is the reason for blurry output images.
 \citet{larsen2015autoencoding}~motivate this by stating that even small translations result in a high pixel-wise loss\footnote{This depends on the image's frequency as well as the variance of the pixel intensities.}.
 
-Instead of measuring the \ac{MSE} between the true and the generated image, \ac{VAE}-\acp{GAN} train a discriminator network to distinguish between generated and true images, i.e.~to maximize
+Instead of measuring the \ac{MSE} between the true and the generated image, \ac{VAE}-\acp{GAN} train a discriminator network to distinguish between generated and real images, i.e.,~to maximize
 \begin{align}
-    \mathcal{L}_{\mathrm{GAN}}=\log (D(\bm{x}))+\log (1-D(G(\bm{z}))) \label{eq:vae_gan_l_gan}
+    \mathcal{L}_{\mathrm{GAN}}=\log (D(\bm{x}))+\log (1-D(G(\bm{z}))), \label{eq:vae_gan_l_gan}
 \end{align}
 where $D$ and $G$ are the discriminator/generator networks, $\bm{x}$ an input image and $\bm{z}\sim \mathcal{N}(\bm{0},\bm{I})$ a random Gaussian sample.
-For \ac{VAE}-\acp{GAN}, the generator network is nothing but the decoder network whereas the discriminator network is an additional network that does not exist for \acp{VAE}.
+For \ac{VAE}-\acp{GAN}, the generator network is nothing but the decoder network, whereas the discriminator network is a new network that does not exist for \acp{VAE}.
 
 Equation~\ref{eq:vae_gan_l_gan} is sufficient to train the discriminator network.
-However, it does not force $p(\bm{x}) \approx \mathcal{N}(\bm{0},\bm{I})$ nor does it force reconstructions to resemble the input image.
+However, it does not force $p(\bm{x}) \approx \mathcal{N}(\bm{0},\bm{I})$, nor does it force reconstructions to resemble the input image.
 
 The latter is achieved by introducing an additional loss term
 \begin{align}
@@ -765,8 +818,8 @@ The former, forcing $p(\bm{x}) \approx \mathcal{N}(\bm{0},\bm{I})$, is achieved 
     \mathcal{L}_{\text {prior }}=\kldiv{q(\boldsymbol{z} | \boldsymbol{x})}{p(\boldsymbol{z})}
 \end{align}
 
-The encoder is trained to minimize $\mathcal{L}_{\text {prior }} +  \mathcal{L}_{\text {llike}}^{\text {D}}$, the decoder to minimize $\gamma \mathcal{L}_{\text {llike}}^{\text {D}} - \mathcal{L}_\mathrm{GAN}$, and the discriminator to minimize $-\mathcal{L}_\mathrm{GAN}$.
-Setting $\gamma = 0.75$ led to training convergence for the experiments performed for this thesis.
+The encoder minimizes $\mathcal{L}_{\text {prior }} +  \mathcal{L}_{\text {llike}}^{\text {D}}$, the decoder minimizes $\gamma \mathcal{L}_{\text {llike}}^{\text {D}} - \mathcal{L}_\mathrm{GAN}$, and the discriminator minimizes $-\mathcal{L}_\mathrm{GAN}$.
+Choosing $\gamma = 0.75$ led to training convergence for the experiments performed for this thesis.
 
 \citet{larsen2015autoencoding}~show that this training procedure leads to less blurry reconstructions.
 
@@ -813,9 +866,9 @@ Setting $\gamma = 0.75$ led to training convergence for the experiments performe
     \label{fig:alae_flow}
 \end{figure}
 Similar to \ac{VAE}-\acp{GAN}, \acfp{ALAE}~\citep{pidhorskyi2020adversarial} are a hybrid model between \acp{VAE} and \acp{GAN}.
-\acp{ALAE} are not based on variational inference but on \acp{GAN}.
+\acp{ALAE} are not based on variational inference but \acp{GAN}.
 
-The starting point of the \ac{ALAE} model is to decompose both, the generator $G$ and discriminator $D$, into two parts, i.e.~$G=\mathcal{G}\circ \mathcal{F}$ and $D=\mathcal{D}\circ \mathcal{E}$ (see Figure~\ref{fig:alae_flow}).
+The starting point of the \ac{ALAE} model is to decompose both the generator $G$ and discriminator $D$ into two parts, i.e., $G=\mathcal{G}\circ \mathcal{F}$ and $D=\mathcal{D}\circ \mathcal{E}$ (see Figure~\ref{fig:alae_flow}).
 $\mathcal{G}$ uses noise $\eta$ as an additional input.
 $\mathcal{F}$ maps the Gaussian random noise $\bm{z} \sim \mathcal{N}(\bm{0}, \bm{I})$ to another latent representation $\bm{w}$.
 The loss function requires the outputs of $\mathcal{F}$ and $\mathcal{E}$ to be similar in terms of the $l^2$-norm.
@@ -824,31 +877,31 @@ In addition to the $l^2$-loss, the model is optimized towards minimizing the dis
 
 Because $p_{\mathcal{E}}(w) \approx p_{\mathcal{F}}(w)$, \ac{ALAE} can generate reconstructions by
 \begin{align}
-    \bm{x}\approx (\mathcal{E}\circ \mathcal{G}_\eta)(\bm{x})
+    \bm{x}\approx (\mathcal{E}\circ \mathcal{G}_\eta)(\bm{x}).
 \end{align}
 $\mathcal{G}_\eta$ here indicates that $\mathcal{G}$ uses $\eta$ as an additional input.
 
 Furthermore, just like for the \ac{VAE}, the Gaussian latent space $Z$ can be traversed to generate new samples by
 \begin{align}
-    \bm{x}_{\text{new}} = (\mathcal{F}\circ \mathcal{G}_\eta)(\bm{z})
+    \bm{x}_{\text{new}} = (\mathcal{F}\circ \mathcal{G}_\eta)(\bm{z}).
 \end{align}
 
 \citet{pidhorskyi2020adversarial} show that (linearly) interpolating in $\bm{w}$-space yields smoother transitions than interpolation between two corresponding points in $\bm{z}$-space.
 This indicates that the $\bm{w}$-space is less entangled than the $\bm{z}$-space~\citep{shao2018riemannian,arvanitidis2017latent}.
 However, traversing the $\bm{w}$-space is not easily possible as its structure is unknown.
-Compared to \acp{VAE} where a linear interpolation between points in the latent $\bm{z}$-space leads to an almost geodesic path in $\bm{x}$-space\footnote{Therefore, points that are close in $\bm{z}$-space of an \ac{VAE} lead to images that are close in the feature space.}, the mapping function $\mathcal{F}$ seems to be non-smooth.
+Compared to \acp{VAE}, where a linear interpolation between points in the latent $\bm{z}$-space leads to an almost geodesic path in $\bm{x}$-space\footnote{Therefore, points that are close in $\bm{z}$-space of an \ac{VAE} lead to images that are close in the feature space.}, the mapping function $\mathcal{F}$ seems to be non-smooth.
 Therefore, traversing $\bm{z}$ for an \ac{ALAE} seems to lead to a non-smooth path in the feature space.
 
-Compared to the \ac{VAE} that uses a pixelwise loss on the reconstructions, \ac{ALAE} penalizes the $l^2$-norm of $\bm{w}$ and $\tilde{\bm{w}}$.
+Compared to the \ac{VAE} that uses a pixel-wise loss on the reconstructions, \ac{ALAE} penalizes the $l^2$-norm of $\bm{w}$ and $\tilde{\bm{w}}$.
 Except for this loss, \ac{ALAE} by no means forces the input to be similar to the reconstruction.
-This mitigates the problem of the pixelwise loss in \acp{VAE} that is assumed to be the reason for blurry reconstructions.
+This mitigates the problem of the pixel-wise loss in \acp{VAE} that is assumed to be the reason for blurry reconstructions.
 
-\citet{tschannen2018recent} further discuss \say{recent advances in autoencoder-based representation learning}.
+\citet{tschannen2018recent} further discuss \say{recent advances in autoencoder-based representation learning.}
 
 \paragraph{Feature Consistency}
 
 One important property of the \ac{VAE} latent space is that it captures image semantics up to a certain degree.
-For a model trained on CelebA\footnote{See Section~\ref{celeba_dataset}.}, for example, it is possible to add sunglasses to a randomly generated face by adding the mean latent vector of images containing sunglasses~\citep{hou2017deep}.
+For a model trained on CelebA\footnote{See Section~\ref{celeba_dataset}.} it is possible to add sunglasses to a randomly generated face by adding the mean latent vector of images containing sunglasses~\citep{hou2017deep}.
 \citet{hou2017deep} train a model particularly tailored to have this property by using the \textit{perceptual loss} (the between hidden layer activations of a feature extraction network).
 \textbf{More could come here}
 
@@ -875,78 +928,39 @@ These two concepts are explained in the following.
     \label{fig:feature_space_disentanglement}
 \end{figure}
 
-Consider Figure~\ref{fig:feature_space_disentanglement_a} and assume a dataset of males containing only two factors of variation, e.g. age ($x$-axis from older to younger) and voice level ($y$-axis, bottom-up from lower to higher).
+Consider Figure~\ref{fig:feature_space_disentanglement_a} and assume a dataset of males containing only two factors of variation, e.g., age ($x$-axis from older to younger) and voice level ($y$-axis, bottom-up from lower to higher).
 The missing square in the upper left is the combination \say{old and high voice level} that is missing in the dataset.
 Now, consider Figure~\ref{fig:feature_space_disentanglement_b} showing a mapping from a latent space to the feature space.
 The upper left square in Figure~\ref{fig:feature_space_disentanglement_a} is not present in this latent space.
-This leads to \textit{Latent Space Entanglement}: when interpolating in the latent space, there are paths along which the factors of variation change faster than for other paths.
+This leads to \textit{Latent Space Entanglement}: when interpolating in the latent space, there are paths along which the factors of variation change faster than other paths.
 
 Different methods have been proposed to measure the degree of latent space entanglement.
 One approach is to measure the degree by which a generated image changes as the latent space is entangled (\textit{Perceptual Path Length})~\citep{karras2019style}.
-The perceptual path length is a measure of how much reconstructions change for small variation in the latent space.
-It is calculated by moving by a small value $\epsilon$ on a path, obtained by interpolating between two random $\bm{z}_1$, $\bm{z}_2$ (or $\bm{w}_1$, $\bm{w}_2$)\footnote{Interpolation is spherical for $\bm{z}$ and linear for $\bm{w}$.} and taking the perceptual loss~\citep{johnson2016perceptual} between the image before moving by $\epsilon$ and after.
+\ac{PPL} measures by much reconstructions change for small variation in the latent space.
+It is calculated by moving by a small value $\epsilon$ on a path obtained by interpolating between two random $\bm{z}_1$, $\bm{z}_2$ (or $\bm{w}_1$, $\bm{w}_2$)\footnote{Interpolation is spherical for $\bm{z}$ and linear for $\bm{w}$.}, and taking the perceptual loss~\citep{johnson2016perceptual} between the image before moving by $\epsilon$ and after.
 Finally, the mean of this value is obtained by applying the procedure for sufficiently many samples.
 If the latent space is entangled, this value on average should be higher compared to a disentangled space.
 
-Another approach is \textit{Linear Separability}~\citep{karras2019style}, measuring how well sets of points can be separated by a linear hyperplane.
+Another approach is \textit{Linear Separability}~\citep{karras2019style}, measuring how well a linear hyperplane can separate sets of points.
 
-\citet{kim2018disentangling} propose to generate data by fixing one factor of variation (for example one dimension in the latent space) and randomly sampling from others.
-If the latent space is disentangled, there should be one or multiple almost invariant dimensions in the generated data that attribute to the fixed factor of variation.
+\citet{kim2018disentangling} propose to generate data by fixing one factor of variation (for example, one dimension in the latent space) and randomly sampling from others.
+If the latent space is disentangled, there should be one or multiple almost invariant dimensions in the generated data attributed to the fixed factor of variation.
 
 \subsection{Latent Space Separability}\label{subsec:feature-separability}
 
-\textit{Latent Space Separability} is related to Latent Space Disentanglement but it is used in a stricter sense in the course of this thesis.
+\textit{Latent Space Separability} is related to Latent Space Disentanglement, but it is used in a stricter sense in the course of this thesis.
 Whereas Latent Space Disentanglement was mainly motivated by the disentanglement of one latent space, Latent Space Separability is concerned with splitting up the latent space representation of features into multiple levels of latent spaces.
 If successful, Latent Space Separability allows to directly control the factors of variation without the need to find the subspace in one latent space controlling this factor.
 
 For example, \textit{InfoGAN} (see Section~\ref{subsubsec:representation_learning}) is based on this principle.
 Another example is \ac{VLAE}.
 
-Importantly, Latent Space Separability is supposed to have two properties: \textit{Consistency} and \textit{Restrictiveness} as defined in \citet{Shu2020Weakly}.
-Consistency means that if only one factor of variation is varied (e.g. the factor that attributes to an object's size) and the others are fixed, generated items only change with respect to this very factor but not to other factors (i.e. only the object's size is changing but not it's shape).
-Restrictiveness means that if, again, only one factor $i$ of variation is varied, the choice of the other factors should not affect the models measurement of the $i$-th factor.
-For example, if factor $i$ again encodes an objects size, the same value of factor $i$ should always encode the same size, irrespective of the choice if the other factors~\citep{Shu2020Weakly}.
+Importantly, Latent Space Separability is supposed to have two properties: \textit{Consistency} and \textit{Restrictiveness}, as defined in \citet{Shu2020Weakly}.
+Consistency means that if only one factor of variation is varied (e.g., the factor that attributes to an object's size) and the others are fixed, generated items only change for this very factor but not to other factors (i.e., only the object's size is changing but not its shape).
+Restrictiveness means that if again, only one factor $i$ of variation is varied, the choice of the other factors should not affect the model's measurement of the $i$th factor.
+For example, if factor $i$ again encodes an object's size, the same value of factor $i$ should always encode the same size, irrespective of the choice if the other factors~\citep{Shu2020Weakly}.
 
 Strictly unsupervised approaches are not guaranteed to have both of the properties.
-Suprisingly, however, most unsupervised approaches for Latent Space Separability empirically show to have these properties to a high degree~\citep{Shu2020Weakly}.
+Surprisingly, however, most unsupervised approaches for Latent Space Separability empirically show to have these properties to a high degree~\citep{Shu2020Weakly}.
 
-\subsection{Semantic Representations}\label{subsec:semantic-representations}
-
-Section~\ref{subsec:visual-object-perception} described the case of a subject who was able to copy drawings of objects but not to capture their \textit{meaning}.
-\citet[pp. 1069, 1070]{squire2012fundamental} hypothesize that the subject's \ac{IT} was impaired, leading to an \say{inability to generate a high-level representation of the object}.
-
-The term \textit{Semantic Representation} refers to these high-level representations that allow to capture the \textit{meaning} of a stimulus.
-
-Albeit, a universally accepted definition for this term yet has to be found.
-\textit{Semantics} is defined as \citep{lexico}
-\begin{displayquote}
-    The branch of linguistics and logic concerned with meaning. There are a number of branches and subbranches of semantics, including formal semantics, which studies the logical aspects of meaning, such as sense, reference, implication, and logical form, lexical semantics, which studies word meanings and word relations, and conceptual semantics, which studies the cognitive structure of meaning.
-\end{displayquote}
-This thesis is less concerned with linguistics but with \textit{meanings} and \textit{relations}, not of language but of \textbf{images}.
-A general definition of \textit{Semantic Representations}, however, should not be restricted to words or images.
-It should incorporate all kinds of concepts a human can form of a perception.
-
-In the course of this thesis, \textit{Semantic Representations} are somewhat related to \textit{Word Embeddings} in \ac{NLP}.
-Word embeddings~\citep{mikolov2013efficient} are a vectorized representation of words in a vector space.
-The training procedure learns a mapping from word into the latent space such that the word's position itself has meaning.
-One prominent example is that the vector space allows \say{simple algebraic operations[...]. [I]t was shown for example that \textit{vector}(\say{King}) - \textit{vector}(\say{Man}) + \textit{vector}(\say{Woman}) results in a vector that is closest to the vector representation of the word \textit{Queen} [...]}~\citep{mikolov2013efficient}.
-For word representations, it has been shown that they correlate with brain activity fMRI data\citep{ruan2016exploring, anderson2013words}.
-
-Just like the brain maps similar visual stimuli to neurons close to one another, a semantic representation should be an encoding of the concept where encodings of similar concepts are close to one another according to some distance metric.
-Unfortunately, a dense vector (as in word embeddings) as a semantic representation is rather unrelated to a subpopulation of active neurons.
-
-Another consideration is the \textit{mode} of perception.
-Section~\ref{subsec:visual-object-perception} discusses that the \ac{IT} seems to play a crucial role in building and accessing semantic representations for visual input.
-Different brain areas may be activated by different modes of presentation (e.g. \textit{visual} vs. \textit{auditory}) but only the brain regions that are active regardless of the mode of presentation are candidate regions for amodal representations~\citep{fairhall2013brain}.
-\citet{fairhall2013brain} attempt to find these brain regions by analyzing which brain regions are active for textual and visual stimuli (both presented visually).
-
-All in all, the question of how to obtain and assess good semantic representations remains.
-One minimum requirement, albeit, is that (amodal) semantic representations should behave like the biological example.
-
-This thesis focuses on visual-modal semantic representations.
-
-For visual input, it has been shown that higher-layer activations of supervised \acp{CNN} explain \ac{IT} cortical representation~\citep{khaligh2014deep,cadieu2014deep}.
-For unsupervised models operating on image data, in contrast, there is some evidence that these models do not explain \ac{IT} cortical representation (or by far worse than supervised models)~\citep{khaligh2014deep} - even though not explicitly for \acp{CNN}.
-
-\acp{CNN}, therefore, seem to be a promising candidate for visual-modal semantic representations.
 
