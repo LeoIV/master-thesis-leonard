@@ -141,9 +141,9 @@ They are no longer able to generalize from tasks learned in one half of the visu
 When shown natural images, between 1.8\% and 3.0\% (with $p < 0.01$) of mice \ac{V1} neurons are active across planes~\citep{yoshida2020natural}.
 The overlap of responsive neurons for different images is quite small.
 Between 4.8\% and 6.0\% of neurons overlap for different natural images.
-The brain uses sparseness to represent information~\citep{yoshida2020natural} (\textbf{More references?}).
+The brain uses sparseness to represent information~(\citep{yoshida2020natural},~\citep[pp. 356, ff.]{trappenberg2010fundamentals}).
 
-\textbf{DRAFT!} More could come here
+% TODO: More could come here
 
 \subsection{Types of Learning}\label{subsec:types-of-learning}
 
@@ -172,12 +172,12 @@ Contrarily, in \textit{online learning}, the mapping function is updated during 
 Users get recommendations while using the service but also provide new labels for the algorithm as they rate watched movies.
 
 \textit{Self-supervised learning} is a special case of supervised learning, where the learning algorithm creates the labels itself.
-An example of this type of learning is the prediction of the next frame in a video \textbf{REF}.
+An example of this type of learning is the prediction of the next frame in a video~\citep{walker2016uncertain}.
 The dataset has no labels.
 However, given a sequence $\bm{x}_{i,1},\bm{x}_{i,2},\dots,\bm{x}_{i,n}$ of images in a video, the sample at time $t$ can be considered as the supervised training set $((\bm{x}_{i,1},\bm{x}_{i,2},\dots,\bm{x}_{i,t}),\bm{x}_{i,t+1}), \quad 1\leq t\leq n-1$.
 Self-supervised learning is also a subtype of unsupervised learning.
 However, algorithms employing this approach usually use classical supervised learning techniques.
-Another example of self-supervised learning is word embeddings \textbf{REF}.
+Another example of self-supervised learning is word embeddings~\citep{mikolov2013efficient}.
 
 \paragraph{Unsupervised Learning}
 \begin{wrapfigure}[16]{R}{0.5\textwidth}
@@ -196,14 +196,61 @@ Figure~\ref{fig:clustering_example} shows an example where this can be feasible 
 
 \paragraph{Reinforcement Learning}
 Reinforcement learning is a very different paradigm compared to supervised and unsupervised learning.
-Here, the aim is to train an \textit{agent} to show some meaningful behavior, e.g.,~to play a computer game.
-Reinforcement learning algorithms achieve this by letting the agent explore the action space\footnote{In the case of a computer game, this would mean to carry out different moves.}.
-If the outcome of an action is good, the agent is getting rewarded.
-The agent, in turn, aims at maximizing its reward. \textbf{REFERENCES FOR THIS PARAGRAPH}
+Here, the aim is to train an \textit{agent} to show some meaningful behavior.
+
+An example is rats in a maze.
+A piece of cheese is located in one corner of the maze.
+The rat has multiple possible actions, going forward, backward, left, or right.
+In this setting, the rat is the agent.
+Its reward is cheese, and the rat will maximize its reward.
+By reinforcing good sequences of actions, the rat eventually shows a reasonable behavior.
+
+Reinforcement learning algorithms resemble such settings by modeling environment, action space, and reward~\citep[pp. 1, ff.]{sutton2018reinforcement}.
+
+\subsection{Semantic Representations}\label{subsec:semantic-representations}
+
+Section~\ref{subsec:visual-object-perception} described a subject who was able to copy drawings of objects but not capture their \textit{meaning}.
+\citet[pp. 1069, 1070]{squire2012fundamental} hypothesize that the subject's \ac{IT} was impaired, leading to an \say{inability to generate a high-level representation of the object.}
+
+The term \textit{Semantic Representation} refers to these high-level representations that allow to capturing the \textit{meaning} of a stimulus.
+
+Albeit, a universally accepted definition for this term yet has to be found.
+\textit{Semantics} is defined as~\citep{lexico}
+\begin{displayquote}
+    The branch of linguistics and logic concerned with meaning. There are a number of branches and subbranches of semantics, including formal semantics, which studies the logical aspects of meaning, such as sense, reference, implication, and logical form, lexical semantics, which studies word meanings and word relations, and conceptual semantics, which studies the cognitive structure of meaning.
+\end{displayquote}
+This thesis is less concerned with linguistics but with \textit{meanings} and \textit{relations}, not of language but \textit{images}.
+A general definition of \textit{Semantic Representations}, however, should not be restricted to words or images.
+It should incorporate all kinds of concepts a human can form of perception.
+
+In this thesis, \textit{Semantic Representations} are somewhat related to \textit{Word Embeddings} in \ac{NLP}.
+Word embeddings~\citep{mikolov2013efficient} are a vectorized representation of words in a vector space.
+The training procedure learns a mapping from word into the latent space so that the word's position itself has meaning.
+One prominent example is that the vector space allows \say{simple algebraic operations[...]. [I]t was shown for example that \textit{vector}(\say{King}) - \textit{vector}(\say{Man}) + \textit{vector}(\say{Woman}) results in a vector that is closest to the vector representation of the word \textit{Queen} [...]}~\citep{mikolov2013efficient}.
+It has been shown that for word representations, they correlate with brain activity fMRI data~\citep{ruan2016exploring, anderson2013words}.
+
+Just like the brain maps similar visual stimuli to neurons close to one another, a semantic representation should encode concepts such that encodings of similar concepts are close to one another according to some distance metric.
+Unfortunately, a dense vector (as in word embeddings) as a semantic representation is somewhat unrelated to active neurons’ subpopulation.
+
+Another consideration is the \textit{mode} of perception.
+Section~\ref{subsec:visual-object-perception} discusses that the \ac{IT} seems to play a crucial role in building and accessing semantic representations for visual input.
+Different brain areas may be activated by different modes of presentation (e.g., \textit{visual} vs. \textit{auditory}).
+However, only the brain regions that are active regardless of the mode of presentation are candidate regions for amodal representations~\citep{fairhall2013brain}.
+\citet{fairhall2013brain} attempt to find these brain regions by analyzing which brain regions are active for textual and visual stimuli (both presented visually).
+
+All in all, the question of how to obtain and assess good semantic representations remains.
+One minimum requirement, albeit, is that those (amodal) semantic representations should behave like biological examples.
+
+This thesis focuses on visual-modal semantic representations.
+
+For visual input, it has been shown that higher-layer activations of supervised \acp{CNN}, described in the following section, explain \ac{IT} cortical representation~\citep{khaligh2014deep,cadieu2014deep}.
+For unsupervised models operating on image data, in contrast, there is some evidence that these models do not explain \ac{IT} cortical representation (or by far worse than supervised models)~\citep{khaligh2014deep} - even though not explicitly for \acp{CNN}.
+
+\acp{CNN}, therefore, seem to be a promising candidate for visual-modal semantic representations.
 
 \subsection{Models of the Visual System}\label{subsec:models-of-the-visual-system}
 
-% TODO: Introduction
+The following section discusses established models of the visual system.
 
 \subsubsection{Simple and Complex Cells in \acl{V1}}\label{subsubseq:simple_complex_cells}
 
@@ -297,7 +344,7 @@ A cell in an \ac{RDM} then contains the correlation of the activity patterns for
 
 \citet{eickenberg2017seeing} explicitly discuss \acp{CNN} as models of the visual system.
 % TODO: Zitat hier rausnehmen und ummodeln
-Their findings show that \say{early visual areas are better described by lower level convolutional net layers and later visual areas by higher level net layers, exhibiting a progression across ventral and dorsal streams}~\citep{eickenberg2017seeing, wen2018neural}.
+Their findings show that \acp{CNN} reproduce the hierarchy of semantic representations in the visual cortex~\citep{eickenberg2017seeing, wen2018neural}.
 The similarity of the \acp{RDM} is evidence that supervised \acp{CNN} and the human \ac{IT} have a similar high-level encoding of information.
 
 % TODO: Der und der nächste Absatz nimmt VAEs vorweg, verschieben?
@@ -307,47 +354,6 @@ The question of whether \acp{VAE} show similar \acp{RDM} as the human \ac{IT}, t
 
 It has been shown that \acp{VAE}, trained in a self-supervised manner, partially learn Gabor wavelets when trained to predict the next image in a sequence of images~\citep{palm2012prediction}.
 Also, some unsupervised models learn Gabor wavelets~\citep{berkes2005slow}.
-
-\subsection{Semantic Representations}\label{subsec:semantic-representations}
-
-Section~\ref{subsec:visual-object-perception} described a subject who was able to copy drawings of objects but not capture their \textit{meaning}.
-\citet[pp. 1069, 1070]{squire2012fundamental} hypothesize that the subject's \ac{IT} was impaired, leading to an \say{inability to generate a high-level representation of the object.}
-
-The term \textit{Semantic Representation} refers to these high-level representations that allow to capturing the \textit{meaning} of a stimulus.
-
-Albeit, a universally accepted definition for this term yet has to be found.
-\textit{Semantics} is defined as~\citep{lexico}
-\begin{displayquote}
-    The branch of linguistics and logic concerned with meaning. There are a number of branches and subbranches of semantics, including formal semantics, which studies the logical aspects of meaning, such as sense, reference, implication, and logical form, lexical semantics, which studies word meanings and word relations, and conceptual semantics, which studies the cognitive structure of meaning.
-\end{displayquote}
-This thesis is less concerned with linguistics but with \textit{meanings} and \textit{relations}, not of language but \textit{images}.
-A general definition of \textit{Semantic Representations}, however, should not be restricted to words or images.
-It should incorporate all kinds of concepts a human can form of perception.
-
-In this thesis, \textit{Semantic Representations} are somewhat related to \textit{Word Embeddings} in \ac{NLP}.
-Word embeddings~\citep{mikolov2013efficient} are a vectorized representation of words in a vector space.
-The training procedure learns a mapping from word into the latent space so that the word's position itself has meaning.
-One prominent example is that the vector space allows \say{simple algebraic operations[...]. [I]t was shown for example that \textit{vector}(\say{King}) - \textit{vector}(\say{Man}) + \textit{vector}(\say{Woman}) results in a vector that is closest to the vector representation of the word \textit{Queen} [...]}~\citep{mikolov2013efficient}.
-It has been shown that for word representations, they correlate with brain activity fMRI data~\citep{ruan2016exploring, anderson2013words}.
-
-Just like the brain maps similar visual stimuli to neurons close to one another, a semantic representation should encode concepts such that encodings of similar concepts are close to one another according to some distance metric.
-Unfortunately, a dense vector (as in word embeddings) as a semantic representation is somewhat unrelated to active neurons’ subpopulation.
-
-Another consideration is the \textit{mode} of perception.
-Section~\ref{subsec:visual-object-perception} discusses that the \ac{IT} seems to play a crucial role in building and accessing semantic representations for visual input.
-Different brain areas may be activated by different modes of presentation (e.g., \textit{visual} vs. \textit{auditory}).
-However, only the brain regions that are active regardless of the mode of presentation are candidate regions for amodal representations~\citep{fairhall2013brain}.
-\citet{fairhall2013brain} attempt to find these brain regions by analyzing which brain regions are active for textual and visual stimuli (both presented visually).
-
-All in all, the question of how to obtain and assess good semantic representations remains.
-One minimum requirement, albeit, is that those (amodal) semantic representations should behave like biological examples.
-
-This thesis focuses on visual-modal semantic representations.
-
-For visual input, it has been shown that higher-layer activations of supervised \acp{CNN} explain \ac{IT} cortical representation~\citep{khaligh2014deep,cadieu2014deep}.
-For unsupervised models operating on image data, in contrast, there is some evidence that these models do not explain \ac{IT} cortical representation (or by far worse than supervised models)~\citep{khaligh2014deep} - even though not explicitly for \acp{CNN}.
-
-\acp{CNN}, therefore, seem to be a promising candidate for visual-modal semantic representations.
 
 \subsection{Generative Methods}\label{subsec:generative-methods}
 
