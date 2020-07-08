@@ -118,12 +118,12 @@ The embedding layer predicts $\mu$ and $\log \sigma^2$ and performs the resampli
 \end{align}
 The encoder input size is equal to the decoder output size and varies with the experiment.
 Also, the number of \say{Convolution, Activation, Batch-Normalization}-blocks is chosen depending on the input size, as smaller input sizes require fewer layers to achieve a receptive field of the input size.
-The batch-normalization can be omitted\footnote{It is stated in the experiments if batch-normalization is omitted.}/
-The activation can be either ReLU or LeakyReLU and is ReLU unless stated otherwise.
+The batch-normalization~~\citep[pp. 317, ff.]{Goodfellow-et-al-2016} can be omitted\footnote{It is stated in the experiments if batch-normalization is omitted.}/
+The activation can be either ReLU~\citep[p. 173]{Goodfellow-et-al-2016} or LeakyReLU~\citep[p. 192]{Goodfellow-et-al-2016} and is ReLU unless stated otherwise.
 The convolutions use zero-padding unless stated otherwise.
 Encoder and decoder use stridden convolutions for downsampling unless stated otherwise.
 
-The decoder uses similar blocks as the encoder but employs transposed convolutions instead of convolutions to upsample feature maps.
+The decoder uses similar blocks as the encoder but employs transposed convolutions~\citep[pp. 356, ff.]{Goodfellow-et-al-2016} instead of convolutions to upsample feature maps.
 The output layer of the decoder uses a sigmoid activation instead of ReLU.
 
 \subsubsection{VLAE Model}

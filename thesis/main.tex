@@ -422,6 +422,52 @@ But also, this thesis discussed ways to extend these models to better model the 
 \end{figure}
 
 \pagebreak
+\section{Additional Plots for Section \ref{subsubsec:latent_space_traversals}}\label{sec:appendix_plots_latent_space_traversals}
+\begin{figure}[H]
+\centering
+\foreach \i in {1,..., 7}{
+\begin{subfigure}{\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_7500_rotation_\i.png}
+\end{subfigure}}
+\caption[7,500-\ac{VAE} - Rotation traversal]{Latent spaces traversal between different rotation values for 7,500-\ac{VAE} on the dsprites dataset}
+\label{fig:vae_dsprites_rotation_vae_7500}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\foreach \i in {1,..., 7}{
+\begin{subfigure}{\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_lf_6250_rotation_\i.png}
+\end{subfigure}}
+\caption[6,250-\ac{VAE} - Rotation traversal]{Latent spaces traversal between different rotation values for 6,250-\ac{VAE} on the dsprites dataset}
+\label{fig:vae_dsprites_rotation_vae_6250}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\foreach \i in {1,..., 7}{
+\begin{subfigure}{\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_5000_rotation_\i.png}
+\end{subfigure}}
+\caption[5,000-\ac{VAE} - Rotation traversal]{Latent spaces traversal between different rotation values for 5,000-\ac{VAE} on the dsprites dataset}
+\label{fig:vae_dsprites_rotation_vae_5000}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\foreach \i in {1,..., 7}{
+\begin{subfigure}{\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_3750_rotation_\i.png}
+\end{subfigure}}
+\caption[3,750-\ac{VAE} - Rotation traversal]{Latent spaces traversal between different rotation values for 3,750-\ac{VAE} on the dsprites dataset}
+\label{fig:vae_dsprites_rotation_vae_3750}
+\end{figure}
+
+\pagebreak
 \section{Feature Extraction Network in Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation}}\label{sec:appendix_feature_extraction_network_ppl_dsprites}
 \begin{lstlisting}[caption={Feature extraction network for \ac{PPL} computation.},captionpos=b]
 _________________________________________________________________
@@ -508,33 +554,35 @@ _________________________________________________________________
 \newpage
 \section*{Acronyms}
 \begin{acronym}[TDMA]
-\acro{AdaIN}{Adaptive Instance Normalization}
-\acro{ALAE}{Adversarial Latent Autoencoder}
-\acro{CNN}{Convolutional Neural Network}
-\acro{CNS}{Central Nervous System}
-\acro{ELBO}{Evidence Lower Bound}
-\acro{GAN}{Generative Adversarial Network}
-\acro{IT}{Inferior Temporal Cortex}
+\acro{AdaIN}{adaptive instance normalization}
+\acro{ALAE}{adversarial latent autoencoder}
+\acro{CNN}{convolutional neural network}
+\acro{CNS}{central nervous system}
+\acro{ELBO}{evidence lower bound}
+\acro{GAN}{generative adversarial network}
+\acro{IT}{inferior temporal cortex}
 \acro{ILSVRC2017}{Large Scale Visual Recognition Challenge 2017}
-\acro{LeakyReLU}{Leaky Rectified Linear Unit}
-\acro{LGN}{Lateral Geniculate Nucleus}
-\acro{KDE}{Kernel Density Estimation}
+\acro{LeakyReLU}{leaky rectified linear unit}
+\acro{LGN}{lateral geniculate nucleus}
+\acro{KDE}{kernel density estimation}
 \acro{KL-divergence}{Kullback-Leibler divergence}
 \acro{KL}{Kullback-Leibler}
-\acro{MSE}{Mean Squared Error}
-\acro{NLP}{Natural Language Processing}
-\acro{PDF}{Probability Density Function}
-\acro{PPL}{Perceptual Path Length}
-\acro{ReLU}{Rectified Linear Unit}
-\acro{RDM}{Representational Dissimilarity Matrix}
-\acrodefplural{RDM}{Representational Dissimilarity Matrices}
-\acro{TEO}{Temporo-Occipital Area}
+\acro{MSE}{mean squared error}
+\acro{NLP}{natural language processing}
+\acro{PCA}{principal component analysis}
+\acrodefplural{PCA}{principal component analyses}
+\acro{PDF}{probability density function}
+\acro{PPL}{perceptual path length}
+\acro{ReLU}{rectified linear unit}
+\acro{RDM}{representational dissimilarity matrix}
+\acrodefplural{RDM}{representational dissimilarity matrices}
+\acro{TEO}{temporo-occipital area}
 \acro{VAE}{Variational Autoencoder}
 \acro{VLAE}{Variational Ladder Autoencoder}
 \acro{LVAE}{Ladder Variational Autoencoder}
-\acro{V1}{Primary Visual Cortex}
-\acro{V2}{Secondary Visual Cortex}
-\acro{V4}{Quaternary Visual Cortex}
+\acro{V1}{primary visual cortex}
+\acro{V2}{secondary visual cortex}
+\acro{V4}{quaternary visual cortex}
 \end{acronym}
 \newpage
 \input{erklaerung}

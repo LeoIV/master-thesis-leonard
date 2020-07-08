@@ -523,6 +523,17 @@ The usage of neural networks poses a challenge for computing the first term in e
 Usually, one would draw a sufficient number of samples from $q_\phi(\bm{z}|\bm{x})$ to approximate the expectation.
 However, sampling is impossible if one wants to compute the gradient to train the model by backpropagation.
 
+Backpropagation for the encoder would be intractable if $\bm{z}$ were realized as a random variable, i.e., $\bm{z} \sim q_\phi(\bm{z}|\bm{x})$.
+This is because the gradients w.r.t.~$\phi$ cannot merely be calculated for one $\bm{z} \sim q_\phi(\bm{z}|\bm{x})$ as this would be biased towards this $\bm{z}$~\citep{kingma2019introduction}.
+Instead, one would have to sample many $\bm{z}$s to approximate the expectation w.r.t.~$q_\phi(\bm{z}|\bm{x})$.
+This is not true for the decoder as its gradients w.r.t. $\theta$ are independent of this expectation.
+To solve this problem, implementations of \acp{VAE} do not sample from the posterior $q_\phi(\bm{z}|\bm{x})$.
+Instead, they use the \textit{resampling trick}~\citep{kingma2019introduction}.
+Under this regime, $\bm{z}$ is the value of a function $g(\phi, \bm{x}, \epsilon)$ where $\epsilon \sim \mathcal{N}(\bm{0}, \bm{I})$ is a random variable~\citep{kingma2019introduction}.
+In an intermediate step, the encoder predicts values $\bm{\mu}$ and $\log \bm{\sigma}$ and $\bm{z}$, eventually, is realized as $\bm{z} = \bm{\mu} + \bm{\sigma} \cdot \epsilon$~\citep{kingma2019introduction}.
+Using this trick, the encoder gradients are w.r.t.~the expectation of $\epsilon$.
+Backpropagation on a minibatch of data, therefore, is unbiased.
+
 \paragraph{Disadvantages}
 
 % TODO: Zitat weg
@@ -907,9 +918,9 @@ This mitigates the problem of the pixel-wise loss in \acp{VAE} that is assumed t
 \paragraph{Feature Consistency}
 
 One important property of the \ac{VAE} latent space is that it captures image semantics up to a certain degree.
-For a model trained on CelebA\footnote{See Section~\ref{celeba_dataset}.} it is possible to add sunglasses to a randomly generated face by adding the mean latent vector of images containing sunglasses~\citep{hou2017deep}.
+For a model trained on CelebA\footnote{See Section~\ref{celeba_dataset}.} it is possible to add sunglasses to a randomly generated face by adding the mean latent vector of images containing sunglasses~\citep{radford2016deep,hou2017deep}.
 \citet{hou2017deep} train a model particularly tailored to have this property by using the \textit{perceptual loss} (the between hidden layer activations of a feature extraction network).
-\textbf{More could come here}
+% TODO: more could come here
 
 \subsection{Latent Space Disentanglement}\label{subsec:feature-disentanglement}
 \textit{Latent Space Disentanglement} is a concept not to be confused with \textit{Latent Space Separability} (see Section~\ref{subsec:feature-separability}).
