@@ -19,6 +19,7 @@
 \usepackage{booktabs}
 \usepackage{listings}
 \usepackage{bm}
+\usepackage{adjustbox}
 \usepackage{amssymb}
 \usepackage{tikz}
 \usepackage{soul}
@@ -166,91 +167,11 @@ But also, this thesis discussed ways to extend these models to better model the 
 \newpage
 \pagenumbering{Roman}
 \setcounter{page}{\thesavepage}
+
 \appendix
-\section{Additional Plots for Section~\ref{subsec:independence-of-vlae-embeddings}}\label{sec:additional-plots-for-section_independence}
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{images/notprop/mnist/vlae/ccs_0_2_vlae.png}
-\caption[VLAE Pixel Proportionality - $\bm{z}_1$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_3=\varphi$ for \ac{VLAE} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
-\end{figure}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{images/notprop/mnist/vlae/ccs_1_2_vlae.png}
-\caption[VLAE Pixel Proportionality - $\bm{z}_2$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_2 = \bm{z}_3=\varphi$ for \ac{VLAE} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{images/notprop/mnist/vlae_gan/ccs_0_1_vlae_gan.png}
-\caption[VLAE-GAN Pixel Proportionality - $\bm{z}_1$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_2=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{images/notprop/mnist/vlae_gan/ccs_0_2_vlae_gan.png}
-\caption[VLAE-GAN Pixel Proportionality - $\bm{z}_1$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_3=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{images/notprop/mnist/vlae_gan/ccs_1_2_vlae_gan.png}
-\caption[VLAE-GAN Pixel Proportionality - $\bm{z}_2$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_2 = \bm{z}_3=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
-\end{figure}
-
-
-\pagebreak
-\section{Additional Plots For Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation}}\label{sec:additional_plots_latent_space_entanglement}
-\begin{figure}[H]
-\centering
-\begin{subfigure}{\textwidth}
-\centering
-\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_7500_traverse_square_ellipse.png}
-\caption{Latent space traversal from \textit{Square} $\rightarrow$ \textit{Ellipse}}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
-\centering
-\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_7500_traverse_ellipse_heart.png}
-\caption{Latent space traversal from \textit{Ellipse} $\rightarrow$ \textit{Heart}}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
-\centering
-\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_7500_traverse_heart_square.png}
-\caption{Latent space traversal from \textit{Heart} $\rightarrow$ \textit{Square}}
-\label{subfig:10000_vae_latent_space_traversal_heart_to_square}
-\end{subfigure}
-\caption[7,500-\ac{VAE} - Latent Space Traversal]{Latent space traversal between latent space representations of images with certain shapes for 7,500-\ac{VAE}. Color-values were inverted for this plot.}
-\label{fig:7500_vae_latent_space_traversal_shape_to_shape}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}{\textwidth}
-\centering
-\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_5000_traverse_square_ellipse.png}
-\caption{Latent space traversal from \textit{Square} $\rightarrow$ \textit{Ellipse}}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
-\centering
-\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_5000_traverse_ellipse_heart.png}
-\caption{Latent space traversal from \textit{Ellipse} $\rightarrow$ \textit{Heart}}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
-\centering
-\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_5000_traverse_heart_square.png}
-\caption{Latent space traversal from \textit{Heart} $\rightarrow$ \textit{Square}}
-\label{subfig:10000_vae_latent_space_traversal_heart_to_square}
-\end{subfigure}
-\caption[5,000-\ac{VAE} - Latent Space Traversal]{Latent space traversal between latent space representations of images with certain shapes for 5,000-\ac{VAE}. Color-values were inverted for this plot.}
-\label{fig:5000_vae_latent_space_traversal_shape_to_shape}
-\end{figure}
-
-
-\pagebreak
 \section{Additional Latent Space Embeddings (Section~\ref{subsubsec:latent_space_embeddings})}
-
 \subsection{\textsc{Mnist}}
-
 \begin{figure}[H]
 \centering
 \begin{subfigure}{.32\textwidth}
@@ -377,16 +298,97 @@ But also, this thesis discussed ways to extend these models to better model the 
 \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae_gan/embeddings_mu_4.png}
 \caption{Latent space colored by object $y$-position}
 \end{subfigure}
-\caption[\ac{VAE}-\ac{GAN} Latent Space - dsprites]{t-SNE latent space embeddings colored by different means of \ac{VAE}-\ac{GAN} with $dim_z=6$ trained on dsprites dataset}
+\caption[\ac{VAE}-\ac{GAN} Latent Space - dsprites]{\ac{t-SNE} latent space embeddings colored by different means of \ac{VAE}-\ac{GAN} with $dim_z=6$ trained on dsprites dataset}
 \label{fig:vae_gan_latent_space_dsprites}
 \end{figure}
 
-\textbf{TODO: VLAE-GAN}
+\begin{figure}[H]
+\centering
+\foreach \i in {1,2,3}{
+\begin{subfigure}{.19\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae_gan/embeddings_mu_\i_0.png}
+\caption{Latent space $z_{\i}$ colored by object shape}
+\label{subfig:vlae_embedding_z\i_dsprites_shape}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.19\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae_gan/embeddings_mu_\i_1.png}
+\caption{Latent space $z_{\i}$ colored by object scale}
+\label{subfig:vlae_embedding_z\i_dsprites_scale}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.19\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae_gan/embeddings_mu_\i_2.png}
+\caption{Latent space $z_{\i}$ colored by object orientation}
+\label{subfig:vlae_embedding_z\i_dsprites_orientation}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.19\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae_gan/embeddings_mu_\i_3.png}
+\caption{Latent space $z_{\i}$ colored by object $x$-position}
+\label{subfig:vlae_embedding_z\i_dsprites_x_pos}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.19\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae_gan/embeddings_mu_\i_4.png}
+\caption{Latent space $z_{\i}$ colored by object $y$-position}
+\label{subfig:vlae_embedding_z\i_dsprites_y_pos}
+\end{subfigure}
+}
+\caption[\ac{VLAE} Latent Space on dsprites]{Latent space colored by different means of \ac{VLAE}-\ac{GAN} with $dim_{z_i}=6$ trained on dsprites dataset}
+\label{fig:vlae_gan_latent_space_dsprites}
+\end{figure}
+
+\pagebreak
+\section{Additional Plots For Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation}}\label{sec:additional_plots_latent_space_entanglement}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_7500_traverse_square_ellipse.png}
+\caption{Latent space traversal from \textit{Square} $\rightarrow$ \textit{Ellipse}}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_7500_traverse_ellipse_heart.png}
+\caption{Latent space traversal from \textit{Ellipse} $\rightarrow$ \textit{Heart}}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_7500_traverse_heart_square.png}
+\caption{Latent space traversal from \textit{Heart} $\rightarrow$ \textit{Square}}
+\label{subfig:10000_vae_latent_space_traversal_heart_to_square}
+\end{subfigure}
+\caption[7,500-\ac{VAE} - Latent Space Traversal]{Latent space traversal between latent space representations of images with certain shapes for 7,500-\ac{VAE}. Color-values were inverted for this plot.}
+\label{fig:7500_vae_latent_space_traversal_shape_to_shape}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_5000_traverse_square_ellipse.png}
+\caption{Latent space traversal from \textit{Square} $\rightarrow$ \textit{Ellipse}}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_5000_traverse_ellipse_heart.png}
+\caption{Latent space traversal from \textit{Ellipse} $\rightarrow$ \textit{Heart}}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_5000_traverse_heart_square.png}
+\caption{Latent space traversal from \textit{Heart} $\rightarrow$ \textit{Square}}
+\label{subfig:10000_vae_latent_space_traversal_heart_to_square}
+\end{subfigure}
+\caption[5,000-\ac{VAE} - Latent Space Traversal]{Latent space traversal between latent space representations of images with certain shapes for 5,000-\ac{VAE}. Color-values were inverted for this plot.}
+\label{fig:5000_vae_latent_space_traversal_shape_to_shape}
+\end{figure}
 
 
 \pagebreak
 \begin{landscape}
-\section{\ac{VLAE} Networks used in Experiments on Sparsity (Section~\label{subsec:effective-network-capacity})}\label{sec:listings_sparsity_networks}
+\section{\ac{VLAE} Networks used in Experiments on Sparseness (Section~\ref{subsec:effective-network-capacity})}\label{sec:listings_sparsity_networks}
 \input{listings/results_sparsity/fm1-encoder.tex}
 \pagebreak
 \input{listings/results_sparsity/fm1-decoder.tex}
@@ -515,7 +517,7 @@ _________________________________________________________________
 
 \pagebreak
 
-\section{Discriminator Network used in Section \ref{subsec:vae-generated-samples-vs-true-samples}}\label{sec:listing_discriminator_network}
+\section{Discriminator Network used in Section \ref{subsubsec:pixel_wise_distribution_mnist}}\label{sec:listing_discriminator_network}
 \begin{lstlisting}[caption={The discriminator network used to distinguish generated \ac{VAE}/\ac{VLAE} samples from true \textsc{MNIST} images.},captionpos=b]
 _________________________________________________________________
 Layer (type)                 Output Shape Param #
@@ -550,6 +552,39 @@ Non-trainable params: 280
 _________________________________________________________________
 \end{lstlisting}
 
+\pagebreak
+\section{Additional Plots for Section~\ref{subsec:independence-of-vlae-embeddings}}\label{sec:additional-plots-for-section_independence}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/notprop/mnist/vlae/ccs_0_2_vlae.png}
+\caption[VLAE Pixel Proportionality - $\bm{z}_1$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_3=\varphi$ for \ac{VLAE} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/notprop/mnist/vlae/ccs_1_2_vlae.png}
+\caption[VLAE Pixel Proportionality - $\bm{z}_2$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_2 = \bm{z}_3=\varphi$ for \ac{VLAE} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/notprop/mnist/vlae_gan/ccs_0_1_vlae_gan.png}
+\caption[VLAE-GAN Pixel Proportionality - $\bm{z}_1$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_2=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/notprop/mnist/vlae_gan/ccs_0_2_vlae_gan.png}
+\caption[VLAE-GAN Pixel Proportionality - $\bm{z}_1$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_3=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/notprop/mnist/vlae_gan/ccs_1_2_vlae_gan.png}
+\caption[VLAE-GAN Pixel Proportionality - $\bm{z}_2$ vs. $\bm{z}_3$]{Proportionality of pixel intensities when fixing $\bm{z}_2 = \bm{z}_3=\varphi$ for \ac{VLAE}-\ac{GAN} on \textsc{Mnist}. Created accordingly to Figure~\ref{fig:notprop}.}
+\end{figure}
+
+
 
 \newpage
 \section*{Acronyms}
@@ -577,6 +612,7 @@ _________________________________________________________________
 \acro{RDM}{representational dissimilarity matrix}
 \acrodefplural{RDM}{representational dissimilarity matrices}
 \acro{TEO}{temporo-occipital area}
+\acro{t-SNE}{t-distributed stochastic neighbor embedding}
 \acro{VAE}{Variational Autoencoder}
 \acro{VLAE}{Variational Ladder Autoencoder}
 \acro{LVAE}{Ladder Variational Autoencoder}
