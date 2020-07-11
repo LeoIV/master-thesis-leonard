@@ -469,11 +469,6 @@ def main(args: List[str]):
                 v = (v - v.min()) / (v.max() - v.min())
                 morpho_dict[k] = shuffle(v, random_state=seed)
 
-        x_train = x_train
-        y_train = y_train
-        x_val = x_val
-        y_val = y_val
-
         bins = np.arange(0.0, 1.0, 0.1)
         embedding_callback_params += [
             {

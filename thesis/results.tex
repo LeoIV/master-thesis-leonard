@@ -100,7 +100,7 @@ The inner activation function is ReLU in all cases.
         \includegraphics[width=\textwidth]{images/sparseness/sparseness_validation_loss.png}
         \caption{Validation loss}
     \end{subfigure}
-    \caption[Sparse Models - Loss Curves]{Loss curves of models with different number of feature maps (see Appendix~\ref{sec:listings_sparsity_networks}). $fm$ is the reduction factor of the feature maps; $fm-1$, therefore, is the original model, $fm=2$ the model with half the number of feature maps, and $fm=3$ the model with one third of the feature maps.}
+    \caption[Sparse Models - Loss Curves]{Loss curves of models with different number of feature maps (see Appendix~\ref{sec:listings_sparsity_networks}). $fm$ is the reduction factor of the feature maps; $fm=1$, therefore, is the original model, $fm=2$ the model with half the number of feature maps, and $fm=3$ the model with one third of the feature maps.}
     \label{fig:learning_curves_sparseness}
 \end{figure}
 
@@ -116,8 +116,8 @@ The validation loss is minimal after 26 epochs for the large, 39 epochs for the 
 Figure~\ref{fig:fm_activities_sparseness} shows the activities of feature maps in the different models.
 Each line in a subplot is a boxplot, each subfigure the output of either a convolutional, activation or fully connected layer.
 Most prominently, the activations are sparse after convolutions.
-The activations usually decrease the level of sparsity.
-Nonetheless, sparsity is apparent in almost all figures - in the larger and smaller models.
+The activations often increase the level of sparsity as the ReLU activation functions map negative values to zero.
+Sparsity is apparent in almost all feature maps - in the larger and smaller models.
 
 \paragraph{Sparseness in \acp{VLAE} vs. Sparse Representations}
 The sparseness in \acp{VLAE}, however, does not seem to be related to sparse representations in the brain.
@@ -300,8 +300,18 @@ Furthermore, for the latent space traversal shown in Figure~\ref{fig:10000_vae_l
     \end{subfigure}
     \begin{subfigure}{\textwidth}
         \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_6250_dist.png}
+        \caption{Reconstruction term weight 6,250}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
         \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_5000_dist.png}
         \caption{Reconstruction term weight 5,000}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_dsprites_lf_3750_dist.png}
+        \caption{Reconstruction term weight 3,750}
     \end{subfigure}
     \caption[VAE Latent Space Distribution - Different Reconstruction Term Weights]{Posterior distribution of VAE with different reconstruction terms weights for 73,728 dsprites images from the validation set in 100 bins}
     \label{fig:7500_5000_vae_latent_space_distribution_scales_and_shapes}
@@ -314,7 +324,7 @@ Surprisingly, the difference between 10,000-\ac{VAE} and 7,500-\ac{VAE} is small
 To account for latent space disentanglement, the \ac{PPL} for the latent spaces of the different models is computed.
 The perceptual loss is obtained by a \ac{CNN}, trained to predict dsprites object categories\footnote{The model architecture can be found in Appendix~\ref{sec:appendix_feature_extraction_network_ppl_dsprites}, the features are extracted in \say{conv2d\_94}. The model was trained for one epoch using categorical crossentropy with the Adam optimizer with an initial learning rate of 0.1. The model achieved a top-1 accuracy of 0.8 on the validation set.}.
 The \ac{PPL} was computed for 50 different random seeds.
-Each of these \ac{PPL}-computations interpolated at random 100 steps (dependent on the random seed).
+Each of these \ac{PPL}-computations interpolated at 100 random steps (dependent on the random seed).
 
 \begin{table}
     \centering
@@ -333,304 +343,33 @@ Each of these \ac{PPL}-computations interpolated at random 100 steps (dependent 
     \label{tab:ppl-dsprites}
 \end{table}
 
-\begin{table}
-    \centering
-    \begin{tabular}{lr}
-        \toprule
-        Model Comparison                   & $p$-value \\
-        \midrule
-        10,000-\ac{VAE} vs. 7,500-\ac{VAE} & 0.0067    \\
-        7,500-\ac{VAE} vs. 5,000-\ac{VAE}  & 0.0409    \\
-        10,000-\ac{VAE} vs. 5,000-\ac{VAE} & 0.0022    \\
-        \bottomrule
-    \end{tabular}
-    \caption{$p$-values of a two-sided Wilcoxon signed-rank test}
-    \label{tab:ppl-dsprites-p-values}
-\end{table}
+Table~\ref{tab:ppl-dsprites} shows mean \ac{PPL} values and the standard deviations.
+A two-sided Wilcoxon rank-sum test for the differences in the model's \acp{PPL} yielded $p$-values $< 10^{-29}$ in all cases.
+Surprisingly, the 10,000-\ac{VAE}'s \ac{PPL} is lower than for 7,500-\ac{VAE} or 6,250-\ac{VAE}.
 
-Table~\ref{tab:ppl-dsprites} shows mean \ac{PPL} values and the standard deviations, Table~\ref{tab:ppl-dsprites-p-values} gives the $p$-values of the model comparisons.
-Surprisingly, 10,000-\ac{VAE} has a lower \ac{PPL} than 7,500-\ac{VAE}.
+This can be explained by the vast regions of low probability density in the posterior distribution.
+For 10,000-\ac{VAE}, it is likely to produce images that are almost entirely black for some random point in the latent space.
+Only a few regions in the latent space produce reasonable images.
+A neighboring point in the latent space will probably also produce a black image, leading to a low perceptual loss.
+As the reconstruction term weight is lowered (7,500-\ac{VAE} and 6,250-\ac{VAE}), the probability of generating some image and, therefore, the \ac{PPL} increases.
+For 5,000-\ac{VAE} and 3,750-\ac{VAE}, finally, the latent space is sufficiently disentangled.
+Again, this leads to a low \ac{PPL}.
 
-This can be explained by the high non-Gaussianity of the latent space of 10,000-\ac{VAE}.
-Many reconstructions lead to black images.
-However, the perceptual loss between two similar images is low, leading to a low perceptual path length.
+The standard deviation of the \acp{PPL} supports this argumentation.
+Consider 6,250-\ac{VAE}.
+Here, generating some image for a random point in the latent space is already quite likely.
+Nevertheless, there are still \say{enough} regions producing black images.
+For these black regions, the \ac{PPL} is low, just like for 10,000-\ac{VAE}.
+However, for the points producing images, the \ac{PPL} is high, because the latent space still is entangled.
+This causes a high standard deviation.
 
-As the latent space Gaussianity improves for 7,500-\ac{VAE}, the \ac{PPL} first increases and decreases again as the latent space is truly disentangled.
-Therefore, it can be argued that latent space Gaussianity is one necessary condition to compare models by \ac{PPL}.
-Only if the sampling does not lead to $z$-space regions of low probability density, the \ac{PPL} gives interpretable results.
-
-The 5,000-\ac{VAE}, by far, has the lowest \ac{PPL} value of the models with a Gaussian latent space (7,500-\ac{VAE} and 5,000-\ac{VAE}).
+The previous observations have some implications for the application of the \ac{PPL}.
+First, the latent space to be approximately Gaussian is necessary for the \ac{PPL} to produce interpretable results.
+Second, if the latent space is Gaussian, the standard deviation should be observed.
+A too high standard deviation is evidence that there are regions of low probability density in the latent space.
+The \ac{PPL} standard deviation could be a measure of this.
 
 \subsection{Latent Space Analysis}\label{subsec:model-generated-samples}
-
-\subsubsection{Latent Space Traversals}\label{subsubsec:latent_space_traversals}
-
-\subparagraph{\textsc{Mnist}}
-
-A latent space traversal is one way to see if and how a model learns a general representation of the dataset.
-Figure~\ref{fig:mnist_latent_space_traversal} shows the latent space traversal of \ac{VAE}\footnote{The model was trained with input size $28\times 28$, batch size 128, learning rate 0.001, reconstruction loss factor 10,000, $z_dim$=2, no batch-normalization for 200 epochs.}, \ac{VAE}-\ac{GAN}\footnote{The model was trained with input size $28\times 28$, batch size 128, learning rate 0.0001, reconstruction loss factor 10,000, $z_dim$=2 for 200 epochs.}, \ac{VLAE}\footnote{The model was trained with input size $28\times 28$, batch size 128, learning rate 0.0005, no batch-normalization, reconstruction loss factor 10,000, $z_dim$=2 for all layers, for 200 epochs.}, and \ac{VLAE}-\ac{GAN}\footnote{The model was trained with input size $28\times 28$, batch size 128, learning rate 0.0001, no batch-normalization, reconstruction loss factor 10,000, $z_dim$=2 for all layers, for 200 epochs.}.
-For the models with only one latent layer (\ac{VAE} and \ac{VAE}-\ac{GAN}), the plot is generated by traversing the latent space in equal steps from $z_i = -3$ to $z_i = 3$ in both dimensions.
-For the hierarchical models (\ac{VLAE} and \ac{VLAE}-\ac{GAN}), one $z$-layer was fixed and traversed in the same way.
-The values of the other $z$-layers were obtained by sampling from a uniform distribution over $[-3; 3]$.
-
-First, most models properly employ the latent space - the traversal shows almost no non-representative generated images, with a few exceptions for \ac{VLAE} and \ac{VLAE}-\ac{GAN}.
-Noteworthy, these non-representative images mainly occur on the borders where the variance is high.
-The models were trained such that the latent space is standard normal, the latent space traversal, however, goes from -3 to 3, in areas with low probability density.
-Unrepresentative generations in such areas, therefore, is no model failure.
-
-\begin{figure}
-    \centering
-    \begin{subfigure}{.45\textwidth}
-        \centering
-        % include first image
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_mnist.png}
-        \caption{\ac{VAE} latent space traversal from $z_i=-3$ to $z_i=3$ in both $z$ dimensions}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{.45\textwidth}
-        \centering
-        % include second image
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_gan_mnist.png}
-        \caption{\ac{VAE}-\ac{GAN} latent space traversal from $z_i=-3$ to $z_i=3$ in both $z$ dimensions}
-    \end{subfigure}
-\end{figure}
-\begin{figure}
-    \ContinuedFloat
-    \centering
-    \begin{subfigure}{\textwidth}
-        \centering
-        % include second image
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_mnist.png}
-        \caption{\ac{VLAE} latent space traversal from $z_i=-3$ to $z_i=-3$ in both dimensions for the respective $z$-dimension. The other $z$ dimensions are sampled uniformly over $[-3; 3]$}
-        \label{subfig:vlae_mnist_latent_space_traversal}
-    \end{subfigure}
-    \begin{subfigure}{\textwidth}
-        \centering
-        % include second image
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_mnist.png}
-        \caption{\ac{VLAE}-\ac{GAN} latent space traversal from $z_i=-3$ to $z_i=3$ in both dimensions for the respective $z$-dimension. The other $z$ dimensions are sampled uniformly over $[-3; 3]$}
-        \label{subfig:vlae_gan_mnist_latent_space_traversal}
-    \end{subfigure}
-    \caption[Models on \textsc{Mnist} - Latent Space Traversal]{Latent space traversal for different models on \textsc{Mnist}. The original images have been inverted for the purpose of this figure.}
-    \label{fig:mnist_latent_space_traversal}
-\end{figure}
-
-\subparagraph{CelebA}
-
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_celeba.png}
-    \caption[\ac{VLAE}-\ac{GAN} on CelebA: Latent Space Traversal]{Latent space traversal of \ac{VLAE}-\ac{GAN} with $z_{dim_i}=2$ on CelebA.}
-    \label{fig:celeba_latent_space_traversal}
-\end{figure}
-
-Figure~\ref{fig:celeba_latent_space_traversal} shows the latent space traversal of a \ac{VLAE}-\ac{GAN} model\footnote{The model was trained with batch size 128, reconstruction loss factor 10,000, $z_{dim}=2$ for all three layers, an initial learning rate of $0.001$, a learning rate decay of 0.01, and the Adam optimizer for 200 epochs.} with input size $128\times 128$ on the CelebA dataset.
-The model was generated by evenly interpolating in $[-3; 3]$ in the respective layer and by sampling from a uniform distribution over $[-3; 3]$ for the other layers.
-Similar to \textsc{Mnist}, the model learns different factors of variation on different layers.
-The first layer mainly learns skin color, layer two hair color, and layer three pose and background color.
-Importantly, the model learns only a few factors of variation due to the small latent space dimensionality.
-
-\begin{figure}
-    \centering
-    \begin{subfigure}{\textwidth}
-        % include second image
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_celeba_black_to_blond.png}
-        \caption{Black to Blond Hair}
-        \label{subfig:black_to_blond}
-    \end{subfigure}
-    \begin{subfigure}{\textwidth}
-        % include second image
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_celeba_man_to_woman.png}
-        \caption{Female to Male}
-        \label{subfig:female_to_male}
-    \end{subfigure}
-    \caption[Interpolating between black and blond hair, man and woman]{Interpolating between latent factors of variation in a \ac{VAE} latent space, trained on CelebA}
-    \label{fig:vae_celeba_black_to_blond_man_to_woman}
-\end{figure}
-
-As discussed in Section~\ref{subsubsec:representation_learning}, \textit{feature consistency} is an important property of \acp{VAE}.
-It was empirically evaluated if the \ac{VAE} models have the same property.
-Figure~\ref{fig:vae_celeba_black_to_blond_man_to_woman} shows the transition between black and blond hair, and female and male for a \ac{VAE} trained on ImageNet.
-
-To generate the plots, the mean vectors of the different factors of variation (\textit{male}, \textit{black hair}, etc.) were obtained by predicting the posterior for corresponding images from CelebA.
-Then, for Figure~\ref{subfig:black_to_blond}, a random latent vector $\bm{v}_1$ with \say{black hair} was chosen from the dataset.
-The transition was then generated by choosing different values $\alpha \in [0, 2]$ in the operation $\bm{v}_1 - \bm{v}(\text{black hair}) + \alpha\bm{v}(\text{blond hair})$.
-For Figure~\ref{subfig:female_to_male}, a random image was generated by sampling $\bm{v}_2\sim \mathcal{N}(\bm{0}, \bm{I})$.
-The transition was then generated by $\bm{v}_2 + \alpha\bm{v}(\text{blond hair})$ with $\alpha \in [0, 4]$.
-
-Even though larger values of $\alpha$ are required to obtain meaningful translations, the latent space has the discussed semantic property.
-The same holds for \ac{VAE}-\ac{GAN}.
-
-\subparagraph{dsprites}
-
-Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation} discusses the latent space of \acp{VAE} on dsprites.
-One conclusion was that \acp{VAE} on dsprites do not learn a smooth transition of different scales.
-A transition between different shapes, however, is possible.
-
-\begin{figure}
-    \centering
-    \foreach \i in {1,..., 7}{
-    \begin{subfigure}{\textwidth}
-        % include second image
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_10000_rotation_\i.png}
-    \end{subfigure}}
-    \caption[10,000-\ac{VAE} - Rotation traversal]{Latent spaces traversal between different rotation values for 10,000-\ac{VAE} on the dsprites dataset}
-    \label{fig:vae_dsprites_rotation_vae_10000}
-\end{figure}
-
-Figure~\ref{fig:vae_dsprites_rotation_vae_10000} shows the latent space traversal between different rotation values of a 10,000-\ac{VAE} on the dsprites dataset (the plots for the other models can be found in Appendix~\ref{sec:appendix_plots_latent_space_traversals}).
-The models are the same as in Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation}.
-The 10,000-\ac{VAE} learns a transition between different rotation values.
-This also holds for the other models (7,500-, 6,250-, 5000-, 3750-\ac{VAE}, see Appendix~\ref{sec:appendix_plots_latent_space_traversals}).
-
-However, how are the different rotation angles represented in the latent space?
-
-\begin{figure}
-    \centering
-    \begin{subfigure}{.3\textwidth}
-        % include second image
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_orientation_latent_space.png}
-        \caption{\textit{Ellipse} - only $\frac{1}{2}$ rotation is shown}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{.3\textwidth}
-        % include second image
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_orientation_latent_space_heart.png}
-        \caption{\textit{Heart} - only $\frac{1}{2}$ rotation is shown}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{.3\textwidth}
-        % include second image
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_orientation_latent_space_square.png}
-        \caption{\textit{Square} - only $\frac{1}{4}$ rotation is shown}
-    \end{subfigure}
-    \caption[10,000-\ac{VAE} - Rotation latent space]{Latent space positions of different dsprites shape with a fixed position, averaged over scales and a 10,000-\ac{VAE} where only rotation is changed between objects. Increasing color values correspond to an increase in rotation. }
-    \label{fig:vae_dsprites_rotation_latent_space_vae_10000}
-\end{figure}
-
-Figure~\ref{fig:vae_dsprites_rotation_latent_space_vae_10000} shows the latent space position of an ellipse with a fixed position, averaged over different scales for different rotations.
-For this plot, the ten-dimensional latent space was reduced to a two-dimensional using \ac{PCA} on the vector values.
-Only half of the rotations are shown (i.e., rotations in $[0;\pi]$).
-Rotations in $[\pi; 2\pi]$ fill the circle a second time.
-The behavior does not qualitatively change for the other models (7,500-, 6,250-, 5000-, 3750-\ac{VAE}), neither for different shapes.
-Rotations are learned naturally;
-A circle in the (reduced) latent space corresponds to a rotation of the object.
-For \textit{Square}, the shape is the same after rotating by $\frac{1}{4}\pi$.
-The model captures this property - the circle is traveled once after a $\frac{1}{4}\pi$-rotation (in contrast to \textit{Ellipse}, where a $\frac{1}{2}\pi$-rotation is required).
-
-Something similar can be observed for the position.
-\begin{figure}
-    \centering
-    \begin{subfigure}{.48\textwidth}
-        % include second image
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_position_latent_space_route.png}
-        \caption{Traversal of the reduced latent space for different $x$-positions.}
-        \label{subfig:vae_dsprites_x_pos_latent_space_route}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{.48\textwidth}
-        % include second image
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_position_latent_space_values.png}
-        \caption{Values of different dimensions in the original latent space for different $x$-positions.}
-        \label{subfig:vae_dsprites_x_pos_dim_values}
-    \end{subfigure}
-    \begin{subfigure}{.48\textwidth}
-        % include second image
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_position_latent_space_route_y.png}
-        \caption{Traversal of the reduced latent space for different $y$-positions.}
-        \label{subfig:vae_dsprites_y_pos_latent_space_route}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{.48\textwidth}
-        % include second image
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_position_latent_space_values_y.png}
-        \caption{Values of different dimensions in the original latent space for different $y$-positions.}
-        \label{subfig:vae_dsprites_y_pos_dim_values}
-    \end{subfigure}
-    \caption[\ac{VAE} on dsprites: Latent Space Values]{Latent space of a \ac{VAE} trained on dsprites. Different values are either for different $x$-positions or for different $y$-position. The other position is fixed to 1.0. It is averaged over all other parameters.}
-    \label{fig:vae_dsprites_latent_space_x_position}
-\end{figure}
-
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_7500_position.png}
-    \caption{Linear interpolation between \textit{top-left} and \textit{bottom-right} 7,500-\ac{VAE} latent space representations on dsprites leads to areas of low probability density.}
-    \label{fig:vae_7500_dsprites_position_interpolation}
-\end{figure}
-
-Figure~\ref{fig:vae_dsprites_latent_space_x_position} shows the path in a reduced latent space.
-Each arrow is the difference between two successive $x$-, or $y$-positions, mapped into the two-dimensional space.
-The path is curved, surprising as linear interpolations in the latent space are known to be successful for natural attributes such as hair color~(\citep{radford2016deep} and CelebA in this section).
-Linear interpolation for the position, however, leads to regions of low probability density (see Figure~\ref{fig:vae_7500_dsprites_position_interpolation}).
-Figure~\ref{subfig:vae_dsprites_x_pos_dim_values} shows the values for the different dimensions in the non-reduced latent space.
-Some values almost resemble a sine-curve.
-This behavior is qualitatively the same for the other models (7,500-, 6,250-, 5000-, 3750-\ac{VAE}).
-
-Like rotation for which this has been reported previously~\citep{chen2018isolating}, \acp{VAE} seem to encode position in a periodic manner.
-
-Regarding the human visual system, a high-level model of the ventral stream should not capture object position, scale, or rotation at all.
-Capturing orientation and position of a whole object is instead a property of the dorsal stream.
-However, by definition of the loss function\footnote{This holds for the pixel-wise and the adversarial loss.}, \acp{VAE} are trained to encode these properties.
-One way to make \acp{VAE} agnostic of these factors is to center objects in the picture as in the CelebA dataset.
-However, even for CelebA, the models learn head rotation as one factor of variation.
-
-Regarding vision, there is no reason to assume that \acp{VAE} are a better model of the ventral than of the dorsal stream.
-
-For the \acp{VLAE} model, a similar analysis allows us to identify which layers encode which factor of variation.
-\begin{figure}
-    \centering
-    \begin{subfigure}{.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_dsprites_left_latent_space_values.png}
-        \caption{Varying $x$-position}
-        \label{subfig:vlae_dsprites_latent_space_values_x}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_dsprites_bottom_latent_space_values.png}
-        \caption{Varying $y$-position}
-        \label{subfig:vlae_dsprites_latent_space_values_y}
-    \end{subfigure}
-    \vfill
-    \begin{subfigure}{.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_dsprites_orientation_latent_space_values.png}
-        \caption{Varying orientation}
-        \label{subfig:vlae_dsprites_latent_space_values_orientation}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_dsprites_scale_latent_space_values.png}
-        \caption{Varying scale}
-        \label{subfig:vlae_dsprites_latent_space_values_scale}
-    \end{subfigure}
-    \vfill
-    \begin{subfigure}{.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_dsprites_shape_latent_space_values.png}
-        \caption{Varying shape}
-        \label{subfig:vlae_dsprites_latent_space_values_shape}
-    \end{subfigure}
-    \caption[\ac{VLAE} on dsprites: Latent Space Values]{Values of different dimensions and layers in the \ac{VLAE} latent space for different factor of variation values (first row in each subplot), and position in a \ac{PCA}-reduced latent space (second row in each subplot). The left column corresponds to the first embedding layer, the right one to the third. \ac{PCA} was performed separately for each factor of variation and latent space layer.}
-    \label{fig:vlae_dsprites_latent_space_values}
-\end{figure}
-Figure~\ref{fig:vlae_dsprites_latent_space_values} shows the $\bm{z}$ values of different layers and dimensions for different factors of variation of a \ac{VLAE}.
-The third layer seems to encode most of the factors of variation: $x$-, and $y$-position, scale, and shape.
-However, the first and second layers also encode orientation (Figures~\ref{subfig:vlae_dsprites_latent_space_values_x} and ~\ref{subfig:vlae_dsprites_latent_space_values_y}) even though less strong.
-The representation, therefore, is not separated;
-The different layers do not independently encode different factors of variation even though these are, by definition, independent in the dsprites dataset.
-Independence, in the case of \textsc{Mnist}, is further discussed in Section~\ref{subsec:independence-of-vlae-embeddings}.
-
-The first and second layers jointly learn orientation, similarly to the \ac{VAE}.
-Scale and shape do not seem to be learned\footnote{In fact, the reconstructed and generated images of this model do not vary by much in shape.}, presumably because the model has a too little latent space leading to an information bottleneck where only the most essential features reducing the reconstruction loss are learned.
-Importantly, the \ac{VLAE} has three four-dimensional latent spaces.
-However, the reconstructions are worse compared to the ten-dimensional-latent-space \ac{VAE}.
-\acp{VLAE}, therefore, do not seem to use the hierarchical latent spaces efficiently under all circumstances.
-
-Qualitatively, \ac{VAE}-\ac{GAN} and \ac{VLAE}-\ac{GAN} behave similarly for the considerations in this section.
-They, therefore, are not discussed.
 
 \subsubsection{Latent Space Embeddings}\label{subsubsec:latent_space_embeddings}
 
@@ -874,6 +613,348 @@ Object position and scale are learned in all layers, but best in $z_3$.
 
 All in all, using a \ac{VAE} with a higher-dimensional space seems superior to the \ac{VLAE} in terms of encoding efficiency.
 
+\subsubsection{Latent Space Traversals}\label{subsubsec:latent_space_traversals}
+
+\subparagraph{\textsc{Mnist}}
+
+A latent space traversal is one way to see if and how a model learns a general representation of the dataset.
+Figure~\ref{fig:mnist_latent_space_traversal} shows the latent space traversal of \ac{VAE}\footnote{The model was trained with input size $28\times 28$, batch size 128, learning rate 0.001, reconstruction loss factor 10,000, $z_dim$=2, no batch-normalization for 200 epochs.}, \ac{VAE}-\ac{GAN}\footnote{The model was trained with input size $28\times 28$, batch size 128, learning rate 0.0001, reconstruction loss factor 10,000, $z_dim$=2 for 200 epochs.}, \ac{VLAE}\footnote{The model was trained with input size $28\times 28$, batch size 128, learning rate 0.0005, no batch-normalization, reconstruction loss factor 10,000, $z_dim$=2 for all layers, for 200 epochs.}, and \ac{VLAE}-\ac{GAN}\footnote{The model was trained with input size $28\times 28$, batch size 128, learning rate 0.0001, no batch-normalization, reconstruction loss factor 10,000, $z_dim$=2 for all layers, for 200 epochs.}.
+For the models with only one latent layer (\ac{VAE} and \ac{VAE}-\ac{GAN}), the plot is generated by traversing the latent space in equal steps from $z_i = -3$ to $z_i = 3$ in both dimensions.
+For the hierarchical models (\ac{VLAE} and \ac{VLAE}-\ac{GAN}), one $z$-layer was fixed and traversed in the same way.
+The values of the other $z$-layers were obtained by sampling from a uniform distribution over $[-3; 3]$.
+
+First, most models properly employ the latent space - the traversal shows almost no non-representative generated images, with a few exceptions for \ac{VLAE} and \ac{VLAE}-\ac{GAN}.
+Noteworthy, these non-representative images mainly occur on the borders where the variance is high.
+The models were trained such that the latent space is standard normal, the latent space traversal, however, goes from -3 to 3, in areas with low probability density.
+Unrepresentative generations in such areas, therefore, is no model failure.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        % include first image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_mnist.png}
+        \caption{\ac{VAE} latent space traversal from $z_i=-3$ to $z_i=3$ in both $z$ dimensions}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_gan_mnist.png}
+        \caption{\ac{VAE}-\ac{GAN} latent space traversal from $z_i=-3$ to $z_i=3$ in both $z$ dimensions}
+    \end{subfigure}
+\end{figure}
+\begin{figure}
+    \ContinuedFloat
+    \centering
+    \begin{subfigure}{\textwidth}
+        \centering
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_mnist.png}
+        \caption{\ac{VLAE} latent space traversal from $z_i=-3$ to $z_i=-3$ in both dimensions for the respective $z$-dimension. The other $z$ dimensions are sampled uniformly over $[-3; 3]$}
+        \label{subfig:vlae_mnist_latent_space_traversal}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \centering
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_mnist.png}
+        \caption{\ac{VLAE}-\ac{GAN} latent space traversal from $z_i=-3$ to $z_i=3$ in both dimensions for the respective $z$-dimension. The other $z$ dimensions are sampled uniformly over $[-3; 3]$}
+        \label{subfig:vlae_gan_mnist_latent_space_traversal}
+    \end{subfigure}
+    \caption[Models on \textsc{Mnist} - Latent Space Traversal]{Latent space traversal for different models on \textsc{Mnist}. The original images have been inverted for the purpose of this figure.}
+    \label{fig:mnist_latent_space_traversal}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.48\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_mnist_morpho_latent_space_values_area.png}
+        \caption{area}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.48\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_mnist_morpho_latent_space_values_height.png}
+        \caption{height}
+    \end{subfigure}
+    \begin{subfigure}{.48\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_mnist_morpho_latent_space_values_identity.png}
+        \caption{identity}
+        \label{subfig:vlae_mnist_morpho_latent_space_values_identity}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.48\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_mnist_morpho_latent_space_values_length.png}
+        \caption{length}
+    \end{subfigure}
+    \begin{subfigure}{.48\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_mnist_morpho_latent_space_values_slant.png}
+        \caption{slant}
+        \label{subfig:vlae_mnist_morpho_latent_space_values_slant}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.48\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_mnist_morpho_latent_space_values_thickness.png}
+        \caption{thickness}
+        \label{subfig:vlae_mnist_morpho_latent_space_values_thickness}
+    \end{subfigure}
+    \begin{subfigure}{.48\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_mnist_morpho_latent_space_values_width.png}
+        \caption{width}
+    \end{subfigure}
+    \caption{Mean latent space values for \ac{VLAE} on \textsc{Mnist} when fixing different factors of variation from Morpho-\textsc{Mnist}}
+    \label{fig:vlae_mnist_morpho_latent_space_values}
+\end{figure}
+
+Morpho-\textsc{Mnist} allows for another kind of analysis.
+Consider Figure~\ref{fig:vlae_mnist_morpho_latent_space_values}\footnote{The corresponding figures for the other models can be found in Appendix~\ref{sec:appendix_plots_latent_space_traversals}}.
+Each sub-figure shows the latent space values for \textsc{Mnist} images, predicted by the \ac{VLAE} when fixing one Morpho-\textsc{Mnist} attribute and averaging over the others.
+The value range of each Morpho-\textsc{Mnist} attribute was divided into 50 evenly-sized bins, and the \textsc{Mnist} images were assigned to these bins based on the value of the corresponding attribute.
+Single bins can contain no values if no \textsc{Mnist} image has an attribute value in the corresponding range.
+The $\bm{z}$-predictions within one bin are averaged.
+Each column in a sub-figure in Figure~\ref{fig:vlae_mnist_morpho_latent_space_values} corresponds to one layer of \ac{VLAE} (the first column corresponds to the first layer, etc.).
+The second row in each sub-figure shows the mean latent space position for each bin.
+The bins are ordered, increasing color values correspond to increasing attribute values as indicated by the respective color bar.
+The first row shows the latent space position for each dimension separately.
+The $x$-axis corresponds to the (ordered) bins.
+
+If one layer does not learn a particular attribute, its value should not change much as the attribute values are varied.
+For example, this can be observed in Figure~\ref{subfig:vlae_mnist_morpho_latent_space_values_thickness} (layers two and three).
+Even though the latent space values are non-stationary for high thickness values, this can be attributed to the few images of a high thickness (see Figure~\ref{fig:morpho_mnist_distribution}).
+Apart from that, only layer one seems to encode thickness as it is the only layer showing a trend for this attribute.
+This is supported by Figure~\ref{subfig:vlae_mnist_latent_space_traversal}, where thickness increases along the trajectory in Figure~\ref{subfig:vlae_mnist_morpho_latent_space_values_thickness}.
+Another example is the slant (Figure~\ref{subfig:vlae_mnist_morpho_latent_space_values_slant}).
+The slant-trajectory is almost orthogonal to the thickness-trajectory (see also Figure~\ref{subfig:vlae_mnist_latent_space_traversal}).
+
+However, many attributes do not seem to be learned in one layer.
+For example, the values of layers two and three are highly non-stationary for digit identity (Figure~\ref{subfig:vlae_mnist_morpho_latent_space_values_identity}).
+This indicates that digit identity is jointly learned in both layers.
+Figure~\ref{subfig:vlae_mnist_latent_space_traversal} supports this.
+Traversals in both layers seem to influence digit identity, but there is still much variation within subregions.
+The same holds for other attributes.
+
+In conclusion, \ac{VLAE}, in some cases, succeeds in learning separable representations but also fails in other cases.
+A low variation of values within one layer when changing one factor of variation indicates that this layer does not learn this factor of variation.
+This is not obvious because the layer could learn this attribute and be overruled by the higher layers during the reconstructions.
+However, this does not seem to be the case, and the \ac{VLAE} uses the latent space efficiently, as observed by jointly studying Figure~\ref{fig:vlae_mnist_morpho_latent_space_values} and Figure~\ref{subfig:vlae_mnist_latent_space_traversal}.
+
+\subparagraph{CelebA}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_celeba.png}
+    \caption[\ac{VLAE}-\ac{GAN} on CelebA: Latent Space Traversal]{Latent space traversal of \ac{VLAE}-\ac{GAN} with $z_{dim_i}=2$ on CelebA.}
+    \label{fig:celeba_latent_space_traversal}
+\end{figure}
+
+Figure~\ref{fig:celeba_latent_space_traversal} shows the latent space traversal of a \ac{VLAE}-\ac{GAN} model\footnote{The model was trained with batch size 128, reconstruction loss factor 10,000, $z_{dim}=2$ for all three layers, an initial learning rate of $0.001$, a learning rate decay of 0.01, and the Adam optimizer for 200 epochs.} with input size $128\times 128$ on the CelebA dataset.
+The model was generated by evenly interpolating in $[-3; 3]$ in the respective layer and by sampling from a uniform distribution over $[-3; 3]$ for the other layers.
+Similar to \textsc{Mnist}, the model learns different factors of variation on different layers.
+The first layer mainly learns skin color, layer two hair color, and layer three pose and background color.
+Importantly, the model learns only a few factors of variation due to the small latent space dimensionality.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_celeba_black_to_blond.png}
+        \caption{Black to Blond Hair}
+        \label{subfig:black_to_blond}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_celeba_man_to_woman.png}
+        \caption{Female to Male}
+        \label{subfig:female_to_male}
+    \end{subfigure}
+    \caption[Interpolating between black and blond hair, man and woman]{Interpolating between latent factors of variation in a \ac{VAE} latent space, trained on CelebA}
+    \label{fig:vae_celeba_black_to_blond_man_to_woman}
+\end{figure}
+
+As discussed in Section~\ref{subsubsec:representation_learning}, \textit{feature consistency} is an important property of \acp{VAE}.
+It was empirically evaluated if the \ac{VAE} models have the same property.
+Figure~\ref{fig:vae_celeba_black_to_blond_man_to_woman} shows the transition between black and blond hair, and female and male for a \ac{VAE} trained on ImageNet.
+
+To generate the plots, the mean vectors of the different factors of variation (\textit{male}, \textit{black hair}, etc.) were obtained by predicting the posterior for corresponding images from CelebA.
+Then, for Figure~\ref{subfig:black_to_blond}, a random latent vector $\bm{v}_1$ with \say{black hair} was chosen from the dataset.
+The transition was then generated by choosing different values $\alpha \in [0, 2]$ in the operation $\bm{v}_1 - \bm{v}(\text{black hair}) + \alpha\bm{v}(\text{blond hair})$.
+For Figure~\ref{subfig:female_to_male}, a random image was generated by sampling $\bm{v}_2\sim \mathcal{N}(\bm{0}, \bm{I})$.
+The transition was then generated by $\bm{v}_2 + \alpha\bm{v}(\text{blond hair})$ with $\alpha \in [0, 4]$.
+
+Even though larger values of $\alpha$ are required to obtain meaningful translations, the latent space has the discussed semantic property.
+The same holds for \ac{VAE}-\ac{GAN}.
+
+\subparagraph{dsprites}
+
+Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation} discusses the latent space of \acp{VAE} on dsprites.
+One conclusion was that \acp{VAE} on dsprites do not learn a smooth transition of different scales.
+A transition between different shapes, however, is possible.
+
+\begin{figure}
+    \centering
+    \foreach \i in {1,..., 7}{
+    \begin{subfigure}{\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_10000_rotation_\i.png}
+    \end{subfigure}}
+    \caption[10,000-\ac{VAE} - Rotation traversal]{Latent spaces traversal between different rotation values for 10,000-\ac{VAE} on the dsprites dataset}
+    \label{fig:vae_dsprites_rotation_vae_10000}
+\end{figure}
+
+Figure~\ref{fig:vae_dsprites_rotation_vae_10000} shows the latent space traversal between different rotation values of a 10,000-\ac{VAE} on the dsprites dataset (the plots for the other models can be found in Appendix~\ref{sec:appendix_plots_latent_space_traversals}).
+The models are the same as in Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation}.
+The 10,000-\ac{VAE} learns a transition between different rotation values.
+This also holds for the other models (7,500-, 6,250-, 5000-, 3750-\ac{VAE}, see Appendix~\ref{sec:appendix_plots_latent_space_traversals}).
+
+However, how are the different rotation angles represented in the latent space?
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.3\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_orientation_latent_space.png}
+        \caption{\textit{Ellipse} - only $\frac{1}{2}$ rotation is shown}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.3\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_orientation_latent_space_heart.png}
+        \caption{\textit{Heart} - only $\frac{1}{2}$ rotation is shown}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.3\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_orientation_latent_space_square.png}
+        \caption{\textit{Square} - only $\frac{1}{4}$ rotation is shown}
+    \end{subfigure}
+    \caption[10,000-\ac{VAE} - Rotation latent space]{\ac{PCA}-transformed latent space positions of different dsprites shapes with a fixed position, averaged over scales and a 10,000-\ac{VAE} where only rotation is changed between objects. Increasing color values correspond to an increase in rotation. }
+    \label{fig:vae_dsprites_rotation_latent_space_vae_10000}
+\end{figure}
+
+Figure~\ref{fig:vae_dsprites_rotation_latent_space_vae_10000} shows the latent space position of an ellipse with a fixed position, averaged over different scales for different rotations.
+For this plot, the ten-dimensional latent space was reduced to a two-dimensional using \ac{PCA} on the vector values.
+Only half of the rotations are shown (i.e., rotations in $[0;\pi]$).
+Rotations in $[\pi; 2\pi]$ fill the circle a second time.
+The behavior does not qualitatively change for the other models (7,500-, 6,250-, 5000-, 3750-\ac{VAE}), neither for different shapes.
+Rotations are learned naturally;
+A circle in the (reduced) latent space corresponds to a rotation of the object.
+For \textit{Square}, the shape is the same after rotating by $\frac{1}{4}\pi$.
+The model captures this property - the circle is traveled once after a $\frac{1}{4}\pi$-rotation (in contrast to \textit{Ellipse}, where a $\frac{1}{2}\pi$-rotation is required).
+
+Something similar can be observed for the position.
+\begin{figure}
+    \centering
+    \begin{subfigure}{.48\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_10000_dsprites_latent_space_values_x_position.png}
+        \caption{Traversal of the reduced latent space for different $x$-positions.}
+        \label{subfig:vae_dsprites_x_pos_latent_space_route}
+    \end{subfigure}
+    \begin{subfigure}{.48\textwidth}
+        % include second image
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_10000_dsprites_latent_space_values_y_position.png}
+        \caption{Traversal of the reduced latent space for different $y$-positions.}
+        \label{subfig:vae_dsprites_y_pos_latent_space_route}
+    \end{subfigure}
+    \caption[\ac{VAE} on dsprites: Latent Space Values]{Latent space of 10,000-\ac{VAE} trained on dsprites. Different values are either for different $x$-positions or for different $y$-position. The other position is fixed to 1.0. It is averaged over all other parameters.}
+    \label{fig:vae_dsprites_latent_space_x_position}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_7500_position.png}
+    \caption{Linear interpolation between \textit{top-left} and \textit{bottom-right} 7,500-\ac{VAE} latent space representations on dsprites leads to areas of low probability density.}
+    \label{fig:vae_7500_dsprites_position_interpolation}
+\end{figure}
+
+Figure~\ref{fig:vae_dsprites_latent_space_x_position} shows the path in a reduced latent space\footnote{Plots for the other models (7,500-, 6,250-, 5,000, 3750-\ac{VAE}, and \ac{VAE}-\ac{GAN}) can be found in Appendix~\ref{sec:appendix_plots_latent_space_traversals}.)}.
+Each arrow is the difference between two successive $x$-, or $y$-positions, mapped into the two-dimensional space.
+The path is curved, surprising as linear interpolations in the latent space are known to be successful for natural attributes such as hair color~(\citep{radford2016deep} and CelebA in this section).
+Linear interpolation for the position, however, leads to regions of low probability density (see Figure~\ref{fig:vae_7500_dsprites_position_interpolation}).
+Figure~\ref{subfig:vae_dsprites_x_pos_dim_values} shows the values for the different dimensions in the non-reduced latent space.
+Some values almost resemble a sine-curve.
+This behavior is qualitatively the same for the other models (7,500-, 6,250-, 5000-, 3750-\ac{VAE}).
+
+Like rotation for which this has been reported previously~\citep{chen2018isolating}, \acp{VAE} seem to encode position in a periodic manner.
+
+Regarding the human visual system, a high-level model of the ventral stream should not capture object position, scale, or rotation at all.
+Capturing orientation and position of a whole object is instead a property of the dorsal stream.
+However, by definition of the loss function\footnote{This holds for the pixel-wise and the adversarial loss.}, \acp{VAE} are trained to encode these properties.
+One way to make \acp{VAE} agnostic of these factors is to center objects in the picture as in the CelebA dataset.
+However, even for CelebA, the models learn head rotation as one factor of variation.
+
+Regarding vision, there is no reason to assume that \acp{VAE} are a better model of the ventral than of the dorsal stream.
+
+For the \acp{VLAE} model, a similar analysis allows us to identify which layers encode which factor of variation\footnote{The plots for the corresponding \ac{VLAE}-\ac{GAN} model can be found in Appendix~\ref{sec:appendix_plots_latent_space_traversals}.}.
+\begin{figure}
+    \centering
+    \begin{subfigure}{.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_dsprites_left_latent_space_values.png}
+        \caption{Varying $x$-position}
+        \label{subfig:vlae_dsprites_latent_space_values_x}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_dsprites_bottom_latent_space_values.png}
+        \caption{Varying $y$-position}
+        \label{subfig:vlae_dsprites_latent_space_values_y}
+    \end{subfigure}
+    \vfill
+    \begin{subfigure}{.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_dsprites_orientation_latent_space_values.png}
+        \caption{Varying orientation}
+        \label{subfig:vlae_dsprites_latent_space_values_orientation}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_dsprites_scale_latent_space_values.png}
+        \caption{Varying scale}
+        \label{subfig:vlae_dsprites_latent_space_values_scale}
+    \end{subfigure}
+    \vfill
+    \begin{subfigure}{.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_dsprites_shape_latent_space_values.png}
+        \caption{Varying shape}
+        \label{subfig:vlae_dsprites_latent_space_values_shape}
+    \end{subfigure}
+    \caption[\ac{VLAE} on dsprites: Latent Space Values]{Values of different dimensions and layers in the \ac{VLAE} latent space for different factor of variation values (first row in each subplot), and position in a \ac{PCA}-reduced latent space (second row in each subplot). The model was trained on dsprites. The left column corresponds to the first embedding layer, the right one to the third. \ac{PCA} was performed separately for each factor of variation and latent space layer. Different values correspond to different values for the respective factor of variation. For orientation and scale, the position is fixed to 0.0 in both directions, shape is fixed to \textit{Square}. For $x$-and $y$-postition, the other position is fixed to 1.0 and shape is fixed to \textit{Square}.}
+    \label{fig:vlae_dsprites_latent_space_values}
+\end{figure}
+Figure~\ref{fig:vlae_dsprites_latent_space_values} shows the $\bm{z}$ values of different layers and dimensions for different factors of variation of a \ac{VLAE}.
+The third layer seems to encode most of the factors of variation: $x$-, and $y$-position, scale, and shape.
+However, the first and second layers also encode orientation (Figures~\ref{subfig:vlae_dsprites_latent_space_values_x} and ~\ref{subfig:vlae_dsprites_latent_space_values_y}) even though less strong.
+The representation, therefore, is not separated;
+The different layers do not independently encode different factors of variation even though these are, by definition, independent in the dsprites dataset.
+Independence, in the case of \textsc{Mnist}, is further discussed in Section~\ref{subsec:independence-of-vlae-embeddings}.
+
+The first and second layers jointly learn orientation, similarly to the \ac{VAE}.
+The scale, and the $x$- and $y$-positions are mainly learned in the third layer.
+Again, the latent space traversal for the $x$- and $y$-positions show a curved path, even though less circular compared to the \ac{VAE}.
+Importantly, the \ac{VLAE} has three four-dimensional latent spaces.
+However, the reconstructions are worse compared to the ten-dimensional-latent-space \ac{VAE}.
+\acp{VLAE}, therefore, do not seem to use the hierarchical latent spaces efficiently under all circumstances.
+
+Qualitatively, \ac{VAE}-\ac{GAN} and \ac{VLAE}-\ac{GAN} behave similarly for the considerations in this section.
+They, therefore, are not discussed.
+
+By analyzing the latent space traversals of different models (\ac{VAE} and \ac{VLAE} models) on different datasets (dsprites and \textsc{Mnist} with Morpho-\textsc{Mnist}), it has been shown that \ac{VAE}- and \ac{VLAE}-models partially learn curved latent space trajectories on for ordered latent space attributes (Figures~\ref{fig:vlae_mnist_morpho_latent_space_values},~\ref{fig:vae_dsprites_latent_space_x_position}, and~\ref{fig:vlae_dsprites_latent_space_values}).
+It has empirically been validated that a simple linear interpolation between different orientation values in the latent space of a \ac{VAE} trained on dsprites does not capture the learned \say{orientation-trajectory}.
+Therefore, it is argued that linear interpolations sometimes do not capture the learned trajectory.
+Interpolating linearly can lead to wrong conclusions regarding the model performance.
+
+% TODO: Write about latent space entangledment
+
 \subsection{Latent Space Separability on Generated Images}\label{subsec:independence-of-vlae-embeddings}
 
 The VLAE learns embeddings on different levels.
@@ -996,28 +1077,28 @@ Different statistical analyses were performed to address this question, revealin
 
 \begin{figure}
     \centering
-    \begin{subfigure}{0.48\textwidth}
+    \begin{subfigure}{0.4\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_mean.png}
         \caption{Histogram of mean pixel intensities for different models}
         \label{subfig:mean_generated_vs_true}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.48\textwidth}
+    \begin{subfigure}{0.4\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_sd.png}
         \caption{Histogram of pixel intensity standard deviations for different models}
         \label{subfig:sd_generated_vs_true}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.48\textwidth}
+    \begin{subfigure}{0.4\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_skew.png}
         \caption{Histogram of pixel intensity skewness for different models}
         \label{subfig:skew_generated_vs_true}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.48\textwidth}
+    \begin{subfigure}{0.4\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_kurt.png}
         \caption{Histogram of pixel intensity kurtosis for different models}
@@ -1025,6 +1106,39 @@ Different statistical analyses were performed to address this question, revealin
     \end{subfigure}
     \caption[Models on \textsc{Mnist}: Pixel-wise distributions]{Pixel-wise distributions of different models and moments for the validation data set.}
     \label{fig:mean_generated_vs_true}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_mean_gauss_post.png}
+        \caption{Histogram of mean pixel intensities for different models}
+        \label{subfig:mean_generated_vs_true_gauss_post}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_sd_gauss_post.png}
+        \caption{Histogram of pixel intensity standard deviations for different models}
+        \label{subfig:sd_generated_vs_true_gauss_post}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_skew_gauss_post.png}
+        \caption{Histogram of pixel intensity skewness for different models}
+        \label{subfig:skew_generated_vs_true_gauss_post}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_kurt_gauss_post.png}
+        \caption{Histogram of pixel intensity kurtosis for different models}
+        \label{subfig:kurt_generated_vs_true_gauss_post}
+    \end{subfigure}
+    \caption[Models on \textsc{Mnist}: Pixel-wise distributions - Gaussian Posterior]{Pixel-wise distributions of different models and moments for the validation data set with a standard normal posterior.}
+    \label{fig:mean_generated_vs_true_gauss_post}
 \end{figure}
 
 The following procedure was applied to generate samples for different models.
@@ -1043,6 +1157,11 @@ The MNIST test set of 10,000 images was compared to a 1,000 generated samples fr
 First, the mean pixel values, i.e.,~the mean over all $28\times 28$ pixel values, were compared (see Figure~\ref{subfig:vlae_mean_generated_vs_true}).
 The plot overlays the histograms of mean pixel values for the five conditions: \textsc{Mnist}, \ac{VAE}, and \ac{VLAE}.
 The other plots in Figure~\ref{fig:mean_generated_vs_true} were created accordingly but for higher moments of the pixel value distributions.
+
+Consider Figure~\ref{fig:mean_generated_vs_true_gauss_post} showing the same distribution but for a standard normal posterior.
+The pixel-wise statistics are quite different compared to Figure~\ref{fig:mean_generated_vs_true} and resemble the true distribution worse.
+Therefore, it is argued that the above procedure is crucial when evaluating a model.
+Sampling from the prior, in general, leads to worse model performance in resembling the data distribution.
 
 Analyzing Figure~\ref{fig:mean_generated_vs_true} leads to the assumption that all models learn the pixel distributions to some extent.
 The overlap of the histograms is high for all models.
@@ -1270,7 +1389,7 @@ Training regular \acp{VAE}, in contrast, is far more stable.
 
 The choice of the loss function might also play an essential role in studying a model's representation with human \ac{IT} representations.
 Compared to the pixel-wise loss, the generative loss allows for a more holistic image assessment.
-This might play an important role in the emergence of a models's latent representation, i.e., might lead to a more realistic latent representation in terms of human IT activations.
+This might play an important role in the emergence of a models' latent representation, i.e., might lead to a more realistic latent representation in terms of human IT activations.
 This aspect should be investigated in future work.
 
 \subsection{Model Limitations}\label{subsec:model-limitations}
@@ -1309,7 +1428,7 @@ It is stated that, compared to the Vanilla VAE, the \ac{LVAE} model is more biol
 
 Maybe the feedback connections fulfil this very function, i.e.\ allowing visual regions operating on a lower semantic level to incorporate the high-level context to disambiguate the lower-level representations.
 
-\subsection{Possible applications of VLAE-GAN model}
+\subsection{Possible applications of VLAE-GAN model}\label{subsec:possible-applications-of-vlae-gan-model}
 \citet{vanrullen2019reconstructing} learn a mapping between test subject's fMRI responses when shown images from the CelebA dataset and the latent space of a \ac{VAE}.
 They discuss which brain regions have most influence in the mapping, showing that the occipital lobe contributes most and the temporal and frontoparietal Cortex less.
 

@@ -1,4 +1,4 @@
-\documentclass[11pt]{article}
+\documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage[margin=1.0in]{geometry}
@@ -170,6 +170,117 @@ But also, this thesis discussed ways to extend these models to better model the 
 
 \appendix
 
+
+\begin{landscape}
+\section{\ac{VLAE} Networks used in Experiments on Sparseness (Section~\ref{subsec:effective-network-capacity})}\label{sec:listings_sparsity_networks}
+\input{listings/results_sparsity/fm1-encoder.tex}
+\pagebreak
+\input{listings/results_sparsity/fm1-decoder.tex}
+\pagebreak
+\input{listings/results_sparsity/fm2-encoder.tex}
+\pagebreak
+\input{listings/results_sparsity/fm2-decoder.tex}
+\pagebreak
+\input{listings/results_sparsity/fm3-encoder.tex}
+\pagebreak
+\input{listings/results_sparsity/fm3-decoder.tex}
+\end{landscape}
+
+
+
+\pagebreak
+\section{Additional Plots For Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation}}\label{sec:additional_plots_latent_space_entanglement}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_7500_traverse_square_ellipse.png}
+\caption{Latent space traversal from \textit{Square} $\rightarrow$ \textit{Ellipse}}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_7500_traverse_ellipse_heart.png}
+\caption{Latent space traversal from \textit{Ellipse} $\rightarrow$ \textit{Heart}}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_7500_traverse_heart_square.png}
+\caption{Latent space traversal from \textit{Heart} $\rightarrow$ \textit{Square}}
+\label{subfig:10000_vae_latent_space_traversal_heart_to_square}
+\end{subfigure}
+\caption[7,500-\ac{VAE} - Latent Space Traversal]{Latent space traversal between latent space representations of images with certain shapes for 7,500-\ac{VAE}. Color-values were inverted for this plot.}
+\label{fig:7500_vae_latent_space_traversal_shape_to_shape}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_5000_traverse_square_ellipse.png}
+\caption{Latent space traversal from \textit{Square} $\rightarrow$ \textit{Ellipse}}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_5000_traverse_ellipse_heart.png}
+\caption{Latent space traversal from \textit{Ellipse} $\rightarrow$ \textit{Heart}}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_5000_traverse_heart_square.png}
+\caption{Latent space traversal from \textit{Heart} $\rightarrow$ \textit{Square}}
+\label{subfig:10000_vae_latent_space_traversal_heart_to_square}
+\end{subfigure}
+\caption[5,000-\ac{VAE} - Latent Space Traversal]{Latent space traversal between latent space representations of images with certain shapes for 5,000-\ac{VAE}. Color-values were inverted for this plot.}
+\label{fig:5000_vae_latent_space_traversal_shape_to_shape}
+\end{figure}
+
+\pagebreak
+\section{Feature Extraction Network in Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation}}\label{sec:appendix_feature_extraction_network_ppl_dsprites}
+\begin{lstlisting}[caption={Feature extraction network for \ac{PPL} computation.},captionpos=b]
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+discriminator_input (InputLa (None, 64, 64, 1)         0
+_________________________________________________________________
+conv2d_91 (Conv2D)           (None, 32, 32, 64)        1664
+_________________________________________________________________
+batch_normalization_114 (Bat (None, 32, 32, 64)        256
+_________________________________________________________________
+leaky_re_lu_55 (LeakyReLU)   (None, 32, 32, 64)        0
+_________________________________________________________________
+conv2d_92 (Conv2D)           (None, 16, 16, 128)       204928
+_________________________________________________________________
+batch_normalization_115 (Bat (None, 16, 16, 128)       512
+_________________________________________________________________
+leaky_re_lu_56 (LeakyReLU)   (None, 16, 16, 128)       0
+_________________________________________________________________
+conv2d_93 (Conv2D)           (None, 8, 8, 256)         295168
+_________________________________________________________________
+batch_normalization_116 (Bat (None, 8, 8, 256)         1024
+_________________________________________________________________
+leaky_re_lu_57 (LeakyReLU)   (None, 8, 8, 256)         0
+_________________________________________________________________
+conv2d_94 (Conv2D)           (None, 8, 8, 512)         1180160
+_________________________________________________________________
+batch_normalization_117 (Bat (None, 8, 8, 512)         2048
+_________________________________________________________________
+leaky_re_lu_58 (LeakyReLU)   (None, 8, 8, 512)         0
+_________________________________________________________________
+conv2d_95 (Conv2D)           (None, 3, 3, 3)           1539
+_________________________________________________________________
+flatten_31 (Flatten)         (None, 27)                0
+_________________________________________________________________
+dense_31 (Dense)             (None, 3)                 84
+_________________________________________________________________
+activation_31 (Activation)   (None, 3)                 0
+=================================================================
+Total params: 1,687,383
+Trainable params: 1,685,463
+Non-trainable params: 1,920
+_________________________________________________________________
+\end{lstlisting}
+
+\pagebreak
 \section{Additional Latent Space Embeddings (Section~\ref{subsubsec:latent_space_embeddings})}
 \subsection{\textsc{Mnist}}
 \begin{figure}[H]
@@ -223,47 +334,61 @@ But also, this thesis discussed ways to extend these models to better model the 
 \begin{figure}[H]
 \centering
 \foreach \i in {1,2,3}{
-\begin{subfigure}{.16\textwidth}
+\begin{adjustbox}{valign=T}
+\begin{subfigure}{.19\textwidth}
 \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_0.png}
 \caption{$z_{\i}$: digit slant}
 \label{subfig:vlae_mnist_latent_space_z_\i_slant}
 \end{subfigure}
+\end{adjustbox}
 \hfill
-\begin{subfigure}{.16\textwidth}
+\begin{adjustbox}{valign=T}
+\begin{subfigure}{.19\textwidth}
 \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_1.png}
 \caption{$z_{\i}$: digit thickness}
 \label{subfig:vlae_mnist_latent_space_z_\i_thickness}
 \end{subfigure}
+\end{adjustbox}
 \hfill
-\begin{subfigure}{.16\textwidth}
+\begin{adjustbox}{valign=T}
+\begin{subfigure}{.19\textwidth}
 \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_2.png}
 \caption{$z_{\i}$: digit area}
 \label{subfig:vlae_mnist_latent_space_z_\i_area}
 \end{subfigure}
+\end{adjustbox}
 \hfill
-\begin{subfigure}{.16\textwidth}
+\begin{adjustbox}{valign=T}
+\begin{subfigure}{.19\textwidth}
 \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_3.png}
 \caption{$z_{\i}$: digit length}
 \label{subfig:vlae_mnist_latent_space_z_\i_length}
 \end{subfigure}
+\end{adjustbox}
 \hfill
-\begin{subfigure}{.16\textwidth}
+\begin{adjustbox}{valign=T}
+\begin{subfigure}{.19\textwidth}
 \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_4.png}
 \caption{$z_{\i}$: digit width}
 \label{subfig:vlae_mnist_latent_space_z_\i_width}
 \end{subfigure}
+\end{adjustbox}
 \hfill
-\begin{subfigure}{.16\textwidth}
+\begin{adjustbox}{valign=T}
+\begin{subfigure}{.19\textwidth}
 \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_5.png}
 \caption{$z_{\i}$: digit height}
 \label{subfig:vlae_mnist_latent_space_z_\i_height}
 \end{subfigure}
+\end{adjustbox}
 \hfill
-\begin{subfigure}{.16\textwidth}
+\begin{adjustbox}{valign=T}
+\begin{subfigure}{.19\textwidth}
 \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_6.png}
 \caption{$z_{\i}$: digit identity}
 \label{subfig:vlae_mnist_latent_space_z_\i_identity}
-\end{subfigure}}
+\end{subfigure}
+\end{adjustbox}}
 \caption[\ac{VLAE}-\ac{GAN} Latent Space - \textsc{Mnist}]{Latent space colored by different means of \ac{VLAE}-\ac{GAN} with $dim_z=2$ trained on \textsc{Mnist} dataset}
 \label{fig:vlae_latent_space_mnist}
 \end{figure}
@@ -338,89 +463,14 @@ But also, this thesis discussed ways to extend these models to better model the 
 \caption[\ac{VLAE} Latent Space on dsprites]{Latent space colored by different means of \ac{VLAE}-\ac{GAN} with $dim_{z_i}=6$ trained on dsprites dataset}
 \label{fig:vlae_gan_latent_space_dsprites}
 \end{figure}
-
-\pagebreak
-\section{Additional Plots For Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation}}\label{sec:additional_plots_latent_space_entanglement}
+\subsection{CelebA}
 \begin{figure}[H]
 \centering
-\begin{subfigure}{\textwidth}
-\centering
-\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_7500_traverse_square_ellipse.png}
-\caption{Latent space traversal from \textit{Square} $\rightarrow$ \textit{Ellipse}}
+\foreach \factor in {5_o_Clock_Shadow,Arched_Eyebrows,Attractive,Bags_Under_Eyes,Bald,Bangs,Big_Lips,Big_Nose,Black_Hair,Blond_Hair,Blurry,Brown_Hair,Bushy_Eyebrows,Chubby,Double_Chin,Eyeglasses,Goatee,Gray_Hair,Heavy_Makeup,High_Cheekbones,Male,Mouth_Slightly_Open,Mustache,Narrow_Eyes,No_Beard,Oval_Face,Pale_Skin,Pointy_Nose,Receding_Hairline,Rosy_Cheeks,Sideburns,Smiling,Straight_Hair,Wavy_Hair,Wearing_Earrings,Wearing_Hat,Wearing_Lipstick,Wearing_Necklace,Wearing_Necktie,Young}{
+\begin{subfigure}{.2\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/celeba/celeba_attribute_distribution_\factor.png}
 \end{subfigure}
-\begin{subfigure}{\textwidth}
-\centering
-\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_7500_traverse_ellipse_heart.png}
-\caption{Latent space traversal from \textit{Ellipse} $\rightarrow$ \textit{Heart}}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
-\centering
-\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_7500_traverse_heart_square.png}
-\caption{Latent space traversal from \textit{Heart} $\rightarrow$ \textit{Square}}
-\label{subfig:10000_vae_latent_space_traversal_heart_to_square}
-\end{subfigure}
-\caption[7,500-\ac{VAE} - Latent Space Traversal]{Latent space traversal between latent space representations of images with certain shapes for 7,500-\ac{VAE}. Color-values were inverted for this plot.}
-\label{fig:7500_vae_latent_space_traversal_shape_to_shape}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}{\textwidth}
-\centering
-\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_5000_traverse_square_ellipse.png}
-\caption{Latent space traversal from \textit{Square} $\rightarrow$ \textit{Ellipse}}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
-\centering
-\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_5000_traverse_ellipse_heart.png}
-\caption{Latent space traversal from \textit{Ellipse} $\rightarrow$ \textit{Heart}}
-\end{subfigure}
-\begin{subfigure}{\textwidth}
-\centering
-\includegraphics[width=\textwidth]{images/latent_space_entanglement/vae_5000_traverse_heart_square.png}
-\caption{Latent space traversal from \textit{Heart} $\rightarrow$ \textit{Square}}
-\label{subfig:10000_vae_latent_space_traversal_heart_to_square}
-\end{subfigure}
-\caption[5,000-\ac{VAE} - Latent Space Traversal]{Latent space traversal between latent space representations of images with certain shapes for 5,000-\ac{VAE}. Color-values were inverted for this plot.}
-\label{fig:5000_vae_latent_space_traversal_shape_to_shape}
-\end{figure}
-
-
-\pagebreak
-\begin{landscape}
-\section{\ac{VLAE} Networks used in Experiments on Sparseness (Section~\ref{subsec:effective-network-capacity})}\label{sec:listings_sparsity_networks}
-\input{listings/results_sparsity/fm1-encoder.tex}
-\pagebreak
-\input{listings/results_sparsity/fm1-decoder.tex}
-\pagebreak
-\input{listings/results_sparsity/fm2-encoder.tex}
-\pagebreak
-\input{listings/results_sparsity/fm2-decoder.tex}
-\pagebreak
-\input{listings/results_sparsity/fm3-encoder.tex}
-\pagebreak
-\input{listings/results_sparsity/fm3-decoder.tex}
-\end{landscape}
-
-\pagebreak
-\section{Additional Plots for Section~\ref{subsubsec:pixel_wise_statistics}}\label{sec:appendix_pixel_wise_statistics}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=.8\textwidth]{images/generated_vs_true/vae_kde.png}
-\caption[\ac{VAE} Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VAE} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=.8\textwidth]{images/generated_vs_true/vlae_kde.png}
-\caption[\ac{VLAE} Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VLAE} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=.8\textwidth]{images/generated_vs_true/vlae_gan_kde.png}
-\caption[\ac{VLAE}-\ac{GAN} Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VLAE}-\ac{GAN} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+}
 \end{figure}
 
 \pagebreak
@@ -469,54 +519,341 @@ But also, this thesis discussed ways to extend these models to better model the 
 \label{fig:vae_dsprites_rotation_vae_3750}
 \end{figure}
 
-\pagebreak
-\section{Feature Extraction Network in Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation}}\label{sec:appendix_feature_extraction_network_ppl_dsprites}
-\begin{lstlisting}[caption={Feature extraction network for \ac{PPL} computation.},captionpos=b]
-_________________________________________________________________
-Layer (type)                 Output Shape              Param #
-=================================================================
-discriminator_input (InputLa (None, 64, 64, 1)         0
-_________________________________________________________________
-conv2d_91 (Conv2D)           (None, 32, 32, 64)        1664
-_________________________________________________________________
-batch_normalization_114 (Bat (None, 32, 32, 64)        256
-_________________________________________________________________
-leaky_re_lu_55 (LeakyReLU)   (None, 32, 32, 64)        0
-_________________________________________________________________
-conv2d_92 (Conv2D)           (None, 16, 16, 128)       204928
-_________________________________________________________________
-batch_normalization_115 (Bat (None, 16, 16, 128)       512
-_________________________________________________________________
-leaky_re_lu_56 (LeakyReLU)   (None, 16, 16, 128)       0
-_________________________________________________________________
-conv2d_93 (Conv2D)           (None, 8, 8, 256)         295168
-_________________________________________________________________
-batch_normalization_116 (Bat (None, 8, 8, 256)         1024
-_________________________________________________________________
-leaky_re_lu_57 (LeakyReLU)   (None, 8, 8, 256)         0
-_________________________________________________________________
-conv2d_94 (Conv2D)           (None, 8, 8, 512)         1180160
-_________________________________________________________________
-batch_normalization_117 (Bat (None, 8, 8, 512)         2048
-_________________________________________________________________
-leaky_re_lu_58 (LeakyReLU)   (None, 8, 8, 512)         0
-_________________________________________________________________
-conv2d_95 (Conv2D)           (None, 3, 3, 3)           1539
-_________________________________________________________________
-flatten_31 (Flatten)         (None, 27)                0
-_________________________________________________________________
-dense_31 (Dense)             (None, 3)                 84
-_________________________________________________________________
-activation_31 (Activation)   (None, 3)                 0
-=================================================================
-Total params: 1,687,383
-Trainable params: 1,685,463
-Non-trainable params: 1,920
-_________________________________________________________________
-\end{lstlisting}
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_mnist_morpho_latent_space_values_area.png}
+\caption{area}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_mnist_morpho_latent_space_values_height.png}
+\caption{height}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_mnist_morpho_latent_space_values_identity.png}
+\caption{identity}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_mnist_morpho_latent_space_values_length.png}
+\caption{length}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_mnist_morpho_latent_space_values_slant.png}
+\caption{slant}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_mnist_morpho_latent_space_values_thickness.png}
+\caption{thickness}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_mnist_morpho_latent_space_values_width.png}
+\caption{width}
+\end{subfigure}
+\caption{Mean latent space values for \ac{VLAE}-\ac{GAN} on \textsc{Mnist} when fixing different factors of variation from Morpho-\textsc{Mnist}}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_mnist_morpho_latent_space_values_area.png}
+\caption{area}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_mnist_morpho_latent_space_values_height.png}
+\caption{height}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_mnist_morpho_latent_space_values_identity.png}
+\caption{identity}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_mnist_morpho_latent_space_values_length.png}
+\caption{length}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_mnist_morpho_latent_space_values_slant.png}
+\caption{slant}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_mnist_morpho_latent_space_values_thickness.png}
+\caption{thickness}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_mnist_morpho_latent_space_values_width.png}
+\caption{width}
+\end{subfigure}
+\caption{Mean latent space values for \ac{VAE} on \textsc{Mnist} when fixing different factors of variation from Morpho-\textsc{Mnist}}
+\label{fig:vae_mnist_morpho_latent_space_values}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_gan_mnist_morpho_latent_space_values_area.png}
+\caption{area}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_gan_mnist_morpho_latent_space_values_height.png}
+\caption{height}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_gan_mnist_morpho_latent_space_values_identity.png}
+\caption{identity}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_gan_mnist_morpho_latent_space_values_length.png}
+\caption{length}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_gan_mnist_morpho_latent_space_values_slant.png}
+\caption{slant}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_gan_mnist_morpho_latent_space_values_thickness.png}
+\caption{thickness}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_gan_mnist_morpho_latent_space_values_width.png}
+\caption{width}
+\end{subfigure}
+\caption{Mean latent space values for \ac{VAE}-\ac{GAN} on \textsc{Mnist} when fixing different factors of variation from Morpho-\textsc{Mnist}}
+\label{fig:vae_gan_mnist_morpho_latent_space_values}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_10000_dsprites_latent_space_values_shape.png}
+\caption{Traversal of the reduced latent space for different shapes.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_10000_dsprites_latent_space_values_scale.png}
+\caption{Traversal of the reduced latent space for different scales.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_10000_dsprites_latent_space_values_orientation.png}
+\caption{Traversal of the reduced latent space for different orientations.}
+\end{subfigure}
+\caption[\ac{VAE} on dsprites: Latent Space Values]{Latent space of 10,000-\ac{VAE} trained on dsprites. Different values are either for different $x$-positions or for different $y$-position. The other position is fixed to 1.0. It is averaged over all other parameters.}
+\label{fig:vae_dsprites_10000_latent_space_position}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_7500_dsprites_latent_space_values_x_position.png}
+\caption{Traversal of the reduced latent space for different $x$-positions.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_7500_dsprites_latent_space_values_y_position.png}
+\caption{Traversal of the reduced latent space for different $y$-positions.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_7500_dsprites_latent_space_values_shape.png}
+\caption{Traversal of the reduced latent space for different shapes.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_7500_dsprites_latent_space_values_scale.png}
+\caption{Traversal of the reduced latent space for different scales.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_7500_dsprites_latent_space_values_orientation.png}
+\caption{Traversal of the reduced latent space for different orientations.}
+\end{subfigure}
+\caption[\ac{VAE} on dsprites: Latent Space Values]{Latent space of 7,500-\ac{VAE} trained on dsprites. Different values are either for different $x$-positions or for different $y$-position. The other position is fixed to 1.0. It is averaged over all other parameters.}
+\label{fig:vae_dsprite_7500_latent_space_position}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_6250_dsprites_latent_space_values_x_position.png}
+\caption{Traversal of the reduced latent space for different $x$-positions.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_6250_dsprites_latent_space_values_y_position.png}
+\caption{Traversal of the reduced latent space for different $y$-positions.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_6250_dsprites_latent_space_values_shape.png}
+\caption{Traversal of the reduced latent space for different shapes.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_6250_dsprites_latent_space_values_scale.png}
+\caption{Traversal of the reduced latent space for different scales.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_6250_dsprites_latent_space_values_orientation.png}
+\caption{Traversal of the reduced latent space for different orientations.}
+\end{subfigure}
+\caption[\ac{VAE} on dsprites: Latent Space Values]{Latent space of 6,250-\ac{VAE} trained on dsprites. Different values correspond to different values for the respective factor of variation. For orientation and scale, the position is fixed to 0.0 in both directions, shape is fixed to \textit{Square}. For $x$-and $y$-postition, the other position is fixed to 1.0 and shape is fixed to \textit{Square}.}
+\label{fig:vae_dsprite_6250_latent_space_position}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_5000_dsprites_latent_space_values_x_position.png}
+\caption{Traversal of the reduced latent space for different $x$-positions.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_5000_dsprites_latent_space_values_y_position.png}
+\caption{Traversal of the reduced latent space for different $y$-positions.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_5000_dsprites_latent_space_values_shape.png}
+\caption{Traversal of the reduced latent space for different shapes.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_5000_dsprites_latent_space_values_scale.png}
+\caption{Traversal of the reduced latent space for different scales.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_5000_dsprites_latent_space_values_orientation.png}
+\caption{Traversal of the reduced latent space for different orientations.}
+\end{subfigure}
+\caption[\ac{VAE} on dsprites: Latent Space Values]{Latent space of 5,000-\ac{VAE} trained on dsprites. Different values correspond to different values for the respective factor of variation. For orientation and scale, the position is fixed to 0.0 in both directions, shape is fixed to \textit{Square}. For $x$-and $y$-postition, the other position is fixed to 1.0 and shape is fixed to \textit{Square}.}
+\label{fig:vae_dsprite_5000_latent_space_position}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_3750_dsprites_latent_space_values_x_position.png}
+\caption{Traversal of the reduced latent space for different $x$-positions.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_3750_dsprites_latent_space_values_y_position.png}
+\caption{Traversal of the reduced latent space for different $y$-positions.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_3750_dsprites_latent_space_values_shape.png}
+\caption{Traversal of the reduced latent space for different shapes.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_3750_dsprites_latent_space_values_scale.png}
+\caption{Traversal of the reduced latent space for different scales.}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+% include second image
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vae_3750_dsprites_latent_space_values_orientation.png}
+\caption{Traversal of the reduced latent space for different orientations.}
+\end{subfigure}
+\caption[\ac{VAE} on dsprites: Latent Space Values]{Latent space of 3,750-\ac{VAE} trained on dsprites. Different values correspond to different values for the respective factor of variation. For orientation and scale, the position is fixed to 0.0 in both directions, shape is fixed to \textit{Square}. For $x$-and $y$-postition, the other position is fixed to 1.0 and shape is fixed to \textit{Square}.}
+\label{fig:vae_dsprite_3750_latent_space_position}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}{.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_dsprites_left_latent_space_values.png}
+\caption{Varying $x$-position}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_dsprites_bottom_latent_space_values.png}
+\caption{Varying $y$-position}
+\end{subfigure}
+\vfill
+\begin{subfigure}{.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_dsprites_orientation_latent_space_values.png}
+\caption{Varying orientation}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_dsprites_scale_latent_space_values.png}
+\caption{Varying scale}
+\end{subfigure}
+\vfill
+\begin{subfigure}{.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_dsprites_shape_latent_space_values.png}
+\caption{Varying shape}
+\end{subfigure}
+\caption[\ac{VLAE}-\ac{GAN} on dsprites: Latent Space Values]{Values of different dimensions and layers in the \ac{VLAE}-\ac{GAN} latent space for different factor of variation values (first row in each subplot), and position in a \ac{PCA}-reduced latent space (second row in each subplot). The left column corresponds to the first embedding layer, the right one to the third. \ac{PCA} was performed separately for each factor of variation and latent space layer. Different values correspond to different values for the respective factor of variation. For orientation and scale, the position is fixed to 0.0 in both directions, shape is fixed to \textit{Square}. For $x$-and $y$-postition, the other position is fixed to 1.0 and shape is fixed to \textit{Square}.}
+\label{fig:vlae_gan_dsprites_latent_space_values}
+\end{figure}
+
 
 \pagebreak
+\section{Additional Plots for Section~\ref{subsubsec:pixel_wise_statistics}}\label{sec:appendix_pixel_wise_statistics}
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/vae_kde.png}
+\caption[\ac{VAE} Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VAE} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/vlae_kde.png}
+\caption[\ac{VLAE} Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VLAE} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/vlae_gan_kde.png}
+\caption[\ac{VLAE}-\ac{GAN} Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VLAE}-\ac{GAN} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\end{figure}
+
+
+\pagebreak
 \section{Discriminator Network used in Section \ref{subsubsec:pixel_wise_distribution_mnist}}\label{sec:listing_discriminator_network}
 \begin{lstlisting}[caption={The discriminator network used to distinguish generated \ac{VAE}/\ac{VLAE} samples from true \textsc{MNIST} images.},captionpos=b]
 _________________________________________________________________
