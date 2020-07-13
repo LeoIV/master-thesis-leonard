@@ -2,15 +2,15 @@ The following Sections describe the methods used in the course of this thesis.
 
 \subsection{Implementation Details}\label{subsec:implementation-details}
 
-All models were implemented with Keras\footnote{\href{https://keras.io/}{https://keras.io/}, last access: 07/01/2020} in Version 2.2.4 using the TensorFlow\footnote{\href{https://www.tensorflow.org/}{https://www.tensorflow.org/}, last access: 07/01/2020} backend in Version 1.15..
-The models were trained on Tesla V100-DGXS GPUs with 16GB of RAM.
+All models are implemented with Keras\footnote{\href{https://keras.io/}{https://keras.io/}, last access: 07/01/2020} in Version 2.2.4 using the TensorFlow\footnote{\href{https://www.tensorflow.org/}{https://www.tensorflow.org/}, last access: 07/01/2020} backend in Version 1.15..
+The models are trained on Tesla V100-DGXS GPUs with 16GB of RAM.
 The model code can be found under \href{https://github.com/LeoIV/master-thesis-leonard}{https://github.com/LeoIV/master-thesis-leonard}.
 
 \subsection{Datasets}\label{subsec:datasets}
 
 Five different datasets were used to train the models.
-Four of the datasets contain images of different sizes, the fifth dataset provides additional labels for \textsc{Mnist}.
-The images were resized to match the model's excepted input sizes using Lanczos interpolation~\citep[pp. 223, ff]{burger2009principles}.
+Four of the datasets contain images of different sizes, the fifth dataset provides additional labels for the \textsc{Mnist} dataset.
+The images were resized to match the model's expected input sizes using Lanczos interpolation~\citep[pp. 223, ff]{burger2009principles}.
 
 \subsubsection{CelebA}\label{subsubsec:celeba_dataset}
 
@@ -25,13 +25,14 @@ The images were resized to match the model's excepted input sizes using Lanczos 
 The \textit{CelebA} dataset~\citep{liu2015faceattributes} consists of 202,599 RGB images of size 178 x 218 pixels representing celebrities, as well as 40 binary attributes.
 The images belong to 10.177 unique identities\footnote{The identities are not revealed.} as well as five \say{landmark annotations}.
 They are aligned and cropped resulting in images of same size always showing only one face (see Figure~\ref{fig:celeba_sample} for an example).
-The landmark annotations give the positions of facial attributes in the image, specifically of the left and right eye, the nose, and the left and right corner of the mouth.
-The binary attributes indicate if the image has certain attributes, for example if the person wears eyeglasses, has black hair, is smiling, etc\footnote{See \href{https://www.kaggle.com/jessicali9530/celeba-dataset\#list\_attr\_celeba.csv}{https://www.kaggle.com/jessicali9530/celeba-dataset\#list\_attr\_celeba.csv} for a complete list of the attributes, login required. Last access: 12/02/2020.}.
+The landmark annotations give the positions of facial attributes in the image; the left and right eye, the nose, and the left and right corner of the mouth.
+The binary attributes indicate if the image has certain characteristics, for example if the person wears eyeglasses, has black hair, is smiling\footnote{See \href{https://www.kaggle.com/jessicali9530/celeba-dataset\#list\_attr\_celeba.csv}{https://www.kaggle.com/jessicali9530/celeba-dataset\#list\_attr\_celeba.csv} for a complete list of the attributes, login required. Last access: 12/02/2020.}.
 
 \subsubsection{ImageNet}\label{ssec:imagenet}
 
-ImageNet\footnote{\href{http://image-net.org/}{http://image-net.org/}, last access: 12/02/2020.} is a large-scale \say{image database organized according to the WordNet hierarchy}~\citep{imagenet_cvpr09} consisting of over 14 million images as of February 2020.
-Accordingly to WordNet\footnote{See \href{https://wordnet.princeton.edu/}{https://wordnet.princeton.edu/}, last access: 12/02/2020.}, on different levels of granularity, the images are subdivided into groups called \say{synsets}~\citep{imagenet_cvpr09}.
+ImageNet\footnote{\href{http://image-net.org/}{http://image-net.org/}, last access: 12/02/2020.} is a large-scale \say{image database organized according to the WordNet hierarchy}~\citep{imagenet_cvpr09}.
+It contains of over 14 million images as of February 2020.
+According to WordNet\footnote{See \href{https://wordnet.princeton.edu/}{https://wordnet.princeton.edu/}, last access: 12/02/2020.}, the images are subdivided into groups called \say{synsets}~\citep{imagenet_cvpr09} on different levels of granularity.
 For example, the group \textit{woman, adult female} is subordinated to \textit{person, individual, someone, somebody, mortal, soul} and is further subdivided into groups like \textit{old woman} or \textit{lady} \footnote{ImageNet 2011 Fall Release, \href{http://image-net.org/explore}{http://image-net.org/explore}, last access: 12/02/2020.}
 
 A smaller version of ImageNet, commonly called \textit{ILSVRC2012} has been used for \ac{ILSVRC2017}~\citep{ILSVRC15}, consisting of approximately 1,3 million images from 1000 different classes, that were selected, such that \say{there is no overlap between synsets: for any synsets $i$ and $j$, $i$ is not an ancestor of $j$ in the ImageNet hierarchy}~\citep{imagenet_cvpr09}.
@@ -50,7 +51,7 @@ This curated version is commonly used as a baseline (\textbf{refs}).
 
 MNIST\footnote{\href{http://yann.lecun.com/exdb/mnist/}{http://yann.lecun.com/exdb/mnist/}, last access: 23/04/2020}~\citep{lecun1998gradient} is a widely-used dataset of hand-written digits.
 The data is subdivided into a training set of 60.000 images and a test set containing 10.000 images.
-The digits are \say{size-normalized and centered}.
+The digits are all of the same size and centered.
 The samples are grayscale images of size $28\times 28$pixels.
 
 \subsubsection{Morpho-MNIST}\label{subsubsec:morphomnist}
@@ -73,14 +74,13 @@ Morpho-MNIST also provides pre-computed datasets that were built using the pertu
 Importantly, the distribution of the morphological attributes partly is highly skewed (for example Thickness and Height, see Figure~\ref{fig:morpho_mnist_distribution}).
 
 \subsubsection{dSprites}
-dSprites\footnote{\href{https://github.com/deepmind/dsprites-dataset/}{https://github.com/deepmind/dsprites-dataset/}, last access: 5/28/2020}~\citep{dsprites17} is a dataset designed \say{to assess the disentanglement properties of unsupervised learning methods.}
+dSprites\footnote{\href{https://github.com/deepmind/dsprites-dataset/}{https://github.com/deepmind/dsprites-dataset/}, last access: 5/28/2020}~\citep{dsprites17} is a dataset designed \say{to assess the disentanglement properties of unsupervised learning methods.}.
 It contains 737,280 grayscale images of size $64\times 64$ pixels.
 The images were generated from \say{6 ground truth independent latent factors}: color, shape, scale, orientation, $x$-position, and $y$-position.
 The color is white in all images.
 The shapes are: square, ellipse, and heart.
 For the other factors, points are chosen evenly along their support: six values in $[0.5, 1]$ (scale), 40 values in $[0, 2\pi]$ (orientation), 32 values in $[0, 1]$ ($x$-position and $y$-position).
 Each factor combination only occurs once in the data set.
-
 The dataset also contains the factor labels for each image.
 
 \subsection{Models}\label{subsec:models}
@@ -89,7 +89,8 @@ Four different base \ac{VAE} models were evaluated in the course of this thesis.
 Furthermore, two \say{AlexNet} models were used for some additional experiments.
 
 The models are described in the following.
-Importantly, the models were varied based on the input dimensionality, are more detailed description can be found in Appendix~\textbf{REF}.
+The models are varied based on the input dimensionality.
+A more detailed description can be found in Appendix~\textbf{REF}.
 
 \subsubsection{VAE Model}
 
@@ -116,12 +117,13 @@ The embedding layer predicts $\mu$ and $\log \sigma^2$ and performs the resampli
     z &= \mu + \epsilon\sigma \\
     \epsilon &\sim \mathcal{N}(0, \bm{I}).
 \end{align}
-The encoder input size is equal to the decoder output size and varies with the experiment.
+The encoder input size is equal to the decoder output size and is depending on the dataset.
+For \textsc{Mnist}, a size of $28\times 28$ is used, for dsprites $64\times 64$, for CelebA $128\times 128$, and for ImageNet $224\times 224$.
 Also, the number of \say{Convolution, Activation, Batch-Normalization}-blocks is chosen depending on the input size, as smaller input sizes require fewer layers to achieve a receptive field of the input size.
-The batch-normalization~~\citep[pp. 317, ff.]{Goodfellow-et-al-2016} can be omitted\footnote{It is stated in the experiments if batch-normalization is omitted.}/
+The batch-normalization~~\citep[pp. 317, ff.]{Goodfellow-et-al-2016} can be omitted\footnote{It is stated in the experiments if batch-normalization is omitted.}.
 The activation can be either ReLU~\citep[p. 173]{Goodfellow-et-al-2016} or LeakyReLU~\citep[p. 192]{Goodfellow-et-al-2016} and is ReLU unless stated otherwise.
 The convolutions use zero-padding unless stated otherwise.
-Encoder and decoder use stridden convolutions for downsampling unless stated otherwise.
+Encoder and decoder use stridden convolutions for downsampling, unless stated otherwise.
 
 The decoder uses similar blocks as the encoder but employs transposed convolutions~\citep[pp. 356, ff.]{Goodfellow-et-al-2016} instead of convolutions to upsample feature maps.
 The output layer of the decoder uses a sigmoid activation instead of ReLU.

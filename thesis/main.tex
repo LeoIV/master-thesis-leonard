@@ -6,7 +6,7 @@
 \usepackage{subcaption}
 \usepackage{wrapfig}
 \usepackage{acronym}
-\usepackage[natbib=true]{biblatex}
+\usepackage[natbib=true,backend=bibtex]{biblatex}
 \usepackage{amsmath}
 \usepackage{dirtytalk}
 \usepackage{hyperref}
@@ -31,6 +31,7 @@
 \let\oldsection\section
 \renewcommand\section{\clearpage\oldsection}
 % @formatter:on
+\newcommand{\round}[2]{\num[round-mode=places,round-precision=#1]{#2}}
 \newcounter{savepage}
 
 \lstset{lineskip=-0.7ex,frame=single,breaklines=true}
@@ -463,14 +464,106 @@ _________________________________________________________________
 \caption[\ac{VLAE} Latent Space on dsprites]{Latent space colored by different means of \ac{VLAE}-\ac{GAN} with $dim_{z_i}=6$ trained on dsprites dataset}
 \label{fig:vlae_gan_latent_space_dsprites}
 \end{figure}
-\subsection{CelebA}
+
+\subsection{CelebA}\label{subsection:appendix_celeba_latent_space}
 \begin{figure}[H]
 \centering
-\foreach \factor in {5_o_Clock_Shadow,Arched_Eyebrows,Attractive,Bags_Under_Eyes,Bald,Bangs,Big_Lips,Big_Nose,Black_Hair,Blond_Hair,Blurry,Brown_Hair,Bushy_Eyebrows,Chubby,Double_Chin,Eyeglasses,Goatee,Gray_Hair,Heavy_Makeup,High_Cheekbones,Male,Mouth_Slightly_Open,Mustache,Narrow_Eyes,No_Beard,Oval_Face,Pale_Skin,Pointy_Nose,Receding_Hairline,Rosy_Cheeks,Sideburns,Smiling,Straight_Hair,Wavy_Hair,Wearing_Earrings,Wearing_Hat,Wearing_Lipstick,Wearing_Necklace,Wearing_Necktie,Young}{
-\begin{subfigure}{.2\textwidth}
-\includegraphics[width=\textwidth]{images/latent_spaces/celeba/celeba_attribute_distribution_\factor.png}
+\foreach \factor in {5_o_Clock_Shadow,Arched_Eyebrows,Attractive,Bags_Under_Eyes,Bald,Bangs,Big_Lips,Big_Nose,Black_Hair,Blond_Hair,Blurry,Brown_Hair,Bushy_Eyebrows,Chubby,Double_Chin,Eyeglasses,Goatee,Gray_Hair,Heavy_Makeup,High_Cheekbones,Male,Mouth_Slightly_Open,Mustache,Narrow_Eyes,No_Beard,Oval_Face,Pale_Skin,Pointy_Nose}{
+\begin{subfigure}{.23\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/celeba/vae/vae_celeba_\factor.png}
 \end{subfigure}
 }
+\end{figure}
+\pagebreak
+\begin{figure}[H]
+\ContinuedFloat
+\centering
+\foreach \factor in {Receding_Hairline,Rosy_Cheeks,Sideburns,Smiling,Straight_Hair,Wavy_Hair,Wearing_Earrings,Wearing_Hat,Wearing_Lipstick,Wearing_Necklace,Wearing_Necktie,Young}{
+\begin{subfigure}{.23\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/celeba/vae/vae_celeba_\factor.png}
+\end{subfigure}
+}
+\caption[\ac{VAE} Latent Space - CelebA]{\ac{t-SNE}-reduced Latent Space of a \ac{VAE} trained on CelebA, colored by Factors of Variation (present or not present)}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\foreach \factor in {5_o_Clock_Shadow,Arched_Eyebrows,Attractive,Bags_Under_Eyes,Bald,Bangs,Big_Lips,Big_Nose,Black_Hair,Blond_Hair,Blurry,Brown_Hair,Bushy_Eyebrows,Chubby,Double_Chin,Eyeglasses,Goatee,Gray_Hair,Heavy_Makeup,High_Cheekbones,Male,Mouth_Slightly_Open,Mustache,Narrow_Eyes,No_Beard,Oval_Face,Pale_Skin,Pointy_Nose}{
+\begin{subfigure}{.23\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/celeba/vae_gan/vae_gan_celeba_\factor.png}
+\end{subfigure}
+}
+\end{figure}
+\pagebreak
+\begin{figure}[H]
+\ContinuedFloat
+\centering
+\foreach \factor in {Receding_Hairline,Rosy_Cheeks,Sideburns,Smiling,Straight_Hair,Wavy_Hair,Wearing_Earrings,Wearing_Hat,Wearing_Lipstick,Wearing_Necklace,Wearing_Necktie,Young}{
+\begin{subfigure}{.23\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/celeba/vae_gan/vae_gan_celeba_\factor.png}
+\end{subfigure}
+}
+\caption[\ac{VAE}-\ac{GAN} Latent Space - CelebA]{\ac{t-SNE}-reduced Latent Space of a \ac{VAE}-\ac{GAN} trained on CelebA, colored by Factors of Variation (present or not present)}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\foreach \factor in {5_o_Clock_Shadow,Arched_Eyebrows,Attractive,Bags_Under_Eyes,Bald,Bangs,Big_Lips,Big_Nose,Black_Hair,Blond_Hair,Blurry,Brown_Hair,Bushy_Eyebrows,Chubby,Double_Chin,Eyeglasses,Goatee,Gray_Hair}{
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/celeba/vlae/vlae_celeba_\factor.png}
+\end{subfigure}
+}
+\end{figure}
+\pagebreak
+\begin{figure}[H]
+\ContinuedFloat
+\centering
+\foreach \factor in {Heavy_Makeup,High_Cheekbones,Male,Mouth_Slightly_Open,Mustache,Narrow_Eyes,No_Beard,Oval_Face,Pale_Skin,Pointy_Nose,Receding_Hairline,Rosy_Cheeks,Sideburns,Smiling,Straight_Hair,Wavy_Hair,Wearing_Earrings,Wearing_Hat}{
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/celeba/vlae/vlae_celeba_\factor.png}
+\end{subfigure}
+}
+\end{figure}
+\pagebreak
+\begin{figure}[H]
+\ContinuedFloat
+\centering
+\foreach \factor in {Wearing_Lipstick,Wearing_Necklace,Wearing_Necktie,Young}{
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/celeba/vlae/vlae_celeba_\factor.png}
+\end{subfigure}
+}
+\caption[\ac{VLAE} Latent Space - CelebA]{\ac{t-SNE}-reduced Latent Space of a \ac{VLAE} trained on CelebA, colored by Factors of Variation (present or not present). Different columns correspond to the different layers.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\foreach \factor in {5_o_Clock_Shadow,Arched_Eyebrows,Attractive,Bags_Under_Eyes,Bald,Bangs,Big_Lips,Big_Nose,Black_Hair,Blond_Hair,Blurry,Brown_Hair,Bushy_Eyebrows,Chubby,Double_Chin,Eyeglasses,Goatee,Gray_Hair}{
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/celeba/vlae_gan/vlae_gan_celeba_\factor.png}
+\end{subfigure}
+}
+\end{figure}
+\pagebreak
+\begin{figure}[H]
+\ContinuedFloat
+\centering
+\foreach \factor in {Heavy_Makeup,High_Cheekbones,Male,Mouth_Slightly_Open,Mustache,Narrow_Eyes,No_Beard,Oval_Face,Pale_Skin,Pointy_Nose,Receding_Hairline,Rosy_Cheeks,Sideburns,Smiling,Straight_Hair,Wavy_Hair,Wearing_Earrings,Wearing_Hat}{
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/celeba/vlae_gan/vlae_gan_celeba_\factor.png}
+\end{subfigure}
+}
+\end{figure}
+\pagebreak
+\begin{figure}[H]
+\ContinuedFloat
+\centering
+\foreach \factor in {Wearing_Lipstick,Wearing_Necklace,Wearing_Necktie,Young}{
+\begin{subfigure}{.49\textwidth}
+\includegraphics[width=\textwidth]{images/latent_spaces/celeba/vlae_gan/vlae_gan_celeba_\factor.png}
+\end{subfigure}
+}
+\caption[\ac{VLAE}-\ac{GAN} Latent Space - CelebA]{\ac{t-SNE}-reduced Latent Space of a \ac{VLAE}-\ac{GAN} trained on CelebA, colored by Factors of Variation (present or not present). Different columns correspond to the different layers.}
 \end{figure}
 
 \pagebreak
@@ -560,6 +653,8 @@ _________________________________________________________________
 \caption{width}
 \end{subfigure}
 \caption{Mean latent space values for \ac{VLAE}-\ac{GAN} on \textsc{Mnist} when fixing different factors of variation from Morpho-\textsc{Mnist}}
+\label{fig:appendix_vlae_gan_mnist_latent_space_morpho}
+
 \end{figure}
 
 \begin{figure}[H]
@@ -833,25 +928,51 @@ _________________________________________________________________
 
 \pagebreak
 \section{Additional Plots for Section~\ref{subsubsec:pixel_wise_statistics}}\label{sec:appendix_pixel_wise_statistics}
-
+\subsection{Mnist}\label{subsec:appendix_pixel_wise_statistics_mnist}
 \begin{figure}[H]
 \centering
-\includegraphics[width=.8\textwidth]{images/generated_vs_true/vae_kde.png}
-\caption[\ac{VAE} Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VAE} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/mnist/vae_kde.png}
+\caption[\ac{VAE} on \textsc{Mnist}: Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VAE} (blue) trained on \textsc{Mnist}, the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=.8\textwidth]{images/generated_vs_true/vlae_kde.png}
-\caption[\ac{VLAE} Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VLAE} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/mnist/vlae_kde.png}
+\caption[\ac{VLAE} on \textsc{Mnist}: Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VLAE} (blue) trained on \textsc{Mnist}, the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=.8\textwidth]{images/generated_vs_true/vlae_gan_kde.png}
-\caption[\ac{VLAE}-\ac{GAN} Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VLAE}-\ac{GAN} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/mnist/vlae_gan_kde.png}
+\caption[\ac{VLAE}-\ac{GAN} on \textsc{Mnist}: Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VLAE}-\ac{GAN} (blue) trained on \textsc{Mnist}, the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
 \end{figure}
 
+
+\subsection{dsprites}\label{subsec:appendix_pixel_wise_statistics_dsprites}
+\begin{figure}[H]
+\centering
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/dsprites/vae_kde.png}
+\caption[\ac{VAE} on dsprites: Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VAE} (blue) trained on dsprites, the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/dsprites/vae_gan_kde.png}
+\caption[\ac{VAE}-\ac{GAN} on dsprites: Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VAE}-\ac{GAN} trained on dsprites (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/dsprites/vlae_kde.png}
+\caption[\ac{VLAE} on dsprites: Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VLAE} trained on dsprites (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=.8\textwidth]{images/generated_vs_true/dsprites/vlae_gan_kde.png}
+\caption[\ac{VLAE}-\ac{GAN} on dsprites: Estimated Latent Space Distribution]{Latent space distribution for different layers and dimensions of \ac{VLAE}-\ac{GAN} trained on dsprites (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange).}
+\end{figure}
 
 \pagebreak
 \section{Discriminator Network used in Section \ref{subsubsec:pixel_wise_distribution_mnist}}\label{sec:listing_discriminator_network}

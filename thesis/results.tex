@@ -2,8 +2,8 @@
 The following sections describe the results of the experiments on visual features in variational autoencoders.
 
 \paragraph{AlexNet Image Classification}
-It is known that AlexNet learns Gabor-like features in the first layer~\citep{krizhevsky2012imagenet}.
-To verify that the AlexNet-like \ac{VAE} by its architecture can learn Gabor wavelets, the corresponding AlexNet classification network was trained on ImageNet similarly to \citet{krizhevsky2012imagenet} (class prediction).
+\citet{krizhevsky2012imagenet} found that AlexNet learns Gabor-like features in the first layer.
+To verify that the AlexNet-like \ac{VAE} can learn Gabor wavelets by its architecture , the corresponding AlexNet classification network was trained on ImageNet similarly to \citet{krizhevsky2012imagenet} (class prediction).
 The network was trained for ten epochs, the top-1 training accuracy at this time was at 0.85.
 
 \begin{figure}
@@ -21,29 +21,30 @@ The network was trained for ten epochs, the top-1 training accuracy at this time
 \end{figure}
 
 Figure~\ref{fig:classification_layer1_kernels} shows all 288 ($96 \cdot 3$) convolutional kernels of the image classification network.
-It is easy to see that in many kernels, Gabor wavelet-like filters emerge.
+In many kernels, Gabor wavelet-like filters emerge.
 
-This, however, is not true for the AlexNet-\ac{VAE} model.
+However, the same effect cannot be observed in the kernels of the AlexNet-\ac{VAE} model.
 Figure~\ref{fig:vae_layer1_kernels} shows the kernels of the first layer in the AlexNet \ac{VAE} network.
 The network has a $z_{dim}$ of 2,000 and a very similar architecture as the AlexNet image classification network.
 
-Even more, no Gabor wavelets were shown in any of the models or for any of the datasets.
+Moreiver, no Gabor wavelets emerged in any of the models or for any of the datasets.
 
 % TODO: elaborate
 
 \subsection{Sparseness in Generative Models}\label{subsec:effective-network-capacity}
 One hyperparameter to choose in the different models is the number of feature maps of one layer.
-During the implementation, it could be observed that some feature maps show little activity compared to others, posing the question by how much the number of feature maps can be reduced without increasing the network loss.
+During the implementation, it could be observed that some feature maps show little activity compared to others.
+As the number of features maps is a model hyperparameter, it was investigated by how much the number of feature maps can be reduced without increasing the network loss.
 
-Furthermore, the question arises whether sparseness in \acp{VLAE} is related to sparseness in the primary visual cortex (see Section~\ref{subsubsec:sparse_representations}).
-The brain uses sparseness to represent information - maybe \acp{VLAE} use a similar mechanism.
-This would be evidence for the relatedness of \acp{VLAE} to the biological example.
+Furthermore, the question arose whether sparseness in \acp{VLAE} is related to sparseness in the primary visual cortex (see Section~\ref{subsubsec:sparse_representations}).
+If the brain uses sparseness to represent information, do \acp{VLAE} use a similar mechanism?
+If they do, this would be evidence for the relatedness of \acp{VLAE} to the biological example.
 
-The following experiment was conducted to answer if \acp{VLAE} employ sparseness or if the model has too much capacity.
+The following experiment was conducted to examine if \acp{VLAE} employ sparseness or if the model has only too much capacity.
 The feature map activity of a \ac{VLAE} on \textsc{Mnist} with input size $28\times 28$ and different numbers of feature maps and nodes in fully connected layers was measured.
-By gradually decreasing the network capacity, it was tested whether sparseness arises due to an initial over-capacity of the network or if it arises because it employs sparseness under all conditions.
-Because it re-scales the feature map activity, batch normalization was disabled for this experiment.
-To compensate for the potentially longer training convergence, the model was trained for 200 instead of 100 epochs.
+By gradually decreasing the network capacity, the evolvement of sparseness was analyzed.
+Batch normalization was disabled for this experiment, because it re-scales the feature map activity.
+The model was trained for 200 epochs.
 
 \begin{figure}
     \centering
@@ -77,9 +78,8 @@ To compensate for the potentially longer training convergence, the model was tra
     \label{fig:fm_activities_sparseness}
 \end{figure}
 
-Listing~\ref{lst:sparsity-vlae-encoder-28-fm1} shows the output of the \ac{VLAE} encoder used for the experiments on sparsity.
-Importantly, this is the initial encoder.
-Three models were trained in total with a gradually decreased number of feature maps (by the factor of two and three).
+Listing~\ref{lst:sparsity-vlae-encoder-28-fm1} shows the initial \ac{VLAE} encoder used to analyze sparseness.
+In total, three models were trained with a gradually decreasing number of feature maps (by the factor of two and three).
 All network configurations can be found in Appendix~\ref{sec:listings_sparsity_networks}.
 The models were trained with the Adam optimizer with an initial learning rate of 0.0005 for the model with the original number of feature maps\footnote{An initial learning rate of 0.001 for the \say{large} model led to loss overflow explosion.} and a learning rate of 0.001 for the models of decreased number of feature maps.
 All models use a reconstruction loss factor of 10,000 and three two-dimensional latent spaces.
@@ -115,42 +115,37 @@ The validation loss is minimal after 26 epochs for the large, 39 epochs for the 
 
 Figure~\ref{fig:fm_activities_sparseness} shows the activities of feature maps in the different models.
 Each line in a subplot is a boxplot, each subfigure the output of either a convolutional, activation or fully connected layer.
-Most prominently, the activations are sparse after convolutions.
+Most prominently, the inner activations are sparse after convolutions.
 The activations often increase the level of sparsity as the ReLU activation functions map negative values to zero.
-Sparsity is apparent in almost all feature maps - in the larger and smaller models.
+Sparsity is apparent in almost all feature maps of all models.
 
 \paragraph{Sparseness in \acp{VLAE} vs. Sparse Representations}
-The sparseness in \acp{VLAE}, however, does not seem to be related to sparse representations in the brain.
+In the brain, the overlap of active neurons is small, i.e., different neurons are active for different stimuli (see Section~\ref{subsubsec:sparse_representations} and \citet{yoshida2020natural}).
+Contrarily, the \acp{VLAE} show high activity mostly in the same feature maps regardless of the input.
 
-Although there are only some feature maps showing high activity, they are mostly the same regardless of the input.
-This is different from the brain where the overlap of active neurons is small and different neurons are active for different stimuli (see Section~\ref{subsubsec:sparse_representations} and \citet{yoshida2020natural}).
+The \ac{VLAE} uses sparseness, mostly regardless of the model capacity, which can be explained by the Lottery Ticket Hypothesis~\citep{frankle2018lottery}.
+The Lottery Ticket Hypothesis states that, in general, it is highly unlikely that re-training a pruned network from scratch will result in the same weight configuration of the subnetwork in the initial model.
+In the three models (small, medium, large), there seems to be a subnetwork that accounts for the activity in the model.
+Regardless of the reduction factor, there always remains an active subnetwork for all three models.
 
-The \ac{VLAE} uses sparseness, mostly regardless of the model capacity, which seems to be more related to the Lottery Ticket Hypothesis~\citep{frankle2018lottery}.
-In all cases, there seems to be a subnetwork.
-Pruning the original network such that only the subnetwork persists should lead to a comparable performance.
-Assume that the small \ac{VLAE}-network approximately is a pruned version of the large \ac{VLAE}-network, having only as many feature maps as are active in the large network.
-Then, the small network is not a successful subnetwork in the large network~\citep{frankle2018lottery}.
-Instead, the small network itself has a successful subnetwork.
-
-The Lottery Ticket Hypothesis states that it is, in general, not possible to train the pruned network from scratch without knowing the weight initializations obtained from training the unpruned network.
+Therefore, the sparseness in \acp{VLAE} does not seem to be related to sparse representations in the brain.
 
 \subsection{Latent Space Entanglement and Categorical Factors of Variation}\label{subsec:latent-space-entanglement-and-categorical-factors-of-variation}
 
-As discussed in Section~\ref{subsec:feature-disentanglement} and Section~\ref{subsubsec:representation_learning} ($\beta$-\ac{VAE}), there is a trade-off between reconstruction quality and prior-posterior matching.
-Increasing the weight of the reconstruction term in the \ac{VAE} training objective (smaller $\beta$ in Equation~\ref{eq:beta-vae}) leads to better reconstructions.
+As discussed in Section~\ref{subsec:feature-disentanglement} and Section~\ref{subsubsec:representation_learning} ($\beta$-\ac{VAE}), in practice, there is a trade-off between reconstruction quality and prior-posterior matching.
+Increasing the weight of the reconstruction term in the \ac{VAE} training objective (smaller $\beta$ in Equation~\ref{eq:beta-vae}\footnote{The $\beta$ in $\beta$-\ac{VAE} is the \ac{KL}-term weight. Therefore, decreasing $\beta$ analog to increasing the reconstruction term weight.}) leads to reconstructions more similar to the training samples.
 The posterior distribution, however, will match the prior distribution less precisely.
-Increasing $\beta$ in Equation~\ref{eq:beta-vae}, in contrast, leads to a posterior closer to the prior distribution at the expense of reconstruction quality.
-
-Specifically, \citet{higgins2017beta} claim that increasing $\beta$ leads to a better latent space disentanglement.
+Contrarily, increasing $\beta$ in Equation~\ref{eq:beta-vae} leads to a posterior closer to the prior distribution at the expense of reconstruction quality.
+Moreover, \citet{higgins2017beta} claim that increasing $\beta$ leads to a better latent space disentanglement, i.e., each dimension in the latent space is uniquely correlated with a single factor of variation.
 
 As discussed in Section~\ref{subsec:feature-disentanglement}, the quality of feature space disentanglement can be assessed by measuring how fast reconstructions change as the latent space is traversed.
-However, a well-disentangled feature space should lead to problems for datasets with categorical factors of variation, such as dsprites, where features by definition change fast.
-Even though CelebA has binary labels as well (for example, \say{brown hair}), there still is enough variation within hair colors to allow a smooth translation between hair colors~\citep{higgins2017beta}.
+However, a disentangled feature space should be problematic for datasets with categorical factors of variation, such as dsprites, where features change fast by definition.
+Even though CelebA has binary labels as well (e.g., \say{brown hair}), there still is enough variation within hair colors to allow a smooth translation between hair colors~\citep{higgins2017beta}.
 For dsprites, there are only three distinct shapes (\say{square}, \say{ellipse}, and \say{heart}).
 To achieve a good reconstruction quality on these shapes, the model would have to place them in separate areas of the latent space, violating both feature space disentanglement and a Gaussian posterior.
 
-To validate this empirically, a \ac{VAE} with input size $64\times 64$ (the size of dsprites images) and a ten-dimensional latent space was trained on dsprites with different reconstruction term weights: 10,000, 7,500, and 5,000.
-For the remainder of this section, these models are referred to as \say{10,000-\ac{VAE}}, \say{7,500-\ac{VAE}}, and \say{5,000-\ac{VAE}}.
+To analyze how \acp{VAE} behave for categorical factors of variation, a \ac{VAE} with input size $64\times 64$ (the size of dsprites images) and a ten-dimensional latent space was trained on dsprites with different reconstruction term weights: 10,000, 7,500, 6,250, 5,000, and 3,750.
+For the remainder of this section, these models are referred to as \say{10,000-\ac{VAE}}, \say{7,500-\ac{VAE}}, \say{6,250-\ac{VAE}}, \say{5,000-\ac{VAE}}, and \say{3,750-\ac{VAE}}\footnote{It was first empirically validated that a reconstruction term weight of 10,000 leads to good reconstruction. The other values were chosen by reducing the reconstruction loss term by 1,250 for each model with a larger initial difference (10,000 vs. 7,500).}.
 
 \begin{figure}
     \centering
@@ -159,10 +154,10 @@ For the remainder of this section, these models are referred to as \say{10,000-\
     \label{fig:10000_vae_latent_space_distribution}
 \end{figure}
 
-Figure~\ref{fig:10000_vae_latent_space_distribution} shows the distribution of dsprites validation images.
-Noticeable, the ninth dimension is far less Gaussian than the other nine dimensions.
+Figure~\ref{fig:10000_vae_latent_space_distribution} shows the posterior distributions of dsprites validation images.
+The ninth dimension is far less Gaussian than the other nine dimensions.
 As \say{object shape} is the only categorical factor of variation, one could assume that the ninth dimension encodes \say{object shape}.
-However, this raises the question of why there are more than three peaks for the ninth dimension.
+However, the graph shows seven peaks in the ninth dimension, while there are only three distinct shapes in the dataset.
 
 \begin{figure}
     \centering
@@ -186,7 +181,7 @@ However, this raises the question of why there are more than three peaks for the
 \end{figure}
 
 Figure~\ref{fig:10000_vae_latent_space_distribution_shapes} shows the distribution of images with a particular shape.
-Even though there is some difference between the plots, the $\mu$-values in the ninth dimension still are assigned to different and distinct areas within the ninth dimension.
+Even though there is some difference between the plots, the $\mu$-values in the ninth dimension still are assigned to different and distinct areas.
 The \textit{shape} alone does not explain the sharp peaks in the ninth dimension.
 
 \begin{figure}
@@ -225,13 +220,15 @@ The \textit{shape} alone does not explain the sharp peaks in the ninth dimension
     \label{fig:10000_vae_latent_space_distribution_scales}
 \end{figure}
 
-Consider Figure~\ref{fig:10000_vae_latent_space_distribution_scales}, showing distributions of images of different \textit{scales}.
+Consider Figure~\ref{fig:10000_vae_latent_space_distribution_scales}, showing distributions of images grouped by their scale.
+Images in dsprites are scaled by six distinct factors evenly chosen from $[0.5; 1.0]$.
 The scale values in the dsprites dataset are six distinct values in the range from 0.5 to 1.0.
-A \ac{VAE} model with a too strong reconstruction term does not learn to interpolate between these values but assigns them to distinct areas of the latent space.
+A \ac{VAE} model with a too strong reconstruction term does not learn to interpolate between these values but assigns them distinct areas in the latent space.
 
-Plotting only the images with a specific scale \textit{and} a particular shape, finally, explains the distinct peaks in the ninth dimension (see Figure~\ref{fig:10000_vae_latent_space_distribution_scales_and_shapes}).
-The model produces two peaks for each scale.
-One of the peaks attributes to the shape \textit{Heart}, the other one for the shapes \textit{Ellipse} and \textit{Square}.
+Grouping images by their scale \textit{and} a shape, explains the distinct peaks in the ninth dimension (see Figure~\ref{fig:10000_vae_latent_space_distribution_scales_and_shapes}).
+Each shape has a distinct peak in the ninth dimension.
+However, the peaks of shapes \textit{Ellipse} and \textit{Square} superpose.
+When plotting all three shapes together, a small peak (\textit{Heart}) and a big peak (\textit{Ellipse} and \textit{Square}) can be observed.
 
 \begin{figure}
     \centering
@@ -254,9 +251,9 @@ One of the peaks attributes to the shape \textit{Heart}, the other one for the s
     \label{fig:10000_vae_latent_space_distribution_scales_and_shapes}
 \end{figure}
 
-Noteworthy, the model learns a hierarchical clustering in the ninth dimension.
-\textit{Shape} is a sub cluster of \textit{Scale}.
-Certainly, this sub clustering leads to highly entangled latent space and a highly un-Gaussian distribution.
+Furthermore, the model seems to learn a hierarchical clustering in the ninth dimension.
+\textit{Shape} appears to be a sub cluster of \textit{Scale}.
+This sub-clustering leads to highly entangled latent space and a highly un-Gaussian distribution.
 However, it allows us to violate the \ac{KL}-term in favor of the reconstruction term in just one instead of two dimensions.
 
 \begin{figure}
@@ -282,12 +279,13 @@ However, it allows us to violate the \ac{KL}-term in favor of the reconstruction
     \label{fig:10000_vae_latent_space_traversal_shape_to_shape}
 \end{figure}
 
-Figure~\ref{fig:10000_vae_latent_space_traversal_shape_to_shape} shows the latent space traversal between different shapes\footnote{The corresponding plots for the other model can be found in Appendix~\ref{sec:additional_plots_latent_space_entanglement}.}.
-For the plot, the latent representations $\bm{z}_1, \bm{z}_2$ of two $\bm{x}_i$s with a particular shape, and the same configuration of the other parameters were obtained and interpolated between linearly.
+Figure~\ref{fig:10000_vae_latent_space_traversal_shape_to_shape} shows generated images for a latent space traversal between different shapes\footnote{The corresponding plots for the other model can be found in Appendix~\ref{sec:additional_plots_latent_space_entanglement}.}.
+For the plot, the latent representations $\bm{z}_1, \bm{z}_2$ were obtained for two $\bm{x}_i$s with identical parameters except for the shape.
 Figure~\ref{fig:10000_vae_latent_space_traversal_shape_to_shape} shows the reconstructions of 21 evenly spaced points on the line segment between $\bm{z}_1$ and $\bm{z}_2$.
-It shows the high degree of latent space entanglement: sudden position changes (Figure~\ref{subfig:10000_vae_latent_space_traversal_square_to_ellipse}) or the sudden emergence of new objects (Figure~\ref{fig:10000_vae_latent_space_traversal_shape_to_shape}).
+It shows the high degree of latent space entanglement: sudden position changes (Figure~\ref{subfig:10000_vae_latent_space_traversal_square_to_ellipse}) or the sudden emergence of new objects (Figure~\ref{subfig:10000_vae_latent_space_traversal_heart_to_square}).
 
-Obtaining $\bm{z}$ by fixing only the shape and the scale\footnote{Based on the cluster analysis, not fixing the scale would easily lead to regions with low probability density.} for an $\bm{x}_i$ and averaging over all other configurations was unsuccessful.
+Obtaining $\bm{z}$ by fixing only the shape and the scale for an $\bm{x}_i$ and averaging over all other configurations was unsuccessful.
+Based on the cluster analysis, not fixing the scale would easily lead to regions with low probability density.
 It lead to empty images as it probably lead to $\bm{z}_i$s in regions of the latent space with low probability density.
 Furthermore, for the latent space traversal shown in Figure~\ref{fig:10000_vae_latent_space_traversal_shape_to_shape}, it was possible always to find parameter combinations where the traversal lead to empty images in the middle of the line segment.
 
@@ -508,7 +506,53 @@ As \ac{VAE} only has one latent space, it employs subspaces to learn the lower-l
 The \ac{VAE} seems to learn an efficient encoding of most of the factors of variation as revealed by this kind of visualization even though it has a narrower information bottleneck with a two-dimensional latent space compared to the three two-dimensional latent spaces of \ac{VLAE}.
 
 \paragraph{CelebA}
-\textbf{TODO}
+
+\begin{wrapfigure}[26]{R}{0.4\textwidth}
+    \centering
+    \includegraphics[height=.39\textheight]{images/latent_spaces/celeba/attribute_distribution.png}
+    \caption[CelebA: Feature Distribution]{Distribution of the Binary Factors of Variation in the CelebA dataset. The green bar shows the fraction of the images where the attribute is present, the red bar where it is not present.}
+    \label{fig:celeba_features_distribution}
+\end{wrapfigure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.49\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/celeba/vlae/vlae_celeba_Black_Hair.png}
+        \caption{Black hair present (green) or not (red)}
+        \label{subfig:latent_space_celeba_vale_colored_black_hair}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.49\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/celeba/vlae/vlae_celeba_Blond_Hair.png}
+        \caption{Blond hair present (green) or not (red)}
+        \label{subfig:latent_space_celeba_vale_colored_blond_hair}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/celeba/vlae/vlae_celeba_Wearing_Hat.png}
+        \caption{Wearing a hat (green) or not (red)}
+        \label{subfig:latent_space_celeba_vale_colored_waring_hat}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.49\textwidth}
+        \includegraphics[width=\textwidth]{images/latent_spaces/celeba/vlae/vlae_celeba_Wearing_Earrings.png}
+        \caption{Wearing earrings (green) or not (red)}
+        \label{subfig:latent_space_celeba_vale_colored_wearing_earrings}
+    \end{subfigure}
+    \caption[\ac{VLAE} Latent Space for CelebA, Curated Features]{\ac{t-SNE}-reduced Latent Space of a \ac{VLAE} trained on CelebA, colored by curated Factors of Variation (present or not present)}
+    \label{fig:latent_space_celeba_vale_colored}
+\end{figure}
+
+The CelebA dataset provides binary labels for factors of variation.
+Figure~\ref{fig:celeba_features_distribution} shows the distribution of the different features in the dataset.
+Figure~\ref{fig:latent_space_celeba_vale_colored} shows the \ac{T-SNE}-reduced latent space of a \ac{VLAE} (\textbf{WHICH ONE}).
+A green dot in the latent space indicates that the feature is present for the data point, a red point indicates that it is not present\footnote{The plots for all models and all factors of variation can be found in Appendix~\ref{subsection:appendix_celeba_latent_space}/}.
+
+The latent space plots allow to analyze which features are learned in which layers.
+For example, hair color is mainly learned in the first and second layers (see Figures~\ref{subfig:latent_space_celeba_vale_colored_black_hair} and \ref{subfig:latent_space_celeba_vale_colored_blond_hair}) because green and red dots build clusters within these layers.
+Other features do not seem to be learned at all (see Figure~\ref{subfig:latent_space_celeba_vale_colored_wearing_earrings}).
+
+However, since CelebA provides only binary attributes, the latent space analysis is less insightful than for dsprites and Morpho-\textsc{Mnist}.
+Furthermore, the models learn factors of variation that are not present in the labels (see Section~\ref{subsubsec:latent_space_traversals}).
 
 \paragraph{dsprites}
 
@@ -1022,9 +1066,48 @@ Choosing a value $\bm{z}_1 = \varphi$ such that $p_\theta(\bm{x} | \bm{z}_1 = \v
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/notprop/mnist/vlae/ccs_0_1_vlae.png}
-    \caption[\ac{VLAE} on \textsc{Mnist} - Pixel proportionality]{Proportionality of pixel intensities when fixing $\bm{z}_1 = \bm{z}_2=\varphi$ for \ac{VLAE} trained on \textsc{Mnist}. Each box represents one of $28\times 28$ MNIST pixels. The $x$-axis of each box encodes the mean pixel intensity of the $\bm{z}_1$-representative sample. The $y$-axis encodes the mean pixel intensity of the of the $\bm{z}_2$-representative sample. Dots within boxes belong to the same $\varphi$ for both, $\bm{z}_1$ and $\bm{z}_2$. }
+    \caption[\ac{VLAE} on \textsc{Mnist} - Pixel intensity correlation]{Correlation of pixel intensities when fixing $\bm{z}_1 = \bm{z}_2=\varphi$ for \ac{VLAE} trained on \textsc{Mnist}. Each box represents one of $28\times 28$ MNIST pixels. The $x$-axis of each box encodes the mean pixel intensity of the $\bm{z}_1$-representative sample. The $y$-axis encodes the mean pixel intensity of the of the $\bm{z}_2$-representative sample. Dots within boxes belong to the same $\varphi$ for both, $\bm{z}_1$ and $\bm{z}_2$. }
     \label{fig:notprop}
 \end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae/dim_1_2.png}
+        \caption{\ac{VLAE} - Layer 1 vs. Layer 2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae/dim_1_3.png}
+        \caption{\ac{VLAE} - Layer 1 vs. Layer 3}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae/dim_2_3.png}
+        \caption{\ac{VLAE} - Layer 2 vs. Layer 3}
+    \end{subfigure}
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae_gan/dim_1_2.png}
+        \caption{\ac{VLAE}-\ac{GAN} - Layer 1 vs. Layer 2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae_gan/dim_1_3.png}
+        \caption{\ac{VLAE}-\ac{GAN} - Layer 1 vs. Layer 3}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae_gan/dim_2_3.png}
+        \caption{\ac{VLAE}-\ac{GAN} - Layer 2 vs. Layer 3}
+    \end{subfigure}
+    \caption[\ac{VLAE} and \ac{VLAE}-\ac{GAN} on \textsc{Mnist} - Pixel intensity correlation]{Histogram of correlations of pixel-wise intensities when fixing different pairs of dimensions for \ac{VLAE} and \ac{VLAE}-\ac{GAN} trained on \textsc{Mnist}.
+    Each value in the histogram is the Pearson correlation coefficient for one pixel of a generated dsprites image (compare Figure~\ref{fig:notprop} showing the correlations in the case of \textsc{Mnist}).
+    The histogram is colored by if the correlation is significant ($H_0$: The absolute correlation is equal to the absolute correlation of samples with zero correlation) at a 95\% confidence level.
+    The $p$-values have be corrected by the Benjamini/Hochberg method.}
+    \label{fig:mnist_vlae_notprop}
+\end{figure}
+
+\subsubsection{Mnist}
 
 Consider Figure~\ref{fig:notprop}.
 It shows results of samples $(\bm{x}_1^1,\bm{x}_2^1),\dots,(\bm{x}_1^{100},\bm{x}_{100}00)$ that were generated by Algorithm~\ref{alg:layer_representative_samples}.
@@ -1050,9 +1133,57 @@ Importantly, the correlation only persists for individual pixels.
 The qualitative behavior is similar for all \ac{VLAE} models.
 All plots can be found in Appendix~\ref{sec:additional-plots-for-section_independence}.
 
-\paragraph{CelebA}
+Figure~\ref{fig:mnist_vlae_notprop} shows a histogram of Pearson correlation coefficients for the pixel-wise intensities (compare Figure~\ref{fig:notprop})
+The correlations are colored by whether the (corrected) $p$-values are $< 0.05$.
+Apparently, the \ac{GAN}-models learn representations more independently in the different layers.
+This could have two reasons.
+First, the \ac{GAN}-models could disregard the lower layers more strongly than the non-\ac{GAN} models, using effectively only the third layer.
+Second, the \ac{GAN}-models could in fact learn more independent representations in terms of image generation.
 
-\textbf{TODO}
+It is probably not the case that the \ac{GAN}-models disregard lower layers, because they seem to incorporate lower-layer information for the generation of new images (compare Figures~\ref{subfig:vlae_gan_mnist_latent_space_traversal} and \ref{fig:appendix_vlae_gan_mnist_latent_space_morpho}).
+Therefore, it is assumed that the discriminative loss leads to more independent generated images.
+
+\subsubsection{dsprites}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae/dim_1_2.png}
+        \caption{\ac{VLAE} - Layer 1 vs. Layer 2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae/dim_1_3.png}
+        \caption{\ac{VLAE} - Layer 1 vs. Layer 3}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae/dim_2_3.png}
+        \caption{\ac{VLAE} - Layer 2 vs. Layer 3}
+    \end{subfigure}
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae_gan/dim_1_2.png}
+        \caption{\ac{VLAE}-\ac{GAN} - Layer 1 vs. Layer 2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae_gan/dim_1_3.png}
+        \caption{\ac{VLAE}-\ac{GAN} - Layer 1 vs. Layer 3}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae_gan/dim_2_3.png}
+        \caption{\ac{VLAE}-\ac{GAN} - Layer 2 vs. Layer 3}
+    \end{subfigure}
+    \caption[\ac{VLAE} and \ac{VLAE}-\ac{GAN} on dsprites - Pixel intensity correlation]{Histogram of correlations of pixel-wise intensities when fixing different pairs of dimensions for \ac{VLAE} and \ac{VLAE}-\ac{GAN} trained on dsprites.
+    Each value in the histogram is the Pearson correlation coefficient for one pixel of a generated dsprites image (compare Figure~\ref{fig:notprop} showing the correlations in the case of \textsc{Mnist}).
+    The histogram is colored by if the correlation is significant ($H_0$: The absolute correlation is equal to the absolute correlation of samples with zero correlation) at a 95\% confidence level.
+    The $p$-values have be corrected by the Benjamini/Hochberg method.}
+    \label{fig:dsprites_vlae_notprop}
+\end{figure}
+
+Consider Figure~\ref{fig:dsprites_vlae_notprop} showing again the histograms of pixel-wise intensity correlations.
+The Figure supports the reasoning of the previous paragraph, i.e., that the \ac{GAN}-generated images are more independent in terms of pixel-wise intensity correlation.
 
 \subsection{Pixel-wise Distribution of Generated Images}\label{subsubsec:pixel_wise_statistics}
 
@@ -1069,7 +1200,7 @@ Different statistical analyses were performed to address this question, revealin
 
 \begin{figure}
     \centering
-    \includegraphics[width=.8\textwidth]{images/generated_vs_true/vlae_gan_kde.png}
+    \includegraphics[width=.8\textwidth]{images/generated_vs_true/mnist/vlae_gan_kde.png}
     \caption[\ac{VLAE}-GAN - Latent Space Distribution]{Histogram of mean $z$-values for different layers and dimensions of \ac{VLAE}-\ac{GAN} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange). Additional plots can be found in Appendix~\ref{sec:appendix_pixel_wise_statistics}.}
     \label{fig:vlae_gan_kde}
 \end{figure}
@@ -1079,32 +1210,32 @@ Different statistical analyses were performed to address this question, revealin
     \centering
     \begin{subfigure}{0.4\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_mean.png}
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist/mnist_vs_models_mean.png}
         \caption{Histogram of mean pixel intensities for different models}
         \label{subfig:mean_generated_vs_true}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.4\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_sd.png}
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist/mnist_vs_models_sd.png}
         \caption{Histogram of pixel intensity standard deviations for different models}
         \label{subfig:sd_generated_vs_true}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.4\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_skew.png}
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist/mnist_vs_models_skew.png}
         \caption{Histogram of pixel intensity skewness for different models}
         \label{subfig:skew_generated_vs_true}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.4\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_kurt.png}
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist/mnist_vs_models_kurt.png}
         \caption{Histogram of pixel intensity kurtosis for different models}
         \label{subfig:kurt_generated_vs_true}
     \end{subfigure}
-    \caption[Models on \textsc{Mnist}: Pixel-wise distributions]{Pixel-wise distributions of different models and moments for the validation data set.}
+    \caption[Models on \textsc{Mnist}: Pixel-wise distributions]{Pixel-wise distributions of different models and moments for the \textsc{Mnist} validation data set.}
     \label{fig:mean_generated_vs_true}
 \end{figure}
 
@@ -1112,32 +1243,32 @@ Different statistical analyses were performed to address this question, revealin
     \centering
     \begin{subfigure}{0.4\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_mean_gauss_post.png}
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist/mnist_vs_models_mean_gauss_post.png}
         \caption{Histogram of mean pixel intensities for different models}
         \label{subfig:mean_generated_vs_true_gauss_post}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.4\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_sd_gauss_post.png}
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist/mnist_vs_models_sd_gauss_post.png}
         \caption{Histogram of pixel intensity standard deviations for different models}
         \label{subfig:sd_generated_vs_true_gauss_post}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.4\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_skew_gauss_post.png}
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist/mnist_vs_models_skew_gauss_post.png}
         \caption{Histogram of pixel intensity skewness for different models}
         \label{subfig:skew_generated_vs_true_gauss_post}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.4\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist_vs_models_kurt_gauss_post.png}
+        \includegraphics[width=\textwidth]{images/generated_vs_true/mnist/mnist_vs_models_kurt_gauss_post.png}
         \caption{Histogram of pixel intensity kurtosis for different models}
         \label{subfig:kurt_generated_vs_true_gauss_post}
     \end{subfigure}
-    \caption[Models on \textsc{Mnist}: Pixel-wise distributions - Gaussian Posterior]{Pixel-wise distributions of different models and moments for the validation data set with a standard normal posterior.}
+    \caption[Models on \textsc{Mnist}: Pixel-wise distributions - Gaussian Posterior]{Pixel-wise distributions of different models and moments for the \textsc{Mnist} validation data set with a standard normal posterior.}
     \label{fig:mean_generated_vs_true_gauss_post}
 \end{figure}
 
@@ -1148,7 +1279,7 @@ Therefore, the model's encoders first predicted the mean values in $z$-space for
 Subsequently, for each dimension, \ac{KDE} was performed to estimate the \ac{PDF} of the latent space for \ac{VAE} and \ac{VAE}-\ac{GAN}.
 Since the learned distribution, by definition, is covariance-free, the \ac{KDE} was performed for each dimension separately.
 The estimated \ac{PDF} was then used to generate 1,000 new images to perform the statistical analyses.
-Figure~\ref{fig:vae_gan_kde} shows the estimated \ac{KDE} for \ac{VAE}-\ac{GAN}, plots for the other models can be found in Appendix~\ref{sec:appendix_pixel_wise_statistics}.
+Figure~\ref{fig:vae_gan_kde} shows the estimated \ac{KDE} for \ac{VAE}-\ac{GAN}, plots for the other models can be found in Appendix~\ref{subsec:appendix_pixel_wise_statistics_mnist}.
 
 For \ac{VLAE} and \ac{VLAE}-\ac{GAN}, it cannot be sampled independently from the different latent spaces (see Section~\ref{subsec:independence-of-vlae-embeddings}).
 For these models, the predicted mean values directly were used to reconstruct 10,000 images.
@@ -1173,28 +1304,78 @@ The overlap of the histograms is high for all models.
         \ac{VAE}           & $6.5\cdot 10^{-15}$ & 0.0                 & $3.7\cdot 10^{-257}$ & $1.4\cdot 10^{-70}$  \\
         \ac{VLAE}          & 0.439               & $4.1\cdot 10^{-98}$ & $1.1\cdot 10^{-8}$   & .0                   \\
         \ac{VAE}-\ac{GAN}  & $6.7\cdot 10^{-75}$ & 0.0                 & $9.3\cdot 10^{-48}$  & $2.2\cdot 10^{-63}$  \\
-        \ac{VLAE}-\ac{GAN} & .0                  & $4.0\cdot 10^{-6}$  & 0.023                & 0.227                \\
+        \ac{VLAE}-\ac{GAN} & 0.0                 & $4.0\cdot 10^{-6}$  & 0.023                & 0.227                \\
         \bottomrule
     \end{tabular}
-    \caption{$p$-values of a Mann-Whitney U test. Each cell tests the hypothesis that the respective moments for the respective model are equal to the values for the \textsc{MNIST} test images. For each cell, the sample size was $2\cdot 10,000$.}
+    \caption{$p$-values of a Mann-Whitney U test. Each cell tests the hypothesis that the respective moments for the respective model are equal to the values for the \textsc{Mnist} test images. For each cell, the sample size was $2\cdot 10,000$.}
     \label{tab:vae-vlae-mnist}
 \end{table}
 Table~\ref{tab:vae-vlae-mnist} shows the results of a two-sided Mann-Whitney $U$ test for the samples of moments of the pixel distributions.
 The results lead to two conclusions: 1) The \ac{VLAE}-models capture the statistics of the pixel distribution better compared to the \ac{VAE}-models.
-2) All models do not capture the true pixel distribution.
+2) All models do not capture the true pixel distribution (rejection of $H_0$: \say{The distributions are the same.}).
 
 To verify that none of the models generates indistinguishable samples, a discriminator network was trained to distinguish generated samples from true \textsc{MNIST} test images\footnote{The configuration of the discriminator network can be found in Appendix~\ref{sec:listing_discriminator_network}. The network was trained using binary cross entropy for one epoch using the Adam optimizer.}.
 The discriminator network shows an accuracy of 1.0 for distinguishing for all models, i.e.,~it is perfectly able to predict generated from true samples for all models.
 
-Comparing the pixel-wise statistics between generated (according to the \ac{KDE} procedure explained above) and reconstructed samples furthermore showed that there is a significant difference ($p < 0.001$, two-sided Mann-Whitney $U$ test) even though the difference between the $\bm{z}$ distribution of encoded validation images and $\bm{z}$s sampled from the estimated posterior is not significant ($p < 0.001$, two-sided Mann-Whitney $U$ test).
+Comparing the pixel-wise statistics between generated (according to the \ac{KDE} procedure explained above) and reconstructed samples furthermore showed that there is a significant difference ($p < 0.05$, two-sided Mann-Whitney $U$ test) even though the difference between the $\bm{z}$ distribution of encoded validation images and $\bm{z}$s sampled from the estimated posterior is not significant ($p < 0.05$, two-sided Mann-Whitney $U$ test).
 The reason for this is assumed to lie in samples for which the encoder predicts very low values $\log \sigma^2$ that have been observed during training.
 Enforcing a lower bound for $\log \sigma^2$ in the encoder could prevent this.
 
-\subsubsection{CelebA}
-\textbf{TODO: Plots and Discussion}
-
 \subsubsection{dsprites}
-\textbf{TODO: Plots and Discussion}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/generated_vs_true/dsprites/dsprites_vs_models_mean.png}
+        \caption{Histogram of mean pixel intensities for different models}
+        \label{subfig:mean_generated_vs_true_dsprites}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/generated_vs_true/dsprites/dsprites_vs_models_sd.png}
+        \caption{Histogram of pixel intensity standard deviations for different models}
+        \label{subfig:sd_generated_vs_true_dsprites}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/generated_vs_true/dsprites/dsprites_vs_models_skew.png}
+        \caption{Histogram of pixel intensity skewness for different models}
+        \label{subfig:skew_generated_vs_true_dsprites}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/generated_vs_true/dsprites/dsprites_vs_models_kurt.png}
+        \caption{Histogram of pixel intensity kurtosis for different models}
+        \label{subfig:kurt_generated_vs_true_dsprites}
+    \end{subfigure}
+    \caption[Models on dsprites: Pixel-wise distributions]{Pixel-wise distributions of different models and moments for the dsprites validation data set.}
+    \label{fig:mean_generated_vs_true_dsprites}
+\end{figure}
+
+\begin{table}
+    \begin{tabular}{lrrrr}
+        \toprule
+        Model              & $p$-value (mean) & $p$-value (sd) & $p$-value (skewness) & $p$-value (kurtosis) \\
+        \midrule
+        \ac{VAE}           & $0.0$            & 0.0            & $3.6\cdot 10^{-22}$  & $6.0\cdot 10^{-24}$  \\
+        \ac{VLAE}          & 0.0              & $0.0$          & $0.091$              & 0.005                \\
+        \ac{VAE}-\ac{GAN}  & 0.0              & 0.0            & 0.0                  & 0.0                  \\
+        \ac{VLAE}-\ac{GAN} & 0.0              & $0.0$          & 0.005                & 0.061                \\
+        \bottomrule
+    \end{tabular}
+    \caption{$p$-values of a Mann-Whitney U test. Each cell tests the hypothesis that the respective moments for the respective model are equal to the values for the dsprites test images. For each cell, the sample size was $2\cdot 1,000$.}
+    \label{tab:vae-vlae-dsprites}
+\end{table}
+
+Figure~\ref{fig:mean_generated_vs_true_dsprites} shows the pixel-wise distribution for the dsprites dataset.
+The \ac{VLAE}-models (\ac{VLAE} and \ac{VLAE}-\ac{GAN}) employ a four-dimensional, the \ac{VAE} (\ac{VAE} and \ac{VAE}-\ac{GAN}) a ten-dimensional latent space.
+Again, the \ac{VLAE}-models capture the true distribution better.
+However, all distributions differ significantly from the true distribution (see Table~\ref{tab:vae-vlae-dsprites}).
+The \ac{KDE} distributions can be found in Appendix~\ref{subsec:appendix_pixel_wise_statistics_dsprites}.
 
 \subsection{Class-Distribution of Generated Images}\label{subsec:class-distribution-of-generated-images}
 
@@ -1209,7 +1390,7 @@ It is the only labeled dataset where the \acp{VAE} and \acp{VLAE} models have sh
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{images/generated_vs_true/class_distr.png}
+    \includegraphics[width=\textwidth]{images/generated_vs_true/mnist/class_distr.png}
     \caption{Distribution of generated class labels for different models.}
     \label{fig:generated_class_distribution}
 \end{figure}
@@ -1226,7 +1407,7 @@ Overall, the \ac{VLAE} models generate a more even distribution of generated dig
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{images/generated_vs_true/morpho_distr.png}
+    \includegraphics[width=\textwidth]{images/generated_vs_true/mnist/morpho_distr.png}
     \caption{Distribution of Morpho- \textsc{Mnist} attributes for different models.}
     \label{fig:generated_morpho_distribution}
 \end{figure}
@@ -1421,12 +1602,15 @@ Future research could aim at investigating if and by how far semantic representa
 
 \subsection{Feedback Connections of the \acl{LGN}}\label{subsec:feedback-connections-of-the-lateral-geniculate-nucleus}
 \textbf{DRAFT!}
-As discussed in Section~\ref{subsubsec:visual-cortex}, the \ac{LGN} receives strong feedback connections from the \ac{V1}.
-Consider the \ac{LVAE}-model in Section~\ref{subsubsec:representation_learning} and the discussion concerning the top-down pass.
-It is stated that, compared to the Vanilla VAE, the \ac{LVAE} model is more biologically plausible because top-down connections resemble the feedback connections in the ventral and primary visual pathway.
-\citet{sonderby2016ladder} claim that the top-down pass helps improving the low-level feature representation because it enables the model to incorporate the higher-level context.
+As discussed in Section~\ref{subsubsec:visual-cortex}, the \ac{LGN} and \ac{V4} receive input from top-down connections.
+The top-down connections into \ac{V4} are assumed to enable attentional mechanisms~\citep{roe2012toward}.
 
-Maybe the feedback connections fulfil this very function, i.e.\ allowing visual regions operating on a lower semantic level to incorporate the high-level context to disambiguate the lower-level representations.
+Similarly, the \ac{LVAE}-model (see Section~\ref{subsubsec:representation_learning}) employs top-down connections.
+In that regard, it is biologically more plausible compared to the original \ac{VAE} models.
+\citet{sonderby2016ladder} claim that the top-down pass helps improving the low-level feature representation because it enables the model to incorporate the higher-level context.
+Even though \citet{zhao2017learning} discuss disadvantages of this model, top-down connections enabling attentional mechanisms could play an important role designing more biologically plausible \ac{VAE} models.
+
+Future work should investigate if such top-down connections are allowing visual regions operating on a lower semantic level to incorporate the high-level context to disambiguate the lower-level representations.
 
 \subsection{Possible applications of VLAE-GAN model}\label{subsec:possible-applications-of-vlae-gan-model}
 \citet{vanrullen2019reconstructing} learn a mapping between test subject's fMRI responses when shown images from the CelebA dataset and the latent space of a \ac{VAE}.
@@ -1435,13 +1619,14 @@ They discuss which brain regions have most influence in the mapping, showing tha
 The \ac{VLAE}(-\ac{GAN}) used in the course of this thesis uses three latent spaces compared to one latent space for a regular \ac{VAE}(-\ac{GAN}).
 Furthermore it is designed such that the latent spaces encode features of different granularities.
 
-\textbf{DRAFT FROM HERE:}
-This model allows to learn three mappings from different lobes to different latent spaces of the VLAE-GAN decoder.
-Maybe this is a better model and allows deeper analyses compared to the normal VAE decoder.
+Conducting an experiment that is similar to \citet{vanrullen2019reconstructing}, but maps information from ealier regions of the visual cortex onto lower layers of the model, and higher regions onto higher layers could help answering whether the lower-level representations are biologically plausible.
+However, a prerequisite for such a model is to find a \ac{VAE}-like model explaining cortical activity.
 
-\subsection{Comparison to \ac{IT}}
-\textbf{DRAFT!}
-Talk about how to compare network activites to IT activities.
+\subsection{Comparison to \ac{IT}}\label{subsec:representational-dissimilarity-matrices}
+\citet{khaligh2014deep} have shown that higher layers of \acp{CNN} trained in a supervised manner explain cortical activity.
+They also showed that this is not true for a variety of unsupervised models, however not for \acp{VAE}-models.
+It cannot be ruled out that \acp{VAE}, even though being unrelated to lower regions of the visual system (see Section~\ref{subsec:results_visual_features_in_variational_autoencoders}) explain cortical activity in the higher layers or the latent space.
+Future work should compare \ac{IT} fMRI data to higher layers of \acp{VAE} to investigate this.
 
 \subsection{Semantic Representations}\label{subsec:semantic-representations-results}
 Other than unsupervised models, supervised models are known to explain cortical activity~\citep{khaligh2014deep,cadieu2014deep}.
