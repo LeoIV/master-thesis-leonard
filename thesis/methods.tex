@@ -39,22 +39,22 @@ A smaller version of ImageNet, commonly called \textit{ILSVRC2012} has been used
 
 This curated version is commonly used as a baseline (\textbf{refs}).
 
-\subsubsection{MNIST}\label{subsubsec:mnist}
+\subsubsection{Mnist}\label{subsubsec:mnist}
 
 \begin{wrapfigure}[9]{R}{0.2\textwidth}
     \begin{center}
         \includegraphics[width=0.18\textwidth]{images/mnist_sample.png}
     \end{center}
-    \caption[MNIST dataset sample image]{A sample image from the MNIST dataset.}
+    \caption[\textsc{Mnist} dataset sample image]{A sample image from the \textsc{Mnist} dataset.}
     \label{fig:mnist_sample}
 \end{wrapfigure}
 
-MNIST\footnote{\href{http://yann.lecun.com/exdb/mnist/}{http://yann.lecun.com/exdb/mnist/}, last access: 23/04/2020}~\citep{lecun1998gradient} is a widely-used dataset of hand-written digits.
+\textsc{Mnist}\footnote{\href{http://yann.lecun.com/exdb/mnist/}{http://yann.lecun.com/exdb/mnist/}, last access: 23/04/2020}~\citep{lecun1998gradient} is a widely-used dataset of hand-written digits.
 The data is subdivided into a training set of 60.000 images and a test set containing 10.000 images.
 The digits are all of the same size and centered.
 The samples are grayscale images of size $28\times 28$pixels.
 
-\subsubsection{Morpho-MNIST}\label{subsubsec:morphomnist}
+\subsubsection{Morpho-\textsc{Mnist}}\label{subsubsec:morphomnist}
 
 \begin{figure}
     \centering
@@ -65,11 +65,11 @@ The samples are grayscale images of size $28\times 28$pixels.
 
 Morpho-\textsc{Mnist}~\citep{castro2019morpho} is an extension of the \textsc{Mnist} dataset that addresses the question: \say{[T]o what extent has my model learned to represent specific factors of
 variation in the data?} ~\citep{castro2019morpho}.
-To address this questions, Morpho-MNIST provides the following (continuous) labels of morphological attributes of the MNIST samples: stroke length, stroke thickness, slant, width, and height.
+To address this questions, Morpho-\textsc{Mnist} provides the following (continuous) labels of morphological attributes of the \textsc{Mnist} samples: stroke length, stroke thickness, slant, width, and height.
 
-Besides providing additional labels of low-level MNIST attributes, Morpho-MNIST provides a toolbox to measure (i.e~ calculate the morphological labels) and perturb MNIST images.
+Besides providing additional labels of low-level \textsc{Mnist} attributes, Morpho-\textsc{Mnist} provides a toolbox to measure (i.e~ calculate the morphological labels) and perturb MNIST images.
 The perturbation toolbox allows it to thin, thicken, swell, and to add fractures to an image.
-Morpho-MNIST also provides pre-computed datasets that were built using the perturbation toolbox.
+Morpho-\textsc{Mnist} also provides pre-computed datasets that were built using the perturbation toolbox.
 
 Importantly, the distribution of the morphological attributes partly is highly skewed (for example Thickness and Height, see Figure~\ref{fig:morpho_mnist_distribution}).
 
@@ -88,11 +88,10 @@ The dataset also contains the factor labels for each image.
 Four different base \ac{VAE} models were evaluated in the course of this thesis.
 Furthermore, two \say{AlexNet} models were used for some additional experiments.
 
-The models are described in the following.
-The models are varied based on the input dimensionality.
-A more detailed description can be found in Appendix~\textbf{REF}.
+The models vary depending on the dataset and are described in the following.
+A more detailed description can be found in Appendix~\ref{sec:appendix_network_architectures}.
 
-\subsubsection{VAE Model}
+\subsubsection{VAE Models}\label{subsubsec:vae_models}
 
 \begin{figure}
     \centering
@@ -115,90 +114,171 @@ The encoder is made up of multiple \say{Convolution, Activation, Batch-Normaliza
 The embedding layer predicts $\mu$ and $\log \sigma^2$ and performs the resampling by:
 \begin{align}
     z &= \mu + \epsilon\sigma \\
-    \epsilon &\sim \mathcal{N}(0, \bm{I}).
+    \epsilon &\sim \mathcal{N}(0, \bm{I}). \label{eq:resampling_vae}
 \end{align}
 The encoder input size is equal to the decoder output size and is depending on the dataset.
-For \textsc{Mnist}, a size of $28\times 28$ is used, for dsprites $64\times 64$, for CelebA $128\times 128$, and for ImageNet $224\times 224$.
-Also, the number of \say{Convolution, Activation, Batch-Normalization}-blocks is chosen depending on the input size, as smaller input sizes require fewer layers to achieve a receptive field of the input size.
+The number of \say{Convolution, Activation, Batch-Normalization}-blocks is chosen depending on the input size, as smaller input sizes require fewer layers to achieve a receptive field of the input size.
 The batch-normalization~~\citep[pp. 317, ff.]{Goodfellow-et-al-2016} can be omitted\footnote{It is stated in the experiments if batch-normalization is omitted.}.
 The activation can be either ReLU~\citep[p. 173]{Goodfellow-et-al-2016} or LeakyReLU~\citep[p. 192]{Goodfellow-et-al-2016} and is ReLU unless stated otherwise.
 The convolutions use zero-padding unless stated otherwise.
 Encoder and decoder use stridden convolutions for downsampling, unless stated otherwise.
 
+The \ac{VAE} model implements the loss function from Equation~\ref{eq:elbo_error_term} but with a pre-factor for the reconstruction term.
+The reconstruction term pre-factor was determined empirically, observing reconstruction and generation quality.
+
 The decoder uses similar blocks as the encoder but employs transposed convolutions~\citep[pp. 356, ff.]{Goodfellow-et-al-2016} instead of convolutions to upsample feature maps.
 The output layer of the decoder uses a sigmoid activation instead of ReLU.
 
-\subsubsection{VLAE Model}
+In total, seven \ac{VAE}-models are used: \say{\textsc{Mnist}-\ac{VAE}}, \say{dsprites-\ac{VAE}}, \say{7,500-\ac{VAE}}, \say{6,250-\ac{VAE}}, \say{5,000-\ac{VAE}},  \say{3,750-\ac{VAE}}, and \say{CelebA-\ac{VAE}}.
+The model structures can be found in Appendix~\ref{subseq:appendix_vae_models}.
 
+\paragraph{\textsc{Mnist}-\ac{VAE}} \textsc{Mnist}-\ac{VAE} uses an input- and output-size of $28\times 28\times 1$ (\textsc{Mnist} images are grayscale images).
+The model is trained with the Adam optimizer on the \textsc{Mnist} training set with a batch size of 128 and a learning rate of 0.001 for 200 epochs.
+The reconstruction loss factor is 10,000.
+The latent space is two-dimensional.
+The inner activation function is ReLU.
+
+\paragraph{dSprites-\ac{VAE}} dSprites-\ac{VAE} uses an input- and output-size of $64\times 64\times 1$.
+The model is trained with the Adam optimizer on a training set consisting of 90\% of the dSprites dataset with a batch size of 128 and a learning rate of 0.001 for 200 epochs.
+The reconstruction loss factor is 10,000.
+The latent space is ten-dimensional.
+The inner activation function is ReLU.
+For dSprites, four additional models have been trained with a different reconstruction term weight: 7,500-\ac{VAE}, 6,250-\ac{VAE}, 5,000-\ac{VAE}, and 3,750-\ac{VAE}.
+These models differ from dSprites-\ac{VAE} only in the reconstruction term weight.
+
+\paragraph{CelebA-\ac{VAE}} CelebA-\ac{VAE} uses an input- and output-size of $128\times 128\times 3$.
+The model is trained with the Adam optimizer on a training set consisting of 90\% of the CelebA dataset with a batch size of 128 and a learning rate of 0.001 for 200 epochs.
+The reconstruction loss factor is 10,000.
+The latent space is eight-dimensional.
+The inner activation function is ReLU.
+
+\subsubsection{VLAE Models}\label{subsubsec:vlae_models}
 \begin{figure}
     \centering
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=\textwidth,height=.85\textheight,keepaspectratio]{images/vlae/encoder.png}
         \caption{Encoder}
+        \label{subfig:vlae_encoder}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=\textwidth,height=.85\textheight,keepaspectratio]{images/vlae/decoder.png}
         \caption{Decoder}
+        \label{subfig:vlae_decoder}
     \end{subfigure}
     \caption{\ac{VLAE} model structure}
     \label{fig:vlae_model_structure}
 \end{figure}
 
-\subsubsection{VAE-GAN Model}
+Figure~\ref{fig:vlae_model_structure} shows the \ac{VLAE} model structure.
+Like the \ac{VAE}, it consists of an encoder and a decoder.
+The encoder has three latent spaces\footnote{\textit{z\_1\_latent}, \textit{z\_2\_latent}, and \textit{z\_3\_latent} in Figure~\ref{subfig:vlae_encoder}.}
+A re-sampling according to Equation~\ref{eq:resampling_vae} is performed for each of the latent spaces.
+Lower latent spaces are equipped with a less powerful encoder (e.g., \textit{z\_1\_latent} in Figure~\ref{subfig:vlae_encoder}), higher latent spaces with a more powerful encoder.
+Again, the network is composed of multiple \say{Convolution, Activation, Batch-Normalization}-blocks.
+The number of these blocks is variable and chosen depending on the dataset.
+Batch-normalization can be omitted (default), the inner activation can be either ReLU (default) or LeakyReLU.
+The convolutions use-zero padding, and encoder and decoder use stridden convolutions for downsampling.
 
-\subsubsection{VLAE-GAN Model}
+The \ac{VAE} model implements the loss function from Equation~\ref{eq:elbo_error_term} but with a pre-factor for the reconstruction term.
+The \ac{KL}-terms of different layers are totalized.
 
-\subsubsection{AlexNet Classifier}
+The decoder has three inputs, where the first input of the decoder\footnote{\textit{z\_3} in Figure~\ref{subfig:vlae_decoder}} receives input from the last output of the encoder\footnote{\textit{z\_3\_latent} in Figure~\ref{subfig:vlae_encoder}}.
+The decoder uses blocks similar to the encoder but with transposed convolutions instead of regular convolutions.
 
-\subsubsection{AlexNet VAE}
+In total, five \ac{VLAE}-models are used: \say{\textsc{Mnist}-\ac{VLAE}-factor-1}, \say{\textsc{Mnist}-\ac{VLAE}-factor-2}, \say{\textsc{Mnist}-\ac{VLAE}-factor-3} \say{dSprites-\ac{VLAE}}, and \say{CelebA-\ac{VLAE}}.
+The model structures can be found in Appendix~\ref{subseq:appendix_vlae_models}.
 
+\paragraph{\textsc{Mnist}-\ac{VLAE}} The three \textsc{Mnist}-\ac{VLAE}s\footnote{\say{\textsc{Mnist}-\ac{VLAE}-factor-1}, \say{\textsc{Mnist}-\ac{VLAE}-factor-2}, \say{\textsc{Mnist}-\ac{VLAE}-factor-3}} use an input- and output-size of $28\times 28\times 1$.
+The models are trained with the Adam optimizer on the \textsc{Mnist} training set with a batch size of 128 for 200 epochs.
+The reconstruction loss factor is 10,000.
+The latent spaces are two-dimensional.
+The inner activation function is ReLU.
+The models use no batch-normalization.
+\textsc{Mnist}-\ac{VLAE}-factor-1 is the model with the original number of feature maps, for \textsc{Mnist}-\ac{VLAE}-factor-2 and \textsc{Mnist}-\ac{VLAE}-factor-3, the number of feature maps is reduced according to the factor.
+\textsc{Mnist}-\ac{VLAE}-factor-1 is trained with a learning rate of 0.005.
+\textsc{Mnist}-\ac{VLAE}-factor-2 and \textsc{Mnist}-\ac{VLAE}-factor-3 are trained with a learning rate of 0.001.
 
-%\subsection{Visual Features Variational Autoencoders}\label{subsec:visual-features-variational-autoencoders}
-%Different questions were asked investigate whether \acp{VAE} are a biologically plausible model of the Visual Cortex.
+\paragraph{dSprites-\ac{VLAE}} dSprites-\ac{VLAE} uses an input- and output-size of $64\times 64\times 1$.
+The model is trained with the Adam optimizer on a training set consisting of 90\% of the dSprites dataset with a batch size of 128 and a learning rate of 0.001 for 200 epochs.
+The reconstruction loss factor is 10,000.
+The latent spaces are four-dimensional.
+The inner activation function is ReLU.
 
-%One essential prerequisite is the emergence of Gabor wavelets (\textbf{Ref}).
-%As discussed in Section~\ref{subsec:visual_features_in_neural_networks}, Gabor wavelets do emerge in deep convolutional networks, trained on image classification~\citep{krizhevsky2012imagenet} (\textbf{Ref: at least one more paper }), specifically on the ImageNet dataset (\textbf{ref}).\par
-%The following approaches were taken to see if Gabor wavelets do naturally emerge in \acp{VAE} (\textbf{explain \say{naturally}}).\par
-%First, the convolutional kernels in a \ac{VAE} that was sucessfully trained on the CelebA (\textbf{ref}) dataset in terms of image reconstruction were examined in terms of emergence of Gabor wavelets (\textbf{explain network architecture}).
-%Subsequently, the size of the convolutional kernels in the first layer was increased to size 11x11 \footnote{This is the same kernel size of the first layers used in~\citet{krizhevsky2012imagenet}.} as they were too small to successfully represent any Gabor wavelets~\citep{han2019variational}.
-%Since still no Gabor wavelets emerged (see Section~\ref{subsec:results_visual_features_in_variational_autoencoders}), the question was raised whether this was because of the different network architectures of AlexNet and the \say{CelebA VAE}, or the dataset, or both.
+\paragraph{CelebA-\ac{VLAE}} CelebA-\ac{VLAE} uses an input- and output-size of $128\times 128\times 3$.
+The model is trained with the Adam optimizer on a training set consisting of 90\% of the CelebA dataset with a batch size of 128, a learning rate of 0.001 with an additional learning rate decay of 0.01 for 200 epochs.
+The reconstruction loss factor is 10,000.
+The latent spaces are two-dimensional.
+The inner activation function is ReLU.
 
-%\begin{figure}
-%    \centering
-%    \begin{subfigure}{.5\textwidth}
-%        \centering
-%        \includegraphics[width=\textwidth,height=.9\textheight,keepaspectratio]{images/alexnet-vae/encoder.png}
-%        \caption{Encoder}
-%    \end{subfigure}%
-%    \begin{subfigure}{.5\textwidth}
-%        \centering
-%        \includegraphics[width=\textwidth,height=.9\textheight,keepaspectratio]{images/alexnet-vae/decoder.png}
-%        \caption{Decoder}
-%    \end{subfigure}
-%    \caption{AlexNet-VAE Network}
-%    \label{fig:alexnet-vae-encoder}
-%\end{figure}
-%
-%To further localize the so-far cause for the non-existence of Gabor wavelets, an \say{AlexNet-like-VAE} (subsequently called AlexNet-VAE, see Figure~\ref{fig:alexnet-vae-encoder}) was trained on ImageNet.
-%This \ac{VAE} consists of an encoder part that closely resembles AlexNet.
-%The output-layer, however, was changed in terms of size and activation function.
-%First of all, the output size was allowed to be dynamical to allow different embedding sizes, i.e.\ differently sized multivariate Gaussians.
-%Also, the activation function was changed from Softmax (\textbf{ref}) to \ac{LeakyReLU} (\textbf{ref}).
-%Furthermore, all other activations were also changed to \ac{LeakyReLU} due to its advantages over \ac{ReLU} (\textbf{which ones? explain}).
-%The encoder is was followed by the reparametrization layer and, subsequently, the decoder part which basically consists of the inverse AlexNet structure.\par
-%
-%\begin{figure}
-%    \centering
-%    \begin{center}
-%        \includegraphics[height=0.9\textheight]{images/alexnet/model.png}
-%    \end{center}
-%    \caption[AlexNet Network]{AlexNet-inspired Image Classification Network}
-%    \label{fig:alexnet}
-%\end{figure}
-%
-%To cross-check the results of the AlexNet-VAE, only the encoder part was trained on ImageNet and image classification, using the Softmax activation in the last layer but keeping the \ac{LeakyReLU} activations in all other layers (see Figure~\ref{fig:alexnet}).
-%
-%As it turned out that also in the AlexNet-VAE no Gabor wavelets emerged (see Section~\ref{subsec:results_visual_features_in_variational_autoencoders}), the image classification AlexNet-like network was used as an encoder with frozen weights and only the decoder part was trained to see if using a network trained on image classification has certain disadvantages when being used as a decoder in a \ac{VAE} compared to a decoder trained from scratch.
+\subsubsection{VAE-GAN Models}\label{subsubsec:vae_gan_models}
 
+The \ac{VAE}-\ac{GAN}-model is similar to the \ac{VAE}-model.
+However, it implements the \ac{VAE}-\ac{GAN} loss function (see Section~\ref{subsubsec:representation_learning}) instead of Equation~\ref{eq:elbo_error_term}.
+Therefore, the \ac{VAE}-\ac{GAN} has an additional \textit{discriminator} network.
+The feature loss compares inner activations in the discriminator of true and generated samples.
+The discriminator loss signifies by how much the discriminator violates the \ac{GAN} training objective.
+See Section~\ref{subsubsec:representation_learning} for more details.
+
+For the encoder, the \ac{KL}-term is weighted ten-times more strongly than the feature loss.
+The decoder weights the discriminator loss with factor 1 and the feature loss with factor 0.75.
+
+In total, seven \ac{VAE}-\ac{GAN}-models are used: \say{\textsc{Mnist}-\ac{VAE}-\ac{GAN}}, \say{dSprites-\ac{VAE}-\ac{GAN}}, and \say{CelebA-\ac{VAE}-\ac{GAN}}.
+The model structures can be found in Appendix~\ref{subseq:appendix_vae_gan_models}.
+
+\paragraph{\textsc{Mnist}-\ac{VAE}-\ac{GAN}} \textsc{Mnist}-\ac{VAE}-\ac{GAN} uses an input- and output-size of $28\times 28\times 1$.
+The model is trained with the Adam optimizer on the \textsc{Mnist} training set with a batch size of 128 and a learning rate of 0.0001 for 200 epochs.
+The reconstruction loss factor is 10,000.
+The latent space is two-dimensional.
+The inner activation function is ReLU.
+
+\paragraph{dSprites-\ac{VAE}-\ac{GAN}} dSprites-\ac{GAN} uses an input- and output-size of $64\times 64\times 1$.
+The model is trained with the Adam optimizer on a training set consisting of 90\% of the dSprites dataset with a batch size of 128 and a learning rate of 0.0001 for 200 epochs.
+The reconstruction loss factor is 10,000.
+The latent space is ten-dimensional.
+The inner activation function is ReLU.
+
+\paragraph{CelebA-\ac{VAE}-\ac{GAN}} CelebA-\ac{VAE}-\ac{GAN} uses an input- and output-size of $128\times 128\times 3$.
+The model is trained with the Adam optimizer on a training set consisting of 90\% of the CelebA dataset with a batch size of 128 and a learning rate of 0.001 with an additional learning rate decay of 0.02 for 200 epochs.
+The reconstruction loss factor is 10,000.
+The latent space is eight-dimensional.
+The inner activation function is ReLU.
+
+\subsubsection{VLAE-GAN Models}\label{subsubsec:vlae_gan_models}
+
+The \ac{VLAE}-\ac{GAN}-model is comparable to the \ac{VAE}-\ac{GAN}-model in terms of the loss functions.
+However, it uses the structure of the \ac{VLAE}-model and totalizes the three $KL$-losses from the different layers.
+
+The model structures can be found in Appendix~\ref{subseq:appendix_vlae_gan_models}.
+
+\paragraph{\textsc{Mnist}-\ac{VLAE}-\ac{GAN}} The three \textsc{Mnist}-\ac{VLAE}-\ac{GAN} uses an input- and output-size of $28\times 28\times 1$.
+The model is trained with the Adam optimizer on the \textsc{Mnist} training set with a batch size of 128 and a learning rate of 0.0001 for 200 epochs.
+The reconstruction loss factor is 10,000.
+The latent spaces are two-dimensional.
+The inner activation function is ReLU.
+The model uses no batch-normalization.
+
+\paragraph{dSprites-\ac{VLAE}-\ac{GAN}} dSprites-\ac{VLAE}-\ac{GAN} uses an input- and output-size of $64\times 64\times 1$.
+The model is trained with the Adam optimizer on a training set consisting of 90\% of the dSprites dataset with a batch size of 128, a learning rate of 0.0001, and an additional learning rate decay of 0.01 for 200 epochs.
+The reconstruction loss factor is 10,000.
+The latent spaces are four-dimensional.
+The inner activation function is ReLU.
+
+\paragraph{CelebA-\ac{VLAE}-\ac{GAN}} CelebA-\ac{VLAE}-\ac{GAN} uses an input- and output-size of $128\times 128\times 3$.
+The model is trained with the Adam optimizer on a training set consisting of 90\% of the CelebA dataset with a batch size of 128, a learning rate of 0.0001 with an additional learning rate decay of 0.01 for 200 epochs.
+The reconstruction loss factor is 10,000.
+The latent spaces are two-dimensional.
+The inner activation function is ReLU.
+
+\subsubsection{AlexNet Classifier}\label{subsubsec:alexnet_classifier}
+The AlexNet Classifier resembles the architecture from \citet{krizhevsky2012imagenet}.
+It uses dropout and a dropout rate of 0.3.
+The model is trained with the Adam optimizer and a learning rate of 0.0001 using batch normalization and a batch size of 32 for ten epochs..
+The model structure can be found in Appendix~\ref{subseq:appendix_alexnet_classifiers}.
+
+\subsubsection{AlexNet-\ac{VAE}}\label{subsubsec:alexnet_vae}
+The AlexNet-\ac{VAE} resembles the AlexNet classifier but uses a 2000-dimensional latent space with re-sampling (see Equation~\ref{eq:resampling_vae}).
+For AlexNet-\ac{VAE}, no dropout is used.
+The model is trained with the Adam optimizer and a learning rate of 0.0001 using batch normalization and a batch size of 32 for 100 epochs..
+The model structure can be found in Appendix~\ref{subseq:appendix_alexnet_vae}.

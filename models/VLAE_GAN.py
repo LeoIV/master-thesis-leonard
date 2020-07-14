@@ -356,17 +356,16 @@ class VLAEGAN(VAEWrapper):
         set_trainable(self.decoder, False)
         set_trainable(self.discriminator, True)
         self.discriminator_train.compile(optimizer1, ['binary_crossentropy'] * 3, ['acc'] * 3)
-        self.discriminator_train.summary()
+        print("VLAEGANDISCRIMINATOR")
+        self.discriminator.summary()
 
         set_trainable(self.discriminator, False)
         set_trainable(self.decoder, True)
         self.decoder_train.compile(optimizer2, ['binary_crossentropy'] * 2, ['acc'] * 2)
-        self.decoder_train.summary()
 
         set_trainable(self.decoder, False)
         set_trainable(self.encoder, True)
         self.encoder_train.compile(optimizer3)
-        self.encoder_train.summary()
 
         set_trainable(self.vlae_gan, True)
 

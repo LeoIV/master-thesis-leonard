@@ -351,7 +351,7 @@ By design, \acp{CNN} share some features with the visual system, namely the conv
 However, \acp{CNN} show further unintentional parallels to the visual system:
 
 AlexNet~\citep{krizhevsky2012imagenet} is a deep \ac{CNN} trained on image classification.
-\citet{krizhevsky2012imagenet} have shown that this network learns Gabor wavelets in the first layer’s kernels.
+\citet{krizhevsky2012imagenet} have shown that this network learns Gabor wavelets in the first layer's kernels.
 A Gabor wavelet is the optimal stimulus for a Gabor-like kernel (see Section~\ref{subsubsec:cnn_model_visual_system}), resulting in the strongest excitement.
 It is also the optimal stimulus for cells in \ac{V1} (see Section~\ref{subsubseq:simple_complex_cells}, and \citet{jones1987evaluation}).
 
@@ -532,6 +532,7 @@ Then
 \end{align}
 Since $\mu$, in this case, is a function of $\bm{z}$ (parametrized by $\theta$), we can consider this as the reconstruction $\hat{\bm{x}} = f_\theta(\bm{z})$.
 Then, except for subtracting a constant and scaling by a constant, equation~\ref{eq:log_normal_distr} is the \ac{MSE}.
+The sum on the left of Equation~\ref{eq:elbo_error_term} is subsequently called \textit{reconstruction term}, the sum on the \textit{\ac{KL}-term}.
 
 Since $p(\bm{x}|\bm{z})$ is a Gaussian, maximizing $\mathbb{E}_{q(z)} \left[ p(x|z) \right]$ is equivalent to minimizing the mean squared error between $x$ and the \textit{reconstruction} $\hat{x}$.
 $\hat{x}$ can be written instead of $z$ because $p(z) = \hat{x}$ and minimizing does not change the relation.
@@ -552,6 +553,11 @@ Under this regime, $\bm{z}$ is the value of a function $g(\phi, \bm{x}, \epsilon
 In an intermediate step, the encoder predicts values $\bm{\mu}$ and $\log \bm{\sigma}$ and $\bm{z}$, eventually, is realized as $\bm{z} = \bm{\mu} + \bm{\sigma} \cdot \epsilon$~\citep{kingma2019introduction}.
 Using this trick, the encoder gradients are w.r.t.~the expectation of $\epsilon$.
 Backpropagation on a minibatch of data, therefore, is unbiased.
+
+Unlike regular autoencoders, \acp{VAE} produce an interpretable latent space.
+Enforcing randomness in the positioning of points in the latent space guides the model to predict an area in the latent space that is likely for a given input $\bm{x}$~\citep[p. 701]{Goodfellow-et-al-2016}.
+Eventually, this allows to sample from the random space to generate new images, employing the decoder.
+Furthermore, it allows simple arithmetic in the latent space (see Section~\ref{subsubsec:representation_learning}).
 
 \paragraph{Disadvantages}
 
@@ -611,11 +617,11 @@ where $V(D, G)$ is the training objective defined in Equation~\ref{eq:gan_object
         \includegraphics[width=.8\textwidth]{images/infogan_c3.png}
         \caption{Varying $\bm{c}_3 \in [-2, 2]$}
     \end{subfigure}
-    \caption[InfoGAN latent space traversal]{Exploration of $\bm{c}$ for InfoGAN on MNIST by traversing either, $\bm{c}_1$, $\bm{c}_2$, or $\bm{c}_3$. Rows correspond to different noise values $\bm{z}$ but are equal for the three figures, columns correspond to different values for $\bm{c}_i$. $\bm{c}_1$ takes discrete values, $\bm{c}_2$ and $\bm{c}_3$ take continuous values. Taken from \citet{chen2016infogan}.}
+    \caption[InfoGAN latent space traversal]{Exploration of $\bm{c}$ for InfoGAN on \textsc{Mnist} by traversing either, $\bm{c}_1$, $\bm{c}_2$, or $\bm{c}_3$. Rows correspond to different noise values $\bm{z}$ but are equal for the three figures, columns correspond to different values for $\bm{c}_i$. $\bm{c}_1$ takes discrete values, $\bm{c}_2$ and $\bm{c}_3$ take continuous values. Taken from \citet{chen2016infogan}.}
     \label{fig:infogan}
 \end{figure}
 
-\say{To disentagle digit shape styles on MNIST,} \citet{chen2016infogan} choose $\bm{c}$ as three-element set $\bm{c} = (\bm{c}_1, \bm{c}_2, \bm{c}_3)$ with $\bm{c}_1$ drawn from a categorical distribution with ten categories (equal to the number of classes in MNIST) and event probability $p_i=0.1 \, \forall i \in [0, 10]$.
+\say{To disentagle digit shape styles on \textsc{Mnist},} \citet{chen2016infogan} choose $\bm{c}$ as three-element set $\bm{c} = (\bm{c}_1, \bm{c}_2, \bm{c}_3)$ with $\bm{c}_1$ drawn from a categorical distribution with ten categories (equal to the number of classes in MNIST) and event probability $p_i=0.1 \, \forall i \in [0, 10]$.
 $\bm{c}_2$ and $\bm{c}_3$ are drawn from a uniform distribution over $[-1, 1]$.
 
 Figure~\ref{fig:infogan} shows the latent space separability by varying the $\bm{c}_i$-values.
@@ -675,7 +681,8 @@ Finally, \citet{karras2019style} analyze how disentangled generations from $\mat
 They show that the perceptual path length is lower for interpolating in $\mathcal{W}$ than for interpolation in $\mathcal{Z}$~\citep{karras2019style}.
 Therefore, they conclude that $\mathcal{Z}$ is more entangled than $\mathcal{W}$ in their setup.
 
-% TODO: Concluding dings
+Disentanglement in the latent space has important ramifications in the context of semantic representations (see Section~\ref{subsec:semantic-representations}).
+It has to be considered if the interpolation between two points in the latent space requires a curved instead of linear path.
 
 \paragraph{\acl{LVAE}}
 
@@ -824,7 +831,7 @@ Controlling encoding capacity is done by introducing a parameter $C$ to Equation
 \begin{align}
     \mathbb{E}_{q_{\phi}(\mathbf{z} \mid \bm{x})}\left[\log p_{\theta}(\bm{x} \mid \bm{z})\right]-\gamma\left|D_{K L}\left(q_{\phi}(\bm{z} \mid \bm{x}) \| p(\bm{z})\right)-C\right|
 \end{align}
-During training, $C$ gradually increases from zero to a higher value (25 for dsprites with $\gamma=1000$ \citep{burgess2018understanding}).
+During training, $C$ gradually increases from zero to a higher value (25 for dSprites with $\gamma=1000$ \citep{burgess2018understanding}).
 
 \paragraph{\ac{VAE}-\ac{GAN}}
 \ac{VAE}-\acp{GAN}~\citep{larsen2015autoencoding} are a variation of \acp{VAE} specifically designed to replace the pixel-wise reconstruction loss.
@@ -935,13 +942,20 @@ This mitigates the problem of the pixel-wise loss in \acp{VAE} that is assumed t
 \paragraph{Feature Consistency}
 
 One important property of the \ac{VAE} latent space is that it captures image semantics up to a certain degree.
-For a model trained on CelebA\footnote{See Section~\ref{celeba_dataset}.} it is possible to add sunglasses to a randomly generated face by adding the mean latent vector of images containing sunglasses~\citep{radford2016deep,hou2017deep}.
+For a model trained on CelebA\footnote{See Section~\ref{subsubsec:celeba_dataset}.} it is possible to add sunglasses to a randomly generated face by adding the mean latent vector of images containing sunglasses~\citep{larsen2015autoencoding,radford2016deep,hou2017deep}.
 \citet{hou2017deep} train a model particularly tailored to have this property by using the \textit{perceptual loss} (the between hidden layer activations of a feature extraction network).
-% TODO: more could come here
+
+Feature consistency as well as an interpretable latent space qualify \acp{VAE} as models of the visual system.
 
 \subsection{Latent Space Disentanglement}\label{subsec:feature-disentanglement}
 \textit{Latent Space Disentanglement} is a concept not to be confused with \textit{Latent Space Separability} (see Section~\ref{subsec:feature-separability}).
-These two concepts are explained in the following.
+Assume we have a dataset of images.
+Each image consists of a shape (for example \textit{Square}, \textit{Heart}, and \textit{Ellipse}) at different $x$- and $y$-positions.
+Then, \textit{shape}, $x$\textit{-position}, and $y$\textit{-position} are called \say{factors of variation}~\citep{Shu2020Weakly,higgins2018towards}, say $S_1$, $S_2$, and $S_3$ with $S_i\in \mathcal{S}^n$~\citep{Shu2020Weakly}.
+Each image $\bm{x}\in \mathcal{X}^m$ can be generated from the factors of variation by a data-generating process $g: \mathcal{S}\times \mathcal{S}\times \mathcal{S}\mapsto \mathcal{X}^m$.
+
+In the context of \acp{VAE} where the generator maps $\bm{x}$ to a vector $\bm{z}$ in the latent space, a disentangled representation has the following property.
+As one factor of variation (e.g., the shape) is changed, one and only one subspace in the latent space is affected~\citep{higgins2018towards}.
 
 \begin{figure}
     \centering
@@ -958,17 +972,22 @@ These two concepts are explained in the following.
         \caption{Mapping from latent space to feature space}
         \label{fig:feature_space_disentanglement_b}
     \end{subfigure}
-    \caption[Latent Space Entanglement]{The problem of latent space entanglement (taken from \citet{karras2019style})}
+    \caption[Latent Space Entanglement]{Unbalanced regions of probability density as one problem of latent space entanglement (taken from \citet{karras2019style})}
     \label{fig:feature_space_disentanglement}
 \end{figure}
+A stricter definition requires these subspaces to be linear subspaces of the latent space~\citep{higgins2018towards}.
+Furthermore, it is often desired that the sampling from the latent space leads to the same data distribution~\citep{karras2019style}.
 
-A disentangled representation is one
+Latent space disentanglement is supposed to have two properties: \textit{Consistency} and \textit{Restrictiveness}, as defined in \citet{Shu2020Weakly}.
+Consistency means that if only one factor of variation is varied (e.g., the factor that attributes to an object's size) and the others are fixed, generated items only change for this very factor but not to other factors (i.e., only the object's size is changing but not its shape).
+Restrictiveness means that if again, only one factor $i$ of variation is varied, the choice of the other factors should not affect the model's measurement of the $i$th factor.
+For example, if factor $i$ again encodes an object's size, the same value of factor $i$ should always encode the same size, irrespective of the choice if the other factors~\citep{Shu2020Weakly}.
 
 Consider Figure~\ref{fig:feature_space_disentanglement_a} and assume a dataset of males containing only two factors of variation, e.g., age ($x$-axis from older to younger) and voice level ($y$-axis, bottom-up from lower to higher).
 The missing square in the upper left is the combination \say{old and high voice level} that is missing in the dataset.
 Now, consider Figure~\ref{fig:feature_space_disentanglement_b} showing a mapping from a latent space to the feature space.
 The upper left square in Figure~\ref{fig:feature_space_disentanglement_a} is not present in this latent space.
-This leads to \textit{Latent Space Entanglement}: when interpolating in the latent space, there are paths along which the factors of variation change faster than other paths.
+Therefore, there are regions of higher (or lower) probability density in the latent space than in the data space.
 
 Different methods have been proposed to measure the degree of latent space entanglement.
 One approach is to measure the degree by which a generated image changes as the latent space is entangled (\textit{Perceptual Path Length})~\citep{karras2019style}.
@@ -987,16 +1006,7 @@ If the latent space is disentangled, there should be one or multiple almost inva
 \textit{Latent Space Separability} is related to Latent Space Disentanglement, but it is used in a stricter sense in the course of this thesis.
 Whereas Latent Space Disentanglement was mainly motivated by the disentanglement of one latent space, Latent Space Separability is concerned with splitting up the latent space representation of features into multiple levels of latent spaces.
 If successful, Latent Space Separability allows to directly control the factors of variation without the need to find the subspace in one latent space controlling this factor.
+Besides this, latent space separability has the same properties as latent space disentanglement.
+If there are less layers than factors of variation, the latent spaces in one layer also have to be disentangled.
 
-For example, \textit{InfoGAN} (see Section~\ref{subsubsec:representation_learning}) is based on this principle.
-Another example is \ac{VLAE}.
-
-Importantly, Latent Space Separability is supposed to have two properties: \textit{Consistency} and \textit{Restrictiveness}, as defined in \citet{Shu2020Weakly}.
-Consistency means that if only one factor of variation is varied (e.g., the factor that attributes to an object's size) and the others are fixed, generated items only change for this very factor but not to other factors (i.e., only the object's size is changing but not its shape).
-Restrictiveness means that if again, only one factor $i$ of variation is varied, the choice of the other factors should not affect the model's measurement of the $i$th factor.
-For example, if factor $i$ again encodes an object's size, the same value of factor $i$ should always encode the same size, irrespective of the choice if the other factors~\citep{Shu2020Weakly}.
-
-Strictly unsupervised approaches are not guaranteed to have both of the properties.
-Surprisingly, however, most unsupervised approaches for Latent Space Separability empirically show to have these properties to a high degree~\citep{Shu2020Weakly}.
-
-
+For example, \textit{InfoGAN} (see Section~\ref{subsubsec:representation_learning}) and \acp{VLAE} are based on this principle.

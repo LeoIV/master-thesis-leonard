@@ -223,7 +223,7 @@ def main(args: List[str]):
         input_dim = infer_input_dim((224, 224), args)
         model = AlexNet(input_dim=input_dim, log_dir=args.logdir, feature_map_layers=args.feature_map_layers,
                         use_batch_norm=args.use_batch_norm, decay_rate=args.lr_decay,
-                        inner_activation=args.inner_activation,
+                        inner_activation=args.inner_activation, use_dropout=args.use_dropout,
                         kernel_visualization_layer=args.kernel_visualization_layer, num_samples=args.num_samples,
                         use_fc=args.use_fc, feature_map_reduction_factor=args.feature_map_reduction_factor)
     elif args.configuration == 'alexnet_vae':
