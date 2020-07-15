@@ -3,7 +3,7 @@ The following sections, therefore, first introduce the human visual system and, 
 
 \subsection{Visual Cognition}\label{subsec:human-brain-structure}
 
-The visual system allows humans and other high developed mammals to make sense of visual stimuli.
+The visual system allows humans and other developed animals to make sense of visual stimuli.
 The following sections describe how the visual system's hierarchical structure enables the perception of gradually increasing complex visual features.
 
 \subsubsection{Cells}
@@ -16,18 +16,17 @@ In contrast, glial cells surround neurons and play a supportive role but are not
 
 Neurons take different forms in different brain regions.
 However, regardless of their specific configuration, they have four defined regions~\citep[p. 22]{mack2013principles}.
-
 The (1) cell body (\textit{soma}) performs metabolism and contains genetic cell information.
 (2) \textit{Dendrites} are attached to the cell body.
 By branching out, they receive signals from other neurons.
 Through their (3) \textit{presynaptic terminals}, (4) \textit{axons} transmit signals, the \textit{action potentials}, to other cells~\citep[pp. 22, 23]{mack2013principles}.
 
-
+\setcounter{figure}{1}
 \begin{wrapfigure}[28]{R}{0.3\textwidth}
     \begin{center}
         \includegraphics[width=0.28\textwidth]{images/neuron.jpeg}
     \end{center}
-    \caption[Neuron structure]{The morphological structure of a neuron, taken from \citet[p. 22]{mack2013principles}}
+    \caption[Neuron structure]{The morphological structure of a neuron, taken from \citet[p. 22]{mack2013principles} (revised)}
     \label{fig:neuron_structure}
 \end{wrapfigure}
 
@@ -48,7 +47,7 @@ The hypothalamus plays a vital role in controlling body functions such as eating
 
 The \textit{cerebral hemispheres}~\citep[p. 341]{mack2013principles} is the brain region the most relevant for vision.
 It can be further subdivided into the \textit{cerebral cortex}, \textit{white matter}, \textit{basal ganglia}, \textit{amygdala}, and \textit{hippocampus}~\citep[p. 341]{mack2013principles}.
-The latter three are \say{concerned with the expression of emotion [amygdala], [\ldots] memory formation [hippocampus], and [\ldots] control of movement and aspects of motor learning [basal ganglia]}~\citep[p. 342]{mack2013principles}.
+The latter three are \say{concerned with the expression of emotion (amygdala), [\ldots] memory formation (hippocampus), and \ldots control of movement and aspects of motor learning (basal ganglia)}~\citep[p. 342]{mack2013principles}.
 Underlaid by the \textit{white matter}, the neocortex is the brain region that enables cognition~\citep[pp. 341, 392]{mack2013principles}.
 It is the region of the cerebral cortex closest to the brain surface~\citep[p. 345]{mack2013principles}.
 
@@ -59,12 +58,14 @@ For example, Layer I mainly contains dendrites of cells in deeper layers, wherea
 
 Furthermore, the neocortex is structured \textit{topographically}, i.e., cells within a sensory area (e.g., the skin or retina) map onto the neocortex such that neighboring cells in the sensory area ultimately map onto neighboring regions in the neocortex~\citep[p. 343]{mack2013principles}.
 
+\setcounter{figure}{0}
 \begin{figure}
     \centering
     \includegraphics[width=.4\textwidth]{images/brain_regions.jpeg}
     \caption[Divisions of the human brain]{Five divisions of the human brain in the \ac{CNS}, the cerebral cortex as part of the cerebral hemispheres, and the spinal cord. Taken from \citet[p. 340]{mack2013principles}.}
     \label{fig:human_brain_divisions}
 \end{figure}
+\setcounter{figure}{2}
 
 \subsubsection{Visual Cortex}\label{subsubsec:visual-cortex}
 
@@ -143,7 +144,15 @@ The overlap of responsive neurons for different images is quite small.
 Between 4.8\% and 6.0\% of neurons overlap for different natural images.
 The brain uses sparseness to represent information~(\citep{yoshida2020natural},~\citep[pp. 356, ff.]{trappenberg2010fundamentals}).
 
-% TODO: More could come here
+Sparse representations (or sparse codes) are a trade-off between \textit{local} and \textit{dense} codes~\citep{foldiak2003sparse}.
+Assume a region in the brain has $N$ neurons that can either be \textit{on} or \textit{off}, depending on the input.
+For a local code, one and only one neuron is active for a particular input.
+This coding scheme allows to encode only $N$ distinct inputs but representations of different inputs can be superposed.
+Dense codes, in contrast, activate about one half of the neurons for an input.
+One example is binary coding that can encode $2^N$ different inputs.
+However, dense codes do not allow to superpose representations of different inputs~\citep{foldiak2003sparse}.
+
+Sparse codes combine advantages of dense and local codes while avoiding their drawbacks~\citep{foldiak2003sparse}.
 
 \subsection{Types of Learning}\label{subsec:types-of-learning}
 
@@ -158,13 +167,6 @@ Here, one is interested in predicting what is present in an image or a sequence 
 However, it is not always the case that a pre-defined and discrete set of samples and labels exist.
 In \textit{active learning}, the learning algorithm has no beforehand-dataset but has to query labels for self-chosen data points in the sample space.
 In this setting, the learning algorithm chooses itself what samples to use for learning.
-% Active learning often is used in the context of \textit{hyperparameter optimization}.
-% Most learning algorithms have a set of parameters that are not learned by the algorithm itself, but are set by the user, e.g. the learning rate or the number of neurons in one layer.
-% Hyperparameter optimization aims at finding the best combination of these parameters in terms of learning algorithm performance.
-% For a classifier, the performance can be expressed as the accuracy, i.e. the fraction of correct predictions.
-% In this context, one datapoint is a specific hyperparameter combination and the corresponding label is the accuracy of the classifier trained with these hyperparameters.
-% Since the space of possible datapoints is large, possibly infinitely large for continuous values such as the learning rate, and one function evaluation is computationally expensive, it is usually not possibly to simply visit all datapoints.
-% Besides others, Bayesian Optimization~\citep{mockus1978application} is one technique to approach this problem.
 
 In the example of a classifier distinguishing cats and dogs, the dataset of samples and labels is available beforehand.
 In such settings, the learning algorithm learns the mapping function and does not update it once the learning is finished.
@@ -180,32 +182,33 @@ However, algorithms employing this approach usually use classical supervised lea
 Another example of self-supervised learning is word embeddings~\citep{mikolov2013efficient}.
 
 \paragraph{Unsupervised Learning}
-\begin{wrapfigure}[16]{R}{0.5\textwidth}
+\begin{wrapfigure}[15]{R}{0.5\textwidth}
     \centering
-    \includegraphics[width=.48\textwidth]{images/latent_spaces/mnist/vae/embeddings_mu_6.png}
-    \caption[Clusters of data points]{Data points colored by their corresponding class building clusters.}
+    \includegraphics[width=.48\textwidth]{images/clustering_example.png}
+    \caption[Clusters of data points]{Data points colored by their cluster correspondence.}
     \label{fig:clustering_example}
 \end{wrapfigure}
 Like in self-supervised learning, unsupervised learning works with unlabeled data, i.e.,~the dataset only consists of samples $\bm{x}_i$.
 A typical example of unsupervised learning is clustering, an approach that can be used if the data points can be compared in terms of a distance measure.
 Consider Figure~\ref{fig:clustering_example}.
-Each data point belongs to one class, visualized by the color of the point.
+A clustering algorithm assigns the points labels as indicated by the color.
 
 Cluster algorithms are often employed in cases where the class identity of data points is unknown, i.e., they aim to find the labeling function by identifying clusters of data points.
 Figure~\ref{fig:clustering_example} shows an example where this can be feasible because adjacent data points tend to have the same class.
 
 \paragraph{Reinforcement Learning}
 Reinforcement learning is a very different paradigm compared to supervised and unsupervised learning.
-Here, the aim is to train an \textit{agent} to show some meaningful behavior.
+Here, the aim is to train an \textit{agent} to show achieve a goal.
 
 An example is rats in a maze.
 A piece of cheese is located in one corner of the maze.
-The rat has multiple possible actions, going forward, backward, left, or right.
-In this setting, the rat is the agent.
-Its reward is cheese, and the rat will maximize its reward.
-By reinforcing good sequences of actions, the rat eventually shows a reasonable behavior.
+The different positions in the maze are the possible \textit{states}, the set of all states is the \textit{state space}.
+The rat has multiple possible actions, going forward, backward, left, or right, the set of all actions is the \textit{action space}.
+In this setting, the rat is the agent, trying to maximize its reward.
+It is rewarded for each action in a state (the reward can also be zero).
+By rewarding good sequences of actions, the rat eventually shows a reasonable behavior.
 
-Reinforcement learning algorithms resemble such settings by modeling environment, action space, and reward~\citep[pp. 1, ff.]{sutton2018reinforcement}.
+Reinforcement learning algorithms resemble such settings by modeling state space, action space, rewards, and reward function~\citep[pp. 1, ff.]{sutton2018reinforcement}.
 
 \subsection{Semantic Representations}\label{subsec:semantic-representations}
 
@@ -256,7 +259,7 @@ The following section discusses established models of the visual system.
 
 \citet{hubel1962receptive} distinguish two main types of cells in the \ac{V1}: simple and complex cells.
 Both cell types are orientation sensitive, i.e.,~different cells are tuned towards different orientations of stripes in a stimulus.
-Other than simple cells, complex cells are more invariant towards the stripe's location (but not its orientation) in the receptive field.
+Unlike simple cells, complex cells are more invariant towards the stripe's location (but not its orientation) in the receptive field.
 Complex cells are assumed to receive input from simple cells~\citep{hubel1962receptive}.
 Based on this assumption, complex cells can be modeled by receiving input from many simple cells, tuned towards a specific orientation but not location.
 If any of the afferent simple cells fire, the complex cells fires, leading to a translation-invariant behavior~\citep{hubel1962receptive}.
@@ -298,7 +301,7 @@ Equation~\ref{eq:conv} holds if indexing starts at zero for the image and at min
 
 The output of a convolution is maximum in image areas where the image contains a flipped version of the kernel.
 % The sums in Equation~\ref{eq:conv_boiled_down} go from low to high indices for the image but from high to low indices for the kernel.
-Other than the cross-correlation\footnote{The cross-correlation is defined as $S(i, j)=(I * K)(i, j)=\sum_{m=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} I(i+m, j+n) K(m, n)$~\citep[p. 329]{Goodfellow-et-al-2016}.}, the convolution is commutative.
+Unlike the cross-correlation\footnote{The cross-correlation is defined as $S(i, j)=(I * K)(i, j)=\sum_{m=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} I(i+m, j+n) K(m, n)$~\citep[p. 329]{Goodfellow-et-al-2016}.}, the convolution is commutative.
 However, this property is not relevant in practice, and \say{many neural network libraries implement [...] the cross-correlation [instead]}~\citep[p. 329]{Goodfellow-et-al-2016}.
 % TODO: Umschreiben, den Satz vorher
 

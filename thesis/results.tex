@@ -322,7 +322,7 @@ Figure~\ref{fig:7500_5000_vae_latent_space_distribution_scales_and_shapes} shows
 The histograms look more Gaussian, and the \ac{KL-divergence} on the validation set decreased from 22.744 (reconstruction loss weight: 10,000) to 22.271 (reconstruction loss weight: 7,500) or, respectively, 18.172 (reconstruction loss weight: 5,000).
 Surprisingly, the difference between 10,000-\ac{VAE} and 7,500-\ac{VAE} is small on the validation data.
 
-To account for latent space disentanglement, the \ac{PPL} for the latent spaces of the different models is computed.
+To account for latent space disentanglement, the \ac{PPL}\footnote{See Section~\ref{subsec:feature-disentanglement}.} for the latent spaces of the different models is computed.
 The perceptual loss is obtained by a \ac{CNN}, trained to predict dSprites object categories\footnote{The model architecture can be found in Appendix~\ref{sec:appendix_feature_extraction_network_ppl_dsprites}, the features are extracted in \say{conv2d\_94}. The model was trained for one epoch using categorical crossentropy with the Adam optimizer with an initial learning rate of 0.1. The model achieved a top-1 accuracy of 0.8 on the validation set.}.
 The \ac{PPL} was computed for 50 different random seeds.
 Each of these \ac{PPL}-computations interpolated at 100 random steps (dependent on the random seed).
@@ -560,11 +560,10 @@ Furthermore, the models learn factors of variation that are not present in the l
 \paragraph{dSprites}
 
 The latent space embeddings for the dSprites dataset allow a more profound comparison of \ac{VAE} and \ac{VLAE}.
-Here, the dSprites-\ac{VAE} model (see Section~\ref{subsubsec:vae_models}) was given a six-dimensional embedding space, whereas the dSprites-\ac{VLAE} (see Section~\ref{subsubsec:vlae_models}) model has three two-dimensional embedding spaces.
-The dimensionality of the \ac{VAE} model was increased as the dSprites dataset was assumed to be more diverse than \textsc{Mnist}, requiring more model capacity to encode the information.
-Importantly, \ac{VAE} and \ac{VLAE} approximately have the same model capacity under the assumption that \ac{VLAE} uses lower embedding layers to learn lower-level features and higher embedding layers to only learn higher-level features and that the dataset can be split in this way.
-
-As the \ac{VAE} model employs a higher dimensional latent space, the embeddings are visualized using \ac{t-SNE} embeddings (see Figure~\ref{fig:vae_latent_space_dsprites}).
+Here, the dSprites-\ac{VAE}-dim6 model (see Section~\ref{subsubsec:vae_models}) was given a six-dimensional embedding space, whereas the dSprites-\ac{VLAE}-dim2 (see Section~\ref{subsubsec:vlae_models}) model has three two-dimensional embedding spaces.
+The \ac{VAE} and \ac{VLAE} approximately have the same model capacity under the assumption that \ac{VLAE} uses lower embedding layers to learn lower-level features and higher embedding layers to only learn higher-level features and that the dataset can be split in this way.
+The \ac{VLAE} latent spaces were chosen two-dimensional to allow for a direct visualization of the latent space without dimensionality reduction.
+As the \ac{VAE} model employs a higher-dimensional latent space, the embeddings are visualized using \ac{t-SNE} embeddings (see Figure~\ref{fig:vae_latent_space_dsprites}).
 
 One advantage of dSprites over \textsc{Mnist} is that all factors of variation by design are independent and represented equally often, allowing a more straightforward analysis.
 
@@ -652,11 +651,14 @@ Especially the object scale seems to be a lower-level feature (see Figure~\ref{s
 Only object-orientation does not seem to be learned at all (see Figure~\ref{subfig:vae_embedding_dsprites_orientation}).
 
 \ac{VLAE} performance on dsprites (see Figure~\ref{fig:vlae_latent_space_dsprites}) is worse compared to \ac{VAE}.
-Again, the model learns main clusters, especially for object position (see Figures~\ref{subfig:vlae_embedding_z3_dsprites_x_pos} and \ref{subfig:vlae_embedding_z3_dsprites_y_pos}).
+Again, the model learns main clusters, especially for object position (see Figures~\ref{subfig:vlae_embedding_z3_dsprites_x_pos} and~\ref{subfig:vlae_embedding_z3_dsprites_y_pos}).
 Furthermore, the model learns the object scale (see Figure~\ref{subfig:vlae_embedding_z3_dsprites_scale} and \ref{subfig:vlae_embedding_z2_dsprites_scale}).
 Otherwise, the model does not seem to learn other factors of variation.
 Furthermore, the representations are not particularly disentangled.
 Object position and scale are learned in all layers, but best in $z_3$.
+
+After training 200 epochs, the \ac{VAE} achieved a loss of 21.638 (reconstruction loss: 6.375, \ac{KL}-loss: 15.264).
+In contrast, the \ac{VLAE} achieved a loss of 47.860 (reconstruction loss: 32.813, \ac{KL}-loss: 15.047).
 
 All in all, using a \ac{VAE} with a higher-dimensional space seems superior to the \ac{VLAE} in terms of encoding efficiency.
 
@@ -665,7 +667,7 @@ All in all, using a \ac{VAE} with a higher-dimensional space seems superior to t
 \subparagraph{\textsc{Mnist}}
 
 A latent space traversal is one way to see if and how a model learns a general representation of the dataset.
-Figure~\ref{fig:mnist_latent_space_traversal} shows the latent space traversal of \textsc{Mnist}-\ac{VAE}\footnote{See Section~\ref{subsubsec:vae_models}.}, \textsc{Mnist}-\ac{VAE}-\ac{GAN}\footnote{See Section~\ref{subsubsec:vae_gan_models}.}, \textsc{Mnist}-\ac{VLAE}\footnote{See Section~\ref{subsubsec:vlae_models}.}, and \textsc{Mnist}-\ac{VLAE}-\ac{GAN}\footnote{See Section~\ref{subsubsec:vlae_gan_models}.}.
+Figures~\ref{fig:mnist_latent_space_traversal_vae} and \ref{fig:mnist_latent_space_traversal_vlae} show the latent space traversal of \textsc{Mnist}-\ac{VAE}\footnote{See Section~\ref{subsubsec:vae_models}.}, \textsc{Mnist}-\ac{VAE}-\ac{GAN}\footnote{See Section~\ref{subsubsec:vae_gan_models}.}, \textsc{Mnist}-\ac{VLAE}\footnote{See Section~\ref{subsubsec:vlae_models}.}, and \textsc{Mnist}-\ac{VLAE}-\ac{GAN}\footnote{See Section~\ref{subsubsec:vlae_gan_models}.}.
 For the models with only one latent layer (\textsc{Mnist}-\ac{VAE} and \textsc{Mnist}-\ac{VAE}-\ac{GAN}), the plot is generated by traversing the latent space in equal steps from $z_i = -3$ to $z_i = 3$ in both dimensions.
 For the hierarchical models (\textsc{Mnist}-\ac{VLAE} and \textsc{Mnist}-\ac{VLAE}-\ac{GAN}), one $z$-layer was fixed and traversed in the same way.
 The values of the other $z$-layers were obtained by sampling from a uniform distribution over $[-3; 3]$.
@@ -690,9 +692,10 @@ Unrepresentative generations in such areas, therefore, is no model failure.
         \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_gan_mnist.png}
         \caption{\ac{VAE}-\ac{GAN} latent space traversal from $z_i=-3$ to $z_i=3$ in both $z$ dimensions}
     \end{subfigure}
+    \caption[\ac{VAE} Models on \textsc{Mnist} - Latent Space Traversal]{Latent space traversal for \ac{VAE} models on \textsc{Mnist}. The original images have been inverted for the purpose of this figure.}
+    \label{fig:mnist_latent_space_traversal_vae}
 \end{figure}
 \begin{figure}
-    \ContinuedFloat
     \centering
     \begin{subfigure}{\textwidth}
         \centering
@@ -708,8 +711,8 @@ Unrepresentative generations in such areas, therefore, is no model failure.
         \caption{\ac{VLAE}-\ac{GAN} latent space traversal from $z_i=-3$ to $z_i=3$ in both dimensions for the respective $z$-dimension. The other $z$ dimensions are sampled uniformly over $[-3; 3]$}
         \label{subfig:vlae_gan_mnist_latent_space_traversal}
     \end{subfigure}
-    \caption[Models on \textsc{Mnist} - Latent Space Traversal]{Latent space traversal for different models on \textsc{Mnist}. The original images have been inverted for the purpose of this figure.}
-    \label{fig:mnist_latent_space_traversal}
+    \caption[\ac{VLAE} Models on \textsc{Mnist} - Latent Space Traversal]{Latent space traversal for \ac{VLAE} models on \textsc{Mnist}. The original images have been inverted for the purpose of this figure.}
+    \label{fig:mnist_latent_space_traversal_vlae}
 \end{figure}
 
 \begin{figure}
@@ -796,11 +799,11 @@ However, this does not seem to be the case, and the \ac{VLAE} uses the latent sp
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/latent_space_traversals/vlae_gan_celeba.png}
-    \caption[\ac{VLAE}-\ac{GAN} on CelebA: Latent Space Traversal]{Latent space traversal of \ac{VLAE}-\ac{GAN} with $z_{dim_i}=2$ on CelebA.}
+    \caption[\ac{VLAE}-\ac{GAN} on CelebA: Latent Space Exploration]{Latent space exploration of \ac{VLAE}-\ac{GAN} with $z_{dim_i}=2$ on CelebA.}
     \label{fig:celeba_latent_space_traversal}
 \end{figure}
 
-Figure~\ref{fig:celeba_latent_space_traversal} shows the latent space traversal of CelebA-\ac{VLAE}-\ac{GAN} model\footnote{See Section~\ref{subsubsec:vlae_gan_models}.} with input size $128\times 128$ on the CelebA dataset.
+Figure~\ref{fig:celeba_latent_space_traversal} shows the latent space exploration of CelebA-\ac{VLAE}-\ac{GAN} model\footnote{See Section~\ref{subsubsec:vlae_gan_models}.} with input size $128\times 128$ on the CelebA dataset.
 The model was generated by evenly interpolating in $[-3; 3]$ in the respective layer and by sampling from a uniform distribution over $[-3; 3]$ for the other layers.
 Similar to \textsc{Mnist}, the model learns different factors of variation on different layers.
 The first layer mainly learns skin color, layer two hair color, and layer three pose and background color.
@@ -856,8 +859,7 @@ A transition between different shapes, however, is possible.
 
 % TODO: Add links to models
 
-Figure~\ref{fig:vae_dsprites_rotation_vae_10000} shows the latent space traversal between different rotation values of a 10,000-\ac{VAE} on the dsprites dataset (the plots for the other models can be found in Appendix~\ref{sec:appendix_plots_latent_space_traversals}).
-The models are the same as in Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation}.
+Figure~\ref{fig:vae_dsprites_rotation_vae_10000} shows the latent space exploration between different rotation values of 10,000-\ac{VAE}\footnote{\say{dSprites-\ac{VAE}}, see Section~\ref{subsubsec:vae_models}} with a reconstruction term weight of 10,000 on the dsprites dataset (the plots for the other models can be found in Appendix~\ref{sec:appendix_plots_latent_space_traversals}).
 The 10,000-\ac{VAE} learns a transition between different rotation values.
 This also holds for the other models (7,500-, 6,250-, 5000-, 3750-\ac{VAE}, see Appendix~\ref{sec:appendix_plots_latent_space_traversals}).
 
@@ -947,7 +949,7 @@ Here, a linear interpolation is misleading because a highly curved interpolation
 This difference in handling positional and non-positional attributes could be related to the two-stream hypothesis where such attributes are also treated differently (see Section~\ref{subsubsec:visual-cortex}).
 In any case it has to be considered in the work with \acp{VAE}.
 
-For the \acp{VLAE} model, a similar analysis allows us to identify which layers encode which factor of variation\footnote{The plots for the corresponding \ac{VLAE}-\ac{GAN} model can be found in Appendix~\ref{sec:appendix_plots_latent_space_traversals}.}.
+For the dSprites-\acp{VLAE} model, a similar analysis allows us to identify which layers encode which factor of variation\footnote{The plots for the corresponding dSprites-\ac{VLAE}-\ac{GAN} model can be found in Appendix~\ref{sec:appendix_plots_latent_space_traversals}.}.
 \begin{figure}
     \centering
     \begin{subfigure}{.48\textwidth}
@@ -987,24 +989,24 @@ For the \acp{VLAE} model, a similar analysis allows us to identify which layers 
     \caption[\ac{VLAE} on dsprites: Latent Space Values]{Values of different dimensions and layers in the \ac{VLAE} latent space for different factor of variation values (first row in each subplot), and position in a \ac{PCA}-reduced latent space (second row in each subplot). The model was trained on dsprites. The left column corresponds to the first embedding layer, the right one to the third. \ac{PCA} was performed separately for each factor of variation and latent space layer. Different values correspond to different values for the respective factor of variation. For orientation and scale, the position is fixed to 0.0 in both directions, shape is fixed to \textit{Square}. For $x$-and $y$-postition, the other position is fixed to 1.0 and shape is fixed to \textit{Square}.}
     \label{fig:vlae_dsprites_latent_space_values}
 \end{figure}
-Figure~\ref{fig:vlae_dsprites_latent_space_values} shows the $\bm{z}$ values of different layers and dimensions for different factors of variation of a \ac{VLAE}.
+Figure~\ref{fig:vlae_dsprites_latent_space_values} shows the $\bm{z}$ values of different layers and dimensions for different factors of variation of dSprites-\ac{VLAE}.
 The third layer seems to encode most of the factors of variation: $x$-, and $y$-position, scale, and shape.
 However, the first and second layers also encode orientation (Figures~\ref{subfig:vlae_dsprites_latent_space_values_x} and ~\ref{subfig:vlae_dsprites_latent_space_values_y}) even though less strong.
 The representation, therefore, is not separated;
 The different layers do not independently encode different factors of variation even though these are, by definition, independent in the dsprites dataset.
 Independence, in the case of \textsc{Mnist}, is further discussed in Section~\ref{subsec:independence-of-vlae-embeddings}.
 
-The first and second layers jointly learn orientation, similarly to the \ac{VAE}.
+The first and second layers jointly learn orientation, similarly to the dSprites-\ac{VAE}.
 The scale, and the $x$- and $y$-positions are mainly learned in the third layer.
-Again, the latent space traversal for the $x$- and $y$-positions show a curved path, even though less circular compared to the \ac{VAE}.
+Again, the latent space trajectories for the $x$- and $y$-positions show a curved path, even though less circular compared to dSprites-\ac{VAE}.
 Importantly, the \ac{VLAE} has three four-dimensional latent spaces.
-However, the reconstructions are worse compared to the ten-dimensional-latent-space \ac{VAE}.
-\acp{VLAE}, therefore, do not seem to use the hierarchical latent spaces efficiently under all circumstances.
+However, the reconstructions are worse compared to the ten-dimensional-latent-space dSprites-\ac{VAE}.
+dSprites-\acp{VLAE}, therefore, do not seem to use the hierarchical latent spaces efficiently under all circumstances.
 
-Qualitatively, \ac{VAE}-\ac{GAN} and \ac{VLAE}-\ac{GAN} behave similarly for the considerations in this section.
+Qualitatively, dSprites-\ac{VAE}-\ac{GAN} and dSprites-\ac{VLAE}-\ac{GAN} behave similarly for the considerations in this section.
 They, therefore, are not discussed.
 
-By analyzing the latent space traversals of different models (\ac{VAE} and \ac{VLAE} models) on different datasets (dsprites and \textsc{Mnist} with Morpho-\textsc{Mnist}), it has been shown that \ac{VAE}- and \ac{VLAE}-models partially learn curved latent space trajectories for ordered latent space attributes (Figures~\ref{fig:vlae_mnist_morpho_latent_space_values},~\ref{fig:vae_dsprites_latent_space_x_position}, and~\ref{fig:vlae_dsprites_latent_space_values}).
+By analyzing the latent spaces of different models (\ac{VAE} and \ac{VLAE} models) on different datasets (dsprites and \textsc{Mnist} with Morpho-\textsc{Mnist}), it has been shown that \ac{VAE}- and \ac{VLAE}-models partially learn curved latent space trajectories for ordered latent space attributes (Figures~\ref{fig:vlae_mnist_morpho_latent_space_values},~\ref{fig:vae_dsprites_latent_space_x_position}, and~\ref{fig:vlae_dsprites_latent_space_values}).
 It has empirically been validated that a simple linear interpolation between different orientation values in the latent space of a \ac{VAE} trained on dsprites does not capture the learned \say{orientation-trajectory}.
 The latent space is highly entangled for positional attributes, even if the reconstruction term is extremely low (see Appendix~\ref{sec:appendix_plots_latent_space_traversals}).
 Therefore, it is argued that linear interpolations sometimes do not capture the learned trajectory.
@@ -1060,7 +1062,7 @@ Therefore, it is not apparent how disentangled the representations are.
 \end{breakablealgorithm}
 
 Consider Algorithm~\ref{alg:layer_representative_samples}.
-The function \textsc{VLAE-Decoder} calls the decoder of the VLAE, i.e., $p_\theta(\bm{x} | \bm{z}_1, \bm{z}_2, \bm{z}_3)$.
+The function \textsc{VLAE-Decoder} calls the decoder of the \ac{VLAE}, i.e., $p_\theta(\bm{x} | \bm{z}_1, \bm{z}_2, \bm{z}_3)$.
 Calling the function \textsc{LayerRepresentativeSamples} returns an ordered set $\mathcal{L}$ of \say{layer representative samples.}
 Each sample $i$ contains three items, say $\bm{x}_1^i, \bm{x}_2^i, \bm{x}_3^i$ that were created by fixing a value $\bm{v}$ in Line~\ref{line:fixing_v} of Algorithm \ref{alg:layer_representative_samples}.
 What is meant by the term \say{layer representative samples} is that for example $\bm{x}_1^i$ is approximately drawn from the marginal distribution
@@ -1079,7 +1081,7 @@ Choosing a value $\bm{z}_1 = \varphi$ such that $p_\theta(\bm{x} | \bm{z}_1 = \v
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/notprop/mnist/vlae/ccs_0_1_vlae.png}
-    \caption[\ac{VLAE} on \textsc{Mnist} - Pixel intensity correlation]{Correlation of pixel intensities when fixing $\bm{z}_1 = \bm{z}_2=\varphi$ for \ac{VLAE} trained on \textsc{Mnist}. Each box represents one of $28\times 28$ \textsc{Mnist} pixels. The $x$-axis of each box encodes the mean pixel intensity of the $\bm{z}_1$-representative sample. The $y$-axis encodes the mean pixel intensity of the of the $\bm{z}_2$-representative sample. Dots within boxes belong to the same $\varphi$ for both, $\bm{z}_1$ and $\bm{z}_2$. }
+    \caption[\textsc{Mnist}-\ac{VLAE} - Pixel intensity correlation]{Correlation of pixel intensities when fixing $\bm{z}_1 = \bm{z}_2=\varphi$ for \textsc{Mnist}-\ac{VLAE}. Each box represents one of $28\times 28$ \textsc{Mnist} pixels. The $x$-axis of each box encodes the mean pixel intensity of the $\bm{z}_1$-representative sample. The $y$-axis encodes the mean pixel intensity of the of the $\bm{z}_2$-representative sample. Dots within boxes belong to the same $\varphi$ for both, $\bm{z}_1$ and $\bm{z}_2$. }
     \label{fig:notprop}
 \end{figure}
 
@@ -1087,33 +1089,33 @@ Choosing a value $\bm{z}_1 = \varphi$ such that $p_\theta(\bm{x} | \bm{z}_1 = \v
     \centering
     \begin{subfigure}{.3\textwidth}
         \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae/dim_1_2.png}
-        \caption{\ac{VLAE} - Layer 1 vs. Layer 2}
+        \caption{\textsc{Mnist}-\ac{VLAE} - Layer 1 vs. Layer 2}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.3\textwidth}
         \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae/dim_1_3.png}
-        \caption{\ac{VLAE} - Layer 1 vs. Layer 3}
+        \caption{\textsc{Mnist}-\ac{VLAE} - Layer 1 vs. Layer 3}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.3\textwidth}
         \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae/dim_2_3.png}
-        \caption{\ac{VLAE} - Layer 2 vs. Layer 3}
+        \caption{\textsc{Mnist}-\ac{VLAE} - Layer 2 vs. Layer 3}
     \end{subfigure}
     \begin{subfigure}{.3\textwidth}
         \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae_gan/dim_1_2.png}
-        \caption{\ac{VLAE}-\ac{GAN} - Layer 1 vs. Layer 2}
+        \caption{\textsc{Mnist}-\ac{VLAE}-\ac{GAN} - Layer 1 vs. Layer 2}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.3\textwidth}
         \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae_gan/dim_1_3.png}
-        \caption{\ac{VLAE}-\ac{GAN} - Layer 1 vs. Layer 3}
+        \caption{\textsc{Mnist}-\ac{VLAE}-\ac{GAN} - Layer 1 vs. Layer 3}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.3\textwidth}
         \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae_gan/dim_2_3.png}
-        \caption{\ac{VLAE}-\ac{GAN} - Layer 2 vs. Layer 3}
+        \caption{\textsc{Mnist}-\ac{VLAE}-\ac{GAN} - Layer 2 vs. Layer 3}
     \end{subfigure}
-    \caption[\ac{VLAE} and \ac{VLAE}-\ac{GAN} on \textsc{Mnist} - Pixel intensity correlation]{Histogram of correlations of pixel-wise intensities when fixing different pairs of dimensions for \ac{VLAE} and \ac{VLAE}-\ac{GAN} trained on \textsc{Mnist}.
+    \caption[\textsc{Mnist}-\ac{VLAE} and \textsc{Mnist}-\ac{VLAE}-\ac{GAN} - Pixel intensity correlation]{Histogram of correlations of pixel-wise intensities when fixing different pairs of dimensions for \textsc{Mnist}-\ac{VLAE} and \textsc{Mnist}-\ac{VLAE}-\ac{GAN}.
     Each value in the histogram is the Pearson correlation coefficient for one pixel of a generated dsprites image (compare Figure~\ref{fig:notprop} showing the correlations in the case of \textsc{Mnist}).
     The histogram is colored by if the correlation is significant ($H_0$: The absolute correlation is equal to the absolute correlation of samples with zero correlation) at a 95\% confidence level.
     The $p$-values have be corrected by the Benjamini/Hochberg method.}
@@ -1162,33 +1164,33 @@ Therefore, it is assumed that the discriminative loss leads to more independent 
     \centering
     \begin{subfigure}{.3\textwidth}
         \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae/dim_1_2.png}
-        \caption{\ac{VLAE} - Layer 1 vs. Layer 2}
+        \caption{dSprites-\ac{VLAE} - Layer 1 vs. Layer 2}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.3\textwidth}
         \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae/dim_1_3.png}
-        \caption{\ac{VLAE} - Layer 1 vs. Layer 3}
+        \caption{dSprites-\ac{VLAE} - Layer 1 vs. Layer 3}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.3\textwidth}
         \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae/dim_2_3.png}
-        \caption{\ac{VLAE} - Layer 2 vs. Layer 3}
+        \caption{dSprites-\ac{VLAE} - Layer 2 vs. Layer 3}
     \end{subfigure}
     \begin{subfigure}{.3\textwidth}
         \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae_gan/dim_1_2.png}
-        \caption{\ac{VLAE}-\ac{GAN} - Layer 1 vs. Layer 2}
+        \caption{dSprites-\ac{VLAE}-\ac{GAN} - Layer 1 vs. Layer 2}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.3\textwidth}
         \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae_gan/dim_1_3.png}
-        \caption{\ac{VLAE}-\ac{GAN} - Layer 1 vs. Layer 3}
+        \caption{dSprites-\ac{VLAE}-\ac{GAN} - Layer 1 vs. Layer 3}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.3\textwidth}
         \includegraphics[width=\textwidth]{images/notprop/dsprites/vlae_gan/dim_2_3.png}
-        \caption{\ac{VLAE}-\ac{GAN} - Layer 2 vs. Layer 3}
+        \caption{dSprites-\ac{VLAE}-\ac{GAN} - Layer 2 vs. Layer 3}
     \end{subfigure}
-    \caption[\ac{VLAE} and \ac{VLAE}-\ac{GAN} on dsprites - Pixel intensity correlation]{Histogram of correlations of pixel-wise intensities when fixing different pairs of dimensions for \ac{VLAE} and \ac{VLAE}-\ac{GAN} trained on dsprites.
+    \caption[dSprites-\ac{VLAE} and dSprites-\ac{VLAE}-\ac{GAN} - Pixel intensity correlation]{Histogram of correlations of pixel-wise intensities when fixing different pairs of dimensions for dSprites-\ac{VLAE} and dSprites-\ac{VLAE}-\ac{GAN}.
     Each value in the histogram is the Pearson correlation coefficient for one pixel of a generated dsprites image (compare Figure~\ref{fig:notprop} showing the correlations in the case of \textsc{Mnist}).
     The histogram is colored by if the correlation is significant ($H_0$: The absolute correlation is equal to the absolute correlation of samples with zero correlation) at a 95\% confidence level.
     The $p$-values have be corrected by the Benjamini/Hochberg method.}
@@ -1214,7 +1216,7 @@ Different statistical analyses were performed to address this question, revealin
 \begin{figure}
     \centering
     \includegraphics[width=.8\textwidth]{images/generated_vs_true/mnist/vlae_gan_kde.png}
-    \caption[\ac{VLAE}-GAN - Latent Space Distribution]{Histogram of mean $z$-values for different layers and dimensions of \ac{VLAE}-\ac{GAN} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange). Additional plots can be found in Appendix~\ref{sec:appendix_pixel_wise_statistics}.}
+    \caption[\textsc{Mnist}-\ac{VLAE}-GAN - Latent Space Distribution]{Histogram of mean $z$-values for different layers and dimensions of \textsc{Mnist}-\ac{VLAE}-\ac{GAN} (blue), the result of the \ac{KDE} (green), and a standard normal distribution (orange). Additional plots can be found in Appendix~\ref{sec:appendix_pixel_wise_statistics}.}
     \label{fig:vlae_gan_kde}
 \end{figure}
 
@@ -1289,20 +1291,20 @@ The following procedure was applied to generate samples for different models.
 One part of the \ac{VAE} loss function (and of the other models) is the \ac{KL}-term, forcing the models to match a standard multivariate normal distribution.
 The learned distribution, however, is not perfectly Gaussian because of the other loss function terms.
 Therefore, the model's encoders first predicted the mean values in $z$-space for the 10,000 validation images of the \textsc{Mnist} dataset.
-Subsequently, for each dimension, \ac{KDE} was performed to estimate the \ac{PDF} of the latent space for \ac{VAE} and \ac{VAE}-\ac{GAN}.
+Subsequently, for each dimension, \ac{KDE} was performed to estimate the \ac{PDF} of the latent space for \textsc{Mnist}-\ac{VAE} and \textsc{Mnist}-\ac{VAE}-\ac{GAN}.
 Since the learned distribution, by definition, is covariance-free, the \ac{KDE} was performed for each dimension separately.
 The estimated \ac{PDF} was then used to generate 1,000 new images to perform the statistical analyses.
-Figure~\ref{fig:vae_gan_kde} shows the estimated \ac{KDE} for \ac{VAE}-\ac{GAN}, plots for the other models can be found in Appendix~\ref{subsec:appendix_pixel_wise_statistics_mnist}.
+Figure~\ref{fig:vlae_gan_kde} shows the estimated \ac{KDE} for \textsc{Mnist}-\ac{VLAE}-\ac{GAN}, plots for the other models can be found in Appendix~\ref{subsec:appendix_pixel_wise_statistics_mnist}.
 
-For \ac{VLAE} and \ac{VLAE}-\ac{GAN}, it cannot be sampled independently from the different latent spaces (see Section~\ref{subsec:independence-of-vlae-embeddings}).
+For \textsc{Mnist}-\ac{VLAE} and \textsc{Mnist}-\ac{VLAE}-\ac{GAN}, it cannot be sampled independently from the different latent spaces (see Section~\ref{subsec:independence-of-vlae-embeddings}).
 For these models, the predicted mean values directly were used to reconstruct 10,000 images.
 
-The \textsc{Mnist} test set of 10,000 images was compared to a 1,000 generated samples from \ac{VAE}, \ac{VLAE}, \ac{VAE}-\ac{GAN}, and \ac{VLAE}-\ac{GAN}.
-First, the mean pixel values, i.e.,~the mean over all $28\times 28$ pixel values, were compared (see Figure~\ref{subfig:vlae_mean_generated_vs_true}).
-The plot overlays the histograms of mean pixel values for the five conditions: \textsc{Mnist}, \ac{VAE}, and \ac{VLAE}.
+The \textsc{Mnist} test set of 10,000 images was compared to a 1,000 generated samples from \textsc{Mnist}-\ac{VAE}, \textsc{Mnist}-\ac{VLAE}, \textsc{Mnist}-\ac{VAE}-\ac{GAN}, and \textsc{Mnist}-\ac{VLAE}-\ac{GAN} according to the estimated posterior.
+First, the mean pixel values, i.e.,~the mean over all $28\times 28$ pixel values, were compared (see Figure~\ref{fig:mean_generated_vs_true}).
+The plot overlays the histograms of mean pixel values for the five conditions: \textsc{Mnist}, \textsc{Mnist}-\ac{VAE}, textsc{Mnist}-\ac{VAE}-\ac{GAN}, \textsc{Mnist}-\ac{VLAE}, and \textsc{Mnist}-\ac{VLAE}-\ac{GAN}.
 The other plots in Figure~\ref{fig:mean_generated_vs_true} were created accordingly but for higher moments of the pixel value distributions.
 
-Consider Figure~\ref{fig:mean_generated_vs_true_gauss_post} showing the same distribution but for a standard normal posterior.
+Consider Figure~\ref{fig:mean_generated_vs_true_gauss_post} showing the same distribution but for the standard normal prior.
 The pixel-wise statistics are quite different compared to Figure~\ref{fig:mean_generated_vs_true} and resemble the true distribution worse.
 Therefore, it is argued that the above procedure is crucial when evaluating a model.
 Sampling from the prior, in general, leads to worse model performance in resembling the data distribution.
@@ -1392,12 +1394,11 @@ The \ac{KDE} distributions can be found in Appendix~\ref{subsec:appendix_pixel_w
 
 \subsection{Class-Distribution of Generated Images}\label{subsec:class-distribution-of-generated-images}
 
-Do the \ac{VAE} and \ac{VLAE} models generate each number with the same probability as a number's probability in the training set?
+Do the \ac{VAE} and \ac{VLAE} models generate each number with the same probability as a number's probability in the training set as required by latent space disentanglement (see Section~\ref{subsec:feature-disentanglement})?
 To answer this question, the following procedure was applied.
 
 First, let each model generate a large number of images by drawing the latent space variable(s) $z$ from their estimated posterior (see Section~\ref{subsubsec:pixel_wise_statistics} for details).
 Second, let a classifier\footnote{The classifier has shown to perform sufficiently well, see above.} classify each generated image.
-
 This procedure was applied to \textsc{Mnist} only.
 It is the only labeled dataset where the \acp{VAE} and \acp{VLAE} models have shown a promising performance and for the availability of labels.
 
@@ -1410,12 +1411,11 @@ It is the only labeled dataset where the \acp{VAE} and \acp{VLAE} models have sh
 
 Figure~\ref{fig:generated_class_distribution} shows the class-distribution of generated images.
 Even though it is sampled from the (estimated) posterior, the class distribution is quite uneven.
-This aligns with Figure~\ref{fig:mnist_latent_space_traversal}.
+This aligns with Figures~\ref{fig:mnist_latent_space_traversal_vae} and \ref{fig:mnist_latent_space_traversal_vlae}.
 The reason why the model maps some digits to very small subspaces, however, remains unclear.
 If it was because there is less variation for a particular digit, i.e.,~the digit three is written very similarly in all cases, then all models should map threes to small subspaces.
 
-However, \ac{VAE} reproduces few threes wheres \ac{VAE}-\ac{GAN} produces few fours.
-
+However, \textsc{Mnist}-\ac{VAE} reproduces few threes whereas \textsc{Mnist}-\ac{VAE}-\ac{GAN} produces few fours.
 Overall, the \ac{VLAE} models generate a more even distribution of generated digits.
 
 \begin{figure}
