@@ -37,9 +37,9 @@ For example, the group \textit{woman, adult female} is subordinated to \textit{p
 
 A smaller version of ImageNet, commonly called \textit{ILSVRC2012} has been used for \ac{ILSVRC2017}~\citep{ILSVRC15}, consisting of approximately 1,3 million images from 1000 different classes, that were selected, such that \say{there is no overlap between synsets: for any synsets $i$ and $j$, $i$ is not an ancestor of $j$ in the ImageNet hierarchy}~\citep{imagenet_cvpr09}.
 
-This curated version is commonly used as a baseline (\textbf{refs}).
+This curated version is commonly used as a baseline~\citep{krizhevsky2012imagenet,Szegedy_2015_CVPR}\footnote{See \href{https://paperswithcode.com/sota/image-classification-on-imagenet}{https://paperswithcode.com/sota/image-classification-on-imagenet} for an overview of models on ImageNet. Last access: 07/16/2020}.
 
-\subsubsection{Mnist}\label{subsubsec:mnist}
+\subsubsection{\textsc{Mnist}}\label{subsubsec:mnist}
 
 \begin{wrapfigure}[9]{R}{0.2\textwidth}
     \begin{center}
@@ -63,7 +63,7 @@ The samples are grayscale images of size $28\times 28$pixels.
     \label{fig:morpho_mnist_distribution}
 \end{figure}
 
-Morpho-\textsc{Mnist}~\citep{castro2019morpho} is an extension of the \textsc{Mnist} dataset that addresses the question: \say{[T]o what extent has my model learned to represent specific factors of
+Morpho-\textsc{Mnist}~\citep{castro2019morpho} is an extension of the \textsc{Mnist} dataset that addresses the question: \say{(T)o what extent has my model learned to represent specific factors of
 variation in the data?} ~\citep{castro2019morpho}.
 To address this questions, Morpho-\textsc{Mnist} provides the following (continuous) labels of morphological attributes of the \textsc{Mnist} samples: stroke length, stroke thickness, slant, width, and height.
 
@@ -85,11 +85,50 @@ The dataset also contains the factor labels for each image.
 
 \subsection{Models}\label{subsec:models}
 
-Four different base \ac{VAE} models were evaluated in the course of this thesis.
+Eight different \ac{VAE}, six different \ac{VLAE}, four different \ac{VAE}-\ac{GAN}, and four different \ac{VLAE}-\ac{GAN} were evaluated in the course of this thesis.
 Furthermore, two \say{AlexNet} models were used for some additional experiments.
 
 The models vary depending on the dataset and are described in the following.
+An overview is given in Table~\ref{tbl:model_overview}.
 A more detailed description can be found in Appendix~\ref{sec:appendix_network_architectures}.
+\begin{table}
+    \centering
+    \begin{tabular}{lrrrrr}
+        \toprule
+        model name              & dataset        & \parbox[t]{2cm}{\normalsize\raggedleft input/output\\size}       & \parbox[t]{2cm}{\normalsize\raggedleft latent\\space\\size} & \parbox[t]{2cm}{\normalsize\raggedleft reconstruction\\term weight} & \parbox[t]{2cm}{\normalsize\raggedleft feature\\map\\reduction factor} \\
+        \midrule
+        \textsc{Mnist}-\ac{VAE} & \textsc{Mnist} & $28\times 28\times 1$   & 2                 & 10,000                     & 1                            \\
+        (dSprites/10,000)-\ac{VAE}       & dSprites       & $64\times 64\times 1$   & 10                & 10,000                     & 1                            \\
+        7,500-\ac{VAE}          & dSprites       & $64\times 64\times 1$   & 10                & 7,500                      & 1                            \\
+        6,250-\ac{VAE}          & dSprites       & $64\times 64\times 1$   & 10                & 6,250                      & 1                            \\
+        5,000-\ac{VAE}          & dSprites       & $64\times 64\times 1$   & 10                & 5,000                      & 1                            \\
+        3,750-\ac{VAE}          & dSprites       & $64\times 64\times 1$   & 10                & 3,750                      & 1                            \\
+        dSprites-\ac{VAE}-dim6  & dSprites       & $64\times 64\times 1$   & 6                 & 10,000                     & 1                            \\
+        CelebA-\ac{VAE}         & CelebA         & $128\times 128\times 3$ & 8                 & 3,750                      & 1                            \\
+        \midrule
+        \textsc{Mnist}-\ac{VLAE}(-factor-1) & \textsc{Mnist} & $28\times 28\times 1$ & 2,2,2 & 10,000 & 1 \\
+        \textsc{Mnist}-\ac{VLAE}-factor-2 & \textsc{Mnist} & $28\times 28\times 1$ & 2,2,2 & 10,000 & 2 \\
+        \textsc{Mnist}-\ac{VLAE}-factor-3 & \textsc{Mnist} & $28\times 28\times 1$ & 2,2,2 & 10,000 & 3 \\
+        dSprites-\ac{VLAE} & dSprites & $64\times 64\times 1$ & 4,4,4 & 10,000 & 1 \\
+        dSprites-\ac{VLAE}-dim2 & dSprites & $64\times 64\times 1$ & 2,2,2 & 10,000 & 1 \\
+        CelebA-\ac{VLAE} & CelebA & $128\times 128\times 3$ & 2,2,2 & 10,000 & 1 \\
+        \midrule
+        \textsc{Mnist}-\ac{VAE}-\ac{GAN} & \textsc{Mnist} & $28\times 28\times 1$ & 2 & 10,000 & 1\\
+        dSprites-\ac{VAE}-\ac{GAN} & dSprites & $64\times 64\times 1$ & 10 & 10,000 & 1\\
+        CelebA-\ac{VAE}-\ac{GAN} & CelebA & $128\times 128\times 3$ & 8 & 10,000 & 1\\
+        \midrule
+        \textsc{Mnist}-\ac{VLAE}-\ac{GAN} & \textsc{Mnist} & $28\times 28\times 1$ & 2,2,2 & 10,000 & 1\\
+        dSprites-\ac{VLAE}-\ac{GAN} & dSprites & $64\times 64\times 1$ & 4,4,4 & 10,000 & 1\\
+        CelebA-\ac{VLAE}-\ac{GAN} & CelebA & $128\times 128\times 3$ & 2,2,2 & 10,000 & 1\\
+        \midrule
+        AlexNet Classifier & ImageNet & $224\times 224\times 3$ & -- & -- & 1\\
+        \midrule
+        AlexNet \ac{VAE} & ImageNet & $224\times 224\times 3$ & 2000 & 10,000 & 1\\
+        \bottomrule
+    \end{tabular}
+    \caption[Models Overview]{Overview of all models with important parameters.}
+    \label{tbl:model_overview}
+\end{table}
 
 \subsubsection{VAE Models}\label{subsubsec:vae_models}
 
@@ -105,11 +144,11 @@ A more detailed description can be found in Appendix~\ref{sec:appendix_network_a
         \includegraphics[width=\textwidth,height=.85\textheight,keepaspectratio]{images/vae/decoder.png}
         \caption{Decoder}
     \end{subfigure}
-    \caption{\ac{VAE} model structure}
+    \caption{VAE model structure}
     \label{fig:vae_model_structure}
 \end{figure}
 
-The \ac{VAE} model (see Section-\ref{fig:vae_model_structure}) consists of an encoder and a decoder.
+The \ac{VAE} model (see Section~\ref{fig:vae_model_structure}) consists of an encoder and a decoder.
 The encoder is made up of multiple \say{Convolution, Activation, Batch-Normalization}-blocks, followed by the embedding layer.
 The embedding layer predicts $\mu$ and $\log \sigma^2$ and performs the resampling by:
 \begin{align}
@@ -146,10 +185,10 @@ The inner activation function is ReLU.
 For dSprites, four additional models have been trained with a different reconstruction term weight: 7,500-\ac{VAE}, 6,250-\ac{VAE}, 5,000-\ac{VAE}, and 3,750-\ac{VAE}.
 These models differ from dSprites-\ac{VAE} only in the reconstruction term weight.
 
-\paragraph{dsprites-\ac{VAE}-dim6}
+\paragraph{dsprites-VAE-dim6}
 The dsprites-\ac{VAE}-dim6 is equivalent to the dSprites-\ac{VAE} model but uses a six-dimensional latent space.
 
-\paragraph{CelebA-\ac{VAE}} CelebA-\ac{VAE} uses an input- and output-size of $128\times 128\times 3$.
+\paragraph{CelebA-VAE} CelebA-\ac{VAE} uses an input- and output-size of $128\times 128\times 3$.
 The model is trained with the Adam optimizer on a training set consisting of 90\% of the CelebA dataset with a batch size of 128 and a learning rate of 0.001 for 200 epochs.
 The reconstruction loss factor is 10,000.
 The latent space is eight-dimensional.
@@ -170,7 +209,7 @@ The inner activation function is ReLU.
         \caption{Decoder}
         \label{subfig:vlae_decoder}
     \end{subfigure}
-    \caption{\ac{VLAE} model structure}
+    \caption{VLAE model structure}
     \label{fig:vlae_model_structure}
 \end{figure}
 
@@ -193,7 +232,7 @@ The decoder uses blocks similar to the encoder but with transposed convolutions 
 In total, six \ac{VLAE}-models are used: \say{\textsc{Mnist}-\ac{VLAE}-factor-1}, \say{\textsc{Mnist}-\ac{VLAE}-factor-2}, \say{\textsc{Mnist}-\ac{VLAE}-factor-3} \say{dSprites-\ac{VLAE}}, \say{dSprites-\ac{VLAE}-dim2}, and \say{CelebA-\ac{VLAE}}.
 The model structures can be found in Appendix~\ref{subseq:appendix_vlae_models}.
 
-\paragraph{\textsc{Mnist}-\ac{VLAE}} The three \textsc{Mnist}-\ac{VLAE}s\footnote{\say{\textsc{Mnist}-\ac{VLAE}-factor-1}, \say{\textsc{Mnist}-\ac{VLAE}-factor-2}, \say{\textsc{Mnist}-\ac{VLAE}-factor-3}} use an input- and output-size of $28\times 28\times 1$.
+\paragraph{\textsc{Mnist}-VLAE} The three \textsc{Mnist}-\ac{VLAE}s\footnote{\say{\textsc{Mnist}-\ac{VLAE}-factor-1}, \say{\textsc{Mnist}-\ac{VLAE}-factor-2}, \say{\textsc{Mnist}-\ac{VLAE}-factor-3}} use an input- and output-size of $28\times 28\times 1$.
 The models are trained with the Adam optimizer on the \textsc{Mnist} training set with a batch size of 128 for 200 epochs.
 The reconstruction loss factor is 10,000.
 The latent spaces are two-dimensional.
@@ -283,7 +322,7 @@ It uses dropout and a dropout rate of 0.3.
 The model is trained with the Adam optimizer and a learning rate of 0.0001 using batch normalization and a batch size of 32 for ten epochs..
 The model structure can be found in Appendix~\ref{subseq:appendix_alexnet_classifiers}.
 
-\subsubsection{AlexNet-\ac{VAE}}\label{subsubsec:alexnet_vae}
+\subsubsection{AlexNet-VAE}\label{subsubsec:alexnet_vae}
 The AlexNet-\ac{VAE} resembles the AlexNet classifier but uses a 2000-dimensional latent space with re-sampling (see Equation~\ref{eq:resampling_vae}).
 For AlexNet-\ac{VAE}, no dropout is used.
 The model is trained with the Adam optimizer and a learning rate of 0.0001 using batch normalization and a batch size of 32 for 100 epochs..

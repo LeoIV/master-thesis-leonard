@@ -414,7 +414,7 @@ Reproducing the data distribution is what is desired in generative methods.
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/gan_samples.png}
-    \caption[\ac{GAN}-generated samples]{\ac{GAN}-generated samples, taken from \citet{brock2018large}.}
+    \caption[GAN-generated samples]{GAN-generated samples, taken from \citet{brock2018large}.}
     \label{fig:gan_samples}
 \end{figure}
 
@@ -735,7 +735,7 @@ It has to be considered if the interpolation between two points in the latent sp
         \draw [decorate,decoration={brace,amplitude=5pt,raise=0.7cm},rotate=90] (dL.west) -- (zL1.east) node [black,midway,yshift=1.5cm] {Encoder};
         \draw [decorate,decoration={brace,amplitude=5pt,raise=0.7cm},rotate=90] (zL2.west) -- (zL2.east) node [black,midway,yshift=1.5cm] {Decoder};
     \end{tikzpicture}
-    \caption[\ac{VLAE} structure]{\ac{LVAE} structure, adapted from \citet{sonderby2016ladder}. Solid arrows indicate feed-forward connections, dashed arrows indicate weight sharing. Diamonds indicate stochastic variables, circles deterministic variables.}
+    \caption[LVAE structure]{Ladder Variational Autoencoder structure, adapted from \citet{sonderby2016ladder}. Solid arrows indicate feed-forward connections, dashed arrows indicate weight sharing. Diamonds indicate stochastic variables, circles deterministic variables.}
     \label{fig:lvae}
 \end{figure}
 
@@ -803,7 +803,7 @@ Using all these techniques on the \ac{LVAE} model allows meaningful representati
         \includegraphics[height=.8\textheight]{images/vlae_decoder.png}
         \caption{Varying $\bm{c}_2 \in [-2, 2]$}
     \end{subfigure}
-    \caption[\ac{VLAE} structure]{Structure of the \ac{VLAE} model}
+    \caption[VLAE structure]{Structure of the VLAE model}
     \label{fig:vlae_structure}
 \end{figure}
 
@@ -818,7 +818,7 @@ Consider Equation~\ref{eq:elbo_error_term}, describing the loss function in a \a
 \citet{higgins2017beta} discovered that weighting both terms, the KL-divergence and the reconstruction loss, equally leads to suboptimal results in terms of \textit{feature disentanglement}.
 They, therefore, formulated the $\beta$-VAE learning objective that adds a hyperparameter $\beta$ to the loss function, controlling the relative weights of the two terms:
 \begin{align}
-    \mathbb{E}_{q_{\phi}(\bm{z} | \bm{x})}\left[\log p_{\theta}(\bm{x} | \bm{z})\right]-\beta \kldiv{q_{\phi}(\bm{z} | \bm{x})}{p(\bm{z})} \label{eq:beta-vae}
+    \mathbb{E}_{q_{\phi}(\bm{z} | \bm{x})}\left[\log p_{\theta}(\bm{x} | \bm{z})\right]-\beta \kldiv{q_{\phi}(\bm{z} | \bm{x})}{p(\bm{z})}. \label{eq:beta-vae}
 \end{align}
 
 A value $\beta > 1$ puts more emphasis on the KL-term than the original \ac{VAE} loss function ($\beta = 1$).
@@ -906,7 +906,7 @@ Choosing $\gamma = 0.75$ led to training convergence for the experiments perform
         \draw [decorate,decoration={brace,amplitude=10pt,raise=0.7cm},rotate=90] (F.west) -- (G.east) node [black,midway,yshift=1.5cm] {$G$};
         \draw [decorate,decoration={brace,amplitude=10pt,raise=0.7cm},rotate=90] (E1.west) -- (D1.east) node [black,midway,yshift=1.5cm] {$D$};
     \end{tikzpicture}
-    \caption[\ac{ALAE} training]{Training of \ac{ALAE}, adapted from \citet{pidhorskyi2020adversarial}}
+    \caption[ALAE training]{Training of ALAE, adapted from \citet{pidhorskyi2020adversarial}}
     \label{fig:alae_flow}
 \end{figure}
 Similar to \ac{VAE}-\acp{GAN}, \Acfp{ALAE}~\citep{pidhorskyi2020adversarial} are a hybrid model between \acp{VAE} and \acp{GAN}.
@@ -955,7 +955,7 @@ Feature consistency as well as an interpretable latent space qualify \acp{VAE} a
 Assume we have a dataset of images.
 Each image consists of a shape (for example \textit{Square}, \textit{Heart}, and \textit{Ellipse}) at different $x$- and $y$-positions.
 Then, \textit{shape}, $x$\textit{-position}, and $y$\textit{-position} are called \say{factors of variation}~\citep{Shu2020Weakly,higgins2018towards}, say $S_1$, $S_2$, and $S_3$ with $S_i\in \mathcal{S}^n$~\citep{Shu2020Weakly}.
-Each image $\bm{x}\in \mathcal{X}^m$ can be generated from the factors of variation by a data-generating process $g: \mathcal{S}\times \mathcal{S}\times \mathcal{S}\mapsto \mathcal{X}^m$.
+Each image $\bm{x}\in \mathcal{X}^m$ can be generated from the factors of variation by a data-generating process $g: \mathcal{S}^n\times \mathcal{S}^n\times \mathcal{S}^n\mapsto \mathcal{X}^m$.
 
 In the context of \acp{VAE} where the generator maps $\bm{x}$ to a vector $\bm{z}$ in the latent space, a disentangled representation has the following property.
 As one factor of variation (e.g., the shape) is changed, one and only one subspace in the latent space is affected~\citep{higgins2018towards}.

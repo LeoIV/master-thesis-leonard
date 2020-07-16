@@ -4,46 +4,39 @@
     \begin{subfigure}{.32\textwidth}
         \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae_gan/embeddings_mu_0.png}
         \caption{Latent space colored by digit slant}
-        \label{subfig:vae_mnist_latent_space_slant}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.32\textwidth}
         \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae_gan/embeddings_mu_1.png}
         \caption{Latent space colored by digit thickness}
-        \label{subfig:vae_mnist_latent_space_thickness}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.32\textwidth}
         \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae_gan/embeddings_mu_2.png}
         \caption{Latent space colored by digit area}
-        \label{subfig:vae_mnist_latent_space_area}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.24\textwidth}
         \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae_gan/embeddings_mu_3.png}
         \caption{Latent space colored by digit length}
-        \label{subfig:vae_mnist_latent_space_length}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.24\textwidth}
         \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae_gan/embeddings_mu_4.png}
         \caption{Latent space colored by digit width}
-        \label{subfig:vae_mnist_latent_space_width}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.24\textwidth}
         \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae_gan/embeddings_mu_5.png}
         \caption{Latent space colored by digit height}
-        \label{subfig:vae_mnist_latent_space_height}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.24\textwidth}
         \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vae_gan/embeddings_mu_6.png}
         \caption{Latent space colored by digit identity}
-        \label{subfig:vae_mnist_latent_space_identity}
     \end{subfigure}
-    \caption[\ac{VAE}-\ac{GAN} Latent Space - \textsc{Mnist}]{Latent space colored by different means of \ac{VAE}-\ac{GAN} with $dim_z=2$ trained on \textsc{Mnist} dataset}
-    \label{fig:vae_latent_space_mnist}
+    \caption[\textsc{Mnist}-VAE-GAN - Latent Space]{Latent space colored by different means of \textsc{Mnist}-\ac{VAE}-\ac{GAN}}
+    \label{fig:vae_gan_latent_space_mnist}
 \end{figure}
 
 \begin{landscape}
@@ -54,7 +47,6 @@
             \begin{subfigure}{.19\textwidth}
                 \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_0.png}
                 \caption{$z_{\i}$: digit slant}
-                \label{subfig:vlae_mnist_latent_space_z_\i_slant}
             \end{subfigure}
         \end{adjustbox}
         \hfill
@@ -62,7 +54,6 @@
             \begin{subfigure}{.19\textwidth}
                 \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_1.png}
                 \caption{$z_{\i}$: digit thickness}
-                \label{subfig:vlae_mnist_latent_space_z_\i_thickness}
             \end{subfigure}
         \end{adjustbox}
         \hfill
@@ -70,7 +61,6 @@
             \begin{subfigure}{.19\textwidth}
                 \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_2.png}
                 \caption{$z_{\i}$: digit area}
-                \label{subfig:vlae_mnist_latent_space_z_\i_area}
             \end{subfigure}
         \end{adjustbox}
         \hfill
@@ -78,7 +68,6 @@
             \begin{subfigure}{.19\textwidth}
                 \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_3.png}
                 \caption{$z_{\i}$: digit length}
-                \label{subfig:vlae_mnist_latent_space_z_\i_length}
             \end{subfigure}
         \end{adjustbox}
         \hfill
@@ -86,7 +75,6 @@
             \begin{subfigure}{.19\textwidth}
                 \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_4.png}
                 \caption{$z_{\i}$: digit width}
-                \label{subfig:vlae_mnist_latent_space_z_\i_width}
             \end{subfigure}
         \end{adjustbox}
         \hfill
@@ -94,7 +82,6 @@
             \begin{subfigure}{.19\textwidth}
                 \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_5.png}
                 \caption{$z_{\i}$: digit height}
-                \label{subfig:vlae_mnist_latent_space_z_\i_height}
             \end{subfigure}
         \end{adjustbox}
         \hfill
@@ -102,11 +89,10 @@
             \begin{subfigure}{.19\textwidth}
                 \includegraphics[width=\textwidth]{images/latent_spaces/mnist/vlae_gan/embeddings_mu_\i_6.png}
                 \caption{$z_{\i}$: digit identity}
-                \label{subfig:vlae_mnist_latent_space_z_\i_identity}
             \end{subfigure}
         \end{adjustbox}}
-        \caption[\ac{VLAE}-\ac{GAN} Latent Space - \textsc{Mnist}]{Latent space colored by different means of \ac{VLAE}-\ac{GAN} with $dim_z=2$ trained on \textsc{Mnist} dataset}
-        \label{fig:vlae_latent_space_mnist}
+        \caption[\textsc{Mnist}-VLAE-GAN - Latent Space]{Latent space colored by different means of \textsc{Mnist}-\ac{VLAE}-\ac{GAN}}
+        \label{fig:vlae_gan_latent_space_mnist}
     \end{figure}
 \end{landscape}
 
@@ -121,13 +107,11 @@
     \begin{subfigure}{.19\textwidth}
         \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae_gan/embeddings_mu_1.png}
         \caption{Latent space colored by object scale}
-        \label{subfig:vae_embedding_dsprites_scale}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.19\textwidth}
         \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae_gan/embeddings_mu_2.png}
         \caption{Latent space colored by object orientation}
-        \label{subfig:vae_embedding_dsprites_orientation}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.19\textwidth}
@@ -139,44 +123,38 @@
         \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vae_gan/embeddings_mu_4.png}
         \caption{Latent space colored by object $y$-position}
     \end{subfigure}
-    \caption[\ac{VAE}-\ac{GAN} Latent Space - dSprites]{\ac{t-SNE} latent space embeddings colored by different means of \ac{VAE}-\ac{GAN} with $dim_z=6$ trained on dSprites dataset}
+    \caption[dSprites-VAE-GAN - Latent Space]{\ac{t-SNE}-reduced latent space embeddings colored by different means of dSprites-\ac{VAE}-\ac{GAN}}
     \label{fig:vae_gan_latent_space_dsprites}
 \end{figure}
-
 \begin{figure}[H]
     \centering
     \foreach \i in {1,2,3}{
     \begin{subfigure}{.19\textwidth}
         \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae_gan/embeddings_mu_\i_0.png}
         \caption{Latent space $z_{\i}$ colored by object shape}
-        \label{subfig:vlae_embedding_z\i_dsprites_shape}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.19\textwidth}
         \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae_gan/embeddings_mu_\i_1.png}
         \caption{Latent space $z_{\i}$ colored by object scale}
-        \label{subfig:vlae_embedding_z\i_dsprites_scale}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.19\textwidth}
         \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae_gan/embeddings_mu_\i_2.png}
         \caption{Latent space $z_{\i}$ colored by object orientation}
-        \label{subfig:vlae_embedding_z\i_dsprites_orientation}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.19\textwidth}
         \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae_gan/embeddings_mu_\i_3.png}
         \caption{Latent space $z_{\i}$ colored by object $x$-position}
-        \label{subfig:vlae_embedding_z\i_dsprites_x_pos}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.19\textwidth}
         \includegraphics[width=\textwidth]{images/latent_spaces/dsprites/vlae_gan/embeddings_mu_\i_4.png}
         \caption{Latent space $z_{\i}$ colored by object $y$-position}
-        \label{subfig:vlae_embedding_z\i_dsprites_y_pos}
     \end{subfigure}
     }
-    \caption[\ac{VLAE} Latent Space on dSprites]{Latent space colored by different means of \ac{VLAE}-\ac{GAN} with $dim_{z_i}=6$ trained on dSprites dataset}
+    \caption[dSprites-VLAE-GAN - Latent Space]{Latent space of dSprites-VLAE-GAN colored by different means}
     \label{fig:vlae_gan_latent_space_dsprites}
 \end{figure}
 
@@ -189,7 +167,6 @@
     \end{subfigure}
     }
 \end{figure}
-\pagebreak
 \begin{figure}[H]
     \ContinuedFloat
     \centering
@@ -198,9 +175,8 @@
         \includegraphics[width=\textwidth]{images/latent_spaces/celeba/vae/vae_celeba_\factor.png}
     \end{subfigure}
     }
-    \caption[\ac{VAE} Latent Space - CelebA]{\ac{t-SNE}-reduced Latent Space of a \ac{VAE} trained on CelebA, colored by Factors of Variation (present or not present)}
+    \caption[CelebA-VAE - Latent Space]{\ac{t-SNE}-reduced Latent Space of CelebA-\ac{VAE}, colored by Factors of Variation (present or not present)}
 \end{figure}
-
 \begin{figure}[H]
     \centering
     \foreach \factor in {5_o_Clock_Shadow,Arched_Eyebrows,Attractive,Bags_Under_Eyes,Bald,Bangs,Big_Lips,Big_Nose,Black_Hair,Blond_Hair,Blurry,Brown_Hair,Bushy_Eyebrows,Chubby,Double_Chin,Eyeglasses,Goatee,Gray_Hair,Heavy_Makeup,High_Cheekbones,Male,Mouth_Slightly_Open,Mustache,Narrow_Eyes,No_Beard,Oval_Face,Pale_Skin,Pointy_Nose}{
@@ -209,7 +185,6 @@
     \end{subfigure}
     }
 \end{figure}
-\pagebreak
 \begin{figure}[H]
     \ContinuedFloat
     \centering
@@ -218,7 +193,7 @@
         \includegraphics[width=\textwidth]{images/latent_spaces/celeba/vae_gan/vae_gan_celeba_\factor.png}
     \end{subfigure}
     }
-    \caption[\ac{VAE}-\ac{GAN} Latent Space - CelebA]{\ac{t-SNE}-reduced Latent Space of a \ac{VAE}-\ac{GAN} trained on CelebA, colored by Factors of Variation (present or not present)}
+    \caption[CelebA-VAE-GAN - Latent Space]{\ac{t-SNE}-reduced Latent Space of CelebA-\ac{VAE}-\ac{GAN}, colored by Factors of Variation (present or not present)}
 \end{figure}
 
 \begin{figure}[H]
@@ -229,7 +204,6 @@
     \end{subfigure}
     }
 \end{figure}
-\pagebreak
 \begin{figure}[H]
     \ContinuedFloat
     \centering
@@ -239,7 +213,6 @@
     \end{subfigure}
     }
 \end{figure}
-\pagebreak
 \begin{figure}[H]
     \ContinuedFloat
     \centering
@@ -248,7 +221,7 @@
         \includegraphics[width=\textwidth]{images/latent_spaces/celeba/vlae/vlae_celeba_\factor.png}
     \end{subfigure}
     }
-    \caption[\ac{VLAE} Latent Space - CelebA]{\ac{t-SNE}-reduced Latent Space of a \ac{VLAE} trained on CelebA, colored by Factors of Variation (present or not present). Different columns correspond to the different layers.}
+    \caption[CelebA-VLAE - Latent Space]{\ac{t-SNE}-reduced Latent Space of CelebA-\ac{VLAE}, colored by Factors of Variation (present or not present). Different columns correspond to the different layers.}
 \end{figure}
 
 \begin{figure}[H]
@@ -259,7 +232,6 @@
     \end{subfigure}
     }
 \end{figure}
-\pagebreak
 \begin{figure}[H]
     \ContinuedFloat
     \centering
@@ -269,7 +241,6 @@
     \end{subfigure}
     }
 \end{figure}
-\pagebreak
 \begin{figure}[H]
     \ContinuedFloat
     \centering
@@ -278,5 +249,5 @@
         \includegraphics[width=\textwidth]{images/latent_spaces/celeba/vlae_gan/vlae_gan_celeba_\factor.png}
     \end{subfigure}
     }
-    \caption[\ac{VLAE}-\ac{GAN} Latent Space - CelebA]{\ac{t-SNE}-reduced Latent Space of a \ac{VLAE}-\ac{GAN} trained on CelebA, colored by Factors of Variation (present or not present). Different columns correspond to the different layers.}
+    \caption[CelebA-VLAE-GAN - Latent Space]{\ac{t-SNE}-reduced Latent Space of CelebA-\ac{VLAE}-\ac{GAN}, colored by Factors of Variation (present or not present). Different columns correspond to the different layers.}
 \end{figure}
