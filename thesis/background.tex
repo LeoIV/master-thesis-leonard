@@ -153,6 +153,7 @@ One example is binary coding that can encode $2^N$ different inputs.
 However, dense codes do not allow to superpose representations of different inputs~\citep{foldiak2003sparse}.
 
 Sparse codes combine advantages of dense and local codes while avoiding their drawbacks~\citep{foldiak2003sparse}.
+Unsupervised models trained to represent natural images from a sparse set of basis functions have shown to learn Gabor-like basis function~\citep{Olshausen1996}.
 
 \subsection{Types of Learning}\label{subsec:types-of-learning}
 
@@ -249,7 +250,7 @@ This thesis focuses on visual-modal semantic representations.
 For visual input, it has been shown that higher-layer activations of supervised \acp{CNN}, described in the following section, explain \ac{IT} cortical representation~\citep{khaligh2014deep,cadieu2014deep}.
 For unsupervised models operating on image data, in contrast, there is some evidence that these models do not explain \ac{IT} cortical representation (or by far worse than supervised models)~\citep{khaligh2014deep} - even though not explicitly for \acp{CNN}.
 
-\acp{CNN}, therefore, seem to be a promising candidate for visual-modal semantic representations.
+Therefore, \acp{CNN} seem to be a promising candidate for visual-modal semantic representations.
 
 \subsection{Models of the Visual System}\label{subsec:models-of-the-visual-system}
 
@@ -375,7 +376,7 @@ The unsupervised models under investigation, however, are only loosely related t
 The question of whether \acp{VAE} show similar \acp{RDM} as the human \ac{IT}, therefore, remains.
 
 It has been shown that \acp{VAE}, trained in a self-supervised manner, partially learn Gabor wavelets when trained to predict the next image in a sequence of images~\citep{palm2012prediction}.
-Also, some unsupervised models learn Gabor wavelets~\citep{berkes2005slow}.
+Also, some unsupervised models learn Gabor wavelets~\citep{Olshausen1996,berkes2005slow} but whether \acp{VAE} learn Gabor wavelets in lower layers remains unanswered.
 
 \subsection{Generative Methods}\label{subsec:generative-methods}
 
@@ -428,13 +429,14 @@ Loss oscillation occurs when the generator and the discriminator alternatingly b
 
 \subsubsection{Variational Autoencoders}\label{subsec:variational-autoencoders}
 
-% TODO: Mach ne ordentliche Introduction
+Autoencoders are models transforming input into a lower dimensional representation~\citep[p. 146]{Goodfellow-et-al-2016}.
+Unlike the regular Autoencoder, \acp{VAE} furthermore require the lower dimensional representation to follow a defined distribution.
 Since \acfp{VAE} are a specialization of the autoencoder, the traditional autoencoder is introduced first.
 
 \paragraph{Autoencoders}
 
 Autoencoders are neural networks trained to reconstruct their input~\citep[p. 499]{Goodfellow-et-al-2016}.
-Autoencoders consist of an \textit{encoder} and a \textit{decoder}.
+They consist of an \textit{encoder} and a \textit{decoder}.
 The encoder $f: \mathbb{R}^n \mapsto \mathbb{R}^m$ transforms an input $\bm{x}$ to a hidden representation $\bm{r} = f(\bm{x})$.
 Usually, the encoder transforms the input into a lower-dimensional representation ($m < n$).
 This mapping can be used for dimensionality reduction or feature learning~\citep[p. 499]{Goodfellow-et-al-2016}.
@@ -562,13 +564,14 @@ Enforcing randomness in the positioning of points in the latent space guides the
 Eventually, this allows to sample from the random space to generate new images, employing the decoder.
 Furthermore, it allows simple arithmetic in the latent space (see Section~\ref{subsubsec:representation_learning}).
 
+Even though the latent space is forced to follow a prior distribution, it remains unclear how (lower-level) attributes of an image are encoded in this latent space.
+
 \paragraph{Disadvantages}
 
 % TODO: Zitat weg
-One problem arising when training \acp{VAE} is \say{\textit{posterior collapse}, in which the variational distribution collapses towards the prior}~(\citep{lucas2019understanding} and \citep[p. 694]{Goodfellow-et-al-2016}).
-Posterior collapse means that one or more of the latent dimensions resemble the prior, i.e.~\citep{lucas2019understanding}:
+One problem arising when training \acp{VAE} is \textit{posterior collapse}, meaning that one or more of the latent dimensions resemble the prior (\citep[p. 694]{Goodfellow-et-al-2016}, \citep{lucas2019understanding}), i.e.~\citep{lucas2019understanding}:
 \begin{align}
-    \exists i: \forall \mathbf{x} q_{\phi}\left(z_{i} | \mathbf{x}\right) \approx p\left(z_{i}\right)
+    \exists i: \forall \mathbf{x} q_{\phi}\left(z_{i} | \mathbf{x}\right) \approx p\left(z_{i}\right) .
 \end{align}
 In the most extreme case, this happens for \textit{all} latent dimensions.
 In that case, the generator cannot make use of $\bm{x}$ at all, because generated images are unrelated to the input image.
@@ -735,7 +738,7 @@ It has to be considered if the interpolation between two points in the latent sp
         \draw [decorate,decoration={brace,amplitude=5pt,raise=0.7cm},rotate=90] (dL.west) -- (zL1.east) node [black,midway,yshift=1.5cm] {Encoder};
         \draw [decorate,decoration={brace,amplitude=5pt,raise=0.7cm},rotate=90] (zL2.west) -- (zL2.east) node [black,midway,yshift=1.5cm] {Decoder};
     \end{tikzpicture}
-    \caption[LVAE structure]{Ladder Variational Autoencoder structure, adapted from \citet{sonderby2016ladder}. Solid arrows indicate feed-forward connections, dashed arrows indicate weight sharing. Diamonds indicate stochastic variables, circles deterministic variables.}
+    \caption[LVAE structure]{Ladder Variational Autoencoder structure, adapted from \citet{sonderby2016ladder}. Solid arrows indicate feed-forward connections, dashed arrows indicate weight sharing. Diamonds indicate stochastic variables, circles deterministic variables. $\bm{z}$s are latent spaces, $\bm{x}$s are model inputs/outputs.}
     \label{fig:lvae}
 \end{figure}
 
@@ -812,6 +815,12 @@ Its design is driven by the idea that \say{[i]f $\bm{z}_i$ is more abstract than
 Figure~\ref{fig:vlae_structure} shows an exemplary network structure of a \ac{VLAE}.
 Early embedding layers like $\bm{z}_1$ are equipped with a less powerful network that, according to \citet{zhao2017learning}, should not learn abstract features\footnote{In case of \textsc{Mnist}, more abstract features are for example the digit identity.}.
 
+This design allows \acp{VLAE} to encode lower-level factors of variation (for example \textit{stroke thickness} in the context of a dataset of written digits) in lower layers and higher-level factors of variation (e.g., \textit{digit identity}) in higher layers.
+\citet{zhao2017learning} claim that the \ac{VLAE}, for such a dataset, learns different factors of variation independently in different layers.
+
+The hierarchical structure of embedding layers in the \ac{VLAE} make it another candidate model for the visual cortex.
+However, the proposition that different layers learn different factors of variation independently seems to be mostly based on an analysis on model-generated samples.
+
 \paragraph{$\beta$-VAE}
 
 Consider Equation~\ref{eq:elbo_error_term}, describing the loss function in a \ac{VAE}.
@@ -866,6 +875,7 @@ The encoder minimizes $\mathcal{L}_{\text {prior }} +  \mathcal{L}_{\text {llike
 Choosing $\gamma = 0.75$ led to training convergence for the experiments performed for this thesis.
 
 \citet{larsen2015autoencoding}~show that this training procedure leads to less blurry reconstructions.
+Adapting the \ac{VAE}-\ac{GAN} training objective to the \ac{VLAE}-model could lead to improvements for that model as well.
 
 \paragraph{Adversarial Latent Autoencoder}
 \begin{figure}
@@ -932,7 +942,7 @@ Furthermore, just like for the \ac{VAE}, the Gaussian latent space $Z$ can be tr
 
 \citet{pidhorskyi2020adversarial} show that (linearly) interpolating in $\bm{w}$-space yields smoother transitions than interpolation between two corresponding points in $\bm{z}$-space.
 This indicates that the $\bm{w}$-space is less entangled than the $\bm{z}$-space~\citep{shao2018riemannian,arvanitidis2017latent}.
-However, traversing the $\bm{w}$-space is not easily possible as its structure is unknown.
+However, traversing the $\bm{w}$-space directly is not easily possible as its structure is unknown.
 Compared to \acp{VAE}, where a linear interpolation between points in the latent $\bm{z}$-space leads to an almost geodesic path in $\bm{x}$-space\footnote{Therefore, points that are close in $\bm{z}$-space of an \ac{VAE} lead to images that are close in the feature space.}, the mapping function $\mathcal{F}$ seems to be non-smooth.
 Therefore, traversing $\bm{z}$ for an \ac{ALAE} seems to lead to a non-smooth path in the feature space.
 

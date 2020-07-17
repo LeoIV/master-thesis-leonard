@@ -91,9 +91,24 @@ M.Sc. Zahra Fayyaz
 \end{titlepage}
 \pagenumbering{Roman}
 
-\section*{\centering Abstract}
 
-bla bla bla
+\newgeometry{margin=2.5in}
+\section*{\centering Abstract}
+Unsupervised convolutional neural networks have been successfully applied to a variety of tasks but their biological plausibility is underexplored.
+Previous research has developed both networks that are biologically plausible and networks able to generate natural images but the gap between these network types remains.
+This thesis aims at answering two questions.
+First, whether \acp{VAE} (a specific type of convolutional neural networks) are a biologically plausible model of the visual cortex and, second, whether the latent representations of these networks are related to semantic representations in the brain.
+Regarding the first question, it is studied whether they learn similar features as the \ac{V1}, whether they employ sparseness similarly to the brain,
+For the second question, it is investigated how the model maps categorical and continuous attributes in the latent space.
+
+For this purpose and six different network types are developed and evaluated on different established datasets.
+It is found that hierarchical and non-hierarchical \acp{VAE} do not learn Gabor wavelets;
+And even though they employ sparseness, this sparseness seems to be unrelated to sparseness in the brain.
+It is shown that feed-forward \acp{VAE}-models, trained on static images, are probably an inapt model of the visual cortex.
+Furthermore, it is argued that the latent space represent many attributes of datasets highly non-linearly.
+This asks to revise common assumptions of the latent space structure.
+\restoregeometry
+\clearpage
 
 \tableofcontents
 \newpage

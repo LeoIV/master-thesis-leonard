@@ -35,7 +35,7 @@ However, the same effect cannot be observed in the kernels AlexNet-\ac{VAE}\foot
 Figure~\ref{fig:vae_layer1_kernels} shows the kernels of the first layer in AlexNet-\ac{VAE}.
 Moreover, no Gabor wavelets emerged in any of the models\footnote{All models described in Section~\ref{subsec:models} apart from AlexNet Classifier.} or for any of the datasets.
 
-It is therefore concluded that a simple feed-forward \ac{VAE} or \ac{VLAE} trained on static images probably cannot learn Gabor-wavelets.
+It is therefore concluded that a simple feed-forward \ac{VAE} or \ac{VLAE} trained to generate dense representations of static images probably cannot learn Gabor-wavelets.
 This does not imply that \acp{VAE} or \acp{VLAE} do not explain cortical activity (this is discussed in Section~\ref{subsec:representational-dissimilarity-matrices}).
 Furthermore, variations of the \ac{VAE}-design are proposed that could lead to a more biologically plausible model (see Sections~\ref{subsec:feedback-connections-of-the-lateral-geniculate-nucleus} and \ref{subsec:sequential-data}).
 
@@ -43,11 +43,11 @@ Furthermore, variations of the \ac{VAE}-design are proposed that could lead to a
 
 \subsection{Sparseness in Generative Models}\label{subsec:effective-network-capacity}
 One hyperparameter to choose in the different models is the number of feature maps of different layers.
-During the implementation, it could be observed that some feature maps show little activity compared to others.
+During the implementation, it was observed that some feature maps show little activity compared to others.
 As the number of features maps is a model hyperparameter, it was investigated by how much the number of feature maps can be reduced without increasing the network loss.
 
 Furthermore, the question arose whether sparseness in \acp{VLAE} is related to sparseness in the primary visual cortex (see Section~\ref{subsubsec:sparse_representations}).
-If the brain uses sparseness to represent information, do \acp{VLAE} use a similar mechanism?
+Even though \acp{VAE} and \acp{VLAE} do not learn Gabor wavelets in lower layers, they could superpose sparse set of different basis functions to represent their input, similar to \citet{Olshausen1996}.
 If they do, this would be evidence for the relatedness of \acp{VLAE} to the biological example.
 
 The following experiment was conducted to examine if \acp{VLAE} employ sparseness or if the model has only too much capacity.
@@ -102,7 +102,7 @@ Batch normalization was disabled for this experiment, because it re-scales the f
         \includegraphics[width=\textwidth]{images/sparseness/sparseness_validation_loss.png}
         \caption{Validation loss}
     \end{subfigure}
-    \caption[Sparse Models - Loss Curves]{Loss curves of models with different number of feature maps (see Section~\ref{subsubsec:vae_models}). $fm$ is the reduction factor of the feature maps; $fm=1$, therefore, is the original model, $fm=2$ the model with half the number of feature maps, and $fm=3$ the model with one third of the feature maps.}
+    \caption[Sparse Models - Loss Curves]{Loss curves of models with different numbers of feature maps (see Section~\ref{subsubsec:vae_models}). $fm$ is the reduction factor of the feature maps; $fm=1$, therefore, is the original model, $fm=2$ the model with half the number of feature maps, and $fm=3$ the model with one third of the feature maps.}
     \label{fig:learning_curves_sparseness}
 \end{figure}
 
@@ -114,16 +114,16 @@ After achieving the minimum validation loss, however, all models overfit.
 \textsc{Mnist}-\ac{VLAE}-factor-1 overfits stronger than \textsc{Mnist}-\ac{VLAE}-factor-2 or \textsc{Mnist}-\ac{VLAE}-factor-3, leading to the highest validation loss after 200 epochs.
 
 Figure~\ref{fig:fm_activities_sparseness} shows the activities of the feature maps in the different models.
-Each line in a subplot is a boxplot, each subfigure the output of either a convolutional, activation, or fully connected layer.
+Each line in a subplot is a boxplot and each subfigure the output of either a convolutional, activation, or fully connected layer.
 Most prominently, the inner activations are sparse after convolutions.
-The activations often increase the level of sparsity as the ReLU activation functions map negative values to zero.
+The activations often increase the level of sparsity since the ReLU activation functions map negative values to zero.
 Sparsity is apparent in almost all feature maps of all models.
 
 \paragraph{Sparseness in \acp{VLAE} vs. Sparse Representations}
 In the brain, the overlap of active neurons is small, i.e., different neurons are active for different stimuli (see Section~\ref{subsubsec:sparse_representations} and \citet{yoshida2020natural}).
 Contrarily, the \acp{VLAE} show high activity mostly in the same feature maps regardless of the input.
 
-The \ac{VLAE} uses sparseness, mostly regardless of the model capacity, which can be explained by the Lottery Ticket Hypothesis~\citep{frankle2018lottery}.
+The \ac{VLAE} uses sparseness mostly regardless of the model capacity, which can be explained by the Lottery Ticket Hypothesis~\citep{frankle2018lottery}.
 The Lottery Ticket Hypothesis states that, in general, it is highly unlikely that re-training a pruned network from scratch will result in the same weight configuration of the subnetwork in the initial model.
 In the three models (\textsc{Mnist}-\ac{VLAE}-factor-1, \textsc{Mnist}-\ac{VLAE}-factor-2, and \textsc{Mnist}-\ac{VLAE}-factor-3), there seems to be a sub-network that accounts for the activity in the model.
 Regardless of the reduction factor, there always remains an active sub-network for all three models.
@@ -138,12 +138,12 @@ Again, the $\beta$-\ac{VAE} loss function is defined as
     \mathbb{E}_{q_{\phi}(\bm{z} | \bm{x})}\left[\log p_{\theta}(\bm{x} | \bm{z})\right]-\beta \kldiv{q_{\phi}(\bm{z} | \bm{x})}{p(\bm{z})}. \label{eq:beta-vae-2}
 \end{align}
 Increasing the weight of the reconstruction term in the \ac{VAE} training objective (smaller $\beta$ in Equation~\ref{eq:beta-vae-2}\footnote{The $\beta$ in $\beta$-\ac{VAE} is the \ac{KL}-term weight. Therefore, decreasing $\beta$ analog to increasing the reconstruction term weight.}) leads to reconstructions more similar to the training samples.
-The posterior distribution, however, will match the prior distribution less precisely.
+The posterior distribution, however, matches the prior distribution less precisely.
 Contrarily, increasing $\beta$ in Equation~\ref{eq:beta-vae-2} leads to a posterior closer to the prior distribution at the expense of reconstruction quality.
 Moreover, \citet{higgins2017beta} claim that increasing $\beta$ leads to a better latent space disentanglement, i.e., each dimension in the latent space is uniquely correlated with a single factor of variation.
 
 As discussed in Section~\ref{subsec:feature-disentanglement}, the quality of feature space disentanglement can be assessed by measuring how fast reconstructions change as the latent space is traversed.
-However, a disentangled feature space should be problematic for datasets with categorical factors of variation, such as dSprites, where features change fast by definition.
+Nevertheless, a disentangled feature space should be problematic for datasets with categorical factors of variation, such as dSprites, where features change fast by definition.
 Even though CelebA has binary labels as well (e.g., \say{brown hair}), there still is enough variation within hair colors to allow a smooth translation between hair colors~\citep{higgins2017beta}.
 For dSprites, there are only three distinct shapes (\say{square}, \say{ellipse}, and \say{heart}).
 To achieve a good reconstruction quality on these shapes, the model would have to place them in separate areas of the latent space, violating both feature space disentanglement and a Gaussian posterior.
@@ -223,12 +223,13 @@ The \textit{shape} alone does not explain the sharp peaks in the ninth dimension
     \label{fig:10000_vae_latent_space_distribution_scales}
 \end{figure}
 
-Consider Figure~\ref{fig:10000_vae_latent_space_distribution_scales}, showing distributions of images grouped by their scale.
+Consider Figure~\ref{fig:10000_vae_latent_space_distribution_scales}.
+It shows distributions of images grouped by their scale.
 Images in dSprites are scaled by six distinct factors evenly chosen from $[0.5; 1.0]$.
 The scale values in the dSprites dataset are six distinct values in the range from 0.5 to 1.0.
 A \ac{VAE} model with a too strong reconstruction term does not learn to interpolate between these values but assigns them distinct areas in the latent space.
 
-Grouping images by their scale \textit{and} a shape, explains the distinct peaks in the ninth dimension (see Figure~\ref{fig:10000_vae_latent_space_distribution_scales_and_shapes}).
+Grouping images by their scale \textit{and} shape explains the distinct peaks in the ninth dimension (see Figure~\ref{fig:10000_vae_latent_space_distribution_scales_and_shapes}).
 Each shape has a distinct peak in the ninth dimension.
 However, the peaks of shapes \textit{Ellipse} and \textit{Square} superpose.
 When plotting all three shapes together, a small peak (\textit{Heart}) and a big peak (\textit{Ellipse} and \textit{Square}) can be observed.
@@ -255,7 +256,7 @@ When plotting all three shapes together, a small peak (\textit{Heart}) and a big
 \end{figure}
 
 Furthermore, the model seems to learn a hierarchical clustering in the ninth dimension.
-\textit{Shape} appears to be a sub cluster of \textit{Scale}.
+\textit{Shape} appears to be a sub-cluster of \textit{Scale}.
 This sub-clustering leads to highly entangled latent space and a highly un-Gaussian distribution.
 However, it allows us to violate the \ac{KL}-term in favor of the reconstruction term in just one instead of two dimensions.
 
@@ -289,8 +290,8 @@ It shows the high degree of latent space entanglement: sudden position changes (
 
 Obtaining $\bm{z}$ by fixing only the shape and the scale for an $\bm{x}_i$ and averaging over all other configurations was unsuccessful.
 Based on the cluster analysis, not fixing the scale would easily result in regions with low probability density.
-It lead to empty images as it probably lead to $\bm{z}_i$s in regions of the latent space with low probability density.
-Furthermore, for the latent space traversal shown in Figure~\ref{fig:10000_vae_latent_space_traversal_shape_to_shape}, it was possible to always find parameter combinations where the traversal lead to empty images in the middle of the line segment.
+It leads to empty images as it probably leads to $\bm{z}_i$s in regions of the latent space with low probability density.
+Furthermore, for the latent space traversal shown in Figure~\ref{fig:10000_vae_latent_space_traversal_shape_to_shape}, it was possible to always find parameter combinations for which the traversal lead to empty images in the middle of the line segment.
 
 \begin{figure}
     \centering
@@ -361,11 +362,11 @@ Consider 6,250-\ac{VAE}.
 Here, generating some image for a random point in the latent space is already quite likely.
 Nevertheless, there are still \say{enough} regions producing black images.
 For these black regions, the \ac{PPL} is low, just like for 10,000-\ac{VAE}.
-However, for the points producing images, the \ac{PPL} is high, because the latent space still is entangled.
+For the points producing images, the \ac{PPL} is high, because the latent space still is entangled.
 This causes a high standard deviation.
 
 The previous observations have some implications for the application of the \ac{PPL}.
-First, the latent space to be approximately Gaussian is necessary for the \ac{PPL} to produce interpretable results.
+First, the latent space needs to be approximately Gaussian for the \ac{PPL} to produce interpretable results.
 Second, if the latent space is Gaussian, the standard deviation should be observed.
 A too high standard deviation is evidence that there are regions of low probability density in the latent space.
 The \ac{PPL} standard deviation could be a measure of this.
@@ -389,16 +390,16 @@ The lower embedding layers of such a model trained on \textsc{Mnist} (see Sectio
 
 Incorporating the additional labels provided by Morpho-\textsc{Mnist} analyzing to what extent the lower layers learn which morphological features of \textsc{MNIST}.
 The morphological attributes, however, are not equally distributed for all digits.
-The mean stroke length and the digit width, for example, have a meager mean value for the digit \say{1} (see Figure~\ref{fig:morpho_mnist_distribution}).
+The mean stroke length and the digit width, for example, have a low mean value for the digit \say{1} (see Figure~\ref{fig:morpho_mnist_distribution}).
 Therefore, it should be possible to almost uniquely identify digit \say{1} identity by just considering the stroke length or the digit width.
 Other attributes, such as stroke thickness, digit slant, and digit height, are more evenly distributed (see Figure~\ref{fig:morpho_mnist_distribution}).
 
 Consider Figure~\ref{subfig:vlae_mnist_latent_space_z_1_slant} showing the embedding layer $\bm{z}_1$ colored by digit slant.
-Figure~\ref{fig:morpho_mnist_distribution} shows that the mean of the attribute \textit{Slant} is quite evenly distributed.
+Figure~\ref{fig:morpho_mnist_distribution} shows that the mean of the attribute \textit{slant} is quite evenly distributed.
 The color gradient in Figure~\ref{subfig:vlae_mnist_latent_space_z_1_slant}, therefore, indicates that the VLAE learns the morphological attribute instead of just showing the class identity, encoded using another morphological attribute that correlates with class identity.
 
 For Figure~\ref{subfig:vlae_mnist_latent_space_z_1_width}, the situation is different.
-The noticeable dark-purple cluster in the top left correlates with dark-purple points in Figure~\ref{subfig:vlae_mnist_latent_space_z_1_identity} that encode image with label \say{1}.
+The noticeable dark-purple cluster in the top left correlates with dark-purple points in Figure~\ref{subfig:vlae_mnist_latent_space_z_1_identity} that encode images with label \say{1}.
 For digit width, however, \say{1} is an outlier (see Figure~\ref{fig:morpho_mnist_distribution}), and a small digit width, therefore, is a reliable indicator for a digit identity of \say{1}.
 Nonetheless, overall digit identity does not seem to be encoded strongly by $\bm{z}_1$ (see Figure~\ref{subfig:vlae_mnist_latent_space_z_1_identity}).
 
@@ -572,7 +573,7 @@ The latent space plots allow to analyze which features are learned in which laye
 For example, hair color is mainly learned in the first and second layers (see Figures~\ref{subfig:latent_space_celeba_vale_colored_black_hair} and \ref{subfig:latent_space_celeba_vale_colored_blond_hair}) because green and red dots build clusters within these layers.
 Other features do not seem to be learned at all (see Figure~\ref{subfig:latent_space_celeba_vale_colored_wearing_earrings}).
 
-However, since CelebA provides only binary attributes, the latent space analysis is less insightful than for dSprites and Morpho-\textsc{Mnist}.
+CelebA provides only binary attributes, the latent space analysis is less insightful than for dSprites and Morpho-\textsc{Mnist}.
 Furthermore, the models learn factors of variation that are not present in the labels (see Section~\ref{subsubsec:latent_space_traversals}).
 
 \paragraph{dSprites}
@@ -671,8 +672,8 @@ Only object-orientation does not seem to be learned at all (see Figure~\ref{subf
 dsprites-\ac{VLAE}-dim2 (see Figure~\ref{fig:vlae_latent_space_dsprites}) is worse compared to dSprites-\ac{VAE}-dim6.
 Again, the model learns main clusters, especially for object position (see Figures~\ref{subfig:vlae_embedding_z3_dsprites_x_pos} and~\ref{subfig:vlae_embedding_z3_dsprites_y_pos}).
 Furthermore, the model learns the object scale (see Figure~\ref{subfig:vlae_embedding_z3_dsprites_scale} and \ref{subfig:vlae_embedding_z2_dsprites_scale}).
-Otherwise, the model does not seem to learn other factors of variation.
-Furthermore, the representations are not particularly disentangled.
+Apart from that, the model does not seem to learn other factors of variation.
+The representations are not particularly disentangled.
 Object position and scale are learned in all layers, but best in $z_3$.
 
 After training 200 epochs, dSprites-\ac{VAE}-dim6 achieved a loss of 21.638 (reconstruction loss: 6.375, \ac{KL}-loss: 15.264).
@@ -693,7 +694,7 @@ The values of the other $z$-layers were obtained by sampling from a uniform dist
 First, most models properly employ the latent space - the traversal shows almost no non-representative generated images, with a few exceptions for \textsc{Mnist}-\ac{VLAE} and \textsc{Mnist}-\ac{VLAE}-\ac{GAN}.
 Noteworthy, these non-representative images mainly occur on the borders where the variance is high.
 The models were trained such that the latent space is standard normal, the latent space traversal, however, goes from -3 to 3, in areas with low probability density.
-Unrepresentative generations in such areas, therefore, is no model failure.
+Unrepresentative generations in such areas, therefore, are no model failure.
 
 \begin{figure}
     \centering
@@ -792,7 +793,7 @@ The bins are ordered, increasing color values correspond to increasing attribute
 The first row shows the latent space position for each dimension separately.
 The $x$-axis corresponds to the (ordered) bins.
 
-If one layer does not learn a particular attribute, its value should not change much as the attribute values are varied.
+If one layer does not learn a particular attribute, its value should not change much while the attribute values are varied.
 For example, this can be observed in Figure~\ref{subfig:vlae_mnist_morpho_latent_space_values_thickness} (layers two and three).
 Even though the latent space values are non-stationary for high thickness values, this can be attributed to the few images of a high thickness (see Figure~\ref{fig:morpho_mnist_distribution}).
 Apart from that, only layer one seems to encode thickness as it is the only layer showing a trend for this attribute.
@@ -944,11 +945,11 @@ Something similar can be observed for the position.
 
 The left sides of Figures~\ref{subfig:vae_dsprites_x_pos_latent_space_route} and \ref{subfig:vae_dsprites_y_pos_latent_space_route} show the path in a reduced latent space\footnote{Plots for the other models (7,500-, 6,250-, 5,000, 3750-\ac{VAE}, and \ac{VAE}-\ac{GAN}) can be found in Appendix~\ref{sec:appendix_plots_latent_space_traversals}.)}.
 Each arrow is the difference between two successive $x$-, or $y$-positions, mapped into the two-dimensional space.
-The path is curved, surprising as linear interpolations in the latent space are known to be successful for natural attributes such as hair color~(\citep{radford2016deep} and CelebA in this section).
+The path is curved, which is surprising since linear interpolations in the latent space are known to be successful for natural attributes such as hair color~(\citep{radford2016deep} and CelebA in this section).
 Linear interpolation for the position, however, leads to regions of low probability density (see Figure~\ref{fig:vae_7500_dsprites_position_interpolation}).
 The right sides of Figures~\ref{subfig:vae_dsprites_x_pos_latent_space_route} and \ref{subfig:vae_dsprites_y_pos_latent_space_route} show the values for the different dimensions in the non-reduced latent space.
 Some values almost resemble a sine-curve.
-This behavior is qualitatively the same for the other models (7,500-, 6,250-, 5000-, 3750-\ac{VAE}).
+This behavior is qualitatively similar for the other models (7,500-, 6,250-, 5000-, 3750-\ac{VAE}).
 
 Like rotation for which this has been reported previously~\citep{chen2018isolating}, \acp{VAE} seem to encode position in a periodic manner.
 
@@ -1009,7 +1010,7 @@ For the dSprites-\acp{VLAE} model, a similar analysis allows us to identify whic
 \end{figure}
 Figure~\ref{fig:vlae_dsprites_latent_space_values} shows the $\bm{z}$ values of different layers and dimensions for different factors of variation of dSprites-\ac{VLAE}.
 The third layer seems to encode most of the factors of variation: $x$-, and $y$-position, scale, and shape.
-However, the first and second layers also encode orientation (Figures~\ref{subfig:vlae_dsprites_latent_space_values_x} and ~\ref{subfig:vlae_dsprites_latent_space_values_y}) even though less strong.
+However, the first and second layers also encode orientation (Figures~\ref{subfig:vlae_dsprites_latent_space_values_x} and ~\ref{subfig:vlae_dsprites_latent_space_values_y}) even though less strongly.
 The representation, therefore, is not separated;
 The different layers do not independently encode different factors of variation even though these are, by definition, independent in the dsprites dataset.
 Independence, in the case of \textsc{Mnist}, is further discussed in Section~\ref{subsec:independence-of-vlae-embeddings}.
@@ -1027,7 +1028,7 @@ They, therefore, are not discussed.
 By analyzing the latent spaces of different models (\ac{VAE} and \ac{VLAE} models) on different datasets (dsprites and \textsc{Mnist} with Morpho-\textsc{Mnist}), it has been shown that \ac{VAE}- and \ac{VLAE}-models partially learn curved latent space trajectories for ordered latent space attributes (Figures~\ref{fig:vlae_mnist_morpho_latent_space_values},~\ref{fig:vae_dsprites_latent_space_x_position}, and~\ref{fig:vlae_dsprites_latent_space_values}).
 It has empirically been validated that a simple linear interpolation between different orientation values in the latent space of a \ac{VAE} trained on dsprites does not capture the learned \say{orientation-trajectory}.
 The latent space is highly entangled for positional attributes, even if the reconstruction term is extremely low (see Appendix~\ref{sec:appendix_plots_latent_space_traversals}).
-Therefore, it is argued that linear interpolations sometimes do not capture the learned trajectory.
+Hence, it is argued that linear interpolations sometimes do not capture the learned trajectory.
 Interpolating linearly can lead to wrong conclusions regarding the model performance.
 
 % TODO: Write about latent space entangledment
@@ -1040,7 +1041,7 @@ They claim that their model can learn disentangled hierarchical features.
 Figure~\ref{subfig:vlae_mnist_latent_space_traversal} shows reconstructions of this model when systematically exploring one dimension and randomly choosing the others.
 Evidently, the model can learn disentangled representations to some extent.
 
-For example, $\bm{z}_1$ seems to mainly encode the digit thickness, whereas $\bm{z}_3$ seems to encode digit identity.
+For instance, $\bm{z}_1$ seems to mainly encode the digit thickness, whereas $\bm{z}_3$ seems to encode digit identity.
 For $\bm{z}_2$, however, it seems also to influence the digit identity.
 It has been shown that these factors of variation are not learned independently in the latent space (see Section~\ref{subsec:model-generated-samples}).
 However, a decoder could be able to ignore this redundancy and to use only the non-redundant latent-space information.
@@ -1085,7 +1086,7 @@ Consider Algorithm~\ref{alg:layer_representative_samples}.
 The function \textsc{VLAE-Decoder} calls the decoder of the \ac{VLAE}, i.e., $p_\theta(\bm{x} | \bm{z}_1, \bm{z}_2, \bm{z}_3)$.
 Calling the function \textsc{LayerRepresentativeSamples} returns an ordered set $\mathcal{L}$ of \say{layer representative samples.}
 Each sample $i$ contains three items, say $\bm{x}_1^i, \bm{x}_2^i, \bm{x}_3^i$ that were created by fixing a value $\bm{v}$ in Line~\ref{line:fixing_v} of Algorithm \ref{alg:layer_representative_samples}.
-What is meant by the term \say{layer representative samples} is that for example $\bm{x}_1^i$ is approximately drawn from the marginal distribution
+\say{Layer representative samples} means that for example $\bm{x}_1^i$ is approximately drawn from the marginal distribution
 \begin{align}
     \bm{x}_1^i \sim p_\theta(\bm{v} | \bm{z}_1) = \int_{\bm{z}_2} \int_{\bm{z}_3} p_\theta(\bm{v} | \bm{z}_1, \bm{z}_2, \bm{z}_3) d\bm{z}_2 d\bm{z}_3.
 \end{align}
@@ -1137,8 +1138,8 @@ Choosing a value $\bm{z}_1 = \varphi$ such that $p_\theta(\bm{x} | \bm{z}_1 = \v
     \end{subfigure}
     \caption[\textsc{Mnist}-VLAE and \textsc{Mnist}-VLAE-GAN - Pixel intensity correlation]{Histogram of correlations of pixel-wise intensities when fixing different pairs of dimensions for \textsc{Mnist}-\ac{VLAE} and \textsc{Mnist}-\ac{VLAE}-\ac{GAN}.
     Each value in the histogram is the Pearson correlation coefficient for one pixel of a generated dsprites image (compare Figure~\ref{fig:notprop} showing the correlations in the case of \textsc{Mnist}).
-    The histogram is colored by if the correlation is significant ($H_0$: The absolute correlation is equal to the absolute correlation of samples with zero correlation) at a 95\% confidence level.
-    The $p$-values have be corrected by the Benjamini/Hochberg method.}
+    The histogram is colored by whether the correlation is significant ($H_0$: The absolute correlation is equal to the absolute correlation of samples with zero correlation) at a 95\% confidence level.
+    The $p$-values have been corrected by the Benjamini/Hochberg method.}
     \label{fig:mnist_vlae_notprop}
 \end{figure}
 
@@ -1154,9 +1155,9 @@ The $\bm{x}$-values of dots in the same box then correspond to $\bm{x}_1^1\big|_
 Analogously, the $y$-values of dots in the same box correspond to $\bm{x}_2^1\big|_{(3,1)}, \dots, \bm{x}_2^{100}\big|_{(3,1)}$.
 Each dot corresponds to one fixed $\varphi$-value.
 
-If changing the value of $\bm{z}_1$ was independent of changing the value of $\bm{z}_2$, the boxes should show no trend.
+If changing the value of $\bm{z}_1$ is independent of changing the value of $\bm{z}_2$, the boxes should show no trend.
 This is true for outer boxes.
-They correspond to pixel values that always close to zero.
+Since they correspond to pixel values that always close to zero.
 Therefore the values are in the bottom left corner, and no correlation can be observed.
 For center pixels, however, the plot shows something different.
 They show an interesting correlation pattern of negative and positive correlations.
@@ -1212,7 +1213,7 @@ Therefore, it is assumed that the discriminative loss leads to decoders factorin
     \end{subfigure}
     \caption[dSprites-VLAE and dSprites-VLAE-GAN - Pixel intensity correlation]{Histogram of correlations of pixel-wise intensities when fixing different pairs of dimensions for dSprites-VLAE and dSprites-VLAE-GAN.
     Each value in the histogram is the Pearson correlation coefficient for one pixel of a generated dsprites image (compare Figure~\ref{fig:notprop} showing the correlations in the case of \textsc{Mnist}).
-    The histogram is colored by if the correlation is significant ($H_0$: The absolute correlation is equal to the absolute correlation of samples with zero correlation) at a 95\% confidence level.
+    The histogram is colored by whether the correlation is significant ($H_0$: The absolute correlation is equal to the absolute correlation of samples with zero correlation) at a 95\% confidence level.
     The $p$-values have be corrected by the Benjamini/Hochberg method.}
     \label{fig:dsprites_vlae_notprop}
 \end{figure}
@@ -1330,7 +1331,7 @@ The other plots in Figure~\ref{fig:mean_generated_vs_true} were created accordin
 
 Consider Figure~\ref{fig:mean_generated_vs_true_gauss_post} showing the same distribution but for the standard normal prior.
 The pixel-wise statistics are quite different compared to Figure~\ref{fig:mean_generated_vs_true} and resemble the true distribution worse.
-The above procedure is crucial when evaluating a model.
+The aforementioned procedure is crucial when evaluating a model.
 Sampling from the prior leads to worse model performance in resembling the data distribution.
 
 Analyzing Figure~\ref{fig:mean_generated_vs_true} leads to the assumption that all models learn the pixel distributions to some extent.
@@ -1551,7 +1552,7 @@ To better understand the behavior, the network was applied to a set of artificia
     \label{fig:stripes_test_img}
 \end{figure}
 
-Figures~\ref{subfig:test_images_stripes8} and~\ref{subfig:test_images_stripes11} turned out to be most insightful.
+Figures~\ref{subfig:test_images_stripes8} and~\ref{subfig:test_images_stripes11} turn out to be most insightful.
 Figure~\ref{fig:stripes_test_img} shows the feature map after the last LeakyReLU (LeakyReLU 5) activation of the network given Figure~\ref{subfig:test_images_stripes8} (Figure~\ref{subfig:stipes_test_img_leakyrelu5}) as well as the feature map after max-pooling of this feature map (Figure~\ref{subfig:stripes_test_img_maxpool3}).
 Figure~\ref{subfig:stipes_test_img_leakyrelu5} allows for multiple observations.
 Firstly, the feature map in the first column of the fifth row resembles the input stimulus itself.
@@ -1594,16 +1595,16 @@ Furthermore, the encoder of the generative models was trained such that the hidd
 Advantages, disadvantages, and use-cases for both loss functions are discussed in the following.
 
 First of all, both loss functions do not seem to be biologically plausible as they are not founded in Hebbian learning.
-For the encoder loss, it could be argued that it is trained to elicit a \say{neural response} in the discriminator, similar to the one for real images.
+For the encoder loss, it is argued that it is trained to elicit a \say{neural response} in the discriminator, similar to the one for real images.
 This \say{activity matching} seems to be somewhat related to Hebbian learning as it explicitly considers the amount of activity on the level of single neurons.
 However, discriminator and encoder itself are trained using backpropagation.
 
 \citet{larsen2015autoencoding} state that the pixel-wise loss can lead to very high values even for small translation (see Section~\ref{subsubsec:representation_learning}).
 Intuitively seeming like a disadvantage, this is only true for images with a high frequency and a notable variance of pixel values.
 A black-and-white image consisting of alternating black and white rows and the same image shifted by one pixel in the $y$-direction would result in a maximum pixel-wise loss as the two images are orthogonal.
-However, natural images are usually less susceptible to a sizeable pixel-wise loss for small translations because there are fewer regions of high contrast.
+Yet, natural images are usually less susceptible to a sizeable pixel-wise loss for small translations because there are fewer regions of high contrast.
 In the context of natural images, the pixel-wise loss function, for example, enables the model to detect if an object is placed in another corner of the image as the loss would increase for such high translations.
-However, if the aim is to generate more realistic images, the generative loss should be used since the pixel-wise loss leads to blurry reconstructions.
+Nevertheless, if the aim is to generate more realistic images, the generative loss should be used since the pixel-wise loss leads to blurry reconstructions.
 
 Another consideration is training stability.
 Due to the adversarial loss, training \acp{GAN} has many difficulties (mode collapse, error oscillation, see Section~\ref{subsubsec:gans}), often resulting in failure modes.
@@ -1677,7 +1678,7 @@ Hidden layer activations of supervised \acp{CNN} have already shown to fulfill t
 Furthermore, the \ac{RDM} study indicates that similar stimuli activate similar subpopulations of \say{neurons} in the network.
 
 However, it remains unclear whether these subpopulations consist of neighboring units.
-This is presumably not the case as the network has no intent to group units that are active for a particular stimulus, close one to another.
+This is presumably not the case as the network has no intent to group units that are active for a particular stimulus, close to another.
 
 \acfp{VAE}, in contrast, have the property to map similar stimuli to neighboring areas of the latent space.
 A \ac{VAE} as part of a supervised \ac{CNN}\footnote{Potentially even a sequential one, see Section~\ref{subsec:sequential-data}}, trained to reconstruct hidden layer activations could therefore be a good candidate model for semantic representations.

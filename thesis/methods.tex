@@ -1,5 +1,19 @@
 The following Sections describe the methods used in the course of this thesis.
 
+\subsection{Research Questions}\label{subsec:research-questions}
+
+The studies in Section~\ref{sec:results} are guided by the following research questions:
+\begin{enumerate}
+    \item Are \acp{VAE} or \acp{VLAE} related to the visual cortex in terms of the emergence of Gabor wavelets or sparse coding?
+    \item Do \acp{VAE} or \acp{VLAE} fulfil the requirements of latent space disentanglement or latent space separability?
+    \item Can \acp{VAE} or \acp{VLAE} represent both continuous and categorical factors of variation in the latent space?
+    \item How do \acp{VAE} and \acp{VLAE} represent lower factors of variation in the latent space?
+    \item Do \acp{VAE} or \acp{VLAE} learn independent factors of variation independently in the latent space?
+    \item Are the latent spaces of \acp{VLAE} independent in terms of generated images?
+    \item Do \acp{VAE}/\acp{VLAE}-generated images resemble the data distribution?
+    \item Is the discriminative loss superior to the pixel-wise loss in terms of the previous research questions?
+\end{enumerate}
+
 \subsection{Implementation Details}\label{subsec:implementation-details}
 
 All models are implemented with Keras\footnote{\href{https://keras.io/}{https://keras.io/}, last access: 07/01/2020} in Version 2.2.4 using the TensorFlow\footnote{\href{https://www.tensorflow.org/}{https://www.tensorflow.org/}, last access: 07/01/2020} backend in Version 1.15..

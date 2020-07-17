@@ -1,16 +1,32 @@
 This thesis discussed if \acfp{VAE} are candidate models of the visual cortex, potentially allowing to obtain semantic representations of the input.
-Only little evidence has been found that \acp{VAE} and other related models have this property, suggesting that these models at least need to be modified to be good models of the visual system.
-A more pessimistic conclusion is that unsupervised models per se are unfit models of the visual system.
 
-This, however, leads to the question why supervised explain \ac{IT} activity better than unsupervised models.
-
+\acp{VAE} and \acp{VLAE} show no Gabor wavelets in early layers, neither does their inner activity seem to be related to sparse coding as observed in the brain.
+Modifications of the \ac{VAE} model structure such as top-down connections or recurrent layers allowing for input sequences could shed new light on biological relatedness.
+Even though \acp{VAE} and \acp{VLAE} are not related to the biological example in the lower layers, an \ac{RDM}-comparison between \ac{IT} and the high-level representations of \acp{VAE} should be conducted in the future.
+If \ac{VAE}-models fail in explaining cortical activity, it should be investigated why supervised models succeed in this regard.
 One assumption is that the brain also mainly learns in a supervised manner and that supervision is always required to build realistic models of the brain.
 This assumption seems to be too naive for a variety of reasons.
-
 First, the models discussed in this thesis are too unrelated to the brain to allow such a conclusion.
 The role of top-down connections as well as the role of sequential data has not been investigated thoroughly.
-Furthermore, there are unsupervised models leading to Gabor wavelets~\citep{berkes2005slow}.
+Furthermore, there are unsupervised models leading to Gabor wavelets~\citep{Olshausen1996,berkes2005slow}.
 This is another hint that unsupervised models in general might be suitable models but need more refinement.
+\ac{VAE}-models learn dense input representations.
+Even though this is benefical in terms of image generation, this representation might be too disconnected from the biological example.
+The higher-layer activity of supervised \acp{CNN} could serve as a biologically more plausible input representation.
+\ac{VAE}-encodings of these representations might combine the advantages of the two models.
 
-This thesis ruled out a family of models (\acp{VAE} and \acp{VLAE} in particular) as good models of the visual system.
-But also, this thesis discussed ways to extend these models to better model the visual cortex and the emergence of semantic representations, suggesting multiple approaches for future research.
+This work proposes new means of analyzing latent space entanglement in \acp{VAE} and independence of \ac{VLAE}-generated items.
+It has been shown that \acp{VLAE} do not learn independent factors of variation independently in different layers.
+Additionally, studying only model-generated samples can be misguiding because decoders could be able to factor out redundant information in the latent spaces.
+However, the latent distributions are also not independent in terms of generated images as shown by a newly proposed method of analysis.
+\acp{VAE} and \acp{VLAE} often fail in retrieving the data distribution.
+Sampling from the posterior distribution leads to class distributions different from the input data.
+Therefore, latent space entanglement seems to be less controllable for \acp{VLAE} than for \acp{VAE}.
+
+Considering lower-, and higher-level factors of variation, it has been shown that \acp{VAE} and \acp{VLAE} learn super-, and sub-clusters of different factors of variation.
+Furthermore, \acp{VAE} with a well-balanced loss function can encode and learn a transition between categorical factors of variation.
+However, poorly defined \acp{VAE} can even fail in learning continuous factors of variation if not enough samples are present in the training set.
+
+Employing adversarial loss function instead of the pixel-wise loss does not seem to lead to improvements in terms of biological plausibility or latent space entanglement.
+Yet, decoders of such models apparently do better factor out redundant information in the latent spaces.
+Nonetheless, it is argued that the pixel-wise loss functions has fewer disadvantages but more advantages than the adversarial loss.

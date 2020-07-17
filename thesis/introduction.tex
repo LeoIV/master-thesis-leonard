@@ -1,22 +1,33 @@
 Research in artificial neural networks has risen in recent years due to their success in a large variety of tasks.
-This increase in research has led to progressively better network architectures, achieving better and better performance.
+This increase in research has led to progressively better network architectures, surpassing previous performance.
 However, the improvement of network architectures is mainly driven by the question of whether a new improvement will lead to better results \citep{lindsay2020convolutional}.
 
-Biological plausibility, an essential consideration in computational neuroscience, is often of no interest to researchers aiming at solving a complex problem.
+Biological plausibility, an essential consideration in computational neuroscience, is often of no interest to researchers aiming at solving complex problems.
 Even though progress in neural network research has become more disconnected from the biological example, they are inspired by biology.
 Modern neural networks operating on images (mainly \acp{CNN}) indeed share many features with the visual system.
 
-Even though neural networks are trained in a manner different from the way the brain learns and builds memories, it has been shown that image classification networks are related to the visual system, not only areas where this relatedness has been built into the model.
+Even though neural networks are trained in a manner different from the way the brain learns and builds memories, it has been shown that image classification networks are related to the visual system, not only in areas where this relatedness has been built into the model.
 
 Both the biological foundation of \acp{CNN} and the more recent insights on their more indirect relatedness to the visual system qualify them as a potentially useful visual system model.
 
 Unfortunately, the neural networks where this kind of relatedness has been discovered are trained in a supervised manner, requiring lots of labeled data.
 This kind of learning is disconnected from human perception, where often one single example is sufficient when it comes to grouping objects into classes.
 
-The \ac{VAE} is one important representative of a class of models \textit{generative models}.
+The \ac{VAE} is one important representative of \textit{generative models}.
 This class of models allows a different training procedure, still requiring many samples but no labels.
 Furthermore, \acp{VAE} build generalizable latent representations of inputs, which might be similar to the abstract representation of the brain when perceiving the world.
 
 \acp{VAE}, therefore, could be an important step towards a more realistic model of the visual system.
+An important consideration in the context of computational neuroscience is the representation of visual input.
+Naturally, \acp{VAE} learn an input representation that generalizes to some degree.
+Furthermore, it has been shown that the latent space learns some semantic relationship.
+Nonetheless, the structure of the latent space mainly is a black box.
 
-This thesis aims to answer whether \acp{VAE} prove to be a successful model of the visual system.
+This thesis aims to answer whether \acp{VAE} prove to be a good model of the visual system, focussing on the representation of data in the latent space.
+
+The remainder of this work is structured as follows.
+
+Section~\ref{sec:theoretical-background} introduces the theoretical background and related work.
+Starting points for further studies and open questions are stated as well.
+Section~\ref{sec:methods} describes the methods and means of work.
+Section~\ref{sec:results} describes and discusses studies based on the open questions raised in Section~\ref{sec:theoretical-background}.
