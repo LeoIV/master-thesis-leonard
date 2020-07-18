@@ -7,7 +7,7 @@ It was later found that supervised \acp{CNN} like AlexNet explain \ac{IT} activi
 
 Therefore, emergence of Gabor wavelets in \acp{VAE} would be evidence for their suitability as a model of the visual system.
 Potentially, they would even indicate that higher layers explain activity of higher regions in the visual cortex.
-Therefore, the following experiment was conducted.
+Therefore, the following experiment was conducted (RQ1 a, see Table~\ref{tbl:research_questions}).
 
 Since it is known that AlexNet learns Gabor wavelets in lower-level filters, a \ac{VAE} network with a similar architecture (AlexNet-\ac{VAE}, see Section~\ref{subsubsec:alexnet_vae}) was designed.
 The hypothesis is that if \acp{VAE} can learn Gabor wavelets, this model should show them because it is very similar to the supervised model for which they are learned.
@@ -46,7 +46,7 @@ One hyperparameter to choose in the different models is the number of feature ma
 During the implementation, it was observed that some feature maps show little activity compared to others.
 As the number of features maps is a model hyperparameter, it was investigated by how much the number of feature maps can be reduced without increasing the network loss.
 
-Furthermore, the question arose whether sparseness in \acp{VLAE} is related to sparseness in the primary visual cortex (see Section~\ref{subsubsec:sparse_representations}).
+Furthermore, the question (RQ1 b, see Table~\ref{tbl:research_questions}) arose whether sparseness in \acp{VLAE} is related to sparseness in the primary visual cortex (see Section~\ref{subsubsec:sparse_representations}).
 Even though \acp{VAE} and \acp{VLAE} do not learn Gabor wavelets in lower layers, they could superpose sparse set of different basis functions to represent their input, similar to \citet{Olshausen1996}.
 If they do, this would be evidence for the relatedness of \acp{VLAE} to the biological example.
 
@@ -148,7 +148,7 @@ Even though CelebA has binary labels as well (e.g., \say{brown hair}), there sti
 For dSprites, there are only three distinct shapes (\say{square}, \say{ellipse}, and \say{heart}).
 To achieve a good reconstruction quality on these shapes, the model would have to place them in separate areas of the latent space, violating both feature space disentanglement and a Gaussian posterior.
 
-To analyze how \acp{VAE} behave for categorical factors of variation, a \ac{VAE} with input size $64\times 64$ (the size of dSprites images) and a ten-dimensional latent space was trained on dsprites with different reconstruction term weights: 10,000, 7,500, 6,250, 5,000, and 3,750 (see Section~\ref{subsubsec:vae_models})\footnote{It was first empirically validated that a reconstruction term weight of 10,000 leads to good reconstruction. The other values were chosen by reducing the reconstruction loss term by 1,250 for each model with a larger initial difference (10,000 vs. 7,500).}.
+To analyze how \acp{VAE} behave for categorical factors of variation (RQ3, see Table~\ref{tbl:research_questions}), a \ac{VAE} with input size $64\times 64$ (the size of dSprites images) and a ten-dimensional latent space was trained on dsprites with different reconstruction term weights: 10,000, 7,500, 6,250, 5,000, and 3,750 (see Section~\ref{subsubsec:vae_models})\footnote{It was first empirically validated that a reconstruction term weight of 10,000 leads to good reconstruction. The other values were chosen by reducing the reconstruction loss term by 1,250 for each model with a larger initial difference (10,000 vs. 7,500).}.
 
 \begin{figure}
     \centering
@@ -375,7 +375,7 @@ The \ac{PPL} standard deviation could be a measure of this.
 
 \acp{VAE} and \acp{VLAE} force the latent space to approximate a standard normal distribution.
 However, latent space disentanglement\footnote{See Section~\ref{subsec:feature-disentanglement}.} and latent space separability\footnote{See Section~\ref{subsec:feature-separability}.} require the latent space also to learn factors of variation in different (linear) sub-spaces.
-The following sections explore feature learning in the latent space and answer by how far \acp{VAE} and \acp{VLAE} satisfy the requirements of latent space disentanglement and separability.
+The following sections explore feature learning in the latent space and answer by how far \acp{VAE} and \acp{VLAE} satisfy the requirements of latent space disentanglement (RQ2, see Table~\ref{tbl:research_questions}) and separability.
 
 \subsubsection{Latent Space Embeddings}\label{subsubsec:latent_space_embeddings}
 
@@ -388,7 +388,7 @@ The embeddings are colored by different means, employing information from Morpho
 As discussed in Section~\ref{subsubsec:representation_learning}, the \ac{VLAE} aims at learning \say{hierarchical disentangled representation}~\citep{zhao2017learning}.
 The lower embedding layers of such a model trained on \textsc{Mnist} (see Section~\ref{subsubsec:mnist}) encode features such as stroke width, digit width, and digit tilt, whereas the highest layer mainly learns digit identity~\citep{zhao2017learning}.
 
-Incorporating the additional labels provided by Morpho-\textsc{Mnist} analyzing to what extent the lower layers learn which morphological features of \textsc{MNIST}.
+Incorporating the additional labels provided by Morpho-\textsc{Mnist} analyzing to what extent the lower layers learn which morphological features of \textsc{MNIST} (RQ4, see Table~\ref{tbl:research_questions}).
 The morphological attributes, however, are not equally distributed for all digits.
 The mean stroke length and the digit width, for example, have a low mean value for the digit \say{1} (see Figure~\ref{fig:morpho_mnist_distribution}).
 Therefore, it should be possible to almost uniquely identify digit \say{1} identity by just considering the stroke length or the digit width.
@@ -682,14 +682,15 @@ In contrast, dSprites-\ac{VLAE}-dim2 achieved a loss of 47.860 (reconstruction l
 All in all, using a \ac{VAE} with a higher-dimensional space seems superior to the \ac{VLAE} in terms of encoding efficiency.
 
 \subsubsection{Latent Space Explorations}\label{subsubsec:latent_space_traversals}
+A latent space exploration is one way to see if and how a model learns a general representation of the dataset.
+Especially for \acp{VLAE}, it also allows to examine if different attributes are learned independently in different layers (RQ5, see Table~\ref{tbl:research_questions}).
 
 \subparagraph{\textsc{Mnist}}
 
-A latent space exploration is one way to see if and how a model learns a general representation of the dataset.
 Figures~\ref{fig:mnist_latent_space_traversal_vae} and \ref{fig:mnist_latent_space_traversal_vlae} show the latent space traversal of \textsc{Mnist}-\ac{VAE}\footnote{See Section~\ref{subsubsec:vae_models}.}, \textsc{Mnist}-\ac{VAE}-\ac{GAN}\footnote{See Section~\ref{subsubsec:vae_gan_models}.}, \textsc{Mnist}-\ac{VLAE}\footnote{See Section~\ref{subsubsec:vlae_models}.}, and \textsc{Mnist}-\ac{VLAE}-\ac{GAN}\footnote{See Section~\ref{subsubsec:vlae_gan_models}.}.
 For the models with only one latent layer (\textsc{Mnist}-\ac{VAE} and \textsc{Mnist}-\ac{VAE}-\ac{GAN}), the plot is generated by traversing the latent space in equal steps from $z_i = -3$ to $z_i = 3$ in both dimensions.
-For the hierarchical models (\textsc{Mnist}-\ac{VLAE} and \textsc{Mnist}-\ac{VLAE}-\ac{GAN}), one $z$-layer was fixed and traversed in the same way.
-The values of the other $z$-layers were obtained by sampling from a uniform distribution over $[-3; 3]$.
+For the hierarchical models (\textsc{Mnist}-\ac{VLAE} and \textsc{Mnist}-\ac{VLAE}-\ac{GAN}), one $\bm{z}$-layer was fixed and traversed in the same way.
+The values of the other $\bm{z}$-layers were obtained by sampling from a uniform distribution over $[-3; 3]$.
 
 First, most models properly employ the latent space - the traversal shows almost no non-representative generated images, with a few exceptions for \textsc{Mnist}-\ac{VLAE} and \textsc{Mnist}-\ac{VLAE}-\ac{GAN}.
 Noteworthy, these non-representative images mainly occur on the borders where the variance is high.
@@ -939,7 +940,7 @@ Something similar can be observed for the position.
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/latent_space_traversals/vae_dsprites_7500_position.png}
-    \caption{Linear interpolation between \textit{top-left} and \textit{bottom-right} 7,500-VAE latent space representations on dsprites leads to areas of low probability density.}
+    \caption[7,500-VAE - Areas of Low Probability Density]{Linear interpolation between \textit{top-left} and \textit{bottom-right} 7,500-VAE latent space representations on dsprites leads to areas of low probability density.}
     \label{fig:vae_7500_dsprites_position_interpolation}
 \end{figure}
 
@@ -1045,7 +1046,7 @@ For instance, $\bm{z}_1$ seems to mainly encode the digit thickness, whereas $\b
 For $\bm{z}_2$, however, it seems also to influence the digit identity.
 It has been shown that these factors of variation are not learned independently in the latent space (see Section~\ref{subsec:model-generated-samples}).
 However, a decoder could be able to ignore this redundancy and to use only the non-redundant latent-space information.
-The following experiment investigates if decoders have this property.
+The following experiment investigates if decoders have this property (RQ6, see Table~\ref{tbl:research_questions}).
 \begin{breakablealgorithm}
     \caption{Generating Layer Representative Samples by Averaging Out Other Embedding Layers}\label{alg:layer_representative_samples}
     \begin{algorithmic}[1]
@@ -1228,7 +1229,7 @@ The Figure supports the reasoning of the previous paragraph, i.e., that the \ac{
 Instead, a reconstruction loss is used to force the reconstruction to be close to the real sample in terms of the difference in the pixel values.
 Simultaneously, the \ac{KL}-loss and the reparametrization trick force the model to place similar samples close to another in a continuous Gaussian embedding space.
 Therefore, drawing from the Gaussian embedding space should allow us to generate new samples similar to real samples.
-However, the question remains how indistinguishable these generates samples are from actual samples.
+However, the question remains how indistinguishable these generates samples are from actual samples and whether \ac{VAE}-models resemble the data distribution (RQ7 and RQ8, see Table~\ref{tbl:research_questions}).
 
 Different statistical analyses were performed to address this question, revealing that generated samples can be correctly distinguished from actual samples.
 

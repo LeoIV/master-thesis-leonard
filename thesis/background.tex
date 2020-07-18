@@ -198,18 +198,18 @@ Cluster algorithms are often employed in cases where the class identity of data 
 Figure~\ref{fig:clustering_example} shows an example where this can be feasible because adjacent data points tend to have the same class.
 
 \paragraph{Reinforcement Learning}
-Reinforcement learning is a very different paradigm compared to supervised and unsupervised learning.
-Here, the aim is to train an \textit{agent} to show achieve a goal.
+Reinforcement learning is a quite different paradigm from supervised and unsupervised learning.
+Here, the aim is to train an \textit{agent} to achieve a goal.
 
-An example is rats in a maze.
+An example are rats in a maze.
 A piece of cheese is located in one corner of the maze.
 The different positions in the maze are the possible \textit{states}, the set of all states is the \textit{state space}.
 The rat has multiple possible actions, going forward, backward, left, or right, the set of all actions is the \textit{action space}.
 In this setting, the rat is the agent, trying to maximize its reward.
-It is rewarded for each action in a state (the reward can also be zero).
+It is rewarded for each action in a state (the reward can also be zero or even negative).
 By rewarding good sequences of actions, the rat eventually shows a reasonable behavior.
 
-Reinforcement learning algorithms resemble such settings by modeling state space, action space, rewards, and reward function~\citep[pp. 1, ff.]{sutton2018reinforcement}.
+Reinforcement learning algorithms resemble such settings by modeling a state space, an action space, rewards, and a reward function~\citep[pp. 1, ff.]{sutton2018reinforcement}.
 
 \subsection{Semantic Representations}\label{subsec:semantic-representations}
 
@@ -339,14 +339,14 @@ Just like max-pooling, it leads to a down-sampling of the image because it is ev
 Replacing max-pooling by strides seems to have no significant effect on network classification performance~\citep{springenberg2015striving}, but it requires fewer evaluations than a full convolution with a subsequent max-pooling step.
 
 \paragraph{Transposed Convolutions}
-Suppose we have a $4\times 4$ input image which we are convolving with a $3\times 3$ kernel without padding and no stride\footnote{No stride is equivalent to a stride of one.}.
+Suppose we have a $4\times 4$ input image which we are convolving with a $3\times 3$ kernel without padding and no stride, i.e., a stride of one.
 The output of this is a $2\times 2$ feature map.
 In this example, the \textit{transposed convolution} is the operation that transforms a $2\times 2$ \textit{input} into a $4\times 4$ \textit{output}~\citep{dumoulin2016guide}.
-This can be achieved by padding the $2\times 2$ input with two pixels of padding on the borders.
+This can be achieved by padding the $2\times 2$ input with two pixels on the borders.
 Convolving this padded input with a $3\times 3$ kernel results in a $4\times 4$ output.
 Therefore, a transposed convolution performs an upsampling of the image.
 Usually, it is used to inverse the convolution operation.
-Even though it could be implemented as described above, this implementation would be rather slow.
+Even though it could be implemented as described above, it would be rather slow.
 Convolutions are mostly implemented as matrix multiplications~\citep{georganas2018anatomy}.
 The transposed convolution is then implemented multiplying with an (eponymous) transposed matrix~~\citep{dumoulin2016guide}.
 
@@ -371,8 +371,8 @@ Their findings show that \acp{CNN} reproduce the hierarchy of semantic represent
 The similarity of the \acp{RDM} is evidence that supervised \acp{CNN} and the human \ac{IT} have a similar high-level encoding of information.
 
 % TODO: Der und der nächste Absatz nimmt VAEs vorweg, verschieben?
-\citet{khaligh2014deep} also show that this is not true for a variety of unsupervised models.
-The unsupervised models under investigation, however, are only loosely related to \acfp{VAE}.
+\citet{khaligh2014deep} also show that this is not true for a variety of unsupervised models, yet, not for \acp{VAE}, the models mainly used in the course of this thesis.
+\acp{VAE} are introduced in Section~\ref{subsec:variational-autoencoders}.
 The question of whether \acp{VAE} show similar \acp{RDM} as the human \ac{IT}, therefore, remains.
 
 It has been shown that \acp{VAE}, trained in a self-supervised manner, partially learn Gabor wavelets when trained to predict the next image in a sequence of images~\citep{palm2012prediction}.
@@ -427,7 +427,7 @@ For mode collapse, the generator produces only a few or even just one sample~\ci
 Mode collapse indicates a failure to match the posterior distribution, which is the \ac{GAN} training objective.
 Loss oscillation occurs when the generator and the discriminator alternatingly become stronger and weaker~\citep{ham2020unbalanced}, leading to a non-convergence of the model.
 
-\subsubsection{Variational Autoencoders}\label{subsec:variational-autoencoders}
+\subsubsection{(Variational) Autoencoders}\label{subsec:variational-autoencoders}
 
 Autoencoders are models transforming input into a lower dimensional representation~\citep[p. 146]{Goodfellow-et-al-2016}.
 Unlike the regular Autoencoder, \acp{VAE} furthermore require the lower dimensional representation to follow a defined distribution.
@@ -465,7 +465,7 @@ Values of $\bm{z}$ that are close to another\footnote{For example in terms of Eu
 
 To \textit{generate} new images, it would be advantageous to enforce $p(\bm{z})$ to follow a particular distribution.
 A common choice is an independent, multivariate normal distribution~\citep[pp. 24, 25]{kingma2019introduction}.
-\acp{VAE} enforce a specific (usually Gaussian) distribution over $\bm{z}$.
+\acp{VAE}~\citep{kingma2014autoencoding} enforce a specific (usually Gaussian) distribution over $\bm{z}$.
 
 \acp{VAE} are trained to generate samples that are likely to occur in the training set.
 Therefore, they aim to maximize $\log p(\bm{x})$\footnote{Note that $\max \log  p(\bm{x}) \equiv \max  p(\bm{x})$.}~\citep[p. 18]{kingma2019introduction}.
@@ -812,67 +812,71 @@ Using all these techniques on the \ac{LVAE} model allows meaningful representati
 
 Unlike the \ac{LVAE}, the \ac{VLAE}~\citep{zhao2017learning} is a pure feed-forward network.
 Its design is driven by the idea that \say{[i]f $\bm{z}_i$ is more abstract than $\bm{z}_j$, then the inference mapping $q(\bm{z}_i|\bm{x})$ and generative mapping when other layers are fixed $p(\bm{x}|\bm{z}_i, \bm{z}_{\neg i}=z^0_{\neg i})$ requires a more expressive network to capture}~\citep{zhao2017learning}.
+In simplified terms, learning more complex input-features requires as deeper network than for less complex input-features.
 Figure~\ref{fig:vlae_structure} shows an exemplary network structure of a \ac{VLAE}.
-Early embedding layers like $\bm{z}_1$ are equipped with a less powerful network that, according to \citet{zhao2017learning}, should not learn abstract features\footnote{In case of \textsc{Mnist}, more abstract features are for example the digit identity.}.
+Early embedding layers like $\bm{z}_1$ ($\bm{z}_1$ corresponds to \textit{z\_1\_latent} in Figure~\ref{fig:vlae_structure}) are equipped with a less powerful network that.
+According to \citet{zhao2017learning}, early layers should not learn abstract features\footnote{In case of \textsc{Mnist}, more abstract features are for example the digit identity.}.
 
-This design allows \acp{VLAE} to encode lower-level factors of variation (for example \textit{stroke thickness} in the context of a dataset of written digits) in lower layers and higher-level factors of variation (e.g., \textit{digit identity}) in higher layers.
+Equipping lower layers with less powerful networks allows \acp{VLAE} to encode lower-level factors of variation (for example \textit{stroke thickness} in the context of a dataset of written digits) in lower layers and higher-level factors of variation (e.g., \textit{digit identity}) in higher layers.
 \citet{zhao2017learning} claim that the \ac{VLAE}, for such a dataset, learns different factors of variation independently in different layers.
 
-The hierarchical structure of embedding layers in the \ac{VLAE} make it another candidate model for the visual cortex.
+The hierarchical structure of embedding layers in the \ac{VLAE} make it a candidate model for the visual cortex.
 However, the proposition that different layers learn different factors of variation independently seems to be mostly based on an analysis on model-generated samples.
 
-\paragraph{$\beta$-VAE}
+\paragraph{$\bm{\beta}$-VAE}
 
 Consider Equation~\ref{eq:elbo_error_term}, describing the loss function in a \ac{VAE}.
-\citet{higgins2017beta} discovered that weighting both terms, the KL-divergence and the reconstruction loss, equally leads to suboptimal results in terms of \textit{feature disentanglement}.
-They, therefore, formulated the $\beta$-VAE learning objective that adds a hyperparameter $\beta$ to the loss function, controlling the relative weights of the two terms:
+\citet{higgins2017beta} discovered that weighting both, the KL-divergence and the reconstruction loss, equally leads to suboptimal results in terms of \textit{feature disentanglement}.
+Therefore, they added a hyperparameter $\beta$ to the loss function, controlling the relative weights of the two terms in the $\beta$-\ac{VAE} learning objective~\citep{higgins2017beta}:
 \begin{align}
     \mathbb{E}_{q_{\phi}(\bm{z} | \bm{x})}\left[\log p_{\theta}(\bm{x} | \bm{z})\right]-\beta \kldiv{q_{\phi}(\bm{z} | \bm{x})}{p(\bm{z})}. \label{eq:beta-vae}
 \end{align}
 
-A value $\beta > 1$ puts more emphasis on the KL-term than the original \ac{VAE} loss function ($\beta = 1$).
+A value of $\beta > 1$ puts more emphasis on the KL-term than the original \ac{VAE} loss function ($\beta = 1$).
 \citet{higgins2017beta} state that this could lead to better feature disentanglement because the KL-term \say{encourages conditional independence in $q_\phi(\bm{z}|\bm{x})$}~\citep{higgins2017beta}.
-A proper disentanglement requires that some factors of the data are conditionally independent, \citet{higgins2017beta}, however, show empirically that this often is the case.
+A proper disentanglement requires that some factors of the data are conditionally independent.
+However, \citet{higgins2017beta} empirically show that disentanglement also succeeds for data not having this property.
 
 Setting $\beta > 1$ also lowers the influence of the reconstruction error in the \ac{VAE} training objective.
-A larger $\beta$ leads to worse reconstructions.
-Hence, the right parameter choice is context-dependent.
+A larger $\beta$ thus leads to worse reconstructions.
+The right parameter choice is therefore context-dependent.
 
 \citet{burgess2018understanding} show that disentangled representations and a good reconstruction quality can be achieved by giving the model \say{control of the encoding capacity.}
 Controlling encoding capacity is done by introducing a parameter $C$ to Equation~\ref{eq:beta-vae}~\citep{burgess2018understanding}:
 \begin{align}
     \mathbb{E}_{q_{\phi}(\mathbf{z} \mid \bm{x})}\left[\log p_{\theta}(\bm{x} \mid \bm{z})\right]-\gamma\left|D_{K L}\left(q_{\phi}(\bm{z} \mid \bm{x}) \| p(\bm{z})\right)-C\right|
 \end{align}
-During training, $C$ gradually increases from zero to a higher value (25 for dSprites with $\gamma=1000$ \citep{burgess2018understanding}).
+During training, $C$ is gradually increased from zero to a higher value (25 for dSprites with $\gamma=1000$ \citep{burgess2018understanding}).
 
 \paragraph{\ac{VAE}-\ac{GAN}}
 \ac{VAE}-\acp{GAN}~\citep{larsen2015autoencoding} are a variation of \acp{VAE} specifically designed to replace the pixel-wise reconstruction loss.
-Even on highly curated datasets such as \textsc{Mnist} (see Section~\ref{subsubsec:mnist}), \acp{VAE} tend to generate blurry images.
+Even on highly curated datasets such as \textsc{Mnist} (see Section~\ref{subsubsec:mnist}), \acp{VAE} tend to generate blurry images~\citep{kingma2014autoencoding}.
 The design of \ac{VAE}-\acp{GAN} is based on the assumption that the pixel-wise loss in the \ac{VAE} training objective (see Equation~\ref{eq:log_normal_distr}) is the reason for blurry output images.
 \citet{larsen2015autoencoding}~motivate this by stating that even small translations result in a high pixel-wise loss\footnote{This depends on the image's frequency as well as the variance of the pixel intensities.}.
 
-Instead of measuring the \ac{MSE} between the true and the generated image, \ac{VAE}-\acp{GAN} train a discriminator network to distinguish between generated and real images, i.e.,~to maximize
+Instead of measuring the \ac{MSE} between the true and the generated image, \ac{VAE}-\acp{GAN} train a discriminator network to distinguish between generated and real images.
+They maximize
 \begin{align}
     \mathcal{L}_{\mathrm{GAN}}=\log (D(\bm{x}))+\log (1-D(G(\bm{z}))), \label{eq:vae_gan_l_gan}
 \end{align}
 where $D$ and $G$ are the discriminator/generator networks, $\bm{x}$ an input image and $\bm{z}\sim \mathcal{N}(\bm{0},\bm{I})$ a random Gaussian sample.
-For \ac{VAE}-\acp{GAN}, the generator network is nothing but the decoder network, whereas the discriminator network is a new network that does not exist for \acp{VAE}.
+For \ac{VAE}-\acp{GAN}, the generator network is nothing but the decoder network, whereas the discriminator network is an additional network.
 
 Equation~\ref{eq:vae_gan_l_gan} is sufficient to train the discriminator network.
-However, it does not force $p(\bm{x}) \approx \mathcal{N}(\bm{0},\bm{I})$, nor does it force reconstructions to resemble the input image.
+However, it does not force $p(\bm{x})$ to resemble a standard multivariate normal distribution, nor does it force reconstructions to resemble the input image.
 
 The latter is achieved by introducing an additional loss term
 \begin{align}
     \mathcal{L}_{\text {llike}}^{\text {D}}=-\mathbb{E}_{q(\bm{z} | \bm{x})}\left[\log p\left(\operatorname{D}_{l}(\bm{x}) | \bm{z}\right)\right]
 \end{align}
-penalizing differences of intermediate discriminator layer activations between $\bm{x}$ and the reconstruction $\tilde{\bm{x}}$ of $\bm{x}$.
-The former, forcing $p(\bm{x}) \approx \mathcal{N}(\bm{0},\bm{I})$, is achieved by minimizing the \ac{KL}-divergence as in Equation~\ref{eq:elbo_error_term}:
+penalizing differences of intermediate discriminator layer activations between $\bm{x}$ and the reconstruction $\tilde{\bm{x}}$.
+Forcing $p(\bm{x}) \approx \mathcal{N}(\bm{0},\bm{I})$ is achieved by minimizing the \ac{KL}-divergence as in Equation~\ref{eq:elbo_error_term}:
 \begin{align}
     \mathcal{L}_{\text {prior }}=\kldiv{q(\boldsymbol{z} | \boldsymbol{x})}{p(\boldsymbol{z})}
 \end{align}
 
-The encoder minimizes $\mathcal{L}_{\text {prior }} +  \mathcal{L}_{\text {llike}}^{\text {D}}$, the decoder minimizes $\gamma \mathcal{L}_{\text {llike}}^{\text {D}} - \mathcal{L}_\mathrm{GAN}$, and the discriminator minimizes $-\mathcal{L}_\mathrm{GAN}$.
-Choosing $\gamma = 0.75$ led to training convergence for the experiments performed for this thesis.
+The encoder minimizes $\mathcal{L}_{\text {prior }} +  \mathcal{L}_{\text {llike}}^{\text {D}}$, the decoder minimizes $\gamma \mathcal{L}_{\text {llike}}^{\text {D}} - \mathcal{L}_\mathrm{GAN}$\footnote{Choosing $\gamma = 0.75$ led to training convergence for the experiments performed for this thesis.}, and the discriminator minimizes $-\mathcal{L}_\mathrm{GAN}$.
+
 
 \citet{larsen2015autoencoding}~show that this training procedure leads to less blurry reconstructions.
 Adapting the \ac{VAE}-\ac{GAN} training objective to the \ac{VLAE}-model could lead to improvements for that model as well.
@@ -920,7 +924,7 @@ Adapting the \ac{VAE}-\ac{GAN} training objective to the \ac{VLAE}-model could l
     \label{fig:alae_flow}
 \end{figure}
 Similar to \ac{VAE}-\acp{GAN}, \Acfp{ALAE}~\citep{pidhorskyi2020adversarial} are a hybrid model between \acp{VAE} and \acp{GAN}.
-\acp{ALAE} are not based on variational inference but \acp{GAN}.
+\acp{ALAE} are not based on variational inference but on the \acp{GAN} training objective.
 
 The starting point of the \ac{ALAE} model is to decompose both the generator $G$ and discriminator $D$ into two parts, i.e., $G=\mathcal{G}\circ \mathcal{F}$ and $D=\mathcal{D}\circ \mathcal{E}$ (see Figure~\ref{fig:alae_flow}).
 $\mathcal{G}$ uses noise $\eta$ as an additional input.
@@ -933,24 +937,24 @@ Because $p_{\mathcal{E}}(w) \approx p_{\mathcal{F}}(w)$, \ac{ALAE} can generate 
 \begin{align}
     \bm{x}\approx (\mathcal{E}\circ \mathcal{G}_\eta)(\bm{x}).
 \end{align}
-$\mathcal{G}_\eta$ here indicates that $\mathcal{G}$ uses $\eta$ as an additional input.
+The notion $\mathcal{G}_\eta$ indicates that $\mathcal{G}$ uses $\eta$ as an additional input.
 
 Furthermore, just like for the \ac{VAE}, the Gaussian latent space $Z$ can be traversed to generate new samples by
 \begin{align}
     \bm{x}_{\text{new}} = (\mathcal{F}\circ \mathcal{G}_\eta)(\bm{z}).
 \end{align}
 
-\citet{pidhorskyi2020adversarial} show that (linearly) interpolating in $\bm{w}$-space yields smoother transitions than interpolation between two corresponding points in $\bm{z}$-space.
+\citet{pidhorskyi2020adversarial} show that (linearly) interpolating in $\bm{w}$-space yields smoother transitions than linear interpolation between two corresponding points in $\bm{z}$-space.
 This indicates that the $\bm{w}$-space is less entangled than the $\bm{z}$-space~\citep{shao2018riemannian,arvanitidis2017latent}.
 However, traversing the $\bm{w}$-space directly is not easily possible as its structure is unknown.
 Compared to \acp{VAE}, where a linear interpolation between points in the latent $\bm{z}$-space leads to an almost geodesic path in $\bm{x}$-space\footnote{Therefore, points that are close in $\bm{z}$-space of an \ac{VAE} lead to images that are close in the feature space.}, the mapping function $\mathcal{F}$ seems to be non-smooth.
-Therefore, traversing $\bm{z}$ for an \ac{ALAE} seems to lead to a non-smooth path in the feature space.
+Therefore, traversing $\bm{z}$ in an \ac{ALAE} seems to lead to a non-smooth path in the feature space.
 
 Compared to the \ac{VAE} that uses a pixel-wise loss on the reconstructions, \ac{ALAE} penalizes the $l^2$-norm of $\bm{w}$ and $\tilde{\bm{w}}$.
 Except for this loss, \ac{ALAE} by no means forces the input to be similar to the reconstruction.
 This mitigates the problem of the pixel-wise loss in \acp{VAE} that is assumed to be the reason for blurry reconstructions.
 
-\citet{tschannen2018recent} further discuss \say{recent advances in autoencoder-based representation learning.}
+For an in-depth discussion on representation learning with autoencoders, the reader is referred to \citet{tschannen2018recent}.
 
 \paragraph{Feature Consistency}
 
@@ -961,14 +965,13 @@ For a model trained on CelebA\footnote{See Section~\ref{subsubsec:celeba_dataset
 Feature consistency as well as an interpretable latent space qualify \acp{VAE} as models of the visual system.
 
 \subsection{Latent Space Disentanglement}\label{subsec:feature-disentanglement}
-\textit{Latent Space Disentanglement} is a concept not to be confused with \textit{Latent Space Separability} (see Section~\ref{subsec:feature-separability}).
 Assume we have a dataset of images.
 Each image consists of a shape (for example \textit{Square}, \textit{Heart}, and \textit{Ellipse}) at different $x$- and $y$-positions.
-Then, \textit{shape}, $x$\textit{-position}, and $y$\textit{-position} are called \say{factors of variation}~\citep{Shu2020Weakly,higgins2018towards}, say $S_1$, $S_2$, and $S_3$ with $S_i\in \mathcal{S}^n$~\citep{Shu2020Weakly}.
+Then, \textit{shape}, $x$\textit{-position}, and $y$\textit{-position} are the \say{factors of variation}~\citep{Shu2020Weakly,higgins2018towards}, say $S_1$, $S_2$, and $S_3$ with $S_i\in \mathcal{S}^n$~\citep{Shu2020Weakly}.
 Each image $\bm{x}\in \mathcal{X}^m$ can be generated from the factors of variation by a data-generating process $g: \mathcal{S}^n\times \mathcal{S}^n\times \mathcal{S}^n\mapsto \mathcal{X}^m$.
 
-In the context of \acp{VAE} where the generator maps $\bm{x}$ to a vector $\bm{z}$ in the latent space, a disentangled representation has the following property.
-As one factor of variation (e.g., the shape) is changed, one and only one subspace in the latent space is affected~\citep{higgins2018towards}.
+In the context of \acp{VAE}, the generator maps $\bm{x}$ to a vector $\bm{z}$ in the latent space.
+In a disentangled latent space, if a single factor of variation (e.g., the shape) is changed, one and only one subspace in the latent space is affected~\citep{higgins2018towards}.
 
 \begin{figure}
     \centering
@@ -988,31 +991,34 @@ As one factor of variation (e.g., the shape) is changed, one and only one subspa
     \caption[Latent Space Entanglement]{Unbalanced regions of probability density as one problem of latent space entanglement (taken from \citet{karras2019style})}
     \label{fig:feature_space_disentanglement}
 \end{figure}
-A stricter definition requires these subspaces to be linear subspaces of the latent space~\citep{higgins2018towards}.
-Furthermore, it is often desired that the sampling from the latent space leads to the same data distribution~\citep{karras2019style}.
+A stricter definition additionally requires these subspaces to be linear subspaces of the latent space~\citep{higgins2018towards}.
+Furthermore, it is often desired that the sampling from the latent space leads to the data distribution~\citep{karras2019style}.
 
 Latent space disentanglement is supposed to have two properties: \textit{Consistency} and \textit{Restrictiveness}, as defined in \citet{Shu2020Weakly}.
-Consistency means that if only one factor of variation is varied (e.g., the factor that attributes to an object's size) and the others are fixed, generated items only change for this very factor but not to other factors (i.e., only the object's size is changing but not its shape).
+Consistency means that if only one factor of variation is varied (e.g., the factor that attributes to an object's size), generated items only change for this very factor but not to other factors (i.e., only the object's size is changing but not its shape).
 Restrictiveness means that if again, only one factor $i$ of variation is varied, the choice of the other factors should not affect the model's measurement of the $i$th factor.
-For example, if factor $i$ again encodes an object's size, the same value of factor $i$ should always encode the same size, irrespective of the choice if the other factors~\citep{Shu2020Weakly}.
+For example, if factor $i$ again encodes an object's size, the same value of factor $i$ should always encode the same size, irrespective of the choice of the other factors~\citep{Shu2020Weakly}.
 
-Consider Figure~\ref{fig:feature_space_disentanglement_a} and assume a dataset of males containing only two factors of variation, e.g., age ($x$-axis from older to younger) and voice level ($y$-axis, bottom-up from lower to higher).
-The missing square in the upper left is the combination \say{old and high voice level} that is missing in the dataset.
-Now, consider Figure~\ref{fig:feature_space_disentanglement_b} showing a mapping from a latent space to the feature space.
+Consider Figure~\ref{fig:feature_space_disentanglement_a} and assume a dataset of voice records of males containing only two factors of variation: age ($x$-axis from older to younger) and voice level ($y$-axis, bottom-up from lower to higher).
+The missing square in the upper left is the combination \say{old and high voice level} that is not present in the dataset.
+Now, consider Figure~\ref{fig:feature_space_disentanglement_b}.
+The latent space is forced to follow a prior distribution.
+Figure~\ref{fig:feature_space_disentanglement_b} shows a mapping from a standard normal latent space to the feature space.
 The upper left square in Figure~\ref{fig:feature_space_disentanglement_a} is not present in this latent space.
 Therefore, there are regions of higher (or lower) probability density in the latent space than in the data space.
 
 Different methods have been proposed to measure the degree of latent space entanglement.
-One approach is to measure the degree by which a generated image changes as the latent space is entangled (\textit{Perceptual Path Length})~\citep{karras2019style}.
-\ac{PPL} measures by much reconstructions change for small variation in the latent space.
+One approach is to measure the degree by which a generated image changes as the latent space is traversed (\ac{PPL})~\citep{karras2019style}.
+The \ac{PPL} measures by how much reconstructions change for small variation in the latent space.
 It is calculated by moving by a small value $\epsilon$ on a path obtained by interpolating between two random $\bm{z}_1$, $\bm{z}_2$ (or $\bm{w}_1$, $\bm{w}_2$)\footnote{Interpolation is spherical for $\bm{z}$ and linear for $\bm{w}$.}, and taking the perceptual loss~\citep{johnson2016perceptual} between the image before moving by $\epsilon$ and after.
 Finally, the mean of this value is obtained by applying the procedure for sufficiently many samples.
-If the latent space is entangled, this value on average should be higher compared to a disentangled space.
+If the latent space is entangled, this value should be on average higher compared to a disentangled space.
 
-Another approach is \textit{Linear Separability}~\citep{karras2019style}, measuring how well a linear hyperplane can separate sets of points.
+Another approach is \textit{Linear Separability}, measuring how well a linear hyperplane can separate sets of points.
+For this purpose, a linear \ac{SVM} is trained to predict class labels based on the latent points~\citep{karras2019style}.
 
 \citet{kim2018disentangling} propose to generate data by fixing one factor of variation (for example, one dimension in the latent space) and randomly sampling from others.
-If the latent space is disentangled, there should be one or multiple almost invariant dimensions in the generated data attributed to the fixed factor of variation.
+If the latent space is disentangled, there should be one or multiple almost invariant dimensions in the generated data that accounts for to the fixed factor of variation.
 
 \subsection{Latent Space Separability}\label{subsec:feature-separability}
 

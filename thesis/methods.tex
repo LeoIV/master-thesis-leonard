@@ -3,16 +3,27 @@ The following Sections describe the methods used in the course of this thesis.
 \subsection{Research Questions}\label{subsec:research-questions}
 
 The studies in Section~\ref{sec:results} are guided by the following research questions:
-\begin{enumerate}
-    \item Are \acp{VAE} or \acp{VLAE} related to the visual cortex in terms of the emergence of Gabor wavelets or sparse coding?
-    \item Do \acp{VAE} or \acp{VLAE} fulfil the requirements of latent space disentanglement or latent space separability?
-    \item Can \acp{VAE} or \acp{VLAE} represent both continuous and categorical factors of variation in the latent space?
-    \item How do \acp{VAE} and \acp{VLAE} represent lower factors of variation in the latent space?
-    \item Do \acp{VAE} or \acp{VLAE} learn independent factors of variation independently in the latent space?
-    \item Are the latent spaces of \acp{VLAE} independent in terms of generated images?
-    \item Do \acp{VAE}/\acp{VLAE}-generated images resemble the data distribution?
-    \item Is the discriminative loss superior to the pixel-wise loss in terms of the previous research questions?
-\end{enumerate}
+
+\begin{table}[H]
+    \begin{tabularx}{\textwidth}{llX}
+        \toprule \\
+        \multicolumn{2}{l}{Number} & Question \\
+        \midrule \\
+        RQ1 &    & Are \acp{VAE} or \acp{VLAE} related to the visual cortex in terms of \ldots                                      \\
+        & a) & \hspace{1cm} \ldots the emergence of Gabor wavelets?                                                             \\
+        & b) & \hspace{1cm} \ldots sparse coding?                                                                               \\
+        RQ2 &    & Do \acp{VAE} or \acp{VLAE} fulfil the requirements of latent space disentanglement or latent space separability? \\
+        RQ3 &    & Can \acp{VAE} or \acp{VLAE} represent both continuous and categorical factors of variation in the latent space?  \\
+        RQ4 &    & How do \acp{VAE} and \acp{VLAE} represent lower factors of variation in the latent space?                        \\
+        RQ5 &    & Do \acp{VAE} or \acp{VLAE} learn independent factors of variation independently in the latent space?             \\
+        RQ6 &    & Are the latent spaces of \acp{VLAE} independent in terms of generated images?                                    \\
+        RQ7 &    & Do \acp{VAE}/\acp{VLAE}-generated images resemble the data distribution?                                         \\
+        RQ8 &    & Is the discriminative loss superior to the pixel-wise loss in terms of the previous research questions?          \\
+        \bottomrule
+    \end{tabularx}
+    \caption{Research Questions}
+    \label{tbl:research_questions}
+\end{table}
 
 \subsection{Implementation Details}\label{subsec:implementation-details}
 
@@ -23,7 +34,7 @@ The model code can be found under \href{https://github.com/LeoIV/master-thesis-l
 \subsection{Datasets}\label{subsec:datasets}
 
 Five different datasets were used to train the models.
-Four of the datasets contain images of different sizes, the fifth dataset provides additional labels for the \textsc{Mnist} dataset.
+Four of the datasets contain images of different sizes, the fifth dataset provides additional labels for one of the datasets.
 The images were resized to match the model's expected input sizes using Lanczos interpolation~\citep[pp. 223, ff]{burger2009principles}.
 
 \subsubsection{CelebA}\label{subsubsec:celeba_dataset}
@@ -169,7 +180,7 @@ The embedding layer predicts $\mu$ and $\log \sigma^2$ and performs the resampli
     z &= \mu + \epsilon\sigma \\
     \epsilon &\sim \mathcal{N}(0, \bm{I}). \label{eq:resampling_vae}
 \end{align}
-The encoder input size is equal to the decoder output size and is depending on the dataset.
+The encoder input size is equal to the decoder output size and depends on the dataset.
 The number of \say{Convolution, Activation, Batch-Normalization}-blocks is chosen depending on the input size, as smaller input sizes require fewer layers to achieve a receptive field of the input size.
 The batch-normalization~~\citep[pp. 317, ff.]{Goodfellow-et-al-2016} can be omitted\footnote{It is stated in the experiments if batch-normalization is omitted.}.
 The activation can be either ReLU~\citep[p. 173]{Goodfellow-et-al-2016} or LeakyReLU~\citep[p. 192]{Goodfellow-et-al-2016} and is ReLU unless stated otherwise.
@@ -306,7 +317,7 @@ The inner activation function is ReLU.
 
 \subsubsection{VLAE-GAN Models}\label{subsubsec:vlae_gan_models}
 
-The \ac{VLAE}-\ac{GAN}-model is comparable to the \ac{VAE}-\ac{GAN}-model in terms of the loss functions.
+The \ac{VLAE}-\ac{GAN}-model is similar to the \ac{VAE}-\ac{GAN}-model in terms of the loss functions.
 However, it uses the structure of the \ac{VLAE}-model and totalizes the three $KL$-losses from the different layers.
 
 The model structures can be found in Appendix~\ref{subseq:appendix_vlae_gan_models}.
@@ -333,7 +344,7 @@ The inner activation function is ReLU.
 \subsubsection{AlexNet Classifier}\label{subsubsec:alexnet_classifier}
 The AlexNet Classifier resembles the architecture from \citet{krizhevsky2012imagenet}.
 It uses dropout and a dropout rate of 0.3.
-The model is trained with the Adam optimizer and a learning rate of 0.0001 using batch normalization and a batch size of 32 for ten epochs..
+The model is trained with the Adam optimizer and a learning rate of 0.0001 using batch normalization and a batch size of 32 for ten epochs.
 The model structure can be found in Appendix~\ref{subseq:appendix_alexnet_classifiers}.
 
 \subsubsection{AlexNet-VAE}\label{subsubsec:alexnet_vae}
