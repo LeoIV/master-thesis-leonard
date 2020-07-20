@@ -61,7 +61,7 @@ Batch normalization was disabled for this experiment, because it re-scales the f
     \begin{subfigure}{.95\textwidth}
         \centering
         % include first image
-        \includegraphics[width=\textwidth]{images/sparseness/encoder_fm1_fms.png}
+        \includegraphics[height=.95\textheight]{images/sparseness/encoder_fm1_fms.png}
         \caption{Feature map activities - large model}
     \end{subfigure}
 \end{figure}
@@ -71,7 +71,7 @@ Batch normalization was disabled for this experiment, because it re-scales the f
     \begin{subfigure}{.95\textwidth}
         \centering
         % include second image
-        \includegraphics[width=\textwidth]{images/sparseness/encoder_fm2_fms.png}
+        \includegraphics[height=.95\textheight]{images/sparseness/encoder_fm2_fms.png}
         \caption{Feature map activities - medium model}
     \end{subfigure}
 \end{figure}
@@ -81,10 +81,13 @@ Batch normalization was disabled for this experiment, because it re-scales the f
     \begin{subfigure}{.95\textwidth}
         \centering
         % include second image
-        \includegraphics[width=\textwidth]{images/sparseness/encoder_fm3_fms.png}
+        \includegraphics[height=.85\textheight]{images/sparseness/encoder_fm3_fms.png}
         \caption{Feature map activities - small model}
     \end{subfigure}
-    \caption{Feature map activities for the different models}
+    \caption{Feature map activities for the different models.
+    Each boxplot corresponds to the distribution of one feature map after the convolution.
+    The activities are scaled by the mean weights of the following convolutional kernel.
+    }
     \label{fig:fm_activities_sparseness}
 \end{figure}
 \begin{figure}
@@ -113,10 +116,11 @@ It also achieves the lowest validation loss among the three models and achieves 
 After achieving the minimum validation loss, however, all models overfit.
 \textsc{Mnist}-\ac{VLAE}-factor-1 overfits stronger than \textsc{Mnist}-\ac{VLAE}-factor-2 or \textsc{Mnist}-\ac{VLAE}-factor-3, leading to the highest validation loss after 200 epochs.
 
-Figure~\ref{fig:fm_activities_sparseness} shows the activities of the feature maps in the different models.
-Each line in a subplot is a boxplot and each subfigure the output of either a convolutional, activation, or fully connected layer.
-Most prominently, the inner activations are sparse after convolutions.
-The activations often increase the level of sparsity since the ReLU activation functions map negative values to zero.
+Figure~\ref{fig:fm_activities_sparseness} shows the activities of the feature maps in the different models, scaled by the weights of the following convolutional kernel.
+The bias terms are not considered:
+If the variations in the feature maps are negligible, the feature map itself acts as a bias term for the network.
+Therefore, only the scaled feature map activity variations are considered.
+The network employs sparseness - only few feature maps seem to heavily influence the network.
 Sparsity is apparent in almost all feature maps of all models.
 
 \paragraph{Sparseness in \acp{VLAE} vs. Sparse Representations}
@@ -129,6 +133,9 @@ In the three models (\textsc{Mnist}-\ac{VLAE}-factor-1, \textsc{Mnist}-\ac{VLAE}
 Regardless of the reduction factor, there always remains an active sub-network for all three models.
 
 Therefore, the sparseness in \acp{VLAE} does not seem to be related to sparse representations in the brain.
+
+Yet, this analysis is only approximative since averaging over the weights in the convolutional kernel leads to information loss.
+Future work should further investigate if the assumption that \acp{VAE} do not employ sparseness similarly to the brain holds.
 
 \subsection{Latent Space Entanglement and Categorical Factors of Variation}\label{subsec:latent-space-entanglement-and-categorical-factors-of-variation}
 
@@ -381,7 +388,7 @@ The following sections explore feature learning in the latent space and answer t
 
 \paragraph{\textsc{Mnist}}
 
-Figures~\ref{fig:vae_latent_space_mnist} and~\ref{fig:vlae_latent_space_mnist} show the latent spaces of \ac{VAE} and \ac{VLAE} trained on the \textsc{Mnist} dataset (\textsc{Mnist}-\ac{VAE} and \textsc{Mnist}-\ac{VLAE}, see Section~\ref{subsec:models}).
+Figures~\ref{fig:vae_latent_space_mnist} and~\ref{fig:vlae_latent_space_mnist} show the latent spaces of \ac{VAE} and \ac{VLAE} trained on the \textsc{Mnist} dataset (\textsc{Mnist}-\ac{VAE} and \textsc{Mnist}-\ac{VLAE}, see Section~\ref{subsec:models})\footnote{Plots for the other models can be found in Appendix~\ref{subsection:appendix_mnist_latent_space}.}.
 For \textsc{Mnist}-\ac{VAE}, there is only one latent space, while there are three for \textsc{Mnist}-\ac{VLAE}.
 The embeddings are colored by different factors of variation, employing information from Morpho-\textsc{Mnist} (see Section~\ref{subsubsec:morphomnist}) and the digit identity information provided by \textsc{Mnist} itself.
 
@@ -580,7 +587,7 @@ Furthermore, the models learn factors of variation that are not present in the l
 \paragraph{dSprites}
 
 The latent space embeddings for the dSprites dataset allow a detailed comparison of \ac{VAE} and \ac{VLAE}.
-Here, the dSprites-\ac{VAE}-dim6 model (see Section~\ref{subsubsec:vae_models}) was given a six-dimensional embedding space, whereas the dSprites-\ac{VLAE}-dim2 (see Section~\ref{subsubsec:vlae_models}) model has three two-dimensional embedding spaces.
+Here, the dSprites-\ac{VAE}-dim6 model (see Section~\ref{subsubsec:vae_models}) was given a six-dimensional embedding space, whereas the dSprites-\ac{VLAE}-dim2 (see Section~\ref{subsubsec:vlae_models}) model has three two-dimensional embedding spaces\footnote{Plots for the other models can be found in Appendix~\ref{subsection:appendix_dsprites_latent_space}.}.
 The \ac{VAE} and \ac{VLAE} approximately have the same model capacity under the assumption that \ac{VLAE} uses lower embedding layers to learn lower-level features and higher embedding layers to only learn higher-level features and that the dataset can be split in this way.
 The \ac{VLAE} latent spaces were chosen with two dimensions to allow for a direct visualization of the latent space without dimensionality reduction.
 As the \ac{VAE} model employs a higher-dimensional latent space, the embeddings are visualized using \ac{t-SNE} embeddings (see Figure~\ref{fig:vae_latent_space_dsprites}).

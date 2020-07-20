@@ -400,7 +400,7 @@ where $\bm{z}$ is random noise\footnote{Usually Gaussian white noise.}.
 Therefore, one is usually interested in the generator network.
 It can be found by~\citep{goodfellow2014gans}:
 \begin{align}
-    G^* = \argmin_G \max_{D} V(D, G) \label{eq:gan_objective}
+    G^* = \argmin_G \max_{D} V(D, G). \label{eq:gan_objective}
 \end{align}
 
 The discriminator $D$ in Equation~\ref{eq:gan_objective} is trained towards maximizing $V(D, G)$.
@@ -444,11 +444,11 @@ The decoder $g: \mathbb{R}^m \mapsto \mathbb{R}^n$ transforms the hidden represe
 Usually, one wants the reconstruction $\tilde{\bm{x}}$ to be close to the original feature $\bm{x}$ ($\tilde{\bm{x}} \approx \bm{x}$).
 In order to achieve this, the autoencoder is usually trained by minimizing the loss $\mathcal{L}(\bm{x}, g(f(\bm{x})))$ with
 \begin{align}
-    \mathcal{L}: \mathbb{R}^n \times \mathbb{R}^n \mapsto \mathbb{R}
+    \mathcal{L}: \mathbb{R}^n \times \mathbb{R}^n \mapsto \mathbb{R}.
 \end{align}
 One common choice for $\mathcal{L}$ is the \ac{MSE} which is defined as~\citep[p. 106]{Goodfellow-et-al-2016}:
 \begin{align}
-    \mathcal{L}(\bm{x}, \bm{y}) = \frac{1}{n}\sum (\bm{x}_i - \bm{y}_i)^2 \label{eq:mse}
+    \mathcal{L}(\bm{x}, \bm{y}) = \frac{1}{n}\sum (\bm{x}_i - \bm{y}_i)^2. \label{eq:mse}
 \end{align}
 Note that for linear activations in the autoencoder, the subspace spanned by the first $m$ principal components is the optimal solution for equation~\ref{eq:mse}~\citep{chicco2014deep}.
 
@@ -477,7 +477,7 @@ Assuming a latent \textit{prior} distribution $p(\bm{z})$ over $\bm{z}$, $p(\bm{
 Unfortunately, due to the integral w.r.t. $\bm{z}$ in equations~\ref{eq:vae_x1} and~\ref{eq:vae_x2}, computing $p(\bm{x})$ is intractable~\citep[p. 13]{kingma2019introduction}.
 However, if the posterior $p(\bm{z}|\bm{x})$ was given, $p(\bm{x})$ could be obtained by
 \begin{align}
-    p(\bm{x}) = \frac{p(\bm{x}, \bm{z})}{p(\bm{z}|\bm{x})}
+    p(\bm{x}) = \frac{p(\bm{x}, \bm{z})}{p(\bm{z}|\bm{x})},
 \end{align}
 since computing $p(\bm{x}, \bm{z})$ is tractable~\citep[p. 14]{kingma2019introduction}.
 
@@ -500,7 +500,7 @@ The \ac{KL-divergence} is used o minimize the difference between $p_{\theta}$ an
 \end{align}
 Then
 \begin{align}
-    \underbrace{\vphantom{\sum_{\bm{z}} x}\log p_\theta(\bm{x})}_{\text{constant}} =  \underbrace{\vphantom{\sum_{\bm{z}} x}\kldiv{q_\phi(\bm{z}|\bm{x})}{p_\theta(\bm{z}|\bm{x})}}_{\downarrow}  + \underbrace{\sum_{\bm{z}} q_\phi(\bm{z}|\bm{x}) \log \frac{p_\theta(\bm{x},\bm{z})}{q_\phi(\bm{z}|\bm{x})}}_{\uparrow}
+    \underbrace{\vphantom{\sum_{\bm{z}} x}\log p_\theta(\bm{x})}_{\text{constant}} =  \underbrace{\vphantom{\sum_{\bm{z}} x}\kldiv{q_\phi(\bm{z}|\bm{x})}{p_\theta(\bm{z}|\bm{x})}}_{\downarrow}  + \underbrace{\sum_{\bm{z}} q_\phi(\bm{z}|\bm{x}) \log \frac{p_\theta(\bm{x},\bm{z})}{q_\phi(\bm{z}|\bm{x})}}_{\uparrow}.
 \end{align}
 Because $\log p_\theta(\bm{x})$ is assumed to be fixed, instead of minimizing $\kldiv{q_\phi(\bm{z}|\bm{x})}{p_\theta(\bm{z}|\bm{x})}$, we can maximize $\sum_{\bm{z}} q_\phi(\bm{z}|\bm{x}) \log \frac{p_\theta(\bm{x},\bm{z})}{q_\phi(\bm{z}|\bm{x})}$, as both terms always sum up to a constant.
 $\sum_{\bm{z}} q_\phi(\bm{z}|\bm{x}) \log \frac{p_\theta(\bm{x},\bm{z})}{q_\phi(\bm{z}|\bm{x})}$ is called \textit{variational lower bound} or \acfi{ELBO}~\citep[p. 18]{kingma2019introduction}.
@@ -510,13 +510,13 @@ The variational lower bound can be written as
     \sum_{\bm{z}} q_\phi(\bm{z}|\bm{x}) \log \frac{p_\theta(\bm{x},\bm{z})}{q_\phi(\bm{z}|\bm{x})} &= \sum_{\bm{z}} q_\phi(\bm{z}|\bm{x}) \log \frac{p_\theta(\bm{z}|\bm{x})p_\theta(\bm{x})}{q_\phi(\bm{z}|\bm{x})}\\
     &= \sum_{\bm{z}} q_\phi(\bm{z}|\bm{x}) \left[ \log p_\theta(\bm{x}) + \log \frac{p_\theta(\bm{z}|\bm{x})}{q_\phi(\bm{z}|\bm{x})} \right]\\
     &= \sum_{\bm{z}} q_\phi(\bm{z}|\bm{x})\log p_\theta(\bm{x}) + \sum_{\bm{z}} q_\phi(\bm{z}|\bm{x})\log \frac{p_\theta(\bm{z}|\bm{x})}{q_\phi(\bm{z}|\bm{x})}\\
-    &= \underbrace{\mathbb{E}_{q_\phi(\bm{z}|\bm{x})} \left[ \log p_\theta(\bm{x}) \right]}_{=\log p_\theta(\bm{x})\, \text{, independent of $\bm{z}$}} + \underbrace{\sum_{\bm{z}} q_\phi(\bm{z}|\bm{x})\log \frac{p_\theta(\bm{z}|\bm{x})}{q_\phi(\bm{z}|\bm{x})}}_{=\kldiv{q_\phi(\bm{z}|\bm{x})}{p_\theta(\bm{z}|\bm{x})}} \label{eq:elbo_lower_bound}
+    &= \underbrace{\mathbb{E}_{q_\phi(\bm{z}|\bm{x})} \left[ \log p_\theta(\bm{x}) \right]}_{=\log p_\theta(\bm{x})\, \text{, independent of $\bm{z}$}} + \underbrace{\sum_{\bm{z}} q_\phi(\bm{z}|\bm{x})\log \frac{p_\theta(\bm{z}|\bm{x})}{q_\phi(\bm{z}|\bm{x})}}_{=\kldiv{q_\phi(\bm{z}|\bm{x})}{p_\theta(\bm{z}|\bm{x})}}, \label{eq:elbo_lower_bound}
 \end{align}
 but also as
 \begin{align}
     \sum_{\bm{z}} q_\phi(\bm{z}|\bm{x}) \log \frac{p_\theta(\bm{x},\bm{z})}{q_\phi(\bm{z}|\bm{x})} &= \sum_{\bm{z}} q_\phi(\bm{z}|\bm{x}) \log \frac{p_\theta(\bm{x}|\bm{z})p_\theta(\bm{z})}{q_\phi(\bm{z}|\bm{x})}\\
     &= \sum_{\bm{z}} q_\phi(\bm{z}|\bm{x}) \left[ \log p_\theta(\bm{x}|\bm{z}) + \log \frac{p_\theta(\bm{z})}{q_\phi(\bm{z}|\bm{x})} \right]\\
-    &= \underbrace{\sum_{\bm{z}} q_\phi(\bm{z}|\bm{x})\log p_\theta(\bm{x}|\bm{z})}_{=\mathbb{E}_{q_\phi(\bm{z}|\bm{x})}\left[ \log p_\theta(\bm{x}|\bm{z}) \right]} + \underbrace{\sum_{\bm{z}} q_\phi(\bm{z}|\bm{x})\log \frac{p_\theta(\bm{z})}{q_\phi(\bm{z}|\bm{x})}}_{=\kldiv{q_\phi(\bm{z}|\bm{x})}{p_\theta(\bm{z})}} \label{eq:elbo_error_term}
+    &= \underbrace{\sum_{\bm{z}} q_\phi(\bm{z}|\bm{x})\log p_\theta(\bm{x}|\bm{z})}_{=\mathbb{E}_{q_\phi(\bm{z}|\bm{x})}\left[ \log p_\theta(\bm{x}|\bm{z}) \right]} + \underbrace{\sum_{\bm{z}} q_\phi(\bm{z}|\bm{x})\log \frac{p_\theta(\bm{z})}{q_\phi(\bm{z}|\bm{x})}}_{=\kldiv{q_\phi(\bm{z}|\bm{x})}{p_\theta(\bm{z})}}. \label{eq:elbo_error_term}
 \end{align}
 
 Equations~\ref{eq:elbo_lower_bound} and~\ref{eq:elbo_error_term} allow two different interpretations of the \ac{ELBO}.
@@ -526,14 +526,14 @@ However, $p_\theta(\bm{z}|\bm{x})$ cannot be computed with a \ac{VAE}.
 
 Equation~\ref{eq:elbo_error_term}, however, is more useful for implementing the error function of a \ac{VAE}.
 Consider the term inside the expectation of the first term.
-Usually, $p_\theta(\bm{x}|\bm{z})$ is chosen to be a normal distribution with \ac{PDF}
+Usually, $p_\theta(\bm{x}|\bm{z})$ is chosen to be a normal distribution with \ac{PDF}:
 \begin{align}
-    f_{\sigma,\mu}(x) = \frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{1}{2}\left( \frac{x-\mu}{\sigma} \right)^2}
+    f_{\sigma,\mu}(x) = \frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{1}{2}\left( \frac{x-\mu}{\sigma} \right)^2}.
 \end{align}
 Then
 \begin{align}
     \log f_{\sigma,\mu}(x) &= \log \left( \frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{1}{2}\left( \frac{x-\mu}{\sigma} \right)^2} \right)\\
-    &= - \log \sqrt{2\pi}\sigma -\frac{1}{2}\left( \frac{x-\mu}{\sigma} \right)^2 \label{eq:log_normal_distr}
+    &= - \log \sqrt{2\pi}\sigma -\frac{1}{2}\left( \frac{x-\mu}{\sigma} \right)^2. \label{eq:log_normal_distr}
 \end{align}
 Since $\mu$, in this case, is a function of $\bm{z}$ (parametrized by $\theta$), we can consider this as the reconstruction $\hat{\bm{x}} = f_\theta(\bm{z})$.
 Then, except for subtracting a constant and scaling by a constant, equation~\ref{eq:log_normal_distr} is the \ac{MSE}.
@@ -602,7 +602,7 @@ The additional variables are assumed to be independent of each other.
 To force $G$ not just to ignorce $c$,~\citet{chen2016infogan} modify the training objective such that \say{there should be high mutual information between latent codes $c$ and the generator distribution $G(z,c)$}~\citep{chen2016infogan}.
 The new loss function takes the form
 \begin{align}
-    \min _{G} \max _{D} V_I(D, G)=V(D, G) - \lambda I(\bm{c}; G(\bm{z}, \bm{c}))
+    \min _{G} \max _{D} V_I(D, G)=V(D, G) - \lambda I(\bm{c}; G(\bm{z}, \bm{c})),
 \end{align}
 where $V(D, G)$ is the training objective defined in Equation~\ref{eq:gan_objective}, $\lambda$ is a trade-off hyperparameter, and $I(\bm{x}; \bm{y})$ is the mutual information between $\bm{x}$ and $\bm{y}$.
 
@@ -690,7 +690,7 @@ Therefore, they conclude that $\mathcal{Z}$ is more entangled than $\mathcal{W}$
 Disentanglement in the latent space has important ramifications in the context of semantic representations (see Section~\ref{subsec:semantic-representations}).
 It has to be considered if the interpolation between two points in the latent space requires a curved instead of linear path.
 
-\paragraph{\acl{LVAE}}
+\paragraph{Ladder Variational Autoencoder}
 
 % TODO: Schreib hier um die zs rum, dass das die Hidden representation is
 \begin{figure}
@@ -778,11 +778,11 @@ Instead, they use a deterministic multi-layer network in the encoder (see Figure
 The output from higher stochastic embedding layers is passed to lower layers via the decoder $p$:
 \begin{align}
     \bm{\sigma}_{q,i}&=\frac{1}{\hat{\bm{\sigma}}^{-2}_{q,i}+\hat{\bm{\sigma}}^{-2}_{p,i}}\\
-    \bm{\mu}_{q,i}&=\frac{\hat{\bm{\mu}}_{q,i}\hat{\bm{\sigma}}^{-2}_{q,i}+\hat{\bm{\mu}}_{p,i}\hat{\bm{\sigma}}^{-2}_{p,i}}{\hat{\bm{\sigma}}^{-2}_{q,i}+\hat{\bm{\sigma}}^{-2}_{p,i}}
+    \bm{\mu}_{q,i}&=\frac{\hat{\bm{\mu}}_{q,i}\hat{\bm{\sigma}}^{-2}_{q,i}+\hat{\bm{\mu}}_{p,i}\hat{\bm{\sigma}}^{-2}_{p,i}}{\hat{\bm{\sigma}}^{-2}_{q,i}+\hat{\bm{\sigma}}^{-2}_{p,i}}.
 \end{align}
 The latent variables then are sampled conditionally:
 \begin{align}
-    q(\bm{z}_i|\cdot)=\mathcal{N}(\bm{z}_i|\bm{\mu}_{q,i},\bm{\sigma}^2_{q,i})
+    q(\bm{z}_i|\cdot)=\mathcal{N}(\bm{z}_i|\bm{\mu}_{q,i},\bm{\sigma}^2_{q,i}).
 \end{align}
 
 \citet{sonderby2016ladder} show that gradually increasing the weight of the KL-term in the \ac{VAE} training criterion leads to better usage of the latent spaces in terms of active units.
@@ -844,7 +844,7 @@ The right parameter choice is therefore context-dependent.
 \citet{burgess2018understanding} show that disentangled representations and a good reconstruction quality can be achieved by giving the model \say{control of the encoding capacity.}
 Controlling encoding capacity is done by introducing a parameter $C$ to Equation~\ref{eq:beta-vae}~\citep{burgess2018understanding}:
 \begin{align}
-    \mathbb{E}_{q_{\phi}(\mathbf{z} \mid \bm{x})}\left[\log p_{\theta}(\bm{x} \mid \bm{z})\right]-\gamma\left|D_{K L}\left(q_{\phi}(\bm{z} \mid \bm{x}) \| p(\bm{z})\right)-C\right|
+    \mathbb{E}_{q_{\phi}(\mathbf{z} \mid \bm{x})}\left[\log p_{\theta}(\bm{x} \mid \bm{z})\right]-\gamma\left|D_{K L}\left(q_{\phi}(\bm{z} \mid \bm{x}) \| p(\bm{z})\right)-C\right|.
 \end{align}
 During training, $C$ is gradually increased from zero to a higher value (25 for dSprites with $\gamma=1000$ \citep{burgess2018understanding}).
 
@@ -867,19 +867,20 @@ However, it does not force $p(\bm{x})$ to resemble a standard multivariate norma
 
 The latter is achieved by introducing an additional loss term
 \begin{align}
-    \mathcal{L}_{\text {llike}}^{\text {D}}=-\mathbb{E}_{q(\bm{z} | \bm{x})}\left[\log p\left(\operatorname{D}_{l}(\bm{x}) | \bm{z}\right)\right]
+    \mathcal{L}_{\text {llike}}^{\text {D}}=-\mathbb{E}_{q(\bm{z} | \bm{x})}\left[\log p\left(\operatorname{D}_{l}(\bm{x}) | \bm{z}\right)\right],
 \end{align}
 penalizing differences of intermediate discriminator layer activations between $\bm{x}$ and the reconstruction $\tilde{\bm{x}}$.
 Forcing $p(\bm{x}) \approx \mathcal{N}(\bm{0},\bm{I})$ is achieved by minimizing the \ac{KL}-divergence as in Equation~\ref{eq:elbo_error_term}:
 \begin{align}
-    \mathcal{L}_{\text {prior }}=\kldiv{q(\boldsymbol{z} | \boldsymbol{x})}{p(\boldsymbol{z})}
+    \mathcal{L}_{\text {prior }}=\kldiv{q(\boldsymbol{z} | \boldsymbol{x})}{p(\boldsymbol{z})}.
 \end{align}
 
 The encoder minimizes $\mathcal{L}_{\text {prior }} +  \mathcal{L}_{\text {llike}}^{\text {D}}$, the decoder minimizes $\gamma \mathcal{L}_{\text {llike}}^{\text {D}} - \mathcal{L}_\mathrm{GAN}$\footnote{Choosing $\gamma = 0.75$ led to training convergence for the experiments performed for this thesis.}, and the discriminator minimizes $-\mathcal{L}_\mathrm{GAN}$.
 
-
 \citet{larsen2015autoencoding}~show that this training procedure leads to less blurry reconstructions.
 Adapting the \ac{VAE}-\ac{GAN} training objective to the \ac{VLAE}-model could lead to improvements for that model as well.
+
+Furthermore, by training a discriminative network to distinguish between prior and posterior samples, \citet{makhzani2016adversarial} have enforced arbitrary distributions in the latent space .
 
 \paragraph{Adversarial Latent Autoencoder}
 \begin{figure}
