@@ -4,7 +4,7 @@ The following sections, therefore, first introduce the human visual system and, 
 \subsection{Visual Cognition}\label{subsec:human-brain-structure}
 
 The visual system allows humans and other developed animals to make sense of visual stimuli.
-The following sections describe how the visual system's hierarchical structure enables the perception of gradually increasing complex visual features.
+The following sections describe how the visual systems' hierarchical structure enables the perception of gradually increasing complex visual features.
 
 \subsubsection{Cells}
 
@@ -119,7 +119,7 @@ Nevertheless, they still encode two different qualities of a stimulus: the ident
     \label{fig:copies_line_drawings}
 \end{wrapfigure}
 % TODO Ich benutze hier perceive, see und recognize. Definiere die Begriffe und benutze trennschärfer
-Recognizing an object's identity is different from the ability to see an object or make a copy of it.
+Recognizing an objects' identity is different from the ability to see an object or make a copy of it.
 \citet{rubens1971associative} report the case of a 47-year-old man who showed an inability to recognize objects, and in cases where he was unable to recognize an object, he also could not describe its use.
 When given the category of an object, \say{identification improved very slightly}:
 He recognized the item after being told the name.
@@ -198,13 +198,13 @@ Cluster algorithms are often employed in cases where the class identity of data 
 Figure~\ref{fig:clustering_example} shows an example where this can be feasible because adjacent data points tend to have the same class.
 
 \paragraph{Reinforcement Learning}
-Reinforcement learning is a quite different paradigm from supervised and unsupervised learning.
+Reinforcement learning is quite a different paradigm from supervised and unsupervised learning.
 Here, the aim is to train an \textit{agent} to achieve a goal.
 
-An example are rats in a maze.
+An example is rats in a maze.
 A piece of cheese is located in one corner of the maze.
-The different positions in the maze are the possible \textit{states}, the set of all states is the \textit{state space}.
-The rat has multiple possible actions, going forward, backward, left, or right, the set of all actions is the \textit{action space}.
+The different positions in the maze are the possible \textit{states}; the set of all states is the \textit{state space}.
+The rat has multiple possible actions, going forward, backward, left, or right; the set of all actions is the \textit{action space}.
 In this setting, the rat is the agent, trying to maximize its reward.
 It is rewarded for each action in a state (the reward can also be zero or even negative).
 By rewarding good sequences of actions, the rat eventually shows a reasonable behavior.
@@ -214,7 +214,7 @@ Reinforcement learning algorithms resemble such settings by modeling a state spa
 \subsection{Semantic Representations}\label{subsec:semantic-representations}
 
 Section~\ref{subsec:visual-object-perception} described a subject who was able to copy drawings of objects but not capture their \textit{meaning}.
-\citet[pp. 1069, 1070]{squire2012fundamental} hypothesize that the subject's \ac{IT} was impaired, leading to an \say{inability to generate a high-level representation of the object.}
+\citet[pp. 1069, 1070]{squire2012fundamental} hypothesize that the subjects' \ac{IT} was impaired, leading to an \say{inability to generate a high-level representation of the object.}
 
 The term \textit{Semantic Representation} refers to these high-level representations that allow to capturing the \textit{meaning} of a stimulus.
 
@@ -229,7 +229,7 @@ It should incorporate all kinds of concepts a human can form of perception.
 
 In this thesis, \textit{Semantic Representations} are somewhat related to \textit{Word Embeddings} in \ac{NLP}.
 Word embeddings~\citep{mikolov2013efficient} are a vectorized representation of words in a vector space.
-The training procedure learns a mapping from word into the latent space so that the word's position itself has meaning.
+The training procedure learns a mapping from word into the latent space so that the words' position itself has meaning.
 One prominent example is that the vector space allows \say{simple algebraic operations[...]. [I]t was shown for example that \textit{vector}(\say{King}) - \textit{vector}(\say{Man}) + \textit{vector}(\say{Woman}) results in a vector that is closest to the vector representation of the word \textit{Queen} [...]}~\citep{mikolov2013efficient}.
 It has been shown that for word representations, they correlate with brain activity fMRI data~\citep{ruan2016exploring, anderson2013words}.
 
@@ -260,13 +260,13 @@ The following section discusses established models of the visual system.
 
 \citet{hubel1962receptive} distinguish two main types of cells in the \ac{V1}: simple and complex cells.
 Both cell types are orientation sensitive, i.e.,~different cells are tuned towards different orientations of stripes in a stimulus.
-Unlike simple cells, complex cells are more invariant towards the stripe's location (but not its orientation) in the receptive field.
+Unlike simple cells, complex cells are more invariant towards the stripes' location (but not its orientation) in the receptive field.
 Complex cells are assumed to receive input from simple cells~\citep{hubel1962receptive}.
 Based on this assumption, complex cells can be modeled by receiving input from many simple cells, tuned towards a specific orientation but not location.
 If any of the afferent simple cells fire, the complex cells fires, leading to a translation-invariant behavior~\citep{hubel1962receptive}.
 
 % TODO: Was ist Gabor wavelet
-It can be shown that a two-dimensional Gabor wavelet is an excellent stimulus for a simple cell in \ac{V1} in terms of the neuronal action potential~\citep{jones1987evaluation}.
+It can be shown that a two-dimensional Gabor wavelet, a (co-)sine function, modulated by a Gaussian function, is an excellent stimulus for a simple cell in \ac{V1} in terms of the neuronal action potential~\citep{jones1987evaluation}.
 
 \subsubsection{Neocognitron}
 
@@ -327,7 +327,7 @@ Other padding techniques mirror the image at the borders or assume that all pixe
 Like the convolution, pooling operations use a sliding window over the feature maps, often with an offset (\textit{stride}) such that the sliding window sees every pixel only once.
 A stridden max-pooling has multiple effects.
 First, it leads to the downsampling of the image.
-Downsampling is a useful property as it allows us to use more convolutional kernels in higher layers without exceeding a system's memory\footnote{Of course, the convolutional kernels itself are almost certainly unproblematic as they are very small. Each convolution, however, produces another memory-consuming feature map.}.
+Downsampling is a useful property as it allows us to use more convolutional kernels in higher layers without exceeding a systems' memory\footnote{Of course, the convolutional kernels itself are almost certainly unproblematic as they are very small. Each convolution, however, produces another memory-consuming feature map.}.
 Not less importantly, max-pooling makes the network more invariant to small translations~\citep[p. 342]{Goodfellow-et-al-2016}.
 In cases where translation invariance is not desired\footnote{This is often the case for generative models.}, but the image should be down-sampled, the max-pooling layer can be omitted, and a stridden convolution can be used instead~\citep[p. 337]{Goodfellow-et-al-2016}.
 
@@ -355,7 +355,7 @@ By design, \acp{CNN} share some features with the visual system, namely the conv
 However, \acp{CNN} show further unintentional parallels to the visual system:
 
 AlexNet~\citep{krizhevsky2012imagenet} is a deep \ac{CNN} trained on image classification.
-\citet{krizhevsky2012imagenet} have shown that this network learns Gabor wavelets in the first layer's kernels.
+\citet{krizhevsky2012imagenet} have shown that this network learns Gabor wavelets in the first layers' kernels.
 A Gabor wavelet is the optimal stimulus for a Gabor-like kernel (see Section~\ref{subsubsec:cnn_model_visual_system}), resulting in the strongest excitement.
 It is also the optimal stimulus for cells in \ac{V1} (see Section~\ref{subsubseq:simple_complex_cells}, and \citet{jones1987evaluation}).
 
@@ -579,7 +579,7 @@ The KL-term is probably the reason for the posterior collapse as it is the term 
 One technique to avoid posterior collapse is to lower the weight of the KL-term compared to the reconstruction term~\citep{lucas2019understanding}.
 
 Another disadvantage of \acp{VAE} are \say{blurry} and \say{fuzzy} reconstructions~\citep{zhao2017towards}.
-According to \citet{zhao2017towards}, these reconstructions occur for $\bm{z}$'s that are encodings of a variety of different $\bm{x}$'s.
+According to \citet{zhao2017towards}, these reconstructions occur for $\bm{z}$s' that are encodings of a variety of different $\bm{x}$s'.
 They propose that blurry reconstructions are caused by the pixel-wise loss and a too simple prior, e.g.,~a standard multivariate normal distribution~\citep{zhao2017towards}.
 
 \subsubsection{Representation Learning}\label{subsubsec:representation_learning}
@@ -852,7 +852,7 @@ During training, $C$ is gradually increased from zero to a higher value (25 for 
 \ac{VAE}-\acp{GAN}~\citep{larsen2015autoencoding} are a variation of \acp{VAE} specifically designed to replace the pixel-wise reconstruction loss.
 Even on highly curated datasets such as \textsc{Mnist} (see Section~\ref{subsubsec:mnist}), \acp{VAE} tend to generate blurry images~\citep{kingma2014autoencoding}.
 The design of \ac{VAE}-\acp{GAN} is based on the assumption that the pixel-wise loss in the \ac{VAE} training objective (see Equation~\ref{eq:log_normal_distr}) is the reason for blurry output images.
-\citet{larsen2015autoencoding}~motivate this by stating that even small translations result in a high pixel-wise loss\footnote{This depends on the image's frequency as well as the variance of the pixel intensities.}.
+\citet{larsen2015autoencoding}~motivate this by stating that even small translations result in a high pixel-wise loss\footnote{This depends on the images' frequency as well as the variance of the pixel intensities.}.
 
 Instead of measuring the \ac{MSE} between the true and the generated image, \ac{VAE}-\acp{GAN} train a discriminator network to distinguish between generated and real images.
 They maximize
@@ -966,7 +966,7 @@ Feature consistency as well as an interpretable latent space qualify \acp{VAE} a
 
 \subsection{Latent Space Disentanglement}\label{subsec:feature-disentanglement}
 Assume we have a dataset of images.
-Each image consists of a shape (for example \textit{Square}, \textit{Heart}, and \textit{Ellipse}) at different $x$- and $y$-positions.
+Each image consists of a shape (e.g., \textit{Square}, \textit{Heart}, and \textit{Ellipse}) at different $x$- and $y$-positions.
 Then, \textit{shape}, $x$\textit{-position}, and $y$\textit{-position} are the \say{factors of variation}~\citep{Shu2020Weakly,higgins2018towards}, say $S_1$, $S_2$, and $S_3$ with $S_i\in \mathcal{S}^n$~\citep{Shu2020Weakly}.
 Each image $\bm{x}\in \mathcal{X}^m$ can be generated from the factors of variation by a data-generating process $g: \mathcal{S}^n\times \mathcal{S}^n\times \mathcal{S}^n\mapsto \mathcal{X}^m$.
 
@@ -992,12 +992,12 @@ In a disentangled latent space, if a single factor of variation (e.g., the shape
     \label{fig:feature_space_disentanglement}
 \end{figure}
 A stricter definition additionally requires these subspaces to be linear subspaces of the latent space~\citep{higgins2018towards}.
-Furthermore, it is often desired that the sampling from the latent space leads to the data distribution~\citep{karras2019style}.
+Furthermore, it is often desired that latent space sampling leads to the data distribution~\citep{karras2019style}.
 
 Latent space disentanglement is supposed to have two properties: \textit{Consistency} and \textit{Restrictiveness}, as defined in \citet{Shu2020Weakly}.
-Consistency means that if only one factor of variation is varied (e.g., the factor that attributes to an object's size), generated items only change for this very factor but not to other factors (i.e., only the object's size is changing but not its shape).
-Restrictiveness means that if again, only one factor $i$ of variation is varied, the choice of the other factors should not affect the model's measurement of the $i$th factor.
-For example, if factor $i$ again encodes an object's size, the same value of factor $i$ should always encode the same size, irrespective of the choice of the other factors~\citep{Shu2020Weakly}.
+Consistency means that if only one factor of variation is varied (e.g., the factor that attributes to an objects' size), generated items only change for this very factor but not to other factors (i.e., only the objects' size is changing but not its shape).
+Restrictiveness means that if again, only one factor $i$ of variation is varied, the choice of the other factors should not affect the models' measurement of the $i$th factor.
+For example, if factor $i$ again encodes an objects' size, the same value of factor $i$ should always encode the same size, irrespective of the choice of the other factors~\citep{Shu2020Weakly}.
 
 Consider Figure~\ref{fig:feature_space_disentanglement_a} and assume a dataset of voice records of males containing only two factors of variation: age ($x$-axis from older to younger) and voice level ($y$-axis, bottom-up from lower to higher).
 The missing square in the upper left is the combination \say{old and high voice level} that is not present in the dataset.
@@ -1018,7 +1018,7 @@ Another approach is \textit{Linear Separability}, measuring how well a linear hy
 For this purpose, a linear \ac{SVM} is trained to predict class labels based on the latent points~\citep{karras2019style}.
 
 \citet{kim2018disentangling} propose to generate data by fixing one factor of variation (for example, one dimension in the latent space) and randomly sampling from others.
-If the latent space is disentangled, there should be one or multiple almost invariant dimensions in the generated data that accounts for to the fixed factor of variation.
+If the latent space is disentangled, there should be one or multiple almost invariant dimensions in the generated data that account for the fixed factor of variation.
 
 \subsection{Latent Space Separability}\label{subsec:feature-separability}
 

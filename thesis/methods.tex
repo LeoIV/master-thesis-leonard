@@ -35,7 +35,7 @@ The model code can be found under \href{https://github.com/LeoIV/master-thesis-l
 
 Five different datasets were used to train the models.
 Four of the datasets contain images of different sizes, the fifth dataset provides additional labels for one of the datasets.
-The images were resized to match the model's expected input sizes using Lanczos interpolation~\citep[pp. 223, ff]{burger2009principles}.
+The images were resized to match the models' expected input sizes using Lanczos interpolation~\citep[pp. 223, ff]{burger2009principles}.
 
 \subsubsection{CelebA}\label{subsubsec:celeba_dataset}
 
@@ -66,22 +66,23 @@ This curated version is commonly used as a baseline~\citep{krizhevsky2012imagene
 
 \subsubsection{\textsc{Mnist}}\label{subsubsec:mnist}
 
-\begin{wrapfigure}[9]{R}{0.2\textwidth}
+\begin{figure}
     \begin{center}
-        \includegraphics[width=0.18\textwidth]{images/mnist_sample.png}
+        \includegraphics[width=\textwidth]{images/mnist_sample.png}
     \end{center}
-    \caption[\textsc{Mnist} dataset sample image]{A sample image from the \textsc{Mnist} dataset.}
+    \caption[\textsc{Mnist} dataset example images]{Examples from the \textsc{Mnist} dataset.}
     \label{fig:mnist_sample}
-\end{wrapfigure}
+\end{figure}
 
 \textsc{Mnist}\footnote{\href{http://yann.lecun.com/exdb/mnist/}{http://yann.lecun.com/exdb/mnist/}, last access: 23/04/2020}~\citep{lecun1998gradient} is a widely-used dataset of hand-written digits.
+Figure~\ref{fig:mnist_sample} shows ten examples from this dataset.
 The data is subdivided into a training set of 60.000 images and a test set containing 10.000 images.
 The digits are all of the same size and centered.
 The samples are grayscale images of size $28\times 28$pixels.
 
 \subsubsection{Morpho-\textsc{Mnist}}\label{subsubsec:morphomnist}
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/morpho_mnist_distribution.png}
     \caption[Morpho-\textsc{Mnist} distribution]{Distribution of the Morpho-\textsc{Mnist} attributes for the different digits. Taken from~\citep{castro2019morpho}.}
