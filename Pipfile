@@ -7,20 +7,16 @@ name = "pypi"
 python_version = "3.6"
 
 [dev-packages]
-pytest="*"
-pytest-mock="*"
 
 [packages]
 keras = "*"
-plaidml-keras = "*"
 matplotlib = "*"
 Pillow = "*"
 tensorflow= "==1.15"
 pandas = "*"
-keras-vis = {editable = true,ref = "master",git = "https://github.com/LeoIV/keras-vis.git"}
-receptivefield="==0.4.0"
 seaborn = "*"
 sklearn = "*"
 scipy = "==1.2.1"
 theano = "*"
 statsmodels = "*"
+kerassurgeon = "*"

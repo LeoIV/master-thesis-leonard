@@ -39,57 +39,22 @@ Therefore, it is concluded that a simple feed-forward \acp{VAE} or \acp{VLAE} tr
 This does not imply that \acp{VAE} or \acp{VLAE} do not explain cortical activity (this is discussed in Section~\ref{subsec:representational-dissimilarity-matrices}).
 Furthermore, variations of the \ac{VAE}-design are proposed that could lead to a more biologically plausible model (see Sections~\ref{subsec:feedback-connections-of-the-lateral-geniculate-nucleus} and \ref{subsec:sequential-data}).
 
-% TODO: show generations and reconstructions of AlexNet VAE
-
 \subsection{Sparseness in Generative Models}\label{subsec:effective-network-capacity}
 One hyperparameter to choose in the different models is the number of feature maps of different layers.
 During the implementation, it was observed that some feature maps show little activity compared to others.
 As the number of features maps is a model hyperparameter, it was investigated by how much the number of feature maps can be reduced without increasing the network loss.
 
-Furthermore, the question (RQ1 b, see Table~\ref{tbl:research_questions}) arose whether sparseness in \acp{VLAE} is related to sparseness in the primary visual cortex (see Section~\ref{subsubsec:sparse_representations}).
-Even though \acp{VAE} and \acp{VLAE} do not learn Gabor wavelets in lower layers, they could superpose sparse set of different basis functions to represent their input, similar to \citet{Olshausen1996}.
-If they do, this would be evidence for the relatedness of \acp{VLAE} to the biological example.
+Furthermore, sparseness has been found to be used in the visual system.
+It is therefore investigated (RQ1 b, see Table~\ref{tbl:research_questions}) whether the sparseness in \acp{VLAE} is related to the sparseness in the primary visual cortex (see Section~\ref{subsubsec:sparse_representations}).
+Even though \acp{VAE} and \acp{VLAE} do not learn Gabor wavelets in lower layers, they could superpose sparse sets of different basis functions to represent their input, similar to \citet{Olshausen1996}.
+If they do, this would support the relatedness of \acp{VLAE} to the biological example.
 
-The following experiment was conducted to examine if \acp{VLAE} employ sparseness or if the model has only too much capacity.
-The feature map activity of \ac{VLAE}s on \textsc{Mnist} with input size $28\times 28$ and different numbers of feature maps and nodes in fully connected layers was measured.
-By gradually decreasing the network capacity, the evolvement of sparseness was analyzed.
+The following experiment was conducted to examine if \acp{VLAE} employ sparseness or if the model only has too much capacity.
+First, the feature map activities of \ac{VLAE}s on \textsc{Mnist} with input size $28\times 28$ and different numbers of feature maps were observed.
+Then, by gradually decreasing the network capacity, the evolvement of sparseness were analyzed.
+
 In total, three models (\textsc{Mnist}-\ac{VLAE}-factor-1, \textsc{Mnist}-\ac{VLAE}-factor-2, and \textsc{Mnist}-\ac{VLAE}-factor-3, see Section~\ref{subsubsec:vlae_models}) were trained.
-Batch normalization was disabled for this experiment, because it re-scales the feature map activity.
-
-\begin{figure}
-    \centering
-    \begin{subfigure}{.95\textwidth}
-        \centering
-        % include first image
-        \includegraphics[height=.95\textheight]{images/sparseness/encoder_fm1_fms.png}
-        \caption{Feature map activities - large model}
-    \end{subfigure}
-\end{figure}
-\begin{figure}
-    \ContinuedFloat
-    \centering
-    \begin{subfigure}{.95\textwidth}
-        \centering
-        % include second image
-        \includegraphics[height=.95\textheight]{images/sparseness/encoder_fm2_fms.png}
-        \caption{Feature map activities - medium model}
-    \end{subfigure}
-\end{figure}
-\begin{figure}
-    \ContinuedFloat
-    \centering
-    \begin{subfigure}{.95\textwidth}
-        \centering
-        % include second image
-        \includegraphics[height=.85\textheight]{images/sparseness/encoder_fm3_fms.png}
-        \caption{Feature map activities - small model}
-    \end{subfigure}
-    \caption{Feature map activities for the different models.
-    Each boxplot corresponds to the distribution of one feature map after the convolution.
-    The activities are scaled by the mean weights of the following convolutional kernel.
-    }
-    \label{fig:fm_activities_sparseness}
-\end{figure}
+Batch normalization was disabled for this experiment, because it re-scales the feature map activities.
 \begin{figure}
     \centering
     \begin{subfigure}{.45\textwidth}
@@ -109,6 +74,7 @@ Batch normalization was disabled for this experiment, because it re-scales the f
     \label{fig:learning_curves_sparseness}
 \end{figure}
 
+
 Figure~\ref{fig:learning_curves_sparseness} shows the training and validation losses for the models.
 Firstly, increasing the number of feature maps increases convergence speed.
 Even though \textsc{Mnist}-\ac{VLAE}-factor-1 is trained with a slightly lower learning rate, it converges faster than \textsc{Mnist}-\ac{VLAE}-factor-2 and \textsc{Mnist}-\ac{VLAE}-factor-3.
@@ -116,26 +82,71 @@ It also achieves the lowest validation loss among the three models and achieves 
 After achieving the minimum validation loss, however, all models overfit.
 \textsc{Mnist}-\ac{VLAE}-factor-1 overfits stronger than \textsc{Mnist}-\ac{VLAE}-factor-2 or \textsc{Mnist}-\ac{VLAE}-factor-3, leading to the highest validation loss after 200 epochs.
 
-Figure~\ref{fig:fm_activities_sparseness} shows the activities of the feature maps in the different models, scaled by the weights of the following convolutional kernel.
+\begin{figure}
+    \centering
+    \begin{subfigure}{\textwidth}
+        \centering
+        % include second image
+        \includegraphics[height=.8\textheight]{images/sparseness/encoder_fm3_fms.png}
+    \end{subfigure}
+    \caption[\textsc{Mnist}-VLAE-factor-3: Feature Map Activites]{Feature map activities for \textsc{Mnist}-\ac{VLAE}-factor-3.
+    Each boxplot corresponds to the distribution of the mean value of one feature map after the convolution.
+    }
+    \label{fig:fm_activities_sparseness}
+\end{figure}
+Figure~\ref{fig:fm_activities_sparseness} shows the activities of the feature maps in \textsc{Mnist}-\ac{VLAE}-factor-3.
 The bias terms are not considered:
-If the variations in the feature maps are negligible, the feature map itself acts as a bias term for the network.
-Therefore, only the scaled feature map activity variations are considered.
-The network employs sparseness - only few feature maps seem to heavily influence the network.
-Sparsity is apparent in almost all feature maps of all models.
+If the variations in the less-active feature maps are negligible, the feature maps carry no information except for the bias term.
+In that case, it should be possible to downscale the model without significantly impairing the model performance.
+Therefore, the network architecture was changed such that of $n$ feature maps only the $\left \lfloor \frac{n}{4} \right \rfloor$ maps with the highest variance of feature map means remained active.
+Feature maps with lower variance are deactivated by a custom filtering layer.
+By appending a custom layer to each convolutional layer of the original network, the values of the less active feature maps were set to their mean values (as determined on the \textsc{Mnist} validation set, presented in Figure~\ref{fig:fm_activities_sparseness}).
 
-\paragraph{Sparseness in \acp{VLAE} vs. Sparse Representations}
-In the brain, the overlap of active neurons is small, i.e., different neurons are active for different stimuli (see Section~\ref{subsubsec:sparse_representations} and \citet{yoshida2020natural}).
-Contrarily, the \acp{VLAE} show high activity mostly in the same feature maps regardless of the input.
+\begin{figure}
+    \centering
+    \begin{subfigure}{\textwidth}
+        \centering
+        % include second image
+        \includegraphics[height=.8\textheight]{images/sparseness/encoder_fm3_fms_inactive.png}
+    \end{subfigure}
+    \caption[\textsc{Mnist}-VLAE-factor-3: Most Active Feature Maps]{Activities of only the $\left \lfloor \frac{n}{4} \right \rfloor$ most active feature maps in \textsc{Mnist}-\ac{VLAE}-factor-3.
+    Each boxplot corresponds to the distribution of the mean value of one feature map after the convolution.
+    Less active feature maps are set to their mean values.
+    }
+    \label{fig:fm_activities_sparseness_inactive}
+\end{figure}
 
-The \ac{VLAE} uses sparseness mostly regardless of the model capacity, which can be explained by the Lottery Ticket Hypothesis~\citep{frankle2018lottery}.
-The Lottery Ticket Hypothesis states that, in general, it is highly unlikely that re-training a pruned network from scratch will result in the same weight configuration of the subnetwork in the initial model.
-In the three models (\textsc{Mnist}-\ac{VLAE}-factor-1, \textsc{Mnist}-\ac{VLAE}-factor-2, and \textsc{Mnist}-\ac{VLAE}-factor-3), there seems to be a sub-network that accounts for the activity in the model.
-Regardless of the reduction factor, there always remains an active sub-network for all three models.
 
-Therefore, the sparseness in \acp{VLAE} does not seem to be related to sparse representations in the brain.
+Figure~\ref{fig:fm_activities_sparseness_inactive} shows the result of the experimental setup for \textsc{Mnist}-\ac{VLAE}-factor-3\footnote{The plots for the other models can be found in Appendix~\ref{sec:additional_plots_sparseness}.}.
+The feature map activities are high in lower layers.
+However, in higher layers, they are partially lower than in the original network (for example in \textit{ladder\_2\_few\_active\_1}).
+In conclusion, activities of lower feature map are not negligible and cannot be replaced with bias terms because they influence higher layers.
 
-Yet, this analysis is only approximative since averaging over the weights in the convolutional kernel leads to information loss.
-Future work should further investigate if the assumption that \acp{VAE} do not employ sparseness similarly to the brain holds.
+A two-sided Wilcoxon rank-sum test with Benjamini/Hochberg correction for multiple tests was conducted to examine if deactivating feature maps influences the reconstruction quality.
+The \textsc{Mnist} validation set was split in 24 subsets and the reconstruction errors for each subset were compared between the original model and the model with deactivated feature maps.
+\begin{table}
+    \centering
+    \begin{tabular}{lrrr}
+        \toprule
+        Model                             & mean (SD) - Original & mean (SD) - Deactivated & $p$-value \\
+        \midrule
+        \textsc{Mnist}-\ac{VLAE}-factor-1 & 232.759 (8.136)      & 1190.616 (14.710)       & $< 0.001$ \\
+        \textsc{Mnist}-\ac{VLAE}-factor-2 & 208.107 (6.958)      & 1111.337 (16.326)       & $< 0.001$ \\
+        \textsc{Mnist}-\ac{VLAE}-factor-3 & 200.258 (6.822)      & 1106.544 (13.942)       & $< 0.001$ \\
+        \bottomrule
+    \end{tabular}
+    \caption[\textsc{Mnist}-VLAEs: Reconstruction Losses]{Reconstruction losses and $p$-values of the comparisons for the original \textsc{Mnist}-\acp{VLAE} and the versions with deactivated feature maps.}
+    \label{tab:factor-mnists-reconstr}
+\end{table}
+Table~\ref{tab:factor-mnists-reconstr} shows the reconstruction losses, their standard deviations, and the $p$-values of comparing the different models.
+The $p$-values indicate that the reconstructions of the models with deactivated feature maps are significantly worse.
+However, the models still reproduce meaningful digits.
+
+In conclusion, the models do not seem to employ true sparseness like the visual cortex does.
+Feature maps with small activities contribute substantially to the model performance.
+Even though some feature maps are less active than others, they still contribute more than just the bias term.
+Since the feature maps are not truly inactive, decreasing the model size does not lead to more \textit{active} feature maps.
+Yet, it helps preventing overfitting.
 
 \subsection{Latent Space Entanglement and Categorical Factors of Variation}\label{subsec:latent-space-entanglement-and-categorical-factors-of-variation}
 

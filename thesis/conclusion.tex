@@ -1,12 +1,12 @@
 This thesis discussed if \acfp{VAE} are candidate models of the visual cortex, potentially allowing to obtain semantic representations of the input.
 
-\acp{VAE} and \acp{VLAE} neither show Gabor wavelets in early layers, nor does their inner activity seem to be related to sparse coding as observed in the brain.
+\acp{VAE} and \acp{VLAE} neither show Gabor wavelets in early layers, nor do they employ sparseness for inner activities.
 In their current form, neither \acp{VAE} nor \acp{VLAE} seem to be a good model of the visual cortex.
 Modifications of the \ac{VAE} model structure such as top-down connections or recurrent layers allowing for input sequences could shed new light on biological relatedness.
 Even though \acp{VAE} and \acp{VLAE} are not related to the biological example in the lower layers, a \ac{RDM} comparison between \ac{IT} and the high-level representations of \acp{VAE} should be conducted in the future.
 If \ac{VAE}-models fail in explaining cortical activity, it should be investigated why supervised models succeed in this regard.
-One explanation is that the brain mainly learns in a supervised manner and that supervision is always required to build realistic models of the brain.
-This assumption seems to be too naïve for a variety of reasons:
+One possible explanation is that the brain mainly learns in a supervised manner and that supervision is always required to build realistic models of the brain.
+This assumption seems to be too naïve:
 First, the models discussed in this thesis are too unrelated to the brain to allow such a conclusion.
 The role of top-down connections as well as the role of sequential data has not been investigated thoroughly.
 Furthermore, there are unsupervised models leading to Gabor wavelets~\citep{Olshausen1996,berkes2005slow}.
@@ -19,9 +19,9 @@ The higher-layer activity of supervised \acp{CNN} could serve as a biologically 
 This work proposes new means of analyzing latent space entanglement in \acp{VAE} and independence of \ac{VLAE}-generated items.
 It has been shown that \acp{VLAE} do not learn independent factors of variation independently in different layers.
 Furthermore, many factors of variation are learned across multiple layers.
-This is a contradiction to \citet{zhao2017learning}.
+This contradicts the findings of \citet{zhao2017learning}.
 Additionally, studying only model-generated samples can be misguiding because decoders could be able to factor out redundant information in the latent spaces.
-However, the latent distributions are also not independent in terms of generated images as shown by a newly proposed method of analysis.
+However, the latent distributions are also not independent in terms of generated images as shown by the proposed method of analysis.
 \acp{VAE} and \acp{VLAE} often fail in retrieving the data distribution.
 Sampling from the posterior distribution leads to class distributions different from the input data.
 Therefore, latent space entanglement seems to be less controllable for \acp{VLAE} than for \acp{VAE}.
@@ -32,4 +32,4 @@ However, poorly defined \acp{VAE} can even fail in learning continuous factors o
 
 Employing the adversarial loss function instead of the pixel-wise loss does not seem to lead to improvements in terms of biological plausibility or latent space entanglement.
 Yet, decoders of such models apparently do better factor out redundant information in the latent spaces.
-Nonetheless, it is argued that the pixel-wise loss functions has fewer disadvantages but more advantages than the adversarial loss.
+In conclusion, it seems that the pixel-wise loss functions has fewer disadvantages but more advantages than the adversarial loss.

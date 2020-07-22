@@ -16,6 +16,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{pgffor}
 \usepackage{algorithm}
+\usepackage{microtype}
 \usepackage{algpseudocode}
 \usepackage{booktabs}
 \usepackage{listings}
@@ -98,15 +99,14 @@ M.Sc. Zahra Fayyaz
 Unsupervised convolutional neural networks have been successfully applied to various tasks, but their biological plausibility is underexplored.
 Previous research has developed both biologically plausible networks and networks able to generate natural images, but the gap between these network types remains.
 This thesis aims at answering two questions:
-First, whether \acp{VAE} (a specific type of convolutional neural networks) are a biologically plausible model of the visual cortex and, second, whether the latent representations of these networks are related to semantic representations in the brain.
+First, whether \acp{VAE} - a specific type of convolutional neural networks - are a biologically plausible model of the visual cortex, and, second, whether the latent representations of these networks are related to semantic representations in the brain.
 Regarding the first question, it is studied whether they learn similar features as the \acl{V1} and whether they employ sparseness similarly to the brain.
-For the second question, it is investigated how the model maps categorical and continuous attributes in the latent space.
+For answering the second question, it is investigated how the model maps categorical and continuous attributes in the latent space.
 
 For this purpose, six different network types are developed and evaluated on different established datasets.
-It is found that hierarchical and non-hierarchical \acp{VAE} do not learn Gabor wavelets;
-And even though they employ sparseness, this sparseness seems dissimilar to sparseness the in the brain.
-It is shown that feed-forward \ac{VAE}-models trained on static images are probably an inapt model of the visual cortex.
-Furthermore, it is argued that the latent space represents many attributes of datasets in a highly non-linear manner.
+The findings show that hierarchical and non-hierarchical \acp{VAE} do not learn the same low-level visual features as the human brain and that \acp{VAE} do not seem to employ sparseness.
+In conclusion, feed-forward \ac{VAE}-models trained on static images are probably an inapt model of the visual cortex.
+Furthermore, it is argued that the latent space represents many attributes of data\-sets in a highly non-linear manner.
 This asks to revise common assumptions of the latent space structure.
 \restoregeometry
 \clearpage
@@ -156,6 +156,10 @@ This asks to revise common assumptions of the latent space structure.
 % \begin{landscape}
 \section{Network Architectures}\label{sec:appendix_network_architectures}
 \input{appendices/network_architectures}
+
+\pagebreak
+\section{Additional Plots For Section~\ref{subsec:effective-network-capacity}}\label{sec:additional_plots_sparseness}
+\input{appendices/sparseness_plots}
 
 \pagebreak
 \section{Additional Plots For Section~\ref{subsec:latent-space-entanglement-and-categorical-factors-of-variation}}\label{sec:additional_plots_latent_space_entanglement}
