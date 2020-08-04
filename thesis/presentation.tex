@@ -19,6 +19,7 @@
 \usepackage{microtype}
 \usepackage{algpseudocode}
 \usepackage{subcaption}
+\usepackage{pgffor}
 \usepackage{tabularx}
 \usepackage[normalem]{ulem}
 \usepackage{graphicx}
@@ -65,7 +66,6 @@
 \begin{frame}{Outline}
 \tableofcontents
 \end{frame}
-
 
 \section{Introduction}
 \begin{frame}{Biological Plausibility}
@@ -857,4 +857,69 @@ Model                             & mean (SD) - Original & mean (SD) -\linebreak
 \caption{Pixel-wise distributions of different models and moments for the \textsc{Mnist} validation data set - Gaussian prior.}
 \end{figure}
 \end{frame}
+
+\section{Feature Map Stripes}
+\begin{frame}
+\begin{figure}
+\centering
+\begin{subfigure}{0.3\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/stripes/original.jpg}
+\caption{The original image.}
+\label{subfig:stripes_original}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.3\textwidth}
+\centering
+\includegraphics[width=.8\textwidth]{images/stripes/leaky_re_lu_5.png}
+\caption{The feature maps after LeakyReLU 5}
+\label{subfig:lakyrelu5}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.3\textwidth}
+\centering
+\includegraphics[width=.8\textwidth]{images/stripes/max_pooling2d_3.png}
+\caption{The feature maps after max pooling of LeakyReLU 5}
+\label{subfig:maxpool}
+\end{subfigure}
+\end{figure}
+\end{frame}
+
+
+
+\begin{frame}{Test Images}
+\begin{figure}
+\centering
+\foreach \n in {0,...,11}{
+\begin{subfigure}{0.05\textwidth}
+\frame{\includegraphics[width=\textwidth]{images/stripes/test_images/original\n.jpg}}
+\caption{}
+\label{subfig:test_images_stripes\n}
+\end{subfigure}
+\hfill
+}
+\caption[Feature Map Stripes - Test Images]{The test images used to analyze the networks behavior.}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\begin{figure}
+\centering
+\begin{subfigure}{0.45\textwidth}
+\centering
+\includegraphics[height=.8\textheight]{images/stripes/test_img_9/leaky_re_lu_5.png}
+\caption{The original image.}
+\label{subfig:stipes_test_img_leakyrelu5}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.45\textwidth}
+\centering
+\includegraphics[height=.8\textheight]{images/stripes/test_img_9/max_pooling2d_3.png}
+\caption{The feature maps after LeakyReLU 5}
+\label{subfig:stripes_test_img_maxpool3}
+\end{subfigure}
+\caption[Feature Map Stripes on Test Images]{The feature maps with respect to test image~\ref{subfig:test_images_stripes8}.}
+\end{figure}
+\end{frame}
+
 \end{document}
